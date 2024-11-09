@@ -5,15 +5,15 @@
 ![Platform](https://img.shields.io/badge/platform-macOS%20|%20Linux%20|%20Windows-informational)
 ![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)
 
-A powerful, secure, and streamlined cryptographic toolkit built with Python, designed to handle high-level cryptographic needs with ease. This suite offers AES encryption, RSA key management, SHA-384 hashing, and secure key handling, ideal for professional applications that require top-notch security.
+A robust, secure, and streamlined cryptographic toolkit in Python, crafted for high-level cryptographic operations. Designed to meet the demands of modern applications, this suite provides AES encryption, RSA key management, SHA-384 hashing, and secure key handling for professional use cases that require top-notch security.
 
 ## ⚡ Key Features
 
-- **AES Encryption**: Fast, secure encryption in CBC mode with PKCS7 padding.
-- **RSA Key Management**: Generate, serialize, and load RSA keys with OAEP padding for secure asymmetric encryption.
-- **SHA-384 Hashing**: Generate robust SHA-384 hashes, tailored for sensitive data.
-- **Key Management**: Secure storage, retrieval, and rotation of keys with password protection.
-- **Ease of Use**: Simple, well-documented functions for easy integration into larger systems.
+- **AES Encryption**: Secure, efficient encryption in CBC mode with PKCS7 padding.
+- **RSA Key Management**: Generate, serialize, and manage RSA keys with OAEP padding for robust asymmetric encryption.
+- **SHA-384 Hashing**: Generate strong SHA-384 hashes, designed for sensitive data handling.
+- **Comprehensive Key Management**: Securely store, retrieve, and rotate keys, with optional password protection.
+- **Developer-Friendly**: Clean, well-documented functions for seamless integration into larger systems.
 
 ## 🔧 Setup and Installation
 
@@ -46,10 +46,10 @@ export ENCRYPTION_PASSWORD="your_secure_password"
 
 ```plaintext
 cryptography-suite/
-├── encryption.py          # AES encryption and decryption
-├── asymmetric.py          # RSA key generation, encryption, and decryption
+├── encryption.py          # AES encryption and decryption functions
+├── asymmetric.py          # RSA key generation, encryption, and decryption functions
 ├── hashing.py             # SHA-384 hashing and PBKDF2 key derivation
-├── key_management.py      # Key generation, storage, and retrieval
+├── key_management.py      # Key generation, storage, retrieval, and rotation functions
 ├── utils.py               # Utility functions (Base62, byte-char conversions)
 └── example_usage.py       # Example script demonstrating functionality
 ```
@@ -151,9 +151,9 @@ The tests cover encryption, decryption, key verification, and various edge cases
 
 ## 🛠 Advanced Usage and Customization
 
-- **Custom Encryption Modes**: Add alternative encryption modes by extending the `encryption.py` module.
-- **Dynamic Key Sizes**: Change the RSA key size by adjusting `DEFAULT_RSA_KEY_SIZE` in `key_management.py`.
-- **Multi-Layered Hashing**: For highly sensitive data, consider combining multiple hash functions.
+- **Custom Encryption Modes**: Extend the `encryption.py` module to support additional encryption modes.
+- **Dynamic Key Sizes**: Adjust the RSA key size by modifying `DEFAULT_RSA_KEY_SIZE` in `key_management.py`.
+- **Multi-Layered Hashing**: For high-security needs, consider combining multiple hash functions.
 
 ## 📜 License
 
@@ -163,7 +163,7 @@ Licensed under the MIT License. See [LICENSE](LICENSE) for details.
 
 ## 🙏 Acknowledgments
 
-Built using the [cryptography](https://cryptography.io/) library for industry-grade cryptographic operations.
+Built with the [cryptography](https://cryptography.io/) library to ensure robust, industry-grade cryptographic operations.
 
 ## 📬 Contact
 
@@ -171,6 +171,6 @@ Interested in contributing or have questions? Reach out to [psychevus@gmail.com]
 
 ## ✨ Additional Ideas to Level Up
 
-- **Cross-Platform Compatibility**: The suite runs on macOS, Linux, and Windows.
-- **Automated Code Formatting**: Use `black` or `isort` to maintain clean and readable code.
-- **Performance Profiling**: Use `timeit` or `cProfile` to evaluate and enhance encryption/decryption speeds.
+- **Cross-Platform Compatibility**: The suite is compatible with macOS, Linux, and Windows.
+- **Automated Code Formatting**: Use `black` or `isort` for consistent code style.
+- **Performance Profiling**: Optimize cryptographic operations by using tools like `timeit` or `cProfile`.

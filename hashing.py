@@ -30,6 +30,11 @@ def derive_key(password: str, salt: bytes, length: int = 32) -> bytes:
     Derives a cryptographic key from a password using PBKDF2 with HMAC-SHA256.
     Returns the derived key in base64 encoding.
     """
+    if not isinstance(password, str):
+        raise TypeError("Password must be a string")
+    if not password:
+        raise ValueError("Password cannot be empty")
+
     kdf = PBKDF2HMAC(
         algorithm=hashes.SHA256(),
         length=length,

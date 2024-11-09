@@ -30,6 +30,9 @@ def aes_encrypt(plaintext: str, password: str) -> str:
     Encrypts plaintext using AES-CBC with a password-derived key and PBKDF2.
     Returns the encrypted data as a base64-encoded string (IV + ciphertext).
     """
+    if not plaintext:
+        raise ValueError("Plaintext cannot be empty")
+
     salt = urandom(SALT_SIZE)
     key = generate_key(password, salt)
     iv = urandom(16)

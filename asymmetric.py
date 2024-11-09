@@ -9,10 +9,6 @@ RSA_KEY_SIZE = 3072  # Key size for RSA-3072 security
 
 
 def generate_rsa_keys() -> Tuple[rsa.RSAPrivateKey, rsa.RSAPublicKey]:
-    """
-    Generates an RSA-3072 private and public key pair.
-    Returns the private and public keys.
-    """
     private_key = rsa.generate_private_key(
         public_exponent=65537,
         key_size=RSA_KEY_SIZE,
@@ -23,10 +19,12 @@ def generate_rsa_keys() -> Tuple[rsa.RSAPrivateKey, rsa.RSAPublicKey]:
 
 
 def rsa_encrypt(plaintext: str, public_key: rsa.RSAPublicKey) -> str:
-    """
-    Encrypts plaintext using the provided RSA public key with OAEP padding.
-    Returns the encrypted data as a base64-encoded string.
-    """
+    if not isinstance(public_key, rsa.RSAPublicKey):
+        raise TypeError("The provided public key is not an RSA public key.")
+
+    if not plaintext:
+        raise ValueError("Plaintext cannot be empty")
+
     ciphertext = public_key.encrypt(
         plaintext.encode(),
         padding.OAEP(
@@ -39,10 +37,9 @@ def rsa_encrypt(plaintext: str, public_key: rsa.RSAPublicKey) -> str:
 
 
 def rsa_decrypt(encrypted_data: str, private_key: rsa.RSAPrivateKey) -> str:
-    """
-    Decrypts RSA-encrypted data using the provided private key with OAEP padding.
-    Expects base64-encoded input. Returns the original plaintext.
-    """
+    if not isinstance(private_key, rsa.RSAPrivateKey):
+        raise TypeError("The provided private key is not an RSA private key.")
+
     ciphertext = base64.b64decode(encrypted_data)
     plaintext = private_key.decrypt(
         ciphertext,
