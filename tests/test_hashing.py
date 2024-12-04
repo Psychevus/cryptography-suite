@@ -1,73 +1,100 @@
 import unittest
-import base64
-from hashing import sha384_hash, generate_salt, derive_key, verify_derived_key
+
+from cryptography_suite.hashing import (
+    sha256_hash,
+    sha384_hash,
+    sha512_hash,
+    blake2b_hash,
+    derive_key_scrypt,
+    derive_key_pbkdf2,
+    verify_derived_key_scrypt,
+    verify_derived_key_pbkdf2,
+    generate_salt,
+)
 
 
 class TestHashing(unittest.TestCase):
+    def setUp(self):
+        self.data = "Data to hash"
+        self.password = "Password123!"
+        self.salt = generate_salt()
+        self.empty_data = ""
+        self.empty_password = ""
+
+    def test_sha256_hash(self):
+        """Test SHA-256 hashing."""
+        digest = sha256_hash(self.data)
+        self.assertIsInstance(digest, str)
+        self.assertEqual(len(digest), 64)  # SHA-256 hash length in hex
+
     def test_sha384_hash(self):
-        data = "Sensitive Data"
-        hashed = sha384_hash(data)
-        self.assertIsInstance(hashed, str)
+        """Test SHA-384 hashing."""
+        digest = sha384_hash(self.data)
+        self.assertIsInstance(digest, str)
+        self.assertEqual(len(digest), 96)  # SHA-384 hash length in hex
 
-    def test_derived_key_verification(self):
-        data = "Sensitive Data"
-        salt = generate_salt()
-        derived_key = derive_key(data, salt)
-        self.assertTrue(verify_derived_key(data, salt, derived_key))
+    def test_sha512_hash(self):
+        """Test SHA-512 hashing."""
+        digest = sha512_hash(self.data)
+        self.assertIsInstance(digest, str)
+        self.assertEqual(len(digest), 128)  # SHA-512 hash length in hex
 
-    def test_derive_key_empty_data(self):
-        # Test edge case for empty string input to derive_key
-        salt = generate_salt()
+    def test_blake2b_hash(self):
+        """Test BLAKE2b hashing."""
+        digest = blake2b_hash(self.data)
+        self.assertIsInstance(digest, str)
+        self.assertEqual(len(digest), 128)  # BLAKE2b default digest size is 64 bytes
+
+    def test_derive_key_scrypt(self):
+        """Test key derivation using Scrypt."""
+        derived_key = derive_key_scrypt(self.password, self.salt)
+        self.assertIsInstance(derived_key, bytes)
+        self.assertEqual(len(derived_key), 32)
+
+    def test_derive_key_pbkdf2(self):
+        """Test key derivation using PBKDF2."""
+        derived_key = derive_key_pbkdf2(self.password, self.salt)
+        self.assertIsInstance(derived_key, bytes)
+        self.assertEqual(len(derived_key), 32)
+
+    def test_verify_derived_key_scrypt(self):
+        """Test verification of derived key using Scrypt."""
+        derived_key = derive_key_scrypt(self.password, self.salt)
+        self.assertTrue(verify_derived_key_scrypt(self.password, self.salt, derived_key))
+        self.assertFalse(verify_derived_key_scrypt("WrongPassword", self.salt, derived_key))
+
+    def test_verify_derived_key_pbkdf2(self):
+        """Test verification of derived key using PBKDF2."""
+        derived_key = derive_key_pbkdf2(self.password, self.salt)
+        self.assertTrue(verify_derived_key_pbkdf2(self.password, self.salt, derived_key))
+        self.assertFalse(verify_derived_key_pbkdf2("WrongPassword", self.salt, derived_key))
+
+    def test_derive_key_with_empty_password(self):
+        """Test key derivation with empty password."""
         with self.assertRaises(ValueError):
-            derive_key("", salt)  # Expect this to raise an error if empty data is not allowed
+            derive_key_scrypt(self.empty_password, self.salt)
 
-    def test_derive_key_invalid_type(self):
-        # Test invalid data type for password (e.g., None instead of a string)
-        salt = generate_salt()
+    def test_derive_key_with_invalid_salt(self):
+        """Test key derivation with invalid salt."""
         with self.assertRaises(TypeError):
-            derive_key(None, salt)
+            derive_key_scrypt(self.password, "InvalidSalt")
 
-    def test_verify_derived_key_with_wrong_password(self):
-        # Test verify_derived_key with a wrong password
-        salt = generate_salt()
-        correct_key = derive_key("correct_password", salt)
-        self.assertFalse(verify_derived_key("wrong_password", salt, correct_key))
+    def test_verify_derived_key_scrypt_with_invalid_parameters(self):
+        """Test verify_derived_key_scrypt with invalid parameters."""
+        derived_key = derive_key_scrypt(self.password, self.salt)
+        with self.assertRaises(TypeError):
+            verify_derived_key_scrypt(None, self.salt, derived_key)
+        with self.assertRaises(TypeError):
+            verify_derived_key_scrypt(self.password, None, derived_key)
+        with self.assertRaises(TypeError):
+            verify_derived_key_scrypt(self.password, self.salt, None)
 
-    def test_verify_derived_key_with_wrong_salt(self):
-        # Verify with an incorrect salt
-        salt = generate_salt()
-        derived_key = derive_key("password", salt)
-        wrong_salt = generate_salt()
-        self.assertFalse(verify_derived_key("password", wrong_salt, derived_key))
+    def test_derive_key_scrypt_with_empty_password(self):
+        """Test deriving key with empty password using Scrypt."""
+        with self.assertRaises(ValueError) as context:
+            derive_key_scrypt('', self.salt)
+        self.assertEqual(str(context.exception), "Password cannot be empty.")
 
-    def test_verify_derived_key_with_altered_key(self):
-        salt = generate_salt()
-        derived_key = derive_key("password", salt)
-
-        # Convert derived_key to bytes if it’s a string
-        if isinstance(derived_key, str):
-            derived_key = derived_key.encode()
-
-        # Alter the last byte and re-encode in base64
-        altered_key_bytes = derived_key[:-1] + bytes([derived_key[-1] ^ 0x01])
-        altered_key = base64.b64encode(altered_key_bytes).decode()
-
-        # Verify that altered_key fails verification
-        self.assertFalse(verify_derived_key("password", salt, altered_key))
-
-    def test_verify_derived_key_with_corrupt_key(self):
-        salt = generate_salt()
-        derived_key = derive_key("password", salt)
-
-        # Ensure derived_key is in bytes
-        if isinstance(derived_key, str):
-            derived_key = derived_key.encode()
-
-        # Alter the last byte and base64-encode it
-        corrupt_key = base64.b64encode(derived_key[:-1] + b'0').decode()
-
-        # Verify that corrupt_key fails verification
-        self.assertFalse(verify_derived_key("password", salt, corrupt_key))
 
 if __name__ == "__main__":
     unittest.main()

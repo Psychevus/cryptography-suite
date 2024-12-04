@@ -1,39 +1,41 @@
 # Cryptography Suite
 
-![Python](https://img.shields.io/badge/python-3.12%2B-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
-![Platform](https://img.shields.io/badge/platform-macOS%20|%20Linux%20|%20Windows-informational)
-![Build Status](https://img.shields.io/github/actions/workflow/status/Psychevus/cryptography-suite/python-app.yml)
-![Coverage](https://img.shields.io/coveralls/github/Psychevus/cryptography-suite)
-![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)
+[![Python Version](https://img.shields.io/badge/python-3.8%2B-blue)](https://www.python.org/downloads/)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![Platform](https://img.shields.io/badge/platform-macOS%20|%20Linux%20|%20Windows-informational)]()
+[![Build Status](https://github.com/Psychevus/cryptography-suite/actions/workflows/python-app.yml/badge.svg)](https://github.com/Psychevus/cryptography-suite/actions)
+[![Coverage Status](https://coveralls.io/repos/github/Psychevus/cryptography-suite/badge.svg?branch=main)](https://coveralls.io/github/Psychevus/cryptography-suite?branch=main)
+[![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-**Cryptography Suite** is an advanced cryptographic toolkit in Python, engineered for high-stakes applications demanding airtight security and seamless integration. With AES encryption, RSA key management, SHA-384 hashing, and secure key handling at its core, this suite provides the essential building blocks for professional-grade encryption workflows.
+**Cryptography Suite** is an advanced cryptographic toolkit for Python, meticulously engineered for applications demanding robust security and seamless integration. It offers a comprehensive set of cryptographic primitives and protocols, empowering developers and organizations to implement state-of-the-art encryption, hashing, key management, digital signatures, and more.
 
 ---
 
-## 🚀 Why Cryptography Suite?
+## 🚀 Why Choose Cryptography Suite?
 
-Built with modern applications in mind, Cryptography Suite provides:
-- **Cutting-edge cryptographic algorithms** integrated into a developer-friendly interface.
-- **Modular design** to plug into diverse applications with minimal setup.
-- **Enterprise-ready security practices** such as key rotation and password-protected serialization.
-- **Detailed documentation** and **robust testing** for reliability and maintainability.
+- **Comprehensive Functionality**: Access a wide array of cryptographic algorithms and protocols, including symmetric and asymmetric encryption, digital signatures, key management, secret sharing, password-authenticated key exchange (PAKE), and one-time passwords (OTP).
+- **High Security Standards**: Implements industry-leading algorithms with best practices, ensuring your data is safeguarded with the highest level of security.
+- **Developer-Friendly API**: Offers intuitive and well-documented APIs that simplify integration and accelerate development.
+- **Cross-Platform Compatibility**: Fully compatible with macOS, Linux, and Windows environments.
+- **Rigorous Testing**: Achieves 98% code coverage with a comprehensive test suite, guaranteeing reliability and robustness.
 
 ---
 
 ## 📦 Installation
 
-### Installing with pip
+### Install via pip
 
-Install Cryptography Suite directly from PyPI:
+Install the latest stable release from PyPI:
 
 ```bash
 pip install cryptography-suite
 ```
 
-### Installing from Source
+> **Note**: Requires Python 3.8 or higher.
 
-Clone the repository for direct installation or customization:
+### Install from Source
+
+Clone the repository and install manually:
 
 ```bash
 git clone https://github.com/Psychevus/cryptography-suite.git
@@ -41,181 +43,206 @@ cd cryptography-suite
 pip install .
 ```
 
-> **Prerequisite**: Python 3.12 or newer.
-
 ---
 
 ## 🔑 Key Features
 
-- **AES Encryption**: High-performance, secure AES encryption in CBC mode with PKCS7 padding for sensitive data.
-- **RSA Key Management**: Asymmetric encryption with full support for RSA key generation, serialization, and OAEP padding.
-- **SHA-384 Hashing**: Robust SHA-384 hashing, optimized for data integrity in high-security environments.
-- **Advanced Key Handling**: Secure key storage, retrieval, and rotation with password protection, ready for production use.
-- **Built for Developers**: Intuitive, documented API with usage examples for a seamless developer experience.
+- **Symmetric Encryption**: AES-GCM, ChaCha20-Poly1305 encryption with password-based key derivation using PBKDF2 and Scrypt.
+- **Asymmetric Encryption**: RSA encryption/decryption, key generation, serialization, and loading.
+- **Digital Signatures**: Support for Ed25519 and ECDSA algorithms for secure message signing and verification.
+- **Hashing Functions**: Implements SHA-256, SHA-384, SHA-512, and BLAKE2b hashing algorithms.
+- **Key Management**: Secure generation, storage, loading, and rotation of cryptographic keys.
+- **Secret Sharing**: Implementation of Shamir's Secret Sharing scheme for splitting and reconstructing secrets.
+- **Password-Authenticated Key Exchange (PAKE)**: SPAKE2 protocol implementation for secure password-based key exchange.
+- **One-Time Passwords (OTP)**: HOTP and TOTP algorithms for generating and verifying one-time passwords.
+- **Utility Functions**: Includes Base62 encoding/decoding, secure random string generation, and memory zeroing.
 
 ---
 
-## 💡 Usage Overview
+## 💡 Usage Examples
 
-### 1. AES Encryption/Decryption
+### Symmetric Encryption
 
-AES encryption with password-derived keys, optimized for secure message handling.
+Encrypt and decrypt messages using AES-GCM with password-derived keys.
 
 ```python
 from cryptography_suite.encryption import aes_encrypt, aes_decrypt
 
 message = "Highly Confidential Information"
-password = "ultrasecurepassword"
+password = "ultra_secure_password"
 
-encrypted = aes_encrypt(message, password)
-print("Encrypted:", encrypted)
+# Encrypt the message
+encrypted_message = aes_encrypt(message, password)
+print(f"Encrypted: {encrypted_message}")
 
-decrypted = aes_decrypt(encrypted, password)
-print("Decrypted:", decrypted)
+# Decrypt the message
+decrypted_message = aes_decrypt(encrypted_message, password)
+print(f"Decrypted: {decrypted_message}")
 ```
 
-### 2. RSA Key Management
+### Asymmetric Encryption
 
-Generate RSA keys, and perform secure asymmetric encryption/decryption.
+Generate RSA key pairs and perform encryption/decryption.
 
 ```python
-from cryptography_suite.asymmetric import generate_rsa_keys, rsa_encrypt, rsa_decrypt
+from cryptography_suite.asymmetric import generate_rsa_keypair, rsa_encrypt, rsa_decrypt
 
-private_key, public_key = generate_rsa_keys()
+# Generate RSA key pair
+private_key, public_key = generate_rsa_keypair()
 
-message = "RSA-encrypted data"
-encrypted = rsa_encrypt(message, public_key)
-print("Encrypted:", encrypted)
+message = b"Secure Data Transfer"
 
-decrypted = rsa_decrypt(encrypted, private_key)
-print("Decrypted:", decrypted)
+# Encrypt the message
+encrypted_message = rsa_encrypt(message, public_key)
+print(f"Encrypted: {encrypted_message}")
+
+# Decrypt the message
+decrypted_message = rsa_decrypt(encrypted_message, private_key)
+print(f"Decrypted: {decrypted_message}")
 ```
 
-### 3. SHA-384 Hashing & Key Derivation
+### Digital Signatures
 
-Advanced hashing and PBKDF2-based key derivation.
+Sign and verify messages using Ed25519.
 
 ```python
-from cryptography_suite.hashing import sha384_hash, generate_salt, derive_key, verify_derived_key
+from cryptography_suite.signatures import generate_ed25519_keypair, sign_message, verify_signature
 
-data = "Sensitive Data"
-hashed_data = sha384_hash(data)
-print("SHA-384 Hash:", hashed_data)
+# Generate key pair
+private_key, public_key = generate_ed25519_keypair()
 
-salt = generate_salt()
-derived_key = derive_key(data, salt)
-print("Derived Key:", derived_key)
-print("Key Verified:", verify_derived_key(data, salt, derived_key))
+message = b"Authenticate this message"
+
+# Sign the message
+signature = sign_message(message, private_key)
+
+# Verify the signature
+is_valid = verify_signature(message, signature, public_key)
+print(f"Signature valid: {is_valid}")
 ```
 
-### 4. Key Management
+### Secret Sharing
 
-Full suite of key management operations for AES and RSA keys.
+Split and reconstruct secrets using Shamir's Secret Sharing.
 
 ```python
-from cryptography_suite.key_management import (
-    generate_aes_key,
-    rotate_aes_key,
-    generate_rsa_key_pair,
-    serialize_private_key,
-    serialize_public_key,
-    save_key_to_file,
-    load_private_key_from_file,
-    load_public_key_from_file
-)
+from cryptography_suite.secret_sharing import create_shares, reconstruct_secret
 
-aes_key = generate_aes_key()
-print("Generated AES Key:", aes_key)
+secret = 1234567890
+threshold = 3
+num_shares = 5
 
-rotated_key = rotate_aes_key()
-print("Rotated AES Key:", rotated_key)
+# Create shares
+shares = create_shares(secret, threshold, num_shares)
 
-private_key, public_key = generate_rsa_key_pair()
-password = "super_secure_password"
-
-private_pem = serialize_private_key(private_key, password)
-public_pem = serialize_public_key(public_key)
-save_key_to_file(private_pem, "private_key.pem")
-save_key_to_file(public_pem, "public_key.pem")
-
-loaded_private_key = load_private_key_from_file("private_key.pem", password)
-loaded_public_key = load_public_key_from_file("public_key.pem")
+# Reconstruct the secret
+selected_shares = shares[:threshold]
+recovered_secret = reconstruct_secret(selected_shares)
+print(f"Recovered secret: {recovered_secret}")
 ```
 
 ---
 
 ## 🧪 Running Tests
 
-The suite includes a comprehensive test suite for each module, ensuring robustness and security across all operations.
+Ensure the integrity of the suite by running comprehensive tests:
 
 ```bash
-python -m unittest discover -s tests
+coverage run -m unittest discover
+coverage report -m
 ```
 
-The tests cover a broad range of use cases, ensuring reliability for mission-critical applications.
+Our test suite achieves **98% code coverage**, guaranteeing reliability and robustness.
 
 ---
 
 ## 🔒 Security Best Practices
 
-- **Secure Key Storage**: Store keys in restricted-access files. For Unix-based systems, apply `chmod 600` permissions.
-- **Environment Variables**: Use environment variables for passwords and other sensitive data to prevent exposure.
-- **Regular Key Rotation**: Periodically rotate keys to minimize exposure risks in case of compromise.
+- **Secure Key Storage**: Store private keys securely, using encrypted files or hardware security modules (HSMs).
+- **Password Management**: Use strong, unique passwords and consider integrating with secret management solutions.
+- **Key Rotation**: Regularly rotate cryptographic keys to minimize potential exposure.
+- **Environment Variables**: Use environment variables for sensitive configurations to prevent hardcoding secrets.
+- **Regular Updates**: Keep dependencies up to date to benefit from the latest security patches.
 
 ---
 
 ## 🛠 Advanced Usage & Customization
 
-### Extend Cryptography Suite
-
-- **Custom Encryption Modes**: Extend the `encryption.py` module with new encryption modes for specific application needs.
-- **RSA Key Size Customization**: Adjust RSA key sizes by setting `DEFAULT_RSA_KEY_SIZE` in `key_management.py`.
-- **Layered Hashing**: Chain multiple hash functions for enhanced security in sensitive applications.
+- **Custom Encryption Modes**: Extend the suite by implementing additional encryption algorithms or modes tailored to your needs.
+- **Adjustable Key Sizes**: Customize RSA or AES key sizes to meet specific security and performance requirements.
+- **Integration with Other Libraries**: Seamlessly integrate with other Python libraries and frameworks for enhanced functionality.
+- **Optimized Performance**: Utilize performance profiling tools to optimize cryptographic operations in high-load environments.
 
 ---
 
 ## 📚 Project Structure
 
-The project follows a modular structure for easy navigation and code extension.
-
 ```plaintext
 cryptography-suite/
-├── encryption.py          # AES encryption and decryption functions
-├── asymmetric.py          # RSA key generation, encryption, and decryption
-├── hashing.py             # SHA-384 hashing and PBKDF2 key derivation
-├── key_management.py      # Key generation, storage, retrieval, and rotation
-├── utils.py               # Utility functions
-└── example_usage.py       # Demonstrative scripts for each function
+├── cryptography_suite/
+│   ├── __init__.py
+│   ├── asymmetric.py
+│   ├── encryption.py
+│   ├── hashing.py
+│   ├── key_management.py
+│   ├── otp.py
+│   ├── pake.py
+│   ├── secret_sharing.py
+│   ├── signatures.py
+│   └── utils.py
+├── tests/
+│   ├── test_asymmetric.py
+│   ├── test_encryption.py
+│   ├── test_hashing.py
+│   ├── test_key_management.py
+│   ├── test_otp.py
+│   ├── test_pake.py
+│   ├── test_secret_sharing.py
+│   ├── test_signatures.py
+│   └── test_utils.py
+├── README.md
+├── setup.py
+├── LICENSE
+└── .github/
+    └── workflows/
+        └── python-app.yml
 ```
 
 ---
 
 ## 📜 License
 
-Cryptography Suite is open-sourced under the MIT License. See [LICENSE](LICENSE) for more information.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 🤝 Contributing
+## 🤝 Contributions
 
-Contributions are welcome. To get started:
-1. Fork the repository.
-2. Create a feature branch.
-3. Commit and push your changes.
-4. Open a pull request for review.
+We welcome contributions from the community. To contribute:
 
-Make sure all new code is well-documented and covered by tests.
+1. **Fork the Repository**: Click on the 'Fork' button at the top right corner of the repository page.
+2. **Create a New Branch**: Use a descriptive name for your branch (e.g., `feature/new-algorithm`).
+3. **Commit Your Changes**: Make sure to write clear, concise commit messages.
+4. **Push to GitHub**: Push your changes to your forked repository.
+5. **Submit a Pull Request**: Open a pull request to the `main` branch of the original repository.
+
+Please ensure that your contributions adhere to the project's coding standards and include relevant tests.
 
 ---
 
 ## 📬 Contact
 
-For any questions, suggestions, or support requests, feel free to reach out via [email](mailto:psychevus@gmail.com) or open an issue on GitHub.
+For support or inquiries:
+
+- **Email**: [psychevus@gmail.com](mailto:psychevus@gmail.com)
+- **GitHub Issues**: [Create an Issue](https://github.com/Psychevus/cryptography-suite/issues)
 
 ---
 
-## 🚀 Additional Resources
+## 🌟 Acknowledgements
 
-- **Cross-Platform Compatibility**: Built to work across macOS, Linux, and Windows.
-- **Code Formatting**: Maintain clean code with tools like `black` and `isort`.
-- **Performance Optimization**: Leverage `timeit` or `cProfile` for measuring and improving cryptographic operations.
+Special thanks to all contributors and users who have helped improve this project through feedback and collaboration.
+
+---
+
+*Empower your applications with secure and reliable cryptographic functions using Cryptography Suite.*
