@@ -17,7 +17,7 @@
 - **High Security Standards**: Implements industry-leading algorithms with best practices, ensuring your data is safeguarded with the highest level of security.
 - **Developer-Friendly API**: Offers intuitive and well-documented APIs that simplify integration and accelerate development.
 - **Cross-Platform Compatibility**: Fully compatible with macOS, Linux, and Windows environments.
-- **Rigorous Testing**: Achieves **98% code coverage** with a comprehensive test suite, guaranteeing reliability and robustness.
+- **Rigorous Testing**: Achieves **95% code coverage** with a comprehensive test suite, guaranteeing reliability and robustness.
 
 ---
 
@@ -152,7 +152,7 @@ coverage run -m unittest discover
 coverage report -m
 ```
 
-Our test suite achieves **98% code coverage**, guaranteeing reliability and robustness.
+Our test suite achieves **95% code coverage**, guaranteeing reliability and robustness.
 
 ---
 
