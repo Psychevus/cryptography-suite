@@ -6,7 +6,6 @@ create and verify Bulletproof range proofs for values in the range
 """
 from __future__ import annotations
 
-import os
 from typing import Tuple
 
 try:  # pragma: no cover - handle missing optional dependency
@@ -52,4 +51,3 @@ def verify(proof: bytes, commitment: bytes) -> bool:
     if not BULLETPROOF_AVAILABLE:
         raise ImportError("pybulletproofs is required for bulletproof range proofs")
     return bool(pybulletproofs.zkrp_verify(proof, commitment))
-

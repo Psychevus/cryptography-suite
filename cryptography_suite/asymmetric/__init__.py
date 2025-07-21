@@ -80,8 +80,15 @@ def serialize_private_key(private_key, password: str) -> bytes:
     """
     if not password:
         raise ValueError("Password cannot be empty.")
-    if not isinstance(private_key, (
-    rsa.RSAPrivateKey, ec.EllipticCurvePrivateKey, ed25519.Ed25519PrivateKey, x25519.X25519PrivateKey)):
+    if not isinstance(
+        private_key,
+        (
+            rsa.RSAPrivateKey,
+            ec.EllipticCurvePrivateKey,
+            ed25519.Ed25519PrivateKey,
+            x25519.X25519PrivateKey,
+        ),
+    ):
         raise TypeError("Invalid private key type.")
 
     encryption_algorithm = serialization.BestAvailableEncryption(password.encode())
@@ -97,14 +104,21 @@ def serialize_public_key(public_key) -> bytes:
     """
     Serializes a public key to PEM format.
     """
-    if not isinstance(public_key, (rsa.RSAPublicKey, ec.EllipticCurvePublicKey, ed25519.Ed25519PublicKey, x25519.X25519PublicKey)):
+    if not isinstance(
+        public_key,
+        (
+            rsa.RSAPublicKey,
+            ec.EllipticCurvePublicKey,
+            ed25519.Ed25519PublicKey,
+            x25519.X25519PublicKey,
+        ),
+    ):
         raise TypeError("Invalid public key type.")
 
     return public_key.public_bytes(
         encoding=serialization.Encoding.PEM,
         format=serialization.PublicFormat.SubjectPublicKeyInfo,
     )
-
 
 
 def load_private_key(pem_data: bytes, password: str):
@@ -164,7 +178,6 @@ def generate_ec_keypair(curve=ec.SECP256R1()) -> Tuple[ec.EllipticCurvePrivateKe
     private_key = ec.generate_private_key(curve)
     public_key = private_key.public_key()
     return private_key, public_key
-
 
 
 def ec_encrypt(plaintext: bytes, public_key: x25519.X25519PublicKey) -> bytes:

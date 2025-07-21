@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import List
 
+
 def _to_bytes(data: List[int]) -> bytes:
     return bytes(bytearray(data))
 
@@ -122,7 +123,6 @@ def _process_ciphertext(S: List[int], ciphertext: bytes) -> bytes:
 
 
 def _finalize(S: List[int], key: bytes) -> bytes:
-    rate = 16
     S[2] ^= _bytes_to_int(key[0:8])
     S[3] ^= _bytes_to_int(key[8:16])
     _ascon_permutation(S, 12)
