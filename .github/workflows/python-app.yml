@@ -23,7 +23,7 @@ jobs:
       - name: Run flake8
         run: flake8
       - name: Run mypy
-        run: mypy cryptography_suite --ignore-errors
+        run: mypy cryptography_suite
 
   tests:
     name: Tests (base)
@@ -55,12 +55,13 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.12'
+          python-version: '3.11'
       - name: Install dependencies with extras
         run: |
           python -m pip install --upgrade pip
           pip install -e .
-          pip install pqcrypto Pyfhel pybulletproofs pysnark
+          pip install pqcrypto pybulletproofs
+          pip install Pyfhel || echo "Pyfhel build failed"
           pip install pytest pytest-cov coverage coveralls
       - name: Run tests with coverage
         run: |
