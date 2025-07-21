@@ -53,6 +53,19 @@ from .signatures import (
     load_ecdsa_public_key,
 )
 
+try:  # pragma: no cover - optional dependency
+    from .post_quantum import (
+        generate_kyber_keypair,
+        kyber_encapsulate,
+        kyber_decapsulate,
+        generate_dilithium_keypair,
+        dilithium_sign,
+        dilithium_verify,
+        PQCRYPTO_AVAILABLE,
+    )
+except Exception:
+    PQCRYPTO_AVAILABLE = False
+
 from .hashing import (
     sha384_hash,
     sha256_hash,
@@ -174,3 +187,16 @@ __all__ = [
     "secure_zero",
     "generate_secure_random_string",
 ]
+
+# Export post-quantum utilities only when pqcrypto is available
+if PQCRYPTO_AVAILABLE:
+    __all__.extend(
+        [
+            "generate_kyber_keypair",
+            "kyber_encapsulate",
+            "kyber_decapsulate",
+            "generate_dilithium_keypair",
+            "dilithium_sign",
+            "dilithium_verify",
+        ]
+    )
