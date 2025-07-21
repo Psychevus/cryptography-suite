@@ -144,7 +144,7 @@ except Exception:  # pragma: no cover - handle missing pybulletproofs
 try:  # pragma: no cover - optional dependency
     from . import zksnark
 
-    ZKSNARK_AVAILABLE = True
+    ZKSNARK_AVAILABLE = getattr(zksnark, "ZKSNARK_AVAILABLE", False)
 except Exception:  # pragma: no cover - handle missing PySNARK
     zksnark = None
     ZKSNARK_AVAILABLE = False
