@@ -49,7 +49,7 @@ pip install .
 
 - **Symmetric Encryption**: AES-GCM, ChaCha20-Poly1305 encryption with password-based key derivation using PBKDF2 and Scrypt.
 - **Asymmetric Encryption**: RSA encryption/decryption, key generation, serialization, and loading.
-- **Digital Signatures**: Support for Ed25519 and ECDSA algorithms for secure message signing and verification.
+- **Digital Signatures**: Support for Ed25519, ECDSA, and BLS (BLS12-381) algorithms for secure message signing and verification.
 - **Hashing Functions**: Implements SHA-256, SHA-384, SHA-512, and BLAKE2b hashing algorithms.
 - **Key Management**: Secure generation, storage, loading, and rotation of cryptographic keys.
 - **Secret Sharing**: Implementation of Shamir's Secret Sharing scheme for splitting and reconstructing secrets.
@@ -104,22 +104,26 @@ print(f"Decrypted: {decrypted_message}")
 
 ### Digital Signatures
 
-Sign and verify messages using Ed25519.
+Sign and verify messages using Ed25519 or BLS.
 
 ```python
-from cryptography_suite.signatures import generate_ed25519_keypair, sign_message, verify_signature
+from cryptography_suite.signatures import (
+    generate_ed25519_keypair,
+    sign_message,
+    verify_signature,
+)
 
-# Generate key pair
-private_key, public_key = generate_ed25519_keypair()
+# Generate Ed25519 key pair
+ed_priv, ed_pub = generate_ed25519_keypair()
+signature = sign_message(b"Authenticate this message", ed_priv)
+print(verify_signature(b"Authenticate this message", signature, ed_pub))
 
-message = b"Authenticate this message"
+from cryptography_suite.bls import generate_bls_keypair, bls_sign, bls_verify
 
-# Sign the message
-signature = sign_message(message, private_key)
-
-# Verify the signature
-is_valid = verify_signature(message, signature, public_key)
-print(f"Signature valid: {is_valid}")
+# Generate BLS key pair
+bls_sk, bls_pk = generate_bls_keypair()
+bls_sig = bls_sign(b"Authenticate this message", bls_sk)
+print(bls_verify(b"Authenticate this message", bls_sig, bls_pk))
 ```
 
 ### Secret Sharing
