@@ -11,10 +11,10 @@ from typing import Tuple
 
 try:  # pragma: no cover - handle missing optional dependency
     import pybulletproofs
-except Exception as exc:  # pragma: no cover - optional dependency not present
-    raise ImportError(
-        "pybulletproofs is required for bulletproof range proofs"
-    ) from exc
+    BULLETPROOF_AVAILABLE = True
+except Exception:  # pragma: no cover - optional dependency not present
+    pybulletproofs = None  # type: ignore[assignment]
+    BULLETPROOF_AVAILABLE = False
 
 BITS = 32
 
@@ -37,6 +37,9 @@ def prove(value: int) -> Tuple[bytes, bytes, bytes]:
     Tuple[bytes, bytes, bytes]
         ``(proof, commitment, nonce)`` produced by ``pybulletproofs``.
     """
+    if not BULLETPROOF_AVAILABLE:
+        raise ImportError("pybulletproofs is required for bulletproof range proofs")
+
     if not 0 <= value < 2 ** BITS:
         raise ValueError("value out of range")
 
@@ -46,5 +49,7 @@ def prove(value: int) -> Tuple[bytes, bytes, bytes]:
 
 def verify(proof: bytes, commitment: bytes) -> bool:
     """Verify a Bulletproof range proof."""
+    if not BULLETPROOF_AVAILABLE:
+        raise ImportError("pybulletproofs is required for bulletproof range proofs")
     return bool(pybulletproofs.zkrp_verify(proof, commitment))
 

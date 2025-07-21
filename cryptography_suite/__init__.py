@@ -118,11 +118,17 @@ try:  # pragma: no cover - optional dependency
 except Exception:  # pragma: no cover - handle missing Pyfhel
     FHE_AVAILABLE = False
 
-from . import bulletproof
+try:  # pragma: no cover - optional dependency
+    from . import bulletproof
+    BULLETPROOF_AVAILABLE = True
+except Exception:  # pragma: no cover - handle missing pybulletproofs
+    bulletproof = None
+    BULLETPROOF_AVAILABLE = False
 try:  # pragma: no cover - optional dependency
     from . import zksnark
     ZKSNARK_AVAILABLE = True
 except Exception:  # pragma: no cover - handle missing PySNARK
+    zksnark = None
     ZKSNARK_AVAILABLE = False
 
 from .utils import (
@@ -232,7 +238,7 @@ if FHE_AVAILABLE:
     )
 
 # Zero-knowledge proofs
-__all__.extend([
-    "bulletproof",
-    "zksnark",
-])
+if BULLETPROOF_AVAILABLE:
+    __all__.append("bulletproof")
+if ZKSNARK_AVAILABLE:
+    __all__.append("zksnark")
