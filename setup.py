@@ -37,6 +37,7 @@ setup(
     python_requires=">=3.10",
     install_requires=[
         "cryptography>=41.0.3",
+        "py_ecc",
     ],
     extras_require={
         "dev": [
