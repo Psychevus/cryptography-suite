@@ -9,8 +9,10 @@ from .bulletproof import prove as bp_prove, verify as bp_verify, setup as bp_set
 
 try:
     from . import zksnark
-    ZKSNARK_AVAILABLE = True
+
+    ZKSNARK_AVAILABLE = getattr(zksnark, "ZKSNARK_AVAILABLE", False)
 except Exception:
+    zksnark = None  # type: ignore[assignment]
     ZKSNARK_AVAILABLE = False
 
 
@@ -34,4 +36,3 @@ def zksnark_cli(argv: list[str] | None = None) -> None:
     hash_hex, proof_path = zksnark.prove(args.preimage.encode())
     valid = zksnark.verify(hash_hex, proof_path)
     print(f"Hash: {hash_hex}\nProof valid: {valid}")
-

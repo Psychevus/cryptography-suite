@@ -57,6 +57,7 @@ pip install .
 - **One-Time Passwords (OTP)**: HOTP and TOTP algorithms for generating and verifying one-time passwords.
 - **Utility Functions**: Includes Base62 encoding/decoding, secure random string generation, and memory zeroing.
 - **Homomorphic Encryption**: Wrapper around Pyfhel supporting CKKS and BFV schemes.
+- **Zero-Knowledge Proofs**: Bulletproof range proofs and zk-SNARK preimage proofs (optional dependencies).
 
 ---
 
@@ -169,6 +170,19 @@ prod_ct = fhe_multiply(he, ct1, ct2)
 
 print(f"Sum: {fhe_decrypt(he, sum_ct)}")
 print(f"Product: {fhe_decrypt(he, prod_ct)}")
+```
+
+### Zero-Knowledge Proofs
+
+Prove knowledge of a SHA-256 preimage without revealing it. These
+functions require the optional `PySNARK` dependency.
+
+```python
+from cryptography_suite import zksnark
+
+zksnark.setup()
+hash_hex, proof_file = zksnark.prove(b"secret")
+print(zksnark.verify(hash_hex, proof_file))
 ```
 
 ---

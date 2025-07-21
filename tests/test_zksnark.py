@@ -1,14 +1,14 @@
-import pytest
+import unittest
 
-try:
-    from cryptography_suite import zksnark
-except Exception:
-    zksnark = None
+from cryptography_suite import zksnark
 
-@pytest.mark.skipif(zksnark is None, reason="PySNARK not installed")
-def test_zksnark_preimage():
-    zksnark.setup()
-    preimage = b"hello"
-    hash_hex, proof = zksnark.prove(preimage)
-    assert zksnark.verify(hash_hex, proof)
 
+@unittest.skipUnless(
+    getattr(zksnark, "ZKSNARK_AVAILABLE", False), "PySNARK not installed"
+)
+class TestZkSnark(unittest.TestCase):
+    def test_preimage_proof(self) -> None:
+        zksnark.setup()
+        preimage = b"hello"
+        hash_hex, proof = zksnark.prove(preimage)
+        self.assertTrue(zksnark.verify(hash_hex, proof))
