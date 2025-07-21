@@ -53,6 +53,15 @@ from .signatures import (
     load_ecdsa_public_key,
 )
 
+from .post_quantum import (
+    generate_kyber_keypair,
+    kyber_encapsulate,
+    kyber_decapsulate,
+    generate_dilithium_keypair,
+    dilithium_sign,
+    dilithium_verify,
+)
+
 from .hashing import (
     sha384_hash,
     sha256_hash,
@@ -160,6 +169,13 @@ __all__ = [
     # Secret Sharing
     "create_shares",
     "reconstruct_secret",
+    # Post-Quantum
+    "generate_kyber_keypair",
+    "kyber_encapsulate",
+    "kyber_decapsulate",
+    "generate_dilithium_keypair",
+    "dilithium_sign",
+    "dilithium_verify",
     # PAKE
     "SPAKE2Client",
     "SPAKE2Server",
