@@ -1,11 +1,12 @@
 """
 Cryptography Suite Package Initialization.
 
-Provides a comprehensive suite of cryptographic functions including symmetric encryption,
-asymmetric encryption, hashing, key management, digital signatures, secret sharing,
-password-authenticated key exchange, and one-time passwords.
+Provides a comprehensive suite of cryptographic functions including symmetric
+encryption, asymmetric encryption, hashing, key management, digital signatures,
+secret sharing, password-authenticated key exchange, and one-time passwords.
 
-Now includes additional algorithms and enhanced features for cutting-edge security applications.
+Now includes additional algorithms and enhanced features for cutting-edge
+security applications.
 """
 
 __version__ = "1.1.0"
@@ -17,10 +18,13 @@ from .encryption import (
     chacha20_decrypt,
     scrypt_encrypt,
     scrypt_decrypt,
+    argon2_encrypt,
+    argon2_decrypt,
     encrypt_file,
     decrypt_file,
     pbkdf2_encrypt,
     pbkdf2_decrypt,
+    derive_key_argon2,
 )
 from .ascon_cipher import encrypt as ascon_encrypt, decrypt as ascon_decrypt
 
@@ -164,6 +168,8 @@ __all__ = [
     "chacha20_decrypt",
     "scrypt_encrypt",
     "scrypt_decrypt",
+    "argon2_encrypt",
+    "argon2_decrypt",
     "pbkdf2_encrypt",
     "pbkdf2_decrypt",
     "ascon_encrypt",
@@ -209,6 +215,7 @@ __all__ = [
     "blake2b_hash",
     "derive_key_scrypt",
     "derive_key_pbkdf2",
+    "derive_key_argon2",
     "verify_derived_key_scrypt",
     "verify_derived_key_pbkdf2",
     "generate_salt",
