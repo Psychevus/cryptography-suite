@@ -10,6 +10,8 @@ from cryptography_suite.asymmetric import (
     generate_x25519_keypair,
     derive_x25519_shared_key,
     generate_ec_keypair,
+    ec_encrypt,
+    ec_decrypt,
 )
 from cryptography.hazmat.primitives.asymmetric import rsa, x25519, ec
 
@@ -198,6 +200,30 @@ class TestAsymmetric(unittest.TestCase):
         with self.assertRaises(ValueError) as context:
             rsa_encrypt(b'', public_key)
         self.assertEqual(str(context.exception), "Plaintext cannot be empty.")
+
+    def test_ecies_encrypt_decrypt(self):
+        """ECIES encryption and decryption round-trip."""
+        priv, pub = generate_x25519_keypair()
+        data = b"Top secret"
+        ct = ec_encrypt(data, pub)
+        pt = ec_decrypt(ct, priv)
+        self.assertEqual(data, pt)
+
+    def test_ecies_decrypt_with_wrong_key(self):
+        """Decryption should fail with an incorrect private key."""
+        priv, pub = generate_x25519_keypair()
+        wrong_priv, _ = generate_x25519_keypair()
+        ct = ec_encrypt(self.message, pub)
+        with self.assertRaises(ValueError):
+            ec_decrypt(ct, wrong_priv)
+
+    def test_ecies_decrypt_tampered_ciphertext(self):
+        """Tampering with ciphertext must raise an error."""
+        priv, pub = generate_x25519_keypair()
+        ct = ec_encrypt(self.message, pub)
+        tampered = ct[:-1] + bytes([ct[-1] ^ 0x01])
+        with self.assertRaises(ValueError):
+            ec_decrypt(tampered, priv)
 
 
 if __name__ == "__main__":
