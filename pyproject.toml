@@ -1,6 +1,53 @@
 [build-system]
-requires = ["setuptools>=42", "wheel"]
+requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "cryptography-suite"
+version = "1.1.0"
+description = "A comprehensive and secure cryptographic toolkit."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Mojtaba Zaferanloo", email = "psychevus@gmail.com"}]
+keywords = [
+    "cryptography",
+    "encryption",
+    "security",
+    "AES",
+    "RSA",
+    "ChaCha20",
+    "Ed25519",
+    "ECDSA",
+    "hashing",
+    "PAKE",
+    "OTP",
+    "secret sharing",
+]
+classifiers = [
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Security :: Cryptography",
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+]
+
+dependencies = [
+    "cryptography>=41.0.3",
+    "py_ecc",
+]
+
+[project.urls]
+Documentation = "https://github.com/Psychevus/cryptography-suite#readme"
+Source = "https://github.com/Psychevus/cryptography-suite"
+Tracker = "https://github.com/Psychevus/cryptography-suite/issues"
+
+[project.optional-dependencies]
+pqc = ["pqcrypto"]
+fhe = ["Pyfhel"]
+zk = ["pybulletproofs", "PySNARK"]
+dev = ["pytest", "pytest-cov", "coverage", "coveralls"]
 
 [tool.black]
 line-length = 88
