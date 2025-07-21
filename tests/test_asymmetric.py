@@ -68,7 +68,10 @@ class TestAsymmetric(unittest.TestCase):
             serialize_public_key(invalid_public_key)
 
         # Test sign_message_ecdsa with invalid private key
-        from cryptography_suite.signatures import sign_message_ecdsa, generate_ecdsa_keypair
+        from cryptography_suite.asymmetric.signatures import (
+            sign_message_ecdsa,
+            generate_ecdsa_keypair,
+        )
 
         with self.assertRaises(ValueError):
             sign_message_ecdsa(self.message, invalid_private_key)
@@ -78,7 +81,7 @@ class TestAsymmetric(unittest.TestCase):
         signature = sign_message_ecdsa(self.message, private_key)
 
         # Test verify_signature_ecdsa with invalid public key
-        from cryptography_suite.signatures import verify_signature_ecdsa
+        from cryptography_suite.asymmetric.signatures import verify_signature_ecdsa
 
         with self.assertRaises(ValueError):
             verify_signature_ecdsa(self.message, signature, invalid_public_key)
