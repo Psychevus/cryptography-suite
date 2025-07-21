@@ -1,4 +1,4 @@
-from cryptography.hazmat.primitives.asymmetric import ed25519, ec, utils
+from cryptography.hazmat.primitives.asymmetric import ed25519, ec
 from cryptography.hazmat.primitives import serialization, hashes
 from cryptography.exceptions import InvalidSignature
 from typing import Tuple

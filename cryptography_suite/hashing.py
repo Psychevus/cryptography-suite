@@ -1,6 +1,6 @@
 from cryptography.hazmat.primitives import hashes
 
-from .symmetric.kdf import (
+from .symmetric.kdf import (  # noqa: F401
     derive_key_scrypt,
     verify_derived_key_scrypt,
     derive_key_pbkdf2,
@@ -43,5 +43,3 @@ def blake2b_hash(data: str) -> str:
     digest = hashes.Hash(hashes.BLAKE2b(64))
     digest.update(data.encode())
     return digest.finalize().hex()
-
-

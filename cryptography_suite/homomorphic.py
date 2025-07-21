@@ -70,4 +70,3 @@ def add(_: Pyfhel, c1: PyCtxt, c2: PyCtxt) -> PyCtxt:
 def multiply(_: Pyfhel, c1: PyCtxt, c2: PyCtxt) -> PyCtxt:
     """Multiply two ciphertexts."""
     return c1 * c2
-

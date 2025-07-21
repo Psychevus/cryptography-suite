@@ -1,6 +1,7 @@
 from typing import List, Tuple
 import secrets
 
+
 def mod_inverse(a: int, p: int) -> int:
     """
     Computes the modular inverse of a modulo p using extended Euclidean algorithm.

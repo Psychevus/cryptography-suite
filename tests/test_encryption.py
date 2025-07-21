@@ -9,8 +9,6 @@ from cryptography_suite.symmetric import (
     chacha20_encrypt,
     chacha20_decrypt,
     derive_key_argon2,
-    argon2_encrypt,
-    argon2_decrypt,
     encrypt_file,
     decrypt_file,
 )

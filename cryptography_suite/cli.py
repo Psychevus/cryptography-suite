@@ -2,8 +2,6 @@
 from __future__ import annotations
 
 import argparse
-import os
-from hashlib import sha256
 
 from .bulletproof import prove as bp_prove, verify as bp_verify, setup as bp_setup
 

@@ -73,7 +73,7 @@ try:  # pragma: no cover - optional dependency
         dilithium_sign,
         dilithium_verify,
         PQCRYPTO_AVAILABLE,
-    )
+    )  # noqa: F401
 except Exception:  # pragma: no cover - fallback when pqcrypto is missing
     PQCRYPTO_AVAILABLE = False
 
@@ -107,7 +107,7 @@ try:  # pragma: no cover - optional dependency
         decrypt as fhe_decrypt,
         add as fhe_add,
         multiply as fhe_multiply,
-    )
+    )  # noqa: F401
 
     FHE_AVAILABLE = True
 except Exception:  # pragma: no cover - handle missing Pyfhel
