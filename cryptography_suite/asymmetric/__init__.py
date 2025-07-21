@@ -1,8 +1,16 @@
 from typing import Tuple
 
-from cryptography.hazmat.primitives import serialization, hashes
-from cryptography.hazmat.primitives.asymmetric import rsa, padding, ec, ed25519
-from cryptography.hazmat.primitives.asymmetric import x25519
+from cryptography.hazmat.primitives import serialization, hashes, constant_time
+from cryptography.hazmat.primitives.asymmetric import (
+    rsa,
+    padding,
+    ec,
+    ed25519,
+    x25519,
+)
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+from os import urandom
 
 # Constants
 DEFAULT_RSA_KEY_SIZE = 4096  # 4096 bits for enhanced security
@@ -159,19 +167,87 @@ def generate_ec_keypair(curve=ec.SECP256R1()) -> Tuple[ec.EllipticCurvePrivateKe
 
 
 
-def ec_encrypt(plaintext: bytes, public_key: ec.EllipticCurvePublicKey) -> bytes:
+def ec_encrypt(plaintext: bytes, public_key: x25519.X25519PublicKey) -> bytes:
+    """Encrypt ``plaintext`` for ``public_key`` using ECIES.
+
+    This implementation follows best practices:
+
+    1. Generate a fresh ephemeral X25519 key pair.
+    2. Derive the ECDH shared secret with the recipient's public key.
+    3. Use HKDF-SHA256 to turn the shared secret into a 256-bit AES key.
+    4. Encrypt the plaintext with AES-GCM using a random nonce.
+
+    The returned value consists of the ephemeral public key, nonce, and
+    ciphertext concatenated together.
     """
-    Encrypts plaintext using ECIES (Elliptic Curve Integrated Encryption Scheme).
-    """
-    # Note: ECIES is not directly supported in cryptography library.
-    # This is a placeholder for an actual ECIES implementation.
-    raise NotImplementedError("ECIES encryption is not implemented.")
+
+    if not plaintext:
+        raise ValueError("Plaintext cannot be empty.")
+    if not isinstance(public_key, x25519.X25519PublicKey):
+        raise TypeError("Invalid X25519 public key provided.")
+
+    eph_priv = x25519.X25519PrivateKey.generate()
+    shared = eph_priv.exchange(public_key)
+    if constant_time.bytes_eq(shared, b"\x00" * 32):
+        raise ValueError("Invalid shared secret derived.")
+
+    key = HKDF(
+        algorithm=hashes.SHA256(),
+        length=32,
+        salt=None,
+        info=b"cryptography-suite-ecies",
+    ).derive(shared)
+
+    nonce = urandom(12)
+    ciphertext = AESGCM(key).encrypt(nonce, plaintext, None)
+    eph_pub_bytes = eph_priv.public_key().public_bytes(
+        encoding=serialization.Encoding.Raw,
+        format=serialization.PublicFormat.Raw,
+    )
+    return eph_pub_bytes + nonce + ciphertext
 
 
-def ec_decrypt(ciphertext: bytes, private_key: ec.EllipticCurvePrivateKey) -> bytes:
+def ec_decrypt(ciphertext: bytes, private_key: x25519.X25519PrivateKey) -> bytes:
+    """Decrypt ECIES ``ciphertext`` using ``private_key``.
+
+    The ``ciphertext`` must contain the ephemeral public key, nonce, and the
+    AES-GCM encrypted payload produced by :func:`ec_encrypt`.
     """
-    Decrypts ciphertext using ECIES (Elliptic Curve Integrated Encryption Scheme).
-    """
-    # Note: ECIES is not directly supported in cryptography library.
-    # This is a placeholder for an actual ECIES implementation.
-    raise NotImplementedError("ECIES decryption is not implemented.")
+
+    if not ciphertext:
+        raise ValueError("Ciphertext cannot be empty.")
+    if not isinstance(private_key, x25519.X25519PrivateKey):
+        raise TypeError("Invalid X25519 private key provided.")
+    if len(ciphertext) < 32 + 12 + 16:
+        raise ValueError("Invalid ciphertext.")
+
+    eph_pub_bytes = ciphertext[:32]
+    nonce = ciphertext[32:44]
+    enc = ciphertext[44:]
+
+    eph_pub = x25519.X25519PublicKey.from_public_bytes(eph_pub_bytes)
+
+    if not constant_time.bytes_eq(
+        eph_pub.public_bytes(
+            encoding=serialization.Encoding.Raw,
+            format=serialization.PublicFormat.Raw,
+        ),
+        eph_pub_bytes,
+    ):
+        raise ValueError("Invalid ephemeral public key.")
+
+    shared = private_key.exchange(eph_pub)
+    if constant_time.bytes_eq(shared, b"\x00" * 32):
+        raise ValueError("Invalid shared secret derived.")
+
+    key = HKDF(
+        algorithm=hashes.SHA256(),
+        length=32,
+        salt=None,
+        info=b"cryptography-suite-ecies",
+    ).derive(shared)
+
+    try:
+        return AESGCM(key).decrypt(nonce, enc, None)
+    except Exception as exc:  # pragma: no cover - high-level error handling
+        raise ValueError(f"Decryption failed: {exc}") from exc
