@@ -47,7 +47,7 @@ pip install .
 
 ## 🔑 Key Features
 
-- **Symmetric Encryption**: AES-GCM, ChaCha20-Poly1305 encryption with password-based key derivation using PBKDF2 and Scrypt.
+- **Symmetric Encryption**: AES-GCM, ChaCha20-Poly1305 encryption with password-based key derivation using PBKDF2, Scrypt, or Argon2.
 - **Asymmetric Encryption**: RSA encryption/decryption, key generation, serialization, and loading.
 - **Digital Signatures**: Support for Ed25519, ECDSA, and BLS (BLS12-381) algorithms for secure message signing and verification.
 - **Hashing Functions**: Implements SHA-256, SHA-384, SHA-512, and BLAKE2b hashing algorithms.
@@ -80,7 +80,14 @@ print(f"Encrypted: {encrypted_message}")
 # Decrypt the message
 decrypted_message = aes_decrypt(encrypted_message, password)
 print(f"Decrypted: {decrypted_message}")
+
+# Use Argon2 key derivation
+argon2_encrypted = aes_encrypt(message, password, kdf="argon2")
+print(aes_decrypt(argon2_encrypted, password, kdf="argon2"))
 ```
+
+Argon2id support is provided by the `cryptography` package and requires no
+additional dependencies.
 
 ### Asymmetric Encryption
 

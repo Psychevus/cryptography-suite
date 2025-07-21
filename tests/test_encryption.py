@@ -8,6 +8,9 @@ from cryptography_suite.encryption import (
     aes_decrypt,
     chacha20_encrypt,
     chacha20_decrypt,
+    derive_key_argon2,
+    argon2_encrypt,
+    argon2_decrypt,
     encrypt_file,
     decrypt_file,
 )
@@ -31,6 +34,28 @@ class TestEncryption(unittest.TestCase):
         encrypted = aes_encrypt(self.message, self.password, kdf='pbkdf2')
         decrypted = aes_decrypt(encrypted, self.password, kdf='pbkdf2')
         self.assertEqual(self.message, decrypted)
+
+    def test_aes_encrypt_decrypt_argon2(self):
+        """Test AES encryption and decryption with Argon2id KDF."""
+        encrypted = aes_encrypt(self.message, self.password, kdf='argon2')
+        decrypted = aes_decrypt(encrypted, self.password, kdf='argon2')
+        self.assertEqual(self.message, decrypted)
+
+    def test_derive_key_argon2(self):
+        """Test Argon2id key derivation is deterministic and correct length."""
+        salt = os.urandom(16)
+        key1 = derive_key_argon2(self.password, salt)
+        key2 = derive_key_argon2(self.password, salt)
+        self.assertEqual(key1, key2)
+        self.assertEqual(len(key1), 32)
+
+    def test_derive_key_argon2_different_salt(self):
+        """Different salts should produce different Argon2id keys."""
+        salt1 = os.urandom(16)
+        salt2 = os.urandom(16)
+        key1 = derive_key_argon2(self.password, salt1)
+        key2 = derive_key_argon2(self.password, salt2)
+        self.assertNotEqual(key1, key2)
 
     def test_aes_decrypt_with_wrong_password(self):
         """Test AES decryption with incorrect password."""
@@ -88,9 +113,16 @@ class TestEncryption(unittest.TestCase):
         encrypt_file(test_filename, encrypted_filename, self.password)
 
         with self.assertRaises(ValueError) as context:
-            decrypt_file(encrypted_filename, "should_not_exist.txt", "WrongPassword")
+            decrypt_file(
+                encrypted_filename,
+                "should_not_exist.txt",
+                "WrongPassword",
+            )
 
-        self.assertIn("Invalid password or corrupted file", str(context.exception))
+        self.assertIn(
+            "Invalid password or corrupted file",
+            str(context.exception),
+        )
 
         # Clean up
         os.remove(test_filename)
@@ -158,7 +190,12 @@ class TestEncryption(unittest.TestCase):
             f.write(self.message)
 
         with self.assertRaises(ValueError):
-            encrypt_file(test_filename, "output.enc", self.password, kdf="invalid_kdf")
+            encrypt_file(
+                test_filename,
+                "output.enc",
+                self.password,
+                kdf="invalid_kdf",
+            )
 
         os.remove(test_filename)
 
@@ -181,18 +218,29 @@ class TestEncryption(unittest.TestCase):
     def test_aes_encrypt_with_invalid_kdf(self):
         """Test AES encryption with an unsupported KDF."""
         with self.assertRaises(ValueError):
-            aes_encrypt(self.message, self.password, kdf='invalid_kdf')
+            aes_encrypt(
+                self.message,
+                self.password,
+                kdf='invalid_kdf',
+            )
 
     def test_aes_encrypt_with_unsupported_kdf(self):
         """Test AES encryption with an unsupported KDF."""
         with self.assertRaises(ValueError):
-            aes_encrypt(self.message, self.password, kdf='unsupported_kdf')
+            aes_encrypt(
+                self.message,
+                self.password,
+                kdf='unsupported_kdf',
+            )
 
     def test_aes_decrypt_with_empty_encrypted_data(self):
         """Test AES decryption with empty encrypted data."""
         with self.assertRaises(ValueError) as context:
             aes_decrypt('', self.password)
-        self.assertEqual(str(context.exception), "Encrypted data cannot be empty.")
+        self.assertEqual(
+            str(context.exception),
+            "Encrypted data cannot be empty.",
+        )
 
     def test_aes_decrypt_with_empty_password(self):
         """Test AES decryption with empty password."""
@@ -234,7 +282,10 @@ class TestEncryption(unittest.TestCase):
             f.write(self.message)
         with self.assertRaises(ValueError) as context:
             encrypt_file(test_filename, "output.enc", '')
-        self.assertEqual(str(context.exception), "Password cannot be empty.")
+        self.assertEqual(
+            str(context.exception),
+            "Password cannot be empty.",
+        )
         os.remove(test_filename)
 
     def test_encrypt_file_with_unsupported_kdf(self):
@@ -243,8 +294,16 @@ class TestEncryption(unittest.TestCase):
         with open(test_filename, "w") as f:
             f.write(self.message)
         with self.assertRaises(ValueError) as context:
-            encrypt_file(test_filename, "output.enc", self.password, kdf='unsupported_kdf')
-        self.assertEqual(str(context.exception), "Unsupported KDF specified.")
+            encrypt_file(
+                test_filename,
+                "output.enc",
+                self.password,
+                kdf='unsupported_kdf',
+            )
+        self.assertEqual(
+            str(context.exception),
+            "Unsupported KDF specified.",
+        )
         os.remove(test_filename)
 
     def test_decrypt_file_with_unsupported_kdf(self):
@@ -255,8 +314,16 @@ class TestEncryption(unittest.TestCase):
             f.write(self.message)
         encrypt_file(test_filename, encrypted_filename, self.password)
         with self.assertRaises(ValueError) as context:
-            decrypt_file(encrypted_filename, "output_decrypted.txt", self.password, kdf='unsupported_kdf')
-        self.assertEqual(str(context.exception), "Unsupported KDF specified.")
+            decrypt_file(
+                encrypted_filename,
+                "output_decrypted.txt",
+                self.password,
+                kdf='unsupported_kdf',
+            )
+        self.assertEqual(
+            str(context.exception),
+            "Unsupported KDF specified.",
+        )
         os.remove(test_filename)
         os.remove(encrypted_filename)
 
@@ -264,15 +331,29 @@ class TestEncryption(unittest.TestCase):
         """Test encrypt_file handling of I/O error."""
         with patch("builtins.open", side_effect=IOError("File not found")):
             with self.assertRaises(IOError) as context:
-                encrypt_file("nonexistent.txt", "output.enc", self.password)
-            self.assertIn("File encryption failed", str(context.exception))
+                encrypt_file(
+                    "nonexistent.txt",
+                    "output.enc",
+                    self.password,
+                )
+            self.assertIn(
+                "File encryption failed",
+                str(context.exception),
+            )
 
     def test_decrypt_file_io_error(self):
         """Test decrypt_file handling of I/O error."""
         with patch("builtins.open", side_effect=IOError("File not found")):
             with self.assertRaises(IOError) as context:
-                decrypt_file("nonexistent.enc", "output.txt", self.password)
-            self.assertIn("Failed to read encrypted file", str(context.exception))
+                decrypt_file(
+                    "nonexistent.enc",
+                    "output.txt",
+                    self.password,
+                )
+            self.assertIn(
+                "Failed to read encrypted file",
+                str(context.exception),
+            )
 
 
 if __name__ == "__main__":
