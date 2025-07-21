@@ -4,12 +4,8 @@ import base64
 import os
 from os import urandom
 
-from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-
-# Constants for streaming file encryption
-CHUNK_SIZE = 4096
-TAG_SIZE = 16  # AES-GCM authentication tag size
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 from .kdf import (
     NONCE_SIZE,
@@ -18,6 +14,10 @@ from .kdf import (
     derive_key_pbkdf2,
     derive_key_scrypt,
 )
+
+# Constants for streaming file encryption
+CHUNK_SIZE = 4096
+TAG_SIZE = 16  # AES-GCM authentication tag size
 
 
 def aes_encrypt(plaintext: str, password: str, kdf: str = "scrypt") -> str:
