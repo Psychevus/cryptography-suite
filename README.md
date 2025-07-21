@@ -1,6 +1,6 @@
 # Cryptography Suite
 
-[![Python Version](https://img.shields.io/badge/python-3.8%2B-blue)](https://www.python.org/downloads/)
+[![Python Version](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-macOS%20|%20Linux%20|%20Windows-informational)]()
 [![Build Status](https://github.com/Psychevus/cryptography-suite/actions/workflows/python-app.yml/badge.svg)](https://github.com/Psychevus/cryptography-suite/actions)
@@ -31,7 +31,7 @@ Install the latest stable release from PyPI:
 pip install cryptography-suite
 ```
 
-> **Note**: Requires Python 3.8 or higher.
+> **Note**: Requires Python 3.10 or higher. Homomorphic encryption features need `Pyfhel` installed separately.
 
 ### Install from Source
 
@@ -56,6 +56,7 @@ pip install .
 - **Password-Authenticated Key Exchange (PAKE)**: SPAKE2 protocol implementation for secure password-based key exchange.
 - **One-Time Passwords (OTP)**: HOTP and TOTP algorithms for generating and verifying one-time passwords.
 - **Utility Functions**: Includes Base62 encoding/decoding, secure random string generation, and memory zeroing.
+- **Homomorphic Encryption**: Wrapper around Pyfhel supporting CKKS and BFV schemes.
 
 ---
 
@@ -141,6 +142,31 @@ recovered_secret = reconstruct_secret(selected_shares)
 print(f"Recovered secret: {recovered_secret}")
 ```
 
+### Homomorphic Encryption
+
+Perform arithmetic over encrypted values using Pyfhel.
+
+```python
+from cryptography_suite.homomorphic import (
+    fhe_keygen,
+    fhe_encrypt,
+    fhe_decrypt,
+    fhe_add,
+    fhe_multiply,
+)
+
+he = fhe_keygen("CKKS")
+
+ct1 = fhe_encrypt(he, 10.5)
+ct2 = fhe_encrypt(he, 5.25)
+
+sum_ct = fhe_add(he, ct1, ct2)
+prod_ct = fhe_multiply(he, ct1, ct2)
+
+print(f"Sum: {fhe_decrypt(he, sum_ct)}")
+print(f"Product: {fhe_decrypt(he, prod_ct)}")
+```
+
 ---
 
 ## 🧪 Running Tests
@@ -189,6 +215,7 @@ cryptography-suite/
 │   ├── pake.py
 │   ├── secret_sharing.py
 │   ├── signatures.py
+│   ├── homomorphic.py
 │   └── utils.py
 ├── tests/
 │   ├── test_asymmetric.py
@@ -201,6 +228,7 @@ cryptography-suite/
 │   ├── test_signatures.py
 │   └── test_utils.py
 ├── README.md
+├── demo_homomorphic.py
 ├── setup.py
 ├── LICENSE
 └── .github/

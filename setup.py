@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="cryptography-suite",
-    version="1.0.0",
+    version="1.1.0",
     description="A comprehensive and secure cryptographic toolkit.",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
@@ -34,7 +34,7 @@ setup(
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
     ],
-    python_requires=">=3.8",
+    python_requires=">=3.10",
     install_requires=[
         "cryptography>=41.0.3",
     ],
