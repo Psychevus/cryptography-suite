@@ -115,6 +115,12 @@ from .otp import (
     verify_hotp,
 )
 
+from .signal_protocol import (
+    SignalSender,
+    SignalReceiver,
+    initialize_signal_session,
+)
+
 try:  # pragma: no cover - optional dependency
     from .homomorphic import (
         keygen as fhe_keygen,
@@ -123,18 +129,21 @@ try:  # pragma: no cover - optional dependency
         add as fhe_add,
         multiply as fhe_multiply,
     )
+
     FHE_AVAILABLE = True
 except Exception:  # pragma: no cover - handle missing Pyfhel
     FHE_AVAILABLE = False
 
 try:  # pragma: no cover - optional dependency
     from . import bulletproof
+
     BULLETPROOF_AVAILABLE = True
 except Exception:  # pragma: no cover - handle missing pybulletproofs
     bulletproof = None
     BULLETPROOF_AVAILABLE = False
 try:  # pragma: no cover - optional dependency
     from . import zksnark
+
     ZKSNARK_AVAILABLE = True
 except Exception:  # pragma: no cover - handle missing PySNARK
     zksnark = None
@@ -228,6 +237,10 @@ __all__ = [
     "base62_decode",
     "secure_zero",
     "generate_secure_random_string",
+    # Signal Protocol
+    "SignalSender",
+    "SignalReceiver",
+    "initialize_signal_session",
 ]
 
 # Export post-quantum utilities only when pqcrypto is available
