@@ -54,6 +54,14 @@ from .signatures import (
     load_ecdsa_public_key,
 )
 
+from .bls import (
+    generate_bls_keypair,
+    bls_sign,
+    bls_verify,
+    bls_aggregate,
+    bls_aggregate_verify,
+)
+
 try:  # pragma: no cover - optional dependency
     from .post_quantum import (
         generate_kyber_keypair,
@@ -179,6 +187,12 @@ __all__ = [
     "serialize_ecdsa_public_key",
     "load_ecdsa_private_key",
     "load_ecdsa_public_key",
+    # BLS Signatures
+    "generate_bls_keypair",
+    "bls_sign",
+    "bls_verify",
+    "bls_aggregate",
+    "bls_aggregate_verify",
     # Hashing
     "sha384_hash",
     "sha256_hash",
