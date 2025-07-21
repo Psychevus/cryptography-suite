@@ -222,5 +222,24 @@ def main():
     rotated_key = rotate_aes_key()
     print(f"Rotated AES Key: {rotated_key.hex()}")
 
+    # Homomorphic Encryption Demo
+    print("\n=== Homomorphic Encryption ===")
+    try:
+        from cryptography_suite.homomorphic import (
+            fhe_keygen,
+            fhe_encrypt,
+            fhe_decrypt,
+            fhe_add,
+            fhe_multiply,
+        )
+
+        fhe = fhe_keygen("CKKS")
+        c1 = fhe_encrypt(fhe, 10.5)
+        c2 = fhe_encrypt(fhe, 5.25)
+        print("Decrypted Sum:", fhe_decrypt(fhe, fhe_add(fhe, c1, c2)))
+        print("Decrypted Product:", fhe_decrypt(fhe, fhe_multiply(fhe, c1, c2)))
+    except ImportError:
+        print("Pyfhel not installed; skipping homomorphic encryption demo.")
+
 if __name__ == "__main__":
     main()

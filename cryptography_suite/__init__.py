@@ -8,7 +8,7 @@ password-authenticated key exchange, and one-time passwords.
 Now includes additional algorithms and enhanced features for cutting-edge security applications.
 """
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
 from .encryption import (
     aes_encrypt,
@@ -106,6 +106,18 @@ from .otp import (
     verify_hotp,
 )
 
+try:  # pragma: no cover - optional dependency
+    from .homomorphic import (
+        keygen as fhe_keygen,
+        encrypt as fhe_encrypt,
+        decrypt as fhe_decrypt,
+        add as fhe_add,
+        multiply as fhe_multiply,
+    )
+    FHE_AVAILABLE = True
+except Exception:  # pragma: no cover - handle missing Pyfhel
+    FHE_AVAILABLE = False
+
 from .utils import (
     base62_encode,
     base62_decode,
@@ -198,5 +210,16 @@ if PQCRYPTO_AVAILABLE:
             "generate_dilithium_keypair",
             "dilithium_sign",
             "dilithium_verify",
+        ]
+    )
+
+if FHE_AVAILABLE:
+    __all__.extend(
+        [
+            "fhe_keygen",
+            "fhe_encrypt",
+            "fhe_decrypt",
+            "fhe_add",
+            "fhe_multiply",
         ]
     )
