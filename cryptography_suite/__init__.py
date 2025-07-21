@@ -53,14 +53,18 @@ from .signatures import (
     load_ecdsa_public_key,
 )
 
-from .post_quantum import (
-    generate_kyber_keypair,
-    kyber_encapsulate,
-    kyber_decapsulate,
-    generate_dilithium_keypair,
-    dilithium_sign,
-    dilithium_verify,
-)
+try:  # pragma: no cover - optional dependency
+    from .post_quantum import (
+        generate_kyber_keypair,
+        kyber_encapsulate,
+        kyber_decapsulate,
+        generate_dilithium_keypair,
+        dilithium_sign,
+        dilithium_verify,
+        PQCRYPTO_AVAILABLE,
+    )
+except Exception:
+    PQCRYPTO_AVAILABLE = False
 
 from .hashing import (
     sha384_hash,
@@ -169,13 +173,6 @@ __all__ = [
     # Secret Sharing
     "create_shares",
     "reconstruct_secret",
-    # Post-Quantum
-    "generate_kyber_keypair",
-    "kyber_encapsulate",
-    "kyber_decapsulate",
-    "generate_dilithium_keypair",
-    "dilithium_sign",
-    "dilithium_verify",
     # PAKE
     "SPAKE2Client",
     "SPAKE2Server",
@@ -190,3 +187,16 @@ __all__ = [
     "secure_zero",
     "generate_secure_random_string",
 ]
+
+# Export post-quantum utilities only when pqcrypto is available
+if PQCRYPTO_AVAILABLE:
+    __all__.extend(
+        [
+            "generate_kyber_keypair",
+            "kyber_encapsulate",
+            "kyber_decapsulate",
+            "generate_dilithium_keypair",
+            "dilithium_sign",
+            "dilithium_verify",
+        ]
+    )

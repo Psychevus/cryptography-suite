@@ -10,8 +10,15 @@ from __future__ import annotations
 
 from typing import Tuple
 
-from pqcrypto.kem import ml_kem_512, ml_kem_768, ml_kem_1024
-from pqcrypto.sign import ml_dsa_44, ml_dsa_65, ml_dsa_87
+try:  # pragma: no cover - optional dependency
+    from pqcrypto.kem import ml_kem_512, ml_kem_768, ml_kem_1024
+    from pqcrypto.sign import ml_dsa_44, ml_dsa_65, ml_dsa_87
+
+    PQCRYPTO_AVAILABLE = True
+except Exception:  # pragma: no cover - graceful fallback
+    PQCRYPTO_AVAILABLE = False
+    ml_kem_512 = ml_kem_768 = ml_kem_1024 = None
+    ml_dsa_44 = ml_dsa_65 = ml_dsa_87 = None
 
 
 _KYBER_LEVEL_MAP = {512: ml_kem_512, 768: ml_kem_768, 1024: ml_kem_1024}
@@ -31,6 +38,9 @@ def generate_kyber_keypair(level: int = 512) -> Tuple[bytes, bytes]:
     Tuple[bytes, bytes]
         ``(public_key, secret_key)``.
     """
+    if not PQCRYPTO_AVAILABLE:
+        raise ImportError("pqcrypto is required for Kyber functions")
+
     alg = _KYBER_LEVEL_MAP.get(level)
     if alg is None:
         raise ValueError("Invalid Kyber level")
@@ -52,6 +62,9 @@ def kyber_encapsulate(public_key: bytes, level: int = 512) -> Tuple[bytes, bytes
     Tuple[bytes, bytes]
         ``(ciphertext, shared_secret)``.
     """
+    if not PQCRYPTO_AVAILABLE:
+        raise ImportError("pqcrypto is required for Kyber functions")
+
     alg = _KYBER_LEVEL_MAP.get(level)
     if alg is None:
         raise ValueError("Invalid Kyber level")
@@ -75,6 +88,9 @@ def kyber_decapsulate(ciphertext: bytes, secret_key: bytes, level: int = 512) ->
     bytes
         The shared secret.
     """
+    if not PQCRYPTO_AVAILABLE:
+        raise ImportError("pqcrypto is required for Kyber functions")
+
     alg = _KYBER_LEVEL_MAP.get(level)
     if alg is None:
         raise ValueError("Invalid Kyber level")
@@ -94,6 +110,9 @@ def generate_dilithium_keypair(level: int = 2) -> Tuple[bytes, bytes]:
     Tuple[bytes, bytes]
         ``(public_key, secret_key)``.
     """
+    if not PQCRYPTO_AVAILABLE:
+        raise ImportError("pqcrypto is required for Dilithium functions")
+
     alg = _DILITHIUM_LEVEL_MAP.get(level)
     if alg is None:
         raise ValueError("Invalid Dilithium level")
@@ -117,13 +136,18 @@ def dilithium_sign(message: bytes, secret_key: bytes, level: int = 2) -> bytes:
     bytes
         Signature bytes.
     """
+    if not PQCRYPTO_AVAILABLE:
+        raise ImportError("pqcrypto is required for Dilithium functions")
+
     alg = _DILITHIUM_LEVEL_MAP.get(level)
     if alg is None:
         raise ValueError("Invalid Dilithium level")
     return alg.sign(secret_key, message)
 
 
-def dilithium_verify(message: bytes, signature: bytes, public_key: bytes, level: int = 2) -> bool:
+def dilithium_verify(
+    message: bytes, signature: bytes, public_key: bytes, level: int = 2
+) -> bool:
     """Verify a Dilithium signature.
 
     Parameters
@@ -142,6 +166,9 @@ def dilithium_verify(message: bytes, signature: bytes, public_key: bytes, level:
     bool
         ``True`` if the signature is valid, ``False`` otherwise.
     """
+    if not PQCRYPTO_AVAILABLE:
+        raise ImportError("pqcrypto is required for Dilithium functions")
+
     alg = _DILITHIUM_LEVEL_MAP.get(level)
     if alg is None:
         raise ValueError("Invalid Dilithium level")
@@ -150,4 +177,3 @@ def dilithium_verify(message: bytes, signature: bytes, public_key: bytes, level:
         return True
     except Exception:
         return False
-

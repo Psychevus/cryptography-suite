@@ -1,6 +1,7 @@
 import unittest
 
 from cryptography_suite.post_quantum import (
+    PQCRYPTO_AVAILABLE,
     generate_kyber_keypair,
     kyber_encapsulate,
     kyber_decapsulate,
@@ -10,6 +11,7 @@ from cryptography_suite.post_quantum import (
 )
 
 
+@unittest.skipUnless(PQCRYPTO_AVAILABLE, "pqcrypto not installed")
 class TestPostQuantum(unittest.TestCase):
     def test_kyber_kem(self):
         pk, sk = generate_kyber_keypair()
