@@ -22,6 +22,7 @@ from .encryption import (
     pbkdf2_encrypt,
     pbkdf2_decrypt,
 )
+from .ascon_cipher import encrypt as ascon_encrypt, decrypt as ascon_decrypt
 
 from .asymmetric import (
     generate_rsa_keypair,
@@ -148,6 +149,8 @@ __all__ = [
     "scrypt_decrypt",
     "pbkdf2_encrypt",
     "pbkdf2_decrypt",
+    "ascon_encrypt",
+    "ascon_decrypt",
     "encrypt_file",
     "decrypt_file",
     # Asymmetric
