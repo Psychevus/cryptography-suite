@@ -232,14 +232,27 @@ Our test suite achieves **95% code coverage**, guaranteeing reliability and robu
 cryptography-suite/
 ├── cryptography_suite/
 │   ├── __init__.py
-│   ├── asymmetric.py
-│   ├── encryption.py
+│   ├── symmetric/
+│   │   ├── __init__.py
+│   │   ├── aes.py
+│   │   ├── chacha.py
+│   │   ├── ascon.py
+│   │   └── kdf.py
+│   ├── asymmetric/
+│   │   ├── __init__.py
+│   │   ├── bls.py
+│   │   └── signatures.py
+│   ├── pqc/
+│   │   └── __init__.py
+│   ├── zk/
+│   │   ├── __init__.py
+│   │   ├── bulletproof.py
+│   │   └── zksnark.py
 │   ├── hashing.py
 │   ├── key_management.py
 │   ├── otp.py
 │   ├── pake.py
 │   ├── secret_sharing.py
-│   ├── signatures.py
 │   ├── homomorphic.py
 │   └── utils.py
 ├── tests/

@@ -1,6 +1,6 @@
 import unittest
 
-from cryptography_suite.post_quantum import (
+from cryptography_suite.pqc import (
     PQCRYPTO_AVAILABLE,
     generate_kyber_keypair,
     kyber_encapsulate,

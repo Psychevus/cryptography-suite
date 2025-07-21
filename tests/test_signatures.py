@@ -1,5 +1,5 @@
 import unittest
-from cryptography_suite.signatures import (
+from cryptography_suite.asymmetric.signatures import (
     generate_ed25519_keypair,
     sign_message,
     verify_signature,

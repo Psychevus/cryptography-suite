@@ -1,17 +1,9 @@
-"""
-Cryptography Suite Package Initialization.
-
-Provides a comprehensive suite of cryptographic functions including symmetric
-encryption, asymmetric encryption, hashing, key management, digital signatures,
-secret sharing, password-authenticated key exchange, and one-time passwords.
-
-Now includes additional algorithms and enhanced features for cutting-edge
-security applications.
-"""
+"""Cryptography Suite Package Initialization."""
 
 __version__ = "1.1.0"
 
-from .encryption import (
+# Symmetric primitives -------------------------------------------------------
+from .symmetric import (
     aes_encrypt,
     aes_decrypt,
     chacha20_encrypt,
@@ -20,14 +12,21 @@ from .encryption import (
     scrypt_decrypt,
     argon2_encrypt,
     argon2_decrypt,
-    encrypt_file,
-    decrypt_file,
     pbkdf2_encrypt,
     pbkdf2_decrypt,
+    encrypt_file,
+    decrypt_file,
+    ascon_encrypt,
+    ascon_decrypt,
+    derive_key_scrypt,
+    derive_key_pbkdf2,
     derive_key_argon2,
+    verify_derived_key_scrypt,
+    verify_derived_key_pbkdf2,
+    generate_salt,
 )
-from .ascon_cipher import encrypt as ascon_encrypt, decrypt as ascon_decrypt
 
+# Asymmetric primitives ------------------------------------------------------
 from .asymmetric import (
     generate_rsa_keypair,
     rsa_encrypt,
@@ -40,8 +39,7 @@ from .asymmetric import (
     derive_x25519_shared_key,
     generate_ec_keypair,
 )
-
-from .signatures import (
+from .asymmetric.signatures import (
     generate_ed25519_keypair,
     sign_message,
     verify_signature,
@@ -57,8 +55,7 @@ from .signatures import (
     load_ecdsa_private_key,
     load_ecdsa_public_key,
 )
-
-from .bls import (
+from .asymmetric.bls import (
     generate_bls_keypair,
     bls_sign,
     bls_verify,
@@ -66,8 +63,9 @@ from .bls import (
     bls_aggregate_verify,
 )
 
+# Post-quantum cryptography --------------------------------------------------
 try:  # pragma: no cover - optional dependency
-    from .post_quantum import (
+    from .pqc import (
         generate_kyber_keypair,
         kyber_encapsulate,
         kyber_decapsulate,
@@ -76,21 +74,16 @@ try:  # pragma: no cover - optional dependency
         dilithium_verify,
         PQCRYPTO_AVAILABLE,
     )
-except Exception:
+except Exception:  # pragma: no cover - fallback when pqcrypto is missing
     PQCRYPTO_AVAILABLE = False
 
+# Hashing and utilities ------------------------------------------------------
 from .hashing import (
     sha384_hash,
     sha256_hash,
     sha512_hash,
     blake2b_hash,
-    derive_key_scrypt,
-    derive_key_pbkdf2,
-    verify_derived_key_scrypt,
-    verify_derived_key_pbkdf2,
-    generate_salt,
 )
-
 from .key_management import (
     generate_aes_key,
     rotate_aes_key,
@@ -101,30 +94,12 @@ from .key_management import (
     generate_rsa_keypair_and_save,
     generate_ec_keypair_and_save,
 )
+from .secret_sharing import create_shares, reconstruct_secret
+from .pake import SPAKE2Client, SPAKE2Server
+from .otp import generate_totp, verify_totp, generate_hotp, verify_hotp
+from .signal_protocol import SignalSender, SignalReceiver, initialize_signal_session
 
-from .secret_sharing import (
-    create_shares,
-    reconstruct_secret,
-)
-
-from .pake import (
-    SPAKE2Client,
-    SPAKE2Server,
-)
-
-from .otp import (
-    generate_totp,
-    verify_totp,
-    generate_hotp,
-    verify_hotp,
-)
-
-from .signal_protocol import (
-    SignalSender,
-    SignalReceiver,
-    initialize_signal_session,
-)
-
+# Optional homomorphic encryption -------------------------------------------
 try:  # pragma: no cover - optional dependency
     from .homomorphic import (
         keygen as fhe_keygen,
@@ -138,18 +113,18 @@ try:  # pragma: no cover - optional dependency
 except Exception:  # pragma: no cover - handle missing Pyfhel
     FHE_AVAILABLE = False
 
+# Zero-knowledge proofs ------------------------------------------------------
 try:  # pragma: no cover - optional dependency
-    from . import bulletproof
-
+    from .zk import bulletproof
     BULLETPROOF_AVAILABLE = True
-except Exception:  # pragma: no cover - handle missing pybulletproofs
+except Exception:  # pragma: no cover - handle missing dependency
     bulletproof = None
     BULLETPROOF_AVAILABLE = False
-try:  # pragma: no cover - optional dependency
-    from . import zksnark
 
+try:  # pragma: no cover - optional dependency
+    from .zk import zksnark
     ZKSNARK_AVAILABLE = getattr(zksnark, "ZKSNARK_AVAILABLE", False)
-except Exception:  # pragma: no cover - handle missing PySNARK
+except Exception:  # pragma: no cover - handle missing dependency
     zksnark = None
     ZKSNARK_AVAILABLE = False
 
@@ -176,6 +151,12 @@ __all__ = [
     "ascon_decrypt",
     "encrypt_file",
     "decrypt_file",
+    "derive_key_scrypt",
+    "derive_key_pbkdf2",
+    "derive_key_argon2",
+    "verify_derived_key_scrypt",
+    "verify_derived_key_pbkdf2",
+    "generate_salt",
     # Asymmetric
     "generate_rsa_keypair",
     "rsa_encrypt",
@@ -213,12 +194,6 @@ __all__ = [
     "sha256_hash",
     "sha512_hash",
     "blake2b_hash",
-    "derive_key_scrypt",
-    "derive_key_pbkdf2",
-    "derive_key_argon2",
-    "verify_derived_key_scrypt",
-    "verify_derived_key_pbkdf2",
-    "generate_salt",
     # Key Management
     "generate_aes_key",
     "rotate_aes_key",
@@ -250,7 +225,7 @@ __all__ = [
     "initialize_signal_session",
 ]
 
-# Export post-quantum utilities only when pqcrypto is available
+# Conditional exports -------------------------------------------------------
 if PQCRYPTO_AVAILABLE:
     __all__.extend(
         [
@@ -274,7 +249,7 @@ if FHE_AVAILABLE:
         ]
     )
 
-# Zero-knowledge proofs
+# Zero-knowledge proofs modules
 if BULLETPROOF_AVAILABLE:
     __all__.append("bulletproof")
 if ZKSNARK_AVAILABLE:

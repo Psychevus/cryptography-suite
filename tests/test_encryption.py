@@ -3,7 +3,7 @@ import os
 import unittest
 from unittest.mock import patch
 
-from cryptography_suite.encryption import (
+from cryptography_suite.symmetric import (
     aes_encrypt,
     aes_decrypt,
     chacha20_encrypt,

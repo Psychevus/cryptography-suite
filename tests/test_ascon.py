@@ -1,6 +1,6 @@
 import unittest
 
-from cryptography_suite.ascon_cipher import encrypt, decrypt
+from cryptography_suite.symmetric.ascon import encrypt, decrypt
 
 
 class TestAscon128a(unittest.TestCase):

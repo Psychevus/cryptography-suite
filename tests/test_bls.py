@@ -1,5 +1,5 @@
 import unittest
-from cryptography_suite.bls import (
+from cryptography_suite.asymmetric.bls import (
     generate_bls_keypair,
     bls_sign,
     bls_verify,
