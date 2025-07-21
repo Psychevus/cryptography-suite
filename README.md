@@ -89,6 +89,18 @@ print(aes_decrypt(argon2_encrypted, password, kdf="argon2"))
 Argon2id support is provided by the `cryptography` package and requires no
 additional dependencies.
 
+### File Encryption
+
+Stream files of any size with AES-GCM. The functions read and write in
+chunks, so even large files can be processed efficiently.
+
+```python
+from cryptography_suite import encrypt_file, decrypt_file
+
+encrypt_file("secret.txt", "secret.enc", password)
+decrypt_file("secret.enc", "secret.out", password)
+```
+
 ### Asymmetric Encryption
 
 Generate RSA key pairs and perform encryption/decryption.

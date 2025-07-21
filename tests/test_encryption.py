@@ -23,20 +23,20 @@ class TestEncryption(unittest.TestCase):
 
     def test_aes_encrypt_decrypt_scrypt(self):
         """Test AES encryption and decryption with Scrypt KDF."""
-        encrypted = aes_encrypt(self.message, self.password, kdf='scrypt')
-        decrypted = aes_decrypt(encrypted, self.password, kdf='scrypt')
+        encrypted = aes_encrypt(self.message, self.password, kdf="scrypt")
+        decrypted = aes_decrypt(encrypted, self.password, kdf="scrypt")
         self.assertEqual(self.message, decrypted)
 
     def test_aes_encrypt_decrypt_pbkdf2(self):
         """Test AES encryption and decryption with PBKDF2 KDF."""
-        encrypted = aes_encrypt(self.message, self.password, kdf='pbkdf2')
-        decrypted = aes_decrypt(encrypted, self.password, kdf='pbkdf2')
+        encrypted = aes_encrypt(self.message, self.password, kdf="pbkdf2")
+        decrypted = aes_decrypt(encrypted, self.password, kdf="pbkdf2")
         self.assertEqual(self.message, decrypted)
 
     def test_aes_encrypt_decrypt_argon2(self):
         """Test AES encryption and decryption with Argon2id KDF."""
-        encrypted = aes_encrypt(self.message, self.password, kdf='argon2')
-        decrypted = aes_decrypt(encrypted, self.password, kdf='argon2')
+        encrypted = aes_encrypt(self.message, self.password, kdf="argon2")
+        decrypted = aes_decrypt(encrypted, self.password, kdf="argon2")
         self.assertEqual(self.message, decrypted)
 
     def test_derive_key_argon2(self):
@@ -219,7 +219,7 @@ class TestEncryption(unittest.TestCase):
             aes_encrypt(
                 self.message,
                 self.password,
-                kdf='invalid_kdf',
+                kdf="invalid_kdf",
             )
 
     def test_aes_encrypt_with_unsupported_kdf(self):
@@ -228,13 +228,13 @@ class TestEncryption(unittest.TestCase):
             aes_encrypt(
                 self.message,
                 self.password,
-                kdf='unsupported_kdf',
+                kdf="unsupported_kdf",
             )
 
     def test_aes_decrypt_with_empty_encrypted_data(self):
         """Test AES decryption with empty encrypted data."""
         with self.assertRaises(ValueError) as context:
-            aes_decrypt('', self.password)
+            aes_decrypt("", self.password)
         self.assertEqual(
             str(context.exception),
             "Encrypted data cannot be empty.",
@@ -244,12 +244,12 @@ class TestEncryption(unittest.TestCase):
         """Test AES decryption with empty password."""
         encrypted = aes_encrypt(self.message, self.password)
         with self.assertRaises(ValueError) as context:
-            aes_decrypt(encrypted, '')
+            aes_decrypt(encrypted, "")
         self.assertEqual(str(context.exception), "Password cannot be empty.")
 
     def test_aes_decrypt_with_invalid_encrypted_data(self):
         """Test AES decryption with invalid encrypted data length."""
-        invalid_data = base64.b64encode(b'short').decode()
+        invalid_data = base64.b64encode(b"short").decode()
         with self.assertRaises(ValueError) as context:
             aes_decrypt(invalid_data, self.password)
         self.assertEqual(str(context.exception), "Invalid encrypted data.")
@@ -257,18 +257,18 @@ class TestEncryption(unittest.TestCase):
     def test_aes_encrypt_with_empty_plaintext(self):
         """Test AES encryption with empty plaintext."""
         with self.assertRaises(ValueError) as context:
-            aes_encrypt('', self.password)
+            aes_encrypt("", self.password)
         self.assertEqual(str(context.exception), "Plaintext cannot be empty.")
 
     def test_chacha20_encrypt_with_empty_plaintext(self):
         """Test ChaCha20 encryption with empty plaintext."""
         with self.assertRaises(ValueError) as context:
-            chacha20_encrypt('', self.password)
+            chacha20_encrypt("", self.password)
         self.assertEqual(str(context.exception), "Plaintext cannot be empty.")
 
     def test_aes_decrypt_with_invalid_encrypted_data_length(self):
         """Test AES decryption with invalid encrypted data length."""
-        invalid_data = base64.b64encode(b'short').decode()
+        invalid_data = base64.b64encode(b"short").decode()
         with self.assertRaises(ValueError) as context:
             aes_decrypt(invalid_data, self.password)
         self.assertEqual(str(context.exception), "Invalid encrypted data.")
@@ -279,7 +279,7 @@ class TestEncryption(unittest.TestCase):
         with open(test_filename, "w") as f:
             f.write(self.message)
         with self.assertRaises(ValueError) as context:
-            encrypt_file(test_filename, "output.enc", '')
+            encrypt_file(test_filename, "output.enc", "")
         self.assertEqual(
             str(context.exception),
             "Password cannot be empty.",
@@ -296,7 +296,7 @@ class TestEncryption(unittest.TestCase):
                 test_filename,
                 "output.enc",
                 self.password,
-                kdf='unsupported_kdf',
+                kdf="unsupported_kdf",
             )
         self.assertEqual(
             str(context.exception),
@@ -316,7 +316,7 @@ class TestEncryption(unittest.TestCase):
                 encrypted_filename,
                 "output_decrypted.txt",
                 self.password,
-                kdf='unsupported_kdf',
+                kdf="unsupported_kdf",
             )
         self.assertEqual(
             str(context.exception),
@@ -352,6 +352,44 @@ class TestEncryption(unittest.TestCase):
                 "Failed to read encrypted file",
                 str(context.exception),
             )
+
+    def test_encrypt_decrypt_empty_file(self):
+        """Encrypt and decrypt an empty file."""
+        test_filename = "empty.txt"
+        encrypted_filename = "empty.enc"
+        decrypted_filename = "empty.dec"
+
+        open(test_filename, "wb").close()
+
+        encrypt_file(test_filename, encrypted_filename, self.password)
+        decrypt_file(encrypted_filename, decrypted_filename, self.password)
+
+        with open(decrypted_filename, "rb") as f:
+            self.assertEqual(b"", f.read())
+
+        os.remove(test_filename)
+        os.remove(encrypted_filename)
+        os.remove(decrypted_filename)
+
+    def test_encrypt_decrypt_large_file(self):
+        """Encrypt and decrypt a large file (~5MB)."""
+        test_filename = "large.txt"
+        encrypted_filename = "large.enc"
+        decrypted_filename = "large.dec"
+
+        data = b"A" * (5 * 1024 * 1024)
+        with open(test_filename, "wb") as f:
+            f.write(data)
+
+        encrypt_file(test_filename, encrypted_filename, self.password)
+        decrypt_file(encrypted_filename, decrypted_filename, self.password)
+
+        with open(decrypted_filename, "rb") as f:
+            self.assertEqual(data, f.read())
+
+        os.remove(test_filename)
+        os.remove(encrypted_filename)
+        os.remove(decrypted_filename)
 
 
 if __name__ == "__main__":

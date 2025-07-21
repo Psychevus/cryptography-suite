@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import base64
+import os
 from os import urandom
 
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 from .kdf import (
@@ -12,6 +14,10 @@ from .kdf import (
     derive_key_pbkdf2,
     derive_key_scrypt,
 )
+
+# Constants for streaming file encryption
+CHUNK_SIZE = 4096
+TAG_SIZE = 16  # AES-GCM authentication tag size
 
 
 def aes_encrypt(plaintext: str, password: str, kdf: str = "scrypt") -> str:
@@ -75,7 +81,12 @@ def encrypt_file(
     password: str,
     kdf: str = "scrypt",
 ) -> None:
-    """Encrypt a file using AES-GCM with a password-derived key."""
+    """Encrypt a file using AES-GCM with a password-derived key.
+
+    The file is processed in chunks to avoid loading the entire file into
+    memory. The output file begins with the salt and nonce and ends with the
+    authentication tag.
+    """
     if not password:
         raise ValueError("Password cannot be empty.")
 
@@ -89,16 +100,21 @@ def encrypt_file(
     else:
         raise ValueError("Unsupported KDF specified.")
 
-    aesgcm = AESGCM(key)
     nonce = urandom(NONCE_SIZE)
+    cipher = Cipher(algorithms.AES(key), modes.GCM(nonce))
+    encryptor = cipher.encryptor()
 
     try:
-        with open(input_file_path, "rb") as f:
-            data = f.read()
-        ciphertext = aesgcm.encrypt(nonce, data, None)
-        with open(output_file_path, "wb") as f:
-            f.write(salt + nonce + ciphertext)
+        with open(input_file_path, "rb") as f_in, open(output_file_path, "wb") as f_out:
+            f_out.write(salt + nonce)
+            while chunk := f_in.read(CHUNK_SIZE):
+                f_out.write(encryptor.update(chunk))
+            encryptor.finalize()
+            f_out.write(encryptor.tag)
     except Exception as exc:
+        # Remove potentially partial output on error
+        if os.path.exists(output_file_path):
+            os.remove(output_file_path)
         raise IOError(f"File encryption failed: {exc}")
 
 
@@ -108,44 +124,61 @@ def decrypt_file(
     password: str,
     kdf: str = "scrypt",
 ) -> None:
-    """Decrypt a file encrypted with AES-GCM using a password-derived key."""
+    """Decrypt a file encrypted with AES-GCM using a password-derived key.
+
+    Data is streamed in chunks, verifying the authentication tag at the end.
+    The output file is removed if decryption fails.
+    """
     if not password:
         raise ValueError("Password cannot be empty.")
 
     try:
-        with open(encrypted_file_path, "rb") as f:
-            encrypted_data = f.read()
+        file_size = os.path.getsize(encrypted_file_path)
+        f_in = open(encrypted_file_path, "rb")
     except Exception as exc:
-        raise IOError(f"Failed to read encrypted file: {exc}")
+        raise IOError(f"Failed to read encrypted file: {exc}") from exc
 
-    if len(encrypted_data) < SALT_SIZE + NONCE_SIZE:
-        raise ValueError("Invalid encrypted file.")
+    with f_in:
+        if file_size < SALT_SIZE + NONCE_SIZE + TAG_SIZE:
+            raise ValueError("Invalid encrypted file.")
 
-    salt = encrypted_data[:SALT_SIZE]
-    nonce = encrypted_data[SALT_SIZE : SALT_SIZE + NONCE_SIZE]
-    ciphertext = encrypted_data[SALT_SIZE + NONCE_SIZE :]
+        salt = f_in.read(SALT_SIZE)
+        nonce = f_in.read(NONCE_SIZE)
+        ciphertext_len = file_size - SALT_SIZE - NONCE_SIZE - TAG_SIZE
 
-    if kdf == "scrypt":
-        key = derive_key_scrypt(password, salt)
-    elif kdf == "pbkdf2":
-        key = derive_key_pbkdf2(password, salt)
-    elif kdf == "argon2":
-        key = derive_key_argon2(password, salt)
-    else:
-        raise ValueError("Unsupported KDF specified.")
+        if kdf == "scrypt":
+            key = derive_key_scrypt(password, salt)
+        elif kdf == "pbkdf2":
+            key = derive_key_pbkdf2(password, salt)
+        elif kdf == "argon2":
+            key = derive_key_argon2(password, salt)
+        else:
+            raise ValueError("Unsupported KDF specified.")
 
-    aesgcm = AESGCM(key)
-    try:
-        data = aesgcm.decrypt(nonce, ciphertext, None)
-        with open(output_file_path, "wb") as f:
-            f.write(data)
-    except Exception as exc:  # pragma: no cover - high-level error handling
-        raise ValueError(
-            "File decryption failed: Invalid password or corrupted file."
-        ) from exc
+        cipher = Cipher(algorithms.AES(key), modes.GCM(nonce))
+        decryptor = cipher.decryptor()
+
+        try:
+            with open(output_file_path, "wb") as f_out:
+                processed = 0
+                while processed < ciphertext_len:
+                    to_read = min(CHUNK_SIZE, ciphertext_len - processed)
+                    chunk = f_in.read(to_read)
+                    processed += len(chunk)
+                    f_out.write(decryptor.update(chunk))
+
+                tag = f_in.read(TAG_SIZE)
+                decryptor.finalize_with_tag(tag)
+        except Exception as exc:  # pragma: no cover - high-level error handling
+            if os.path.exists(output_file_path):
+                os.remove(output_file_path)
+            raise ValueError(
+                "File decryption failed: Invalid password or corrupted file."
+            ) from exc
 
 
 # Convenience wrappers -------------------------------------------------------
+
 
 def scrypt_encrypt(plaintext: str, password: str) -> str:
     return aes_encrypt(plaintext, password, kdf="scrypt")
