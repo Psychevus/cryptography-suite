@@ -118,6 +118,13 @@ try:  # pragma: no cover - optional dependency
 except Exception:  # pragma: no cover - handle missing Pyfhel
     FHE_AVAILABLE = False
 
+from . import bulletproof
+try:  # pragma: no cover - optional dependency
+    from . import zksnark
+    ZKSNARK_AVAILABLE = True
+except Exception:  # pragma: no cover - handle missing PySNARK
+    ZKSNARK_AVAILABLE = False
+
 from .utils import (
     base62_encode,
     base62_decode,
@@ -223,3 +230,9 @@ if FHE_AVAILABLE:
             "fhe_multiply",
         ]
     )
+
+# Zero-knowledge proofs
+__all__.extend([
+    "bulletproof",
+    "zksnark",
+])
