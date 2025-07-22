@@ -12,7 +12,12 @@ from .aes import (
     argon2_encrypt,
     argon2_decrypt,
 )
-from .chacha import chacha20_encrypt, chacha20_decrypt
+from .chacha import (
+    chacha20_encrypt,
+    chacha20_decrypt,
+    xchacha_encrypt,
+    xchacha_decrypt,
+)
 from .ascon import encrypt as ascon_encrypt, decrypt as ascon_decrypt
 from .kdf import (
     derive_key_scrypt,
@@ -36,6 +41,8 @@ __all__ = [
     "argon2_decrypt",
     "chacha20_encrypt",
     "chacha20_decrypt",
+    "xchacha_encrypt",
+    "xchacha_decrypt",
     "ascon_encrypt",
     "ascon_decrypt",
     "derive_key_scrypt",
