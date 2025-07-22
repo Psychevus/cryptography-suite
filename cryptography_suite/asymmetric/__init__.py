@@ -7,6 +7,7 @@ from cryptography.hazmat.primitives.asymmetric import (
     ec,
     ed25519,
     x25519,
+    x448,
 )
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
@@ -87,6 +88,7 @@ def serialize_private_key(private_key, password: str) -> bytes:
             ec.EllipticCurvePrivateKey,
             ed25519.Ed25519PrivateKey,
             x25519.X25519PrivateKey,
+            x448.X448PrivateKey,
         ),
     ):
         raise TypeError("Invalid private key type.")
@@ -111,6 +113,7 @@ def serialize_public_key(public_key) -> bytes:
             ec.EllipticCurvePublicKey,
             ed25519.Ed25519PublicKey,
             x25519.X25519PublicKey,
+            x448.X448PublicKey,
         ),
     ):
         raise TypeError("Invalid public key type.")
@@ -123,7 +126,7 @@ def serialize_public_key(public_key) -> bytes:
 
 def load_private_key(pem_data: bytes, password: str):
     """
-    Loads a private key (RSA, X25519, or EC) from PEM data.
+    Loads a private key (RSA, X25519, X448, or EC) from PEM data.
     """
     if not password:
         raise ValueError("Password cannot be empty.")
@@ -139,7 +142,7 @@ def load_private_key(pem_data: bytes, password: str):
 
 def load_public_key(pem_data: bytes):
     """
-    Loads a public key (RSA, X25519, or EC) from PEM data.
+    Loads a public key (RSA, X25519, X448, or EC) from PEM data.
     """
     try:
         public_key = serialization.load_pem_public_key(pem_data)
@@ -167,6 +170,22 @@ def derive_x25519_shared_key(private_key, peer_public_key) -> bytes:
         raise TypeError("Invalid X25519 public key.")
     shared_key = private_key.exchange(peer_public_key)
     return shared_key
+
+
+def generate_x448_keypair() -> Tuple[x448.X448PrivateKey, x448.X448PublicKey]:
+    """Generates an X448 private and public key pair."""
+    private_key = x448.X448PrivateKey.generate()
+    public_key = private_key.public_key()
+    return private_key, public_key
+
+
+def derive_x448_shared_key(private_key, peer_public_key) -> bytes:
+    """Derives a shared key using X448 key exchange."""
+    if not isinstance(private_key, x448.X448PrivateKey):
+        raise TypeError("Invalid X448 private key.")
+    if not isinstance(peer_public_key, x448.X448PublicKey):
+        raise TypeError("Invalid X448 public key.")
+    return private_key.exchange(peer_public_key)
 
 
 def generate_ec_keypair(curve=ec.SECP256R1()) -> Tuple[ec.EllipticCurvePrivateKey, ec.EllipticCurvePublicKey]:

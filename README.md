@@ -49,7 +49,7 @@ pip install .
 
 - **Symmetric Encryption**: AES-GCM and ChaCha20-Poly1305 with Argon2 key derivation by default (PBKDF2 and Scrypt also supported).
 - **Asymmetric Encryption**: RSA encryption/decryption, key generation, serialization, and loading.
-- **Digital Signatures**: Support for Ed25519, ECDSA, and BLS (BLS12-381) algorithms for secure message signing and verification.
+- **Digital Signatures**: Support for Ed25519, **Ed448**, ECDSA, and BLS (BLS12-381) algorithms for secure message signing and verification.
 - **Hashing Functions**: Implements SHA-256, SHA-384, SHA-512, and BLAKE2b hashing algorithms.
 - **Key Management**: Secure generation, storage, loading, and rotation of cryptographic keys.
 - **Secret Sharing**: Implementation of Shamir's Secret Sharing scheme for splitting and reconstructing secrets.
@@ -129,21 +129,56 @@ decrypted_message = rsa_decrypt(encrypted_message, private_key)
 print(f"Decrypted: {decrypted_message}")
 ```
 
+### Key Exchange
+
+```python
+from cryptography_suite import (
+    generate_x25519_keypair,
+    derive_x25519_shared_key,
+    generate_x448_keypair,
+    derive_x448_shared_key,
+)
+
+# X25519 exchange
+alice_priv, alice_pub = generate_x25519_keypair()
+bob_priv, bob_pub = generate_x25519_keypair()
+print(
+    derive_x25519_shared_key(alice_priv, bob_pub)
+    == derive_x25519_shared_key(bob_priv, alice_pub)
+)
+
+# X448 exchange
+a_priv, a_pub = generate_x448_keypair()
+b_priv, b_pub = generate_x448_keypair()
+print(
+    derive_x448_shared_key(a_priv, b_pub)
+    == derive_x448_shared_key(b_priv, a_pub)
+)
+```
+
 ### Digital Signatures
 
-Sign and verify messages using Ed25519 or BLS.
+Sign and verify messages using Ed25519, Ed448 or BLS.
 
 ```python
 from cryptography_suite.signatures import (
     generate_ed25519_keypair,
+    generate_ed448_keypair,
     sign_message,
+    sign_message_ed448,
     verify_signature,
+    verify_signature_ed448,
 )
 
 # Generate Ed25519 key pair
 ed_priv, ed_pub = generate_ed25519_keypair()
 signature = sign_message(b"Authenticate this message", ed_priv)
 print(verify_signature(b"Authenticate this message", signature, ed_pub))
+
+# Ed448 usage
+ed448_priv, ed448_pub = generate_ed448_keypair()
+sig448 = sign_message_ed448(b"Authenticate this message", ed448_priv)
+print(verify_signature_ed448(b"Authenticate this message", sig448, ed448_pub))
 
 from cryptography_suite.bls import generate_bls_keypair, bls_sign, bls_verify
 

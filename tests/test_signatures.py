@@ -1,8 +1,11 @@
 import unittest
 from cryptography_suite.asymmetric.signatures import (
     generate_ed25519_keypair,
+    generate_ed448_keypair,
     sign_message,
+    sign_message_ed448,
     verify_signature,
+    verify_signature_ed448,
     serialize_ed25519_private_key,
     serialize_ed25519_public_key,
     load_ed25519_private_key,
@@ -15,7 +18,7 @@ from cryptography_suite.asymmetric.signatures import (
     load_ecdsa_private_key,
     load_ecdsa_public_key,
 )
-from cryptography.hazmat.primitives.asymmetric import ed25519, ec
+from cryptography.hazmat.primitives.asymmetric import ed25519, ed448, ec
 
 
 class TestSignatures(unittest.TestCase):
@@ -54,6 +57,27 @@ class TestSignatures(unittest.TestCase):
 
         self.assertIsInstance(loaded_private_key, ed25519.Ed25519PrivateKey)
         self.assertIsInstance(loaded_public_key, ed25519.Ed25519PublicKey)
+
+    def test_ed448_sign_and_verify(self):
+        """Test Ed448 signature generation and verification."""
+        private_key, public_key = generate_ed448_keypair()
+        signature = sign_message_ed448(self.message, private_key)
+        is_valid = verify_signature_ed448(self.message, signature, public_key)
+        self.assertTrue(is_valid)
+
+    def test_ed448_sign_with_empty_message(self):
+        """Test Ed448 signing with empty message."""
+        private_key, _ = generate_ed448_keypair()
+        with self.assertRaises(ValueError):
+            sign_message_ed448(b"", private_key)
+
+    def test_ed448_verify_with_invalid_signature(self):
+        """Test Ed448 verification with invalid signature."""
+        _, public_key = generate_ed448_keypair()
+        invalid_signature = b"invalid_signature"
+        self.assertFalse(
+            verify_signature_ed448(self.message, invalid_signature, public_key)
+        )
 
     def test_ecdsa_sign_and_verify(self):
         """Test ECDSA signature generation and verification."""
@@ -195,6 +219,15 @@ class TestSignatures(unittest.TestCase):
         with self.assertRaises(ValueError) as context:
             verify_signature_ecdsa(self.message, signature, invalid_public_key)
         self.assertEqual(str(context.exception), "Invalid ECDSA public key.")
+
+    def test_verify_signature_ed448_with_invalid_public_key(self):
+        """Test verifying signature with invalid Ed448 public key."""
+        private_key, _ = generate_ed448_keypair()
+        signature = sign_message_ed448(self.message, private_key)
+        invalid_public_key = "not_a_public_key"
+        with self.assertRaises(ValueError) as context:
+            verify_signature_ed448(self.message, signature, invalid_public_key)
+        self.assertEqual(str(context.exception), "Invalid Ed448 public key.")
 
 
 if __name__ == "__main__":

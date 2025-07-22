@@ -1,4 +1,4 @@
-from cryptography.hazmat.primitives.asymmetric import ed25519, ec
+from cryptography.hazmat.primitives.asymmetric import ed25519, ed448, ec
 from cryptography.hazmat.primitives import serialization, hashes
 from cryptography.exceptions import InvalidSignature
 from typing import Tuple
@@ -36,6 +36,39 @@ def verify_signature(message: bytes, signature: bytes, public_key: ed25519.Ed255
         raise ValueError("Signature cannot be empty.")
     if not isinstance(public_key, ed25519.Ed25519PublicKey):
         raise ValueError("Invalid Ed25519 public key.")
+
+    try:
+        public_key.verify(signature, message)
+        return True
+    except InvalidSignature:
+        return False
+
+
+def generate_ed448_keypair() -> Tuple[ed448.Ed448PrivateKey, ed448.Ed448PublicKey]:
+    """Generates an Ed448 private and public key pair."""
+    private_key = ed448.Ed448PrivateKey.generate()
+    public_key = private_key.public_key()
+    return private_key, public_key
+
+
+def sign_message_ed448(message: bytes, private_key: ed448.Ed448PrivateKey) -> bytes:
+    """Signs a message using Ed448."""
+    if not message:
+        raise ValueError("Message cannot be empty.")
+    if not isinstance(private_key, ed448.Ed448PrivateKey):
+        raise ValueError("Invalid Ed448 private key.")
+
+    return private_key.sign(message)
+
+
+def verify_signature_ed448(message: bytes, signature: bytes, public_key: ed448.Ed448PublicKey) -> bool:
+    """Verifies an Ed448 signature."""
+    if not message:
+        raise ValueError("Message cannot be empty.")
+    if not signature:
+        raise ValueError("Signature cannot be empty.")
+    if not isinstance(public_key, ed448.Ed448PublicKey):
+        raise ValueError("Invalid Ed448 public key.")
 
     try:
         public_key.verify(signature, message)
