@@ -38,6 +38,8 @@ from .asymmetric import (
     generate_x25519_keypair,
     derive_x25519_shared_key,
     generate_ec_keypair,
+    ec_encrypt,
+    ec_decrypt,
 )
 from .asymmetric.signatures import (
     generate_ed25519_keypair,
@@ -175,6 +177,8 @@ __all__ = [
     "generate_x25519_keypair",
     "derive_x25519_shared_key",
     "generate_ec_keypair",
+    "ec_encrypt",
+    "ec_decrypt",
     # Signatures
     "generate_ed25519_keypair",
     "sign_message",
