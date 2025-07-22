@@ -50,7 +50,7 @@ pip install .
 - **Symmetric Encryption**: AES-GCM and ChaCha20-Poly1305 with Argon2 key derivation by default (PBKDF2 and Scrypt also supported).
 - **Asymmetric Encryption**: RSA encryption/decryption, key generation, serialization, and loading.
 - **Digital Signatures**: Support for Ed25519, **Ed448**, ECDSA, and BLS (BLS12-381) algorithms for secure message signing and verification.
-- **Hashing Functions**: Implements SHA-256, SHA-384, SHA-512, and BLAKE2b hashing algorithms.
+- **Hashing Functions**: Implements SHA-256, SHA-384, SHA-512, SHA3-256, SHA3-512, BLAKE2b, and BLAKE3 hashing algorithms.
 - **Key Management**: Secure generation, storage, loading, and rotation of cryptographic keys.
 - **Secret Sharing**: Implementation of Shamir's Secret Sharing scheme for splitting and reconstructing secrets.
 - **Password-Authenticated Key Exchange (PAKE)**: SPAKE2 protocol implementation for secure password-based key exchange.
@@ -278,6 +278,27 @@ from cryptography_suite import initialize_signal_session
 sender, receiver = initialize_signal_session()
 msg = sender.encrypt(b"hi")
 print(receiver.decrypt(msg))
+```
+
+## Hashing
+
+Generate message digests with standard algorithms.
+
+```python
+from cryptography_suite.hashing import (
+    sha256_hash,
+    sha3_256_hash,
+    sha3_512_hash,
+    blake2b_hash,
+    blake3_hash,
+)
+
+data = "The quick brown fox jumps over the lazy dog"
+print(sha256_hash(data))
+print(sha3_256_hash(data))
+print(sha3_512_hash(data))
+print(blake2b_hash(data))
+print(blake3_hash(data))
 ```
 
 ---

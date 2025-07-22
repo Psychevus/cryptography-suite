@@ -2,3 +2,4 @@ cryptography>=44.0.0
 pqcrypto
 py_ecc
 spake2
+blake3
