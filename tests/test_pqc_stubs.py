@@ -51,9 +51,12 @@ def test_pqc_key_enc_sign(monkeypatch):
     pqc = reload_module(monkeypatch)
     pk, sk = pqc.generate_kyber_keypair()
     ct, ss = pqc.kyber_encrypt(pk, b"m")
+    assert isinstance(ct, str)
+    assert isinstance(ss, str)
     assert pqc.kyber_decrypt(sk, ct, ss) == b"m"
     pk2, sk2 = pqc.generate_dilithium_keypair()
     sig = pqc.dilithium_sign(sk2, b"m")
+    assert isinstance(sig, str)
     assert pqc.dilithium_verify(pk2, b"m", sig)
 
 

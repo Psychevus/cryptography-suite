@@ -1,5 +1,6 @@
 from typing import Tuple
 from ..errors import EncryptionError, DecryptionError
+import base64
 
 from cryptography.hazmat.primitives import serialization, hashes, constant_time
 from cryptography.hazmat.primitives.asymmetric import (
@@ -34,9 +35,17 @@ def generate_rsa_keypair(
     return private_key, public_key
 
 
-def rsa_encrypt(plaintext: bytes, public_key: rsa.RSAPublicKey) -> bytes:
-    """
-    Encrypts plaintext using RSA-OAEP with SHA-256.
+def rsa_encrypt(
+    plaintext: bytes,
+    public_key: rsa.RSAPublicKey,
+    *,
+    raw_output: bool = False,
+) -> str | bytes:
+    """Encrypt ``plaintext`` for ``public_key`` using RSA-OAEP with SHA-256.
+
+    By default the ciphertext is returned as a Base64-encoded string for ease of
+    storage and transmission. Set ``raw_output=True`` to receive the raw byte
+    sequence instead.
     """
     if not plaintext:
         raise EncryptionError("Plaintext cannot be empty.")
@@ -51,10 +60,12 @@ def rsa_encrypt(plaintext: bytes, public_key: rsa.RSAPublicKey) -> bytes:
             label=None,
         ),
     )
-    return ciphertext
+    if raw_output:
+        return ciphertext
+    return base64.b64encode(ciphertext).decode()
 
 
-def rsa_decrypt(ciphertext: bytes, private_key: rsa.RSAPrivateKey) -> bytes:
+def rsa_decrypt(ciphertext: bytes | str, private_key: rsa.RSAPrivateKey) -> bytes:
     """
     Decrypts ciphertext using RSA-OAEP with SHA-256.
     """
@@ -63,6 +74,11 @@ def rsa_decrypt(ciphertext: bytes, private_key: rsa.RSAPrivateKey) -> bytes:
 
     if not ciphertext:
         raise DecryptionError("Ciphertext cannot be empty.")
+    if isinstance(ciphertext, str):
+        try:
+            ciphertext = base64.b64decode(ciphertext)
+        except Exception as exc:  # pragma: no cover - defensive
+            raise DecryptionError(f"Invalid ciphertext: {exc}") from exc
 
     try:
         plaintext = private_key.decrypt(
@@ -202,7 +218,12 @@ def generate_ec_keypair(curve=ec.SECP256R1()) -> Tuple[ec.EllipticCurvePrivateKe
     return private_key, public_key
 
 
-def ec_encrypt(plaintext: bytes, public_key: x25519.X25519PublicKey) -> bytes:
+def ec_encrypt(
+    plaintext: bytes,
+    public_key: x25519.X25519PublicKey,
+    *,
+    raw_output: bool = False,
+) -> str | bytes:
     """Encrypt ``plaintext`` for ``public_key`` using ECIES.
 
     This implementation follows best practices:
@@ -239,10 +260,16 @@ def ec_encrypt(plaintext: bytes, public_key: x25519.X25519PublicKey) -> bytes:
         encoding=serialization.Encoding.Raw,
         format=serialization.PublicFormat.Raw,
     )
-    return eph_pub_bytes + nonce + ciphertext
+    out = eph_pub_bytes + nonce + ciphertext
+    if raw_output:
+        return out
+    return base64.b64encode(out).decode()
 
 
-def ec_decrypt(ciphertext: bytes, private_key: x25519.X25519PrivateKey) -> bytes:
+def ec_decrypt(
+    ciphertext: bytes | str,
+    private_key: x25519.X25519PrivateKey,
+) -> bytes:
     """Decrypt ECIES ``ciphertext`` using ``private_key``.
 
     The ``ciphertext`` must contain the ephemeral public key, nonce, and the
@@ -251,6 +278,11 @@ def ec_decrypt(ciphertext: bytes, private_key: x25519.X25519PrivateKey) -> bytes
 
     if not ciphertext:
         raise DecryptionError("Ciphertext cannot be empty.")
+    if isinstance(ciphertext, str):
+        try:
+            ciphertext = base64.b64decode(ciphertext)
+        except Exception as exc:  # pragma: no cover - defensive
+            raise DecryptionError(f"Invalid ciphertext: {exc}") from exc
     if not isinstance(private_key, x25519.X25519PrivateKey):
         raise TypeError("Invalid X25519 private key provided.")
     if len(ciphertext) < 32 + 12 + 16:

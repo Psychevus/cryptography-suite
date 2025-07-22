@@ -105,6 +105,9 @@ decrypt_file("secret.enc", "secret.out", password)
 
 Generate RSA key pairs and perform encryption/decryption.
 
+Ciphertext and related binary outputs are returned as Base64 strings by
+default. Pass ``raw_output=True`` to obtain raw bytes instead.
+
 ```python
 from cryptography_suite import ec_encrypt
 from cryptography_suite.asymmetric import (
@@ -120,7 +123,7 @@ private_key, public_key = generate_rsa_keypair()
 
 message = b"Secure Data Transfer"
 
-# Encrypt the message
+# Encrypt the message (Base64 encoded by default)
 encrypted_message = rsa_encrypt(message, public_key)
 print(f"Encrypted: {encrypted_message}")
 
@@ -266,6 +269,7 @@ Requires the optional `spake2` package.
 from cryptography_suite import ec_encrypt, ec_decrypt, generate_x25519_keypair
 
 priv, pub = generate_x25519_keypair()
+# ``cipher`` is Base64 encoded by default. Use ``raw_output=True`` for bytes.
 cipher = ec_encrypt(b"secret", pub)
 print(ec_decrypt(cipher, priv))
 ```

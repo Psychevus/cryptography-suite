@@ -12,6 +12,7 @@ from typing import Tuple
 from ..errors import EncryptionError, DecryptionError
 import os
 import hashlib
+import base64
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 try:  # pragma: no cover - optional dependency
@@ -87,7 +88,12 @@ def kyber_decapsulate(ciphertext: bytes, secret_key: bytes, level: int = 512) ->
     return alg.decrypt(secret_key, ciphertext)
 
 
-def kyber_encrypt(public_key: bytes, plaintext: bytes) -> Tuple[bytes, bytes]:
+def kyber_encrypt(
+    public_key: bytes,
+    plaintext: bytes,
+    *,
+    raw_output: bool = False,
+) -> Tuple[str | bytes, str | bytes]:
     """Encrypt ``plaintext`` using Kyber and AES-GCM.
 
     The function first encapsulates a shared secret with ML-KEM-512 and then
@@ -103,15 +109,32 @@ def kyber_encrypt(public_key: bytes, plaintext: bytes) -> Tuple[bytes, bytes]:
     aesgcm = AESGCM(key)
     nonce = os.urandom(12)
     enc = nonce + aesgcm.encrypt(nonce, plaintext, None)
-    return kem_ct + enc, ss
+    ct = kem_ct + enc
+    if raw_output:
+        return ct, ss
+    return base64.b64encode(ct).decode(), base64.b64encode(ss).decode()
 
 
-def kyber_decrypt(private_key: bytes, ciphertext: bytes, shared_secret: bytes) -> bytes:
+def kyber_decrypt(
+    private_key: bytes,
+    ciphertext: bytes | str,
+    shared_secret: bytes | str,
+) -> bytes:
     """Decrypt data encrypted by :func:`kyber_encrypt`."""
     if not PQCRYPTO_AVAILABLE:
         raise ImportError("pqcrypto is required for Kyber functions")
 
     ct_size = ml_kem_512.CIPHERTEXT_SIZE
+    if isinstance(ciphertext, str):
+        try:
+            ciphertext = base64.b64decode(ciphertext)
+        except Exception as exc:  # pragma: no cover - defensive
+            raise DecryptionError(f"Invalid ciphertext: {exc}") from exc
+    if isinstance(shared_secret, str):
+        try:
+            shared_secret = base64.b64decode(shared_secret)
+        except Exception as exc:  # pragma: no cover - defensive
+            raise DecryptionError(f"Invalid shared secret: {exc}") from exc
     if len(ciphertext) < ct_size + 12 + 16:
         raise DecryptionError("Invalid ciphertext")
 
@@ -136,19 +159,36 @@ def generate_dilithium_keypair() -> Tuple[bytes, bytes]:
     return ml_dsa_44.generate_keypair()
 
 
-def dilithium_sign(private_key: bytes, message: bytes) -> bytes:
+def dilithium_sign(
+    private_key: bytes,
+    message: bytes,
+    *,
+    raw_output: bool = False,
+) -> str | bytes:
     """Sign a message using Dilithium level 2."""
     if not PQCRYPTO_AVAILABLE:
         raise ImportError("pqcrypto is required for Dilithium functions")
 
-    return ml_dsa_44.sign(private_key, message)
+    sig = ml_dsa_44.sign(private_key, message)
+    if raw_output:
+        return sig
+    return base64.b64encode(sig).decode()
 
 
-def dilithium_verify(public_key: bytes, message: bytes, signature: bytes) -> bool:
+def dilithium_verify(
+    public_key: bytes,
+    message: bytes,
+    signature: bytes | str,
+) -> bool:
     """Verify a Dilithium signature using level 2."""
     if not PQCRYPTO_AVAILABLE:
         raise ImportError("pqcrypto is required for Dilithium functions")
 
+    if isinstance(signature, str):
+        try:
+            signature = base64.b64decode(signature)
+        except Exception:
+            return False
     try:
         ml_dsa_44.verify(public_key, message, signature)
         return True
