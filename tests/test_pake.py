@@ -77,3 +77,42 @@ class TestPAKE(unittest.TestCase):
         ck = client.compute_shared_key(server_msg)
         sk = server.compute_shared_key(client_msg)
         self.assertNotEqual(ck, sk)
+
+    def test_spake2_server_before_generate_message(self):
+        """Server.compute_shared_key should fail if generate_message() not called."""
+        server = SPAKE2Server(self.password)
+        with self.assertRaises(ValueError):
+            server.compute_shared_key(b"msg")
+
+    def test_spake2_reflection_error(self):
+        """Passing our own message should raise InvalidKey due to SPAKEError."""
+        client = SPAKE2Client(self.password)
+        msg = client.generate_message()
+        with self.assertRaises(InvalidKey):
+            client.compute_shared_key(msg)
+
+    def test_base_spake2party_roundtrip(self):
+        """The base SPAKE2Party class using X25519 should exchange keys."""
+        from cryptography_suite.protocols.pake import SPAKE2Party
+
+        a = SPAKE2Party(self.password)
+        b = SPAKE2Party(self.password)
+        amsg = a.generate_message()
+        bmsg = b.generate_message()
+        akey = a.compute_shared_key(bmsg)
+        bkey = b.compute_shared_key(amsg)
+        self.assertEqual(akey, bkey)
+
+    def test_base_spake2party_errors(self):
+        from cryptography_suite.protocols.pake import SPAKE2Party
+
+        party = SPAKE2Party(self.password)
+        with self.assertRaises(ValueError):
+            party.compute_shared_key(b"x")
+        party.generate_message()
+        with self.assertRaises(InvalidKey):
+            party.compute_shared_key(b"short")
+        with self.assertRaises(ValueError):
+            SPAKE2Party("")
+        with self.assertRaises(ValueError):
+            SPAKE2Party("pw").get_shared_key()
