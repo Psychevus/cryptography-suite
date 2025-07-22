@@ -18,6 +18,12 @@ from .chacha import (
     xchacha_encrypt,
     xchacha_decrypt,
 )
+from .stream import (
+    salsa20_encrypt,
+    salsa20_decrypt,
+    chacha20_stream_encrypt,
+    chacha20_stream_decrypt,
+)
 from .ascon import encrypt as ascon_encrypt, decrypt as ascon_decrypt
 from .kdf import (
     derive_key_scrypt,
@@ -43,6 +49,10 @@ __all__ = [
     "chacha20_decrypt",
     "xchacha_encrypt",
     "xchacha_decrypt",
+    "salsa20_encrypt",
+    "salsa20_decrypt",
+    "chacha20_stream_encrypt",
+    "chacha20_stream_decrypt",
     "ascon_encrypt",
     "ascon_decrypt",
     "derive_key_scrypt",
