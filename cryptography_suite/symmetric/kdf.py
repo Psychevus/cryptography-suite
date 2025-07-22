@@ -7,6 +7,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives.kdf.argon2 import Argon2id
 from ..errors import KeyDerivationError
 
@@ -110,6 +111,39 @@ def derive_key_argon2(
     return kdf.derive(password.encode())
 
 
+def derive_hkdf(key: bytes, salt: bytes | None, info: bytes | None, length: int) -> bytes:
+    """Derive a key using HKDF-SHA256."""
+
+    if not isinstance(key, bytes):
+        raise TypeError("Key must be bytes.")
+    if salt is not None and not isinstance(salt, bytes):
+        raise TypeError("Salt must be bytes or None.")
+    if info is not None and not isinstance(info, bytes):
+        raise TypeError("Info must be bytes or None.")
+    if length <= 0:
+        raise ValueError("Length must be positive.")
+
+    hkdf = HKDF(algorithm=hashes.SHA256(), length=length, salt=salt, info=info)
+    return hkdf.derive(key)
+
+
+def derive_pbkdf2(password: str, salt: bytes, iterations: int, length: int) -> bytes:
+    """Derive a key using PBKDF2-HMAC-SHA256 with configurable iterations."""
+
+    if not password:
+        raise KeyDerivationError("Password cannot be empty.")
+    if iterations <= 0:
+        raise ValueError("Iterations must be positive.")
+
+    kdf = PBKDF2HMAC(
+        algorithm=hashes.SHA256(),
+        length=length,
+        salt=salt,
+        iterations=iterations,
+    )
+    return kdf.derive(password.encode())
+
+
 __all__ = [
     "AES_KEY_SIZE",
     "CHACHA20_KEY_SIZE",
@@ -120,5 +154,7 @@ __all__ = [
     "derive_key_pbkdf2",
     "verify_derived_key_pbkdf2",
     "derive_key_argon2",
+    "derive_hkdf",
+    "derive_pbkdf2",
     "generate_salt",
 ]

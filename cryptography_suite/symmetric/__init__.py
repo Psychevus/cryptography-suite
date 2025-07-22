@@ -31,6 +31,8 @@ from .kdf import (
     derive_key_pbkdf2,
     verify_derived_key_pbkdf2,
     derive_key_argon2,
+    derive_hkdf,
+    derive_pbkdf2,
     generate_salt,
 )
 
@@ -60,5 +62,7 @@ __all__ = [
     "derive_key_pbkdf2",
     "verify_derived_key_pbkdf2",
     "derive_key_argon2",
+    "derive_hkdf",
+    "derive_pbkdf2",
     "generate_salt",
 ]
