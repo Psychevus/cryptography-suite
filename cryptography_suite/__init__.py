@@ -163,6 +163,7 @@ from .utils import (
     base62_decode,
     secure_zero,
     generate_secure_random_string,
+    KeyVault,
 )
 
 __all__ = [
@@ -260,6 +261,7 @@ __all__ = [
     "base62_decode",
     "secure_zero",
     "generate_secure_random_string",
+    "KeyVault",
     # Signal Protocol
     "SignalSender",
     "SignalReceiver",

@@ -4,6 +4,7 @@ from cryptography_suite.utils import (
     base62_decode,
     secure_zero,
     generate_secure_random_string,
+    KeyVault,
 )
 
 
@@ -36,6 +37,14 @@ class TestUtils(unittest.TestCase):
         random_string = generate_secure_random_string(16)
         self.assertIsInstance(random_string, str)
         self.assertTrue(len(random_string) > 0)
+
+    def test_key_vault_context_manager(self):
+        """Test KeyVault securely erases key on exit."""
+        data = b"secret-key"
+        with KeyVault(data) as key:
+            self.assertIsInstance(key, bytearray)
+            self.assertEqual(bytes(key), data)
+        self.assertTrue(all(b == 0 for b in key))
 
 
 if __name__ == "__main__":
