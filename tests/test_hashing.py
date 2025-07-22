@@ -4,7 +4,10 @@ from cryptography_suite.hashing import (
     sha256_hash,
     sha384_hash,
     sha512_hash,
+    sha3_256_hash,
+    sha3_512_hash,
     blake2b_hash,
+    blake3_hash,
     derive_key_scrypt,
     derive_key_pbkdf2,
     verify_derived_key_scrypt,
@@ -44,6 +47,31 @@ class TestHashing(unittest.TestCase):
         digest = blake2b_hash(self.data)
         self.assertIsInstance(digest, str)
         self.assertEqual(len(digest), 128)  # BLAKE2b default digest size is 64 bytes
+
+    def test_sha3_256_hash_vector(self):
+        """Test SHA3-256 against a known vector."""
+        digest = sha3_256_hash("The quick brown fox jumps over the lazy dog")
+        self.assertEqual(
+            digest,
+            "69070dda01975c8c120c3aada1b282394e7f032fa9cf32f4cb2259a0897dfc04",
+        )
+
+    def test_sha3_512_hash_vector(self):
+        """Test SHA3-512 against a known vector."""
+        digest = sha3_512_hash("The quick brown fox jumps over the lazy dog")
+        self.assertEqual(
+            digest,
+            "01dedd5de4ef14642445ba5f5b97c15e47b9ad931326e4b0727cd94cefc44fff"
+            "23f07bf543139939b49128caf436dc1bdee54fcb24023a08d9403f9b4bf0d450",
+        )
+
+    def test_blake3_hash_vector(self):
+        """Test BLAKE3 against a known vector."""
+        digest = blake3_hash("The quick brown fox jumps over the lazy dog")
+        self.assertEqual(
+            digest,
+            "2f1514181aadccd913abd94cfa592701a5686ab23f8df1dff1b74710febc6d4a",
+        )
 
     def test_derive_key_scrypt(self):
         """Test key derivation using Scrypt."""

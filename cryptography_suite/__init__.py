@@ -89,7 +89,10 @@ from .hashing import (
     sha384_hash,
     sha256_hash,
     sha512_hash,
+    sha3_256_hash,
+    sha3_512_hash,
     blake2b_hash,
+    blake3_hash,
 )
 from .protocols import (
     generate_aes_key,
@@ -214,7 +217,10 @@ __all__ = [
     "sha384_hash",
     "sha256_hash",
     "sha512_hash",
+    "sha3_256_hash",
+    "sha3_512_hash",
     "blake2b_hash",
+    "blake3_hash",
     # Key Management
     "generate_aes_key",
     "rotate_aes_key",

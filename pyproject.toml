@@ -37,6 +37,7 @@ dependencies = [
     "cryptography>=44.0.0",
     "py_ecc",
     "spake2",
+    "blake3",
 ]
 
 [project.urls]
