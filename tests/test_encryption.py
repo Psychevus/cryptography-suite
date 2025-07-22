@@ -392,5 +392,8 @@ class TestEncryption(unittest.TestCase):
         os.remove(decrypted_filename)
 
 
-if __name__ == "__main__":
-    unittest.main()
+
+    def test_aes_decrypt_with_unsupported_kdf(self):
+        encrypted = aes_encrypt(self.message, self.password)
+        with self.assertRaises(ValueError):
+            aes_decrypt(encrypted, self.password, kdf="unsupported")

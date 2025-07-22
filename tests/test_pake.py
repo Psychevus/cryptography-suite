@@ -58,5 +58,12 @@ class TestPAKE(unittest.TestCase):
         self.assertEqual(str(context.exception), "Shared key has not been computed yet.")
 
 
-if __name__ == "__main__":
-    unittest.main()
+
+    def test_spake2_get_shared_key_after_computation(self):
+        client = SPAKE2Client(self.password)
+        server = SPAKE2Server(self.password)
+        cm = client.generate_message()
+        sm = server.generate_message()
+        client.compute_shared_key(sm)
+        server.compute_shared_key(cm)
+        self.assertEqual(client.get_shared_key(), server.get_shared_key())

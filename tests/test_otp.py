@@ -67,5 +67,13 @@ class TestOTP(unittest.TestCase):
         self.assertIn("Invalid secret", str(context.exception))
 
 
-if __name__ == "__main__":
-    unittest.main()
+    def test_invalid_algorithm(self):
+        with self.assertRaises(ValueError):
+            generate_totp(self.secret, algorithm="md5")
+        with self.assertRaises(ValueError):
+            generate_hotp(self.secret, self.counter, algorithm="md5")
+
+    def test_verify_totp_with_timestamp(self):
+        ts = 1000000000
+        code = generate_totp(self.secret, timestamp=ts)
+        self.assertTrue(verify_totp(code, self.secret, timestamp=ts))
