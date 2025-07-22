@@ -4,7 +4,12 @@ import base64
 from os import urandom
 
 from cryptography.hazmat.primitives.ciphers.aead import ChaCha20Poly1305
-from ..errors import EncryptionError, DecryptionError
+
+try:  # pragma: no cover - optional algorithm
+    from cryptography.hazmat.primitives.ciphers.aead import XChaCha20Poly1305
+except Exception:  # pragma: no cover - old cryptography versions
+    XChaCha20Poly1305 = None
+from ..errors import EncryptionError, DecryptionError, MissingDependencyError
 
 from .kdf import (
     CHACHA20_KEY_SIZE,
@@ -57,4 +62,47 @@ def chacha20_decrypt(encrypted_data: str, password: str) -> str:
         raise DecryptionError(f"Decryption failed: {exc}")
 
 
-__all__ = ["chacha20_encrypt", "chacha20_decrypt"]
+def xchacha_encrypt(message: bytes, key: bytes, nonce: bytes) -> dict:
+    """Encrypt ``message`` using XChaCha20-Poly1305."""
+
+    if XChaCha20Poly1305 is None:
+        raise MissingDependencyError("XChaCha20Poly1305 not available")
+
+    if not message:
+        raise EncryptionError("Message cannot be empty.")
+    if not isinstance(key, (bytes, bytearray)) or len(key) != CHACHA20_KEY_SIZE:
+        raise EncryptionError("Key must be 32 bytes.")
+    if not isinstance(nonce, (bytes, bytearray)) or len(nonce) != 24:
+        raise EncryptionError("Nonce must be 24 bytes.")
+
+    cipher = XChaCha20Poly1305(bytes(key))
+    ciphertext = cipher.encrypt(bytes(nonce), bytes(message), None)
+    return {"nonce": bytes(nonce), "ciphertext": ciphertext}
+
+
+def xchacha_decrypt(ciphertext: bytes, key: bytes, nonce: bytes) -> bytes:
+    """Decrypt data encrypted with :func:`xchacha_encrypt`."""
+
+    if XChaCha20Poly1305 is None:
+        raise MissingDependencyError("XChaCha20Poly1305 not available")
+
+    if not ciphertext:
+        raise DecryptionError("Ciphertext cannot be empty.")
+    if not isinstance(key, (bytes, bytearray)) or len(key) != CHACHA20_KEY_SIZE:
+        raise DecryptionError("Key must be 32 bytes.")
+    if not isinstance(nonce, (bytes, bytearray)) or len(nonce) != 24:
+        raise DecryptionError("Nonce must be 24 bytes.")
+
+    cipher = XChaCha20Poly1305(bytes(key))
+    try:
+        return cipher.decrypt(bytes(nonce), ciphertext, None)
+    except Exception as exc:  # pragma: no cover - high-level error handling
+        raise DecryptionError(f"Decryption failed: {exc}")
+
+
+__all__ = [
+    "chacha20_encrypt",
+    "chacha20_decrypt",
+    "xchacha_encrypt",
+    "xchacha_decrypt",
+]
