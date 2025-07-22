@@ -9,11 +9,13 @@ from cryptography_suite.asymmetric import (
     load_public_key,
     generate_x25519_keypair,
     derive_x25519_shared_key,
+    generate_x448_keypair,
+    derive_x448_shared_key,
     generate_ec_keypair,
     ec_encrypt,
     ec_decrypt,
 )
-from cryptography.hazmat.primitives.asymmetric import rsa, x25519, ec
+from cryptography.hazmat.primitives.asymmetric import rsa, x25519, x448, ec
 
 
 class TestAsymmetric(unittest.TestCase):
@@ -55,6 +57,18 @@ class TestAsymmetric(unittest.TestCase):
         invalid_public_key = "not_a_public_key"
         with self.assertRaises(TypeError):
             derive_x25519_shared_key(private_key, invalid_public_key)
+
+    def test_derive_x448_shared_key_with_invalid_private_key(self):
+        """Test deriving X448 shared key with invalid private key."""
+        _, public_key = generate_x448_keypair()
+        with self.assertRaises(TypeError):
+            derive_x448_shared_key("bad", public_key)
+
+    def test_derive_x448_shared_key_with_invalid_public_key(self):
+        """Test deriving X448 shared key with invalid public key."""
+        private_key, _ = generate_x448_keypair()
+        with self.assertRaises(TypeError):
+            derive_x448_shared_key(private_key, "bad")
 
     def test_ec_functions_with_invalid_key_types(self):
         """Test EC functions with invalid key types."""
@@ -127,6 +141,28 @@ class TestAsymmetric(unittest.TestCase):
 
         self.assertIsInstance(loaded_private_key, x25519.X25519PrivateKey)
         self.assertIsInstance(loaded_public_key, x25519.X25519PublicKey)
+
+    def test_x448_key_exchange(self):
+        """Test X448 key exchange."""
+        alice_private, alice_public = generate_x448_keypair()
+        bob_private, bob_public = generate_x448_keypair()
+
+        alice_shared = derive_x448_shared_key(alice_private, bob_public)
+        bob_shared = derive_x448_shared_key(bob_private, alice_public)
+
+        self.assertEqual(alice_shared, bob_shared)
+
+    def test_x448_serialize_and_load_keys(self):
+        """Test serialization and loading of X448 keys."""
+        private_key, public_key = generate_x448_keypair()
+        private_pem = serialize_private_key(private_key, self.password)
+        public_pem = serialize_public_key(public_key)
+
+        loaded_private_key = load_private_key(private_pem, self.password)
+        loaded_public_key = load_public_key(public_pem)
+
+        self.assertIsInstance(loaded_private_key, x448.X448PrivateKey)
+        self.assertIsInstance(loaded_public_key, x448.X448PublicKey)
 
     def test_ec_key_generation(self):
         """Test EC key pair generation."""
