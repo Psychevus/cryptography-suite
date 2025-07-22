@@ -8,6 +8,7 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives.kdf.argon2 import Argon2id
+from ..errors import KeyDerivationError
 
 # Constants
 AES_KEY_SIZE = 32  # 256 bits
@@ -31,7 +32,7 @@ def generate_salt(size: int = SALT_SIZE) -> bytes:
 def derive_key_scrypt(password: str, salt: bytes, key_size: int = AES_KEY_SIZE) -> bytes:
     """Derive a cryptographic key using Scrypt KDF."""
     if not password:
-        raise ValueError("Password cannot be empty.")
+        raise KeyDerivationError("Password cannot be empty.")
     kdf = Scrypt(salt=salt, length=key_size, n=SCRYPT_N, r=SCRYPT_R, p=SCRYPT_P)
     return kdf.derive(password.encode())
 
@@ -63,7 +64,7 @@ def verify_derived_key_scrypt(password: str, salt: bytes, expected_key: bytes) -
 def derive_key_pbkdf2(password: str, salt: bytes, key_size: int = AES_KEY_SIZE) -> bytes:
     """Derive a key using PBKDF2 HMAC SHA-256."""
     if not password:
-        raise ValueError("Password cannot be empty.")
+        raise KeyDerivationError("Password cannot be empty.")
     kdf = PBKDF2HMAC(
         algorithm=hashes.SHA256(),
         length=key_size,
@@ -98,7 +99,7 @@ def derive_key_argon2(
 ) -> bytes:
     """Derive a key using Argon2id."""
     if not password:
-        raise ValueError("Password cannot be empty.")
+        raise KeyDerivationError("Password cannot be empty.")
     kdf = Argon2id(
         salt=salt,
         length=key_size,

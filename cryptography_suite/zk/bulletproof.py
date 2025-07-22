@@ -7,6 +7,7 @@ create and verify Bulletproof range proofs for values in the range
 from __future__ import annotations
 
 from typing import Tuple
+from ..errors import ProtocolError
 
 try:  # pragma: no cover - handle missing optional dependency
     import pybulletproofs
@@ -40,7 +41,7 @@ def prove(value: int) -> Tuple[bytes, bytes, bytes]:
         raise ImportError("pybulletproofs is required for bulletproof range proofs")
 
     if not 0 <= value < 2 ** BITS:
-        raise ValueError("value out of range")
+        raise ProtocolError("value out of range")
 
     proof, commitment, nonce = pybulletproofs.zkrp_prove(value, BITS)
     return bytes(proof), bytes(commitment), bytes(nonce)

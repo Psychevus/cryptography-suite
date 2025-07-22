@@ -1,5 +1,6 @@
 from typing import List, Tuple
 import secrets
+from ..errors import ProtocolError
 
 
 def mod_inverse(a: int, p: int) -> int:
@@ -9,7 +10,7 @@ def mod_inverse(a: int, p: int) -> int:
     try:
         return pow(a, -1, p)
     except ValueError as e:
-        raise ValueError(f"No modular inverse exists for {a} modulo {p}: {e}")
+        raise ProtocolError(f"No modular inverse exists for {a} modulo {p}: {e}")
 
 
 def lagrange_interpolate(x: int, x_s: List[int], y_s: List[int], p: int) -> int:
@@ -37,9 +38,9 @@ def create_shares(secret: int, threshold: int, num_shares: int, prime: int = 2**
     Splits a secret into shares using Shamir's Secret Sharing.
     """
     if threshold > num_shares:
-        raise ValueError("Threshold cannot be greater than the number of shares.")
+        raise ProtocolError("Threshold cannot be greater than the number of shares.")
     if secret >= prime:
-        raise ValueError("Secret must be less than the prime number.")
+        raise ProtocolError("Secret must be less than the prime number.")
 
     # Generate random coefficients for the polynomial
     coeffs = [secret] + [secrets.randbelow(prime) for _ in range(threshold - 1)]

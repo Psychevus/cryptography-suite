@@ -4,6 +4,7 @@ import base64
 import struct
 from hashlib import sha1, sha256, sha512
 from typing import Optional
+from ..errors import ProtocolError
 
 
 def generate_hotp(secret: str, counter: int, digits: int = 6, algorithm: str = 'sha1') -> str:
@@ -13,7 +14,7 @@ def generate_hotp(secret: str, counter: int, digits: int = 6, algorithm: str = '
     try:
         key = base64.b32decode(secret.upper(), casefold=True)
     except Exception as e:
-        raise ValueError(f"Invalid secret: {e}")
+        raise ProtocolError(f"Invalid secret: {e}")
 
     if algorithm == 'sha1':
         hash_function = sha1
@@ -22,7 +23,7 @@ def generate_hotp(secret: str, counter: int, digits: int = 6, algorithm: str = '
     elif algorithm == 'sha512':
         hash_function = sha512
     else:
-        raise ValueError("Unsupported algorithm.")
+        raise ProtocolError("Unsupported algorithm.")
 
     msg = struct.pack(">Q", counter)
     hmac_digest = hmac.new(key, msg, hash_function).digest()

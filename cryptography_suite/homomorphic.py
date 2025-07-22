@@ -7,6 +7,7 @@ and arithmetic on ciphertexts using either the CKKS or BFV scheme.
 from __future__ import annotations
 
 from typing import Iterable, List, Union
+from .errors import EncryptionError
 
 try:  # pragma: no cover - optional dependency
     from Pyfhel import PyCtxt, Pyfhel
@@ -39,7 +40,7 @@ def keygen(scheme: str = "CKKS") -> Pyfhel:
     elif scheme == "BFV":
         he.contextGen(scheme="BFV", n=2**14, t_bits=20)
     else:
-        raise ValueError("Unsupported scheme: %s" % scheme)
+        raise EncryptionError("Unsupported scheme: %s" % scheme)
     he.keyGen()
     he.scheme = scheme  # type: ignore[attr-defined]
     return he

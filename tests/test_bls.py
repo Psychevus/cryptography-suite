@@ -6,6 +6,7 @@ from cryptography_suite.asymmetric.bls import (
     bls_aggregate,
     bls_aggregate_verify,
 )
+from cryptography_suite.errors import CryptographySuiteError
 
 
 class TestBLS(unittest.TestCase):
@@ -20,7 +21,7 @@ class TestBLS(unittest.TestCase):
 
     def test_sign_with_empty_message(self):
         sk, _ = generate_bls_keypair()
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError):
             bls_sign(b"", sk)
 
     def test_verify_with_invalid_public_key_type(self):
@@ -43,7 +44,7 @@ class TestBLS(unittest.TestCase):
         sk, pk = generate_bls_keypair()
         sig = bls_sign(self.message1, sk)
         agg = bls_aggregate([sig])
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError):
             bls_aggregate_verify([pk, pk], [self.message1], agg)
 
     def test_known_vector(self):

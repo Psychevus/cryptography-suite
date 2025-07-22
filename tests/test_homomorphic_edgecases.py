@@ -3,6 +3,7 @@ import importlib
 import sys
 import types
 import pytest
+from cryptography_suite.errors import EncryptionError
 
 
 class FakePyCtxt:
@@ -84,7 +85,7 @@ def test_keygen_case_insensitive(monkeypatch):
     assert he.scheme == "CKKS"
     he = h.keygen("bFv")
     assert he.scheme == "BFV"
-    with pytest.raises(ValueError):
+    with pytest.raises(EncryptionError):
         h.keygen("unsupported")
 
 

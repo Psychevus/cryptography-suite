@@ -12,6 +12,12 @@ from cryptography_suite.symmetric import (
     encrypt_file,
     decrypt_file,
 )
+from cryptography_suite.errors import (
+    CryptographySuiteError,
+    EncryptionError,
+    DecryptionError,
+    KeyDerivationError,
+)
 
 
 class TestEncryption(unittest.TestCase):
@@ -58,12 +64,12 @@ class TestEncryption(unittest.TestCase):
     def test_aes_decrypt_with_wrong_password(self):
         """Test AES decryption with incorrect password."""
         encrypted = aes_encrypt(self.message, self.password)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError):
             aes_decrypt(encrypted, "WrongPassword")
 
     def test_aes_encrypt_with_empty_message(self):
         """Test AES encryption with empty message."""
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError):
             aes_encrypt(self.empty_message, self.password)
 
     def test_chacha20_encrypt_decrypt(self):
@@ -75,7 +81,7 @@ class TestEncryption(unittest.TestCase):
     def test_chacha20_decrypt_with_wrong_password(self):
         """Test ChaCha20 decryption with incorrect password."""
         encrypted = chacha20_encrypt(self.message, self.password)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError):
             chacha20_decrypt(encrypted, "WrongPassword")
 
     def test_encrypt_file_and_decrypt_file(self):
@@ -110,7 +116,7 @@ class TestEncryption(unittest.TestCase):
 
         encrypt_file(test_filename, encrypted_filename, self.password)
 
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(CryptographySuiteError) as context:
             decrypt_file(
                 encrypted_filename,
                 "should_not_exist.txt",
@@ -128,12 +134,12 @@ class TestEncryption(unittest.TestCase):
 
     def test_aes_decrypt_invalid_data(self):
         """Test AES decryption with invalid encrypted data."""
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError):
             aes_decrypt("invalid_data", self.password)
 
     def test_chacha20_decrypt_invalid_data(self):
         """Test ChaCha20 decryption with invalid encrypted data."""
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError):
             chacha20_decrypt("invalid_data", self.password)
 
     def test_encrypt_file_nonexistent_input(self):
@@ -148,37 +154,37 @@ class TestEncryption(unittest.TestCase):
 
     def test_aes_encrypt_with_empty_data(self):
         """Test AES encryption with empty data."""
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError):
             aes_encrypt("", self.password)
 
     def test_aes_encrypt_with_empty_password(self):
         """Test AES encryption with empty password."""
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError):
             aes_encrypt(self.message, "")
 
     def test_aes_decrypt_with_empty_data(self):
         """Test AES decryption with empty data."""
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError):
             aes_decrypt("", self.password)
 
     def test_chacha20_encrypt_with_empty_data(self):
         """Test ChaCha20 encryption with empty data."""
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError):
             chacha20_encrypt("", self.password)
 
     def test_chacha20_encrypt_with_empty_password(self):
         """Test ChaCha20 encryption with empty password."""
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError):
             chacha20_encrypt(self.message, "")
 
     def test_chacha20_decrypt_with_empty_data(self):
         """Test ChaCha20 decryption with empty data."""
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError):
             chacha20_decrypt("", self.password)
 
     def test_chacha20_decrypt_with_invalid_data(self):
         """Test ChaCha20 decryption with invalid data."""
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError):
             chacha20_decrypt("invalid_data", self.password)
 
     def test_encrypt_file_with_invalid_kdf(self):
@@ -187,7 +193,7 @@ class TestEncryption(unittest.TestCase):
         with open(test_filename, "w") as f:
             f.write(self.message)
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError):
             encrypt_file(
                 test_filename,
                 "output.enc",
@@ -207,7 +213,7 @@ class TestEncryption(unittest.TestCase):
 
         encrypt_file(test_filename, encrypted_filename, self.password)
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError):
             decrypt_file(encrypted_filename, "output.txt", "")
 
         os.remove(test_filename)
@@ -215,7 +221,7 @@ class TestEncryption(unittest.TestCase):
 
     def test_aes_encrypt_with_invalid_kdf(self):
         """Test AES encryption with an unsupported KDF."""
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError):
             aes_encrypt(
                 self.message,
                 self.password,
@@ -224,7 +230,7 @@ class TestEncryption(unittest.TestCase):
 
     def test_aes_encrypt_with_unsupported_kdf(self):
         """Test AES encryption with an unsupported KDF."""
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError):
             aes_encrypt(
                 self.message,
                 self.password,
@@ -233,7 +239,7 @@ class TestEncryption(unittest.TestCase):
 
     def test_aes_decrypt_with_empty_encrypted_data(self):
         """Test AES decryption with empty encrypted data."""
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(CryptographySuiteError) as context:
             aes_decrypt("", self.password)
         self.assertEqual(
             str(context.exception),
@@ -243,33 +249,33 @@ class TestEncryption(unittest.TestCase):
     def test_aes_decrypt_with_empty_password(self):
         """Test AES decryption with empty password."""
         encrypted = aes_encrypt(self.message, self.password)
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(CryptographySuiteError) as context:
             aes_decrypt(encrypted, "")
         self.assertEqual(str(context.exception), "Password cannot be empty.")
 
     def test_aes_decrypt_with_invalid_encrypted_data(self):
         """Test AES decryption with invalid encrypted data length."""
         invalid_data = base64.b64encode(b"short").decode()
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(CryptographySuiteError) as context:
             aes_decrypt(invalid_data, self.password)
         self.assertEqual(str(context.exception), "Invalid encrypted data.")
 
     def test_aes_encrypt_with_empty_plaintext(self):
         """Test AES encryption with empty plaintext."""
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(CryptographySuiteError) as context:
             aes_encrypt("", self.password)
         self.assertEqual(str(context.exception), "Plaintext cannot be empty.")
 
     def test_chacha20_encrypt_with_empty_plaintext(self):
         """Test ChaCha20 encryption with empty plaintext."""
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(CryptographySuiteError) as context:
             chacha20_encrypt("", self.password)
         self.assertEqual(str(context.exception), "Plaintext cannot be empty.")
 
     def test_aes_decrypt_with_invalid_encrypted_data_length(self):
         """Test AES decryption with invalid encrypted data length."""
         invalid_data = base64.b64encode(b"short").decode()
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(CryptographySuiteError) as context:
             aes_decrypt(invalid_data, self.password)
         self.assertEqual(str(context.exception), "Invalid encrypted data.")
 
@@ -278,7 +284,7 @@ class TestEncryption(unittest.TestCase):
         test_filename = "test_file.txt"
         with open(test_filename, "w") as f:
             f.write(self.message)
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(CryptographySuiteError) as context:
             encrypt_file(test_filename, "output.enc", "")
         self.assertEqual(
             str(context.exception),
@@ -291,7 +297,7 @@ class TestEncryption(unittest.TestCase):
         test_filename = "test_file.txt"
         with open(test_filename, "w") as f:
             f.write(self.message)
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(CryptographySuiteError) as context:
             encrypt_file(
                 test_filename,
                 "output.enc",
@@ -311,7 +317,7 @@ class TestEncryption(unittest.TestCase):
         with open(test_filename, "w") as f:
             f.write(self.message)
         encrypt_file(test_filename, encrypted_filename, self.password)
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(CryptographySuiteError) as context:
             decrypt_file(
                 encrypted_filename,
                 "output_decrypted.txt",
@@ -395,5 +401,5 @@ class TestEncryption(unittest.TestCase):
 
     def test_aes_decrypt_with_unsupported_kdf(self):
         encrypted = aes_encrypt(self.message, self.password)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError):
             aes_decrypt(encrypted, self.password, kdf="unsupported")

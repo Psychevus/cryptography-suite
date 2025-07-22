@@ -2,6 +2,7 @@ import importlib
 import sys
 import types
 import pytest
+from cryptography_suite.errors import ProtocolError
 
 
 def test_bulletproof_prove_verify(monkeypatch):
@@ -15,7 +16,7 @@ def test_bulletproof_prove_verify(monkeypatch):
     assert bp.BULLETPROOF_AVAILABLE
     proof, commit, nonce = bp.prove(10)
     assert bp.verify(proof, commit)
-    with pytest.raises(ValueError):
+    with pytest.raises(ProtocolError):
         bp.prove(-1)
 
 

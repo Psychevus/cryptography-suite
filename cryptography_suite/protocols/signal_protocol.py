@@ -9,6 +9,7 @@ from typing import Tuple
 from cryptography.hazmat.primitives import hashes, hmac
 from cryptography.hazmat.primitives.asymmetric import x25519
 from cryptography.hazmat.primitives import serialization
+from ..errors import ProtocolError
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 
@@ -153,7 +154,7 @@ class DoubleRatchet:
             self._ratchet_step(remote_pub)
 
         if self.recv_chain_key is None:
-            raise ValueError("No receiving chain key available")
+            raise ProtocolError("No receiving chain key available")
 
         self.recv_chain_key, msg_key = _kdf_ck(self.recv_chain_key)
         return AESGCM(msg_key).decrypt(message.nonce, message.ciphertext, None)
@@ -244,14 +245,14 @@ class SignalReceiver:
         """Encrypt a message for the sender."""
 
         if self.ratchet is None:
-            raise ValueError("Session not initialized")
+            raise ProtocolError("Session not initialized")
         return self.ratchet.encrypt(plaintext)
 
     def decrypt(self, message: EncryptedMessage) -> bytes:
         """Decrypt a message from the sender."""
 
         if self.ratchet is None:
-            raise ValueError("Session not initialized")
+            raise ProtocolError("Session not initialized")
         return self.ratchet.decrypt(message)
 
 

@@ -1,4 +1,5 @@
 from typing import Tuple
+from ..errors import EncryptionError, DecryptionError
 
 from cryptography.hazmat.primitives import serialization, hashes, constant_time
 from cryptography.hazmat.primitives.asymmetric import (
@@ -25,7 +26,9 @@ def generate_rsa_keypair(
     Generates an RSA private and public key pair.
     """
     if key_size < 2048:
-        raise ValueError("Key size should be at least 2048 bits for security reasons.")
+        raise EncryptionError(
+            "Key size should be at least 2048 bits for security reasons."
+        )
     private_key = rsa.generate_private_key(public_exponent=65537, key_size=key_size)
     public_key = private_key.public_key()
     return private_key, public_key
@@ -36,7 +39,7 @@ def rsa_encrypt(plaintext: bytes, public_key: rsa.RSAPublicKey) -> bytes:
     Encrypts plaintext using RSA-OAEP with SHA-256.
     """
     if not plaintext:
-        raise ValueError("Plaintext cannot be empty.")
+        raise EncryptionError("Plaintext cannot be empty.")
     if not isinstance(public_key, rsa.RSAPublicKey):
         raise TypeError("Invalid RSA public key provided.")
 
@@ -59,7 +62,7 @@ def rsa_decrypt(ciphertext: bytes, private_key: rsa.RSAPrivateKey) -> bytes:
         raise TypeError("Invalid RSA private key provided.")
 
     if not ciphertext:
-        raise ValueError("Ciphertext cannot be empty.")
+        raise DecryptionError("Ciphertext cannot be empty.")
 
     try:
         plaintext = private_key.decrypt(
@@ -72,7 +75,7 @@ def rsa_decrypt(ciphertext: bytes, private_key: rsa.RSAPrivateKey) -> bytes:
         )
         return plaintext
     except Exception as e:
-        raise ValueError(f"Decryption failed: {e}")
+        raise DecryptionError(f"Decryption failed: {e}")
 
 
 def serialize_private_key(private_key, password: str) -> bytes:
@@ -80,7 +83,7 @@ def serialize_private_key(private_key, password: str) -> bytes:
     Serializes a private key to PEM format, encrypted with a password.
     """
     if not password:
-        raise ValueError("Password cannot be empty.")
+        raise EncryptionError("Password cannot be empty.")
     if not isinstance(
         private_key,
         (
@@ -129,7 +132,7 @@ def load_private_key(pem_data: bytes, password: str):
     Loads a private key (RSA, X25519, X448, or EC) from PEM data.
     """
     if not password:
-        raise ValueError("Password cannot be empty.")
+        raise DecryptionError("Password cannot be empty.")
 
     try:
         private_key = serialization.load_pem_private_key(
@@ -137,7 +140,7 @@ def load_private_key(pem_data: bytes, password: str):
         )
         return private_key
     except Exception as e:
-        raise ValueError(f"Failed to load private key: {e}")
+        raise DecryptionError(f"Failed to load private key: {e}")
 
 
 def load_public_key(pem_data: bytes):
@@ -148,7 +151,7 @@ def load_public_key(pem_data: bytes):
         public_key = serialization.load_pem_public_key(pem_data)
         return public_key
     except Exception as e:
-        raise ValueError(f"Failed to load public key: {e}")
+        raise DecryptionError(f"Failed to load public key: {e}")
 
 
 def generate_x25519_keypair() -> Tuple[x25519.X25519PrivateKey, x25519.X25519PublicKey]:
@@ -214,14 +217,14 @@ def ec_encrypt(plaintext: bytes, public_key: x25519.X25519PublicKey) -> bytes:
     """
 
     if not plaintext:
-        raise ValueError("Plaintext cannot be empty.")
+        raise EncryptionError("Plaintext cannot be empty.")
     if not isinstance(public_key, x25519.X25519PublicKey):
         raise TypeError("Invalid X25519 public key provided.")
 
     eph_priv = x25519.X25519PrivateKey.generate()
     shared = eph_priv.exchange(public_key)
     if constant_time.bytes_eq(shared, b"\x00" * 32):
-        raise ValueError("Invalid shared secret derived.")
+        raise EncryptionError("Invalid shared secret derived.")
 
     key = HKDF(
         algorithm=hashes.SHA256(),
@@ -247,11 +250,11 @@ def ec_decrypt(ciphertext: bytes, private_key: x25519.X25519PrivateKey) -> bytes
     """
 
     if not ciphertext:
-        raise ValueError("Ciphertext cannot be empty.")
+        raise DecryptionError("Ciphertext cannot be empty.")
     if not isinstance(private_key, x25519.X25519PrivateKey):
         raise TypeError("Invalid X25519 private key provided.")
     if len(ciphertext) < 32 + 12 + 16:
-        raise ValueError("Invalid ciphertext.")
+        raise DecryptionError("Invalid ciphertext.")
 
     eph_pub_bytes = ciphertext[:32]
     nonce = ciphertext[32:44]
@@ -266,11 +269,11 @@ def ec_decrypt(ciphertext: bytes, private_key: x25519.X25519PrivateKey) -> bytes
         ),
         eph_pub_bytes,
     ):
-        raise ValueError("Invalid ephemeral public key.")
+        raise DecryptionError("Invalid ephemeral public key.")
 
     shared = private_key.exchange(eph_pub)
     if constant_time.bytes_eq(shared, b"\x00" * 32):
-        raise ValueError("Invalid shared secret derived.")
+        raise DecryptionError("Invalid shared secret derived.")
 
     key = HKDF(
         algorithm=hashes.SHA256(),
@@ -282,4 +285,4 @@ def ec_decrypt(ciphertext: bytes, private_key: x25519.X25519PrivateKey) -> bytes
     try:
         return AESGCM(key).decrypt(nonce, enc, None)
     except Exception as exc:  # pragma: no cover - high-level error handling
-        raise ValueError(f"Decryption failed: {exc}") from exc
+        raise DecryptionError(f"Decryption failed: {exc}") from exc
