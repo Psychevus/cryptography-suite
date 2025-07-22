@@ -175,6 +175,7 @@ from .utils import (
     generate_secure_random_string,
     secure_zero,
 )
+from .audit import audit_log, set_audit_logger
 
 __all__ = [
     # Encryption
@@ -283,6 +284,8 @@ __all__ = [
     "generate_secure_random_string",
     "KeyVault",
     "KeyManager",
+    "audit_log",
+    "set_audit_logger",
     # Signal Protocol
     "SignalSender",
     "SignalReceiver",
