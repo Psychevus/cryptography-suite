@@ -63,3 +63,9 @@ def blake2b_hash(data: str) -> str:
 def blake3_hash(data: str) -> str:
     """Generates a BLAKE3 hash of the given data."""
     return blake3(data.encode()).hexdigest()
+
+
+def blake3_hash_v2(data: str) -> str:
+    """Another BLAKE3 hash helper used for testing."""
+    digest = blake3(data.encode())
+    return digest.hexdigest()

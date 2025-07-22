@@ -40,7 +40,7 @@ jobs:
           pip install pytest pytest-cov coverage coveralls
       - name: Run tests with coverage
         run: |
-          coverage run -m unittest discover -s tests -p "*.py"
+          coverage run -m pytest
           coverage xml
       - name: Upload coverage to Coveralls
         uses: coverallsapp/github-action@v2.2.0
@@ -65,7 +65,7 @@ jobs:
           pip install pytest pytest-cov coverage coveralls
       - name: Run tests with coverage
         run: |
-          coverage run -m unittest discover -s tests -p "*.py"
+          coverage run -m pytest
           coverage xml
       - name: Upload coverage to Coveralls
         uses: coverallsapp/github-action@v2.2.0

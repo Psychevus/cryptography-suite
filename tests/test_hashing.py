@@ -10,6 +10,7 @@ from cryptography_suite.hashing import (
     sha3_512_hash,
     blake2b_hash,
     blake3_hash,
+    blake3_hash_v2,
 )
 
 
@@ -22,6 +23,7 @@ REF_HASHES = {
     sha3_512_hash: lambda s: hashlib.sha3_512(s).hexdigest(),
     blake2b_hash: lambda s: hashlib.blake2b(s, digest_size=64).hexdigest(),
     blake3_hash: lambda s: blake3(s).hexdigest(),
+    blake3_hash_v2: lambda s: blake3(s).hexdigest(),
 }
 
 
@@ -33,6 +35,7 @@ REF_HASHES = {
     (sha3_512_hash, '840006653e9ac9e95117a15c915caab81662918e925de9e004f774ff82d7079a40d4d27b1b372657c61d46d470304c88c788b3a4527ad074d1dccbee5dbaa99a'),
     (blake2b_hash, '021ced8799296ceca557832ab941a50b4a11f83478cf141f51f933f653ab9fbcc05a037cddbed06e309bf334942c4e58cdf1a46e237911ccd7fcf9787cbc7fd0'),
     (blake3_hash, 'd74981efa70a0c880b8d8c1985d075dbcbf679b99a5f9914e5aaf96b831a9e24'),
+    (blake3_hash_v2, 'd74981efa70a0c880b8d8c1985d075dbcbf679b99a5f9914e5aaf96b831a9e24'),
 ])
 def test_known_vectors(func, expected):
     """Verify each hash function against a known digest for 'hello world'."""
@@ -40,9 +43,9 @@ def test_known_vectors(func, expected):
 
 
 @pytest.mark.parametrize("func", list(REF_HASHES))
-def test_empty_and_long_strings(func):
-    """Hashing empty and very long strings should match hashlib results."""
-    for text in ("", "a" * 10000):
+def test_various_inputs(func):
+    """Hashing empty, unicode and long strings should match reference libs."""
+    for text in ("", "こんにちは", "a" * 10000):
         expected = REF_HASHES[func](text.encode())
         assert func(text) == expected
 
