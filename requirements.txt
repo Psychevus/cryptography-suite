@@ -1,4 +1,4 @@
-cryptography~=43.0.3
+cryptography>=44.0.0
 pqcrypto
 py_ecc
 spake2

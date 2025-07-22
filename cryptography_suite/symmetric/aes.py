@@ -93,7 +93,7 @@ def encrypt_file(
 
     Argon2id is used by default. Specify ``kdf='scrypt'`` or ``kdf='pbkdf2'`` to
     maintain compatibility with existing files.
-    
+
     The file is processed in chunks to avoid loading the entire file into
     memory. The output file begins with the salt and nonce and ends with the
     authentication tag.
