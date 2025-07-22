@@ -7,21 +7,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-
-try:  # pragma: no cover - optional in older cryptography versions
-    from cryptography.hazmat.primitives.kdf.argon2 import Argon2id
-    _ARGON2_CRYPTOGRAPHY = True
-except Exception:  # pragma: no cover - argon2 not supported
-    Argon2id = None
-    _ARGON2_CRYPTOGRAPHY = False
-
-try:  # pragma: no cover - optional external dependency
-    from argon2.low_level import hash_secret_raw, Type as _ArgonType
-    _ARGON2_CFFI = True
-except Exception:  # pragma: no cover - argon2-cffi missing
-    _ARGON2_CFFI = False
-
-_ARGON2_AVAILABLE = _ARGON2_CRYPTOGRAPHY or _ARGON2_CFFI
+from cryptography.hazmat.primitives.kdf.argon2 import Argon2id
 
 # Constants
 AES_KEY_SIZE = 32  # 256 bits
@@ -113,26 +99,14 @@ def derive_key_argon2(
     """Derive a key using Argon2id."""
     if not password:
         raise ValueError("Password cannot be empty.")
-    if _ARGON2_CRYPTOGRAPHY:
-        kdf = Argon2id(
-            salt=salt,
-            length=key_size,
-            iterations=time_cost,
-            lanes=parallelism,
-            memory_cost=memory_cost,
-        )
-        return kdf.derive(password.encode())
-    if _ARGON2_CFFI:
-        return hash_secret_raw(
-            password.encode(),
-            salt,
-            time_cost,
-            memory_cost,
-            parallelism,
-            key_size,
-            _ArgonType.ID,
-        )
-    raise RuntimeError("Argon2id KDF is not available in this environment.")
+    kdf = Argon2id(
+        salt=salt,
+        length=key_size,
+        iterations=time_cost,
+        lanes=parallelism,
+        memory_cost=memory_cost,
+    )
+    return kdf.derive(password.encode())
 
 
 __all__ = [
