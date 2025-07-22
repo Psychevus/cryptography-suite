@@ -1,5 +1,4 @@
 from cryptography.exceptions import InvalidKey
-from cryptography.exceptions import InvalidKey
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import x25519
 from spake2 import SPAKE2_A, SPAKE2_B, SPAKEError

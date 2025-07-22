@@ -1,23 +1,27 @@
 from __future__ import annotations
 
+from os import urandom
+
+from cryptography.exceptions import InvalidKey
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+
 try:  # pragma: no cover - optional in older cryptography versions
     from cryptography.hazmat.primitives.kdf.argon2 import Argon2id
     _ARGON2_CRYPTOGRAPHY = True
 except Exception:  # pragma: no cover - argon2 not supported
     Argon2id = None
     _ARGON2_CRYPTOGRAPHY = False
+
 try:  # pragma: no cover - optional external dependency
     from argon2.low_level import hash_secret_raw, Type as _ArgonType
     _ARGON2_CFFI = True
 except Exception:  # pragma: no cover - argon2-cffi missing
     _ARGON2_CFFI = False
+
 _ARGON2_AVAILABLE = _ARGON2_CRYPTOGRAPHY or _ARGON2_CFFI
-from cryptography.exceptions import InvalidKey
-from os import urandom
 
 # Constants
 AES_KEY_SIZE = 32  # 256 bits
