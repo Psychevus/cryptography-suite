@@ -5,3 +5,8 @@ source = cryptography_suite
 [report]
 omit =
     tests/*
+
+[paths]
+source =
+    cryptography_suite/
+    */site-packages/
