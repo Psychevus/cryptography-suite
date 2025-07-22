@@ -1,5 +1,5 @@
 import unittest
-from cryptography_suite.secret_sharing import (
+from cryptography_suite.protocols import (
     create_shares,
     reconstruct_secret,
 )

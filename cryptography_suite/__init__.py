@@ -84,7 +84,7 @@ from .hashing import (
     sha512_hash,
     blake2b_hash,
 )
-from .key_management import (
+from .protocols import (
     generate_aes_key,
     rotate_aes_key,
     secure_save_key_to_file,
@@ -93,11 +93,18 @@ from .key_management import (
     key_exists,
     generate_rsa_keypair_and_save,
     generate_ec_keypair_and_save,
+    create_shares,
+    reconstruct_secret,
+    SPAKE2Client,
+    SPAKE2Server,
+    generate_totp,
+    verify_totp,
+    generate_hotp,
+    verify_hotp,
+    SignalSender,
+    SignalReceiver,
+    initialize_signal_session,
 )
-from .secret_sharing import create_shares, reconstruct_secret
-from .pake import SPAKE2Client, SPAKE2Server
-from .otp import generate_totp, verify_totp, generate_hotp, verify_hotp
-from .signal_protocol import SignalSender, SignalReceiver, initialize_signal_session
 
 # Optional homomorphic encryption -------------------------------------------
 try:  # pragma: no cover - optional dependency
