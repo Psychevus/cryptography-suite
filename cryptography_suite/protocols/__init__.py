@@ -17,6 +17,7 @@ from .key_management import (
     key_exists,
     generate_rsa_keypair_and_save,
     generate_ec_keypair_and_save,
+    KeyManager,
 )
 
 __all__ = [
@@ -39,4 +40,5 @@ __all__ = [
     "key_exists",
     "generate_rsa_keypair_and_save",
     "generate_ec_keypair_and_save",
+    "KeyManager",
 ]
