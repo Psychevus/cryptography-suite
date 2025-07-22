@@ -1,4 +1,5 @@
 import unittest
+import base64
 from cryptography_suite.asymmetric import (
     generate_rsa_keypair,
     rsa_encrypt,
@@ -29,6 +30,7 @@ class TestAsymmetric(unittest.TestCase):
         """Test RSA encryption and decryption."""
         private_key, public_key = generate_rsa_keypair()
         ciphertext = rsa_encrypt(self.message, public_key)
+        self.assertIsInstance(ciphertext, str)
         plaintext = rsa_decrypt(ciphertext, private_key)
         self.assertEqual(self.message, plaintext)
 
@@ -243,6 +245,7 @@ class TestAsymmetric(unittest.TestCase):
         priv, pub = generate_x25519_keypair()
         data = b"Top secret"
         ct = ec_encrypt(data, pub)
+        self.assertIsInstance(ct, str)
         pt = ec_decrypt(ct, priv)
         self.assertEqual(data, pt)
 
@@ -258,9 +261,11 @@ class TestAsymmetric(unittest.TestCase):
         """Tampering with ciphertext must raise an error."""
         priv, pub = generate_x25519_keypair()
         ct = ec_encrypt(self.message, pub)
-        tampered = ct[:-1] + bytes([ct[-1] ^ 0x01])
+        raw = base64.b64decode(ct)
+        tampered = raw[:-1] + bytes([raw[-1] ^ 0x01])
+        tampered_b64 = base64.b64encode(tampered).decode()
         with self.assertRaises(CryptographySuiteError):
-            ec_decrypt(tampered, priv)
+            ec_decrypt(tampered_b64, priv)
 
 
 if __name__ == "__main__":

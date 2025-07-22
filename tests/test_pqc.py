@@ -17,12 +17,15 @@ class TestPQC(unittest.TestCase):
         pk, sk = generate_kyber_keypair()
         msg = b"pqc test"
         ct, ss = kyber_encrypt(pk, msg)
+        self.assertIsInstance(ct, str)
+        self.assertIsInstance(ss, str)
         self.assertEqual(kyber_decrypt(sk, ct, ss), msg)
 
     def test_dilithium_signature(self):
         pk, sk = generate_dilithium_keypair()
         msg = b"sign me"
         sig = dilithium_sign(sk, msg)
+        self.assertIsInstance(sig, str)
         self.assertTrue(dilithium_verify(pk, msg, sig))
 
 

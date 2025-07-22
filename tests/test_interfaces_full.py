@@ -1,6 +1,7 @@
 import importlib
 import sys
 import types
+import base64
 
 import pytest
 from cryptography_suite.errors import DecryptionError
@@ -96,6 +97,7 @@ def test_ecies_roundtrip():
     priv, pub = generate_x25519_keypair()
     msg = b"top"
     ct = ec_encrypt(msg, pub)
+    assert isinstance(ct, str)
     assert ec_decrypt(ct, priv) == msg
 
 
@@ -110,9 +112,11 @@ def test_ecies_wrong_key():
 def test_ecies_tamper(monkeypatch):
     priv, pub = generate_x25519_keypair()
     ct = ec_encrypt(b"msg", pub)
-    tampered = ct[:-1] + bytes([ct[-1] ^ 1])
+    raw = base64.b64decode(ct)
+    tampered = raw[:-1] + bytes([raw[-1] ^ 1])
+    tampered_b64 = base64.b64encode(tampered).decode()
     with pytest.raises(DecryptionError):
-        ec_decrypt(tampered, priv)
+        ec_decrypt(tampered_b64, priv)
 
 
 def test_ecies_deterministic(monkeypatch):
