@@ -1,4 +1,5 @@
 import os
+from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ec
 from os import path
 from ..asymmetric import (
@@ -9,6 +10,7 @@ from ..asymmetric import (
     serialize_public_key,
     generate_ec_keypair,
 )
+from ..errors import DecryptionError
 
 # Constants
 DEFAULT_AES_KEY_SIZE = 32  # 256 bits
@@ -33,7 +35,7 @@ def secure_save_key_to_file(key_data: bytes, filepath: str):
     Saves key data to a specified file path with secure permissions.
     """
     try:
-        with open(filepath, 'wb') as key_file:
+        with open(filepath, "wb") as key_file:
             key_file.write(key_data)
         os.chmod(filepath, 0o600)
     except Exception as e:
@@ -47,7 +49,7 @@ def load_private_key_from_file(filepath: str, password: str):
     if not path.exists(filepath):
         raise FileNotFoundError(f"Private key file {filepath} does not exist.")
 
-    with open(filepath, 'rb') as key_file:
+    with open(filepath, "rb") as key_file:
         pem_data = key_file.read()
     return load_private_key(pem_data, password)
 
@@ -59,7 +61,7 @@ def load_public_key_from_file(filepath: str):
     if not path.exists(filepath):
         raise FileNotFoundError(f"Public key file {filepath} does not exist.")
 
-    with open(filepath, 'rb') as key_file:
+    with open(filepath, "rb") as key_file:
         pem_data = key_file.read()
     return load_public_key(pem_data)
 
@@ -103,3 +105,63 @@ def generate_ec_keypair_and_save(
 
     secure_save_key_to_file(private_pem, private_key_path)
     secure_save_key_to_file(public_pem, public_key_path)
+
+
+class KeyManager:
+    """Utility class for handling private key storage and rotation."""
+
+    def save_private_key(
+        self, private_key, filepath: str, password: str | None = None
+    ) -> None:
+        """Save a private key in PEM format.
+
+        If ``password`` is provided the key is wrapped using AES-256-CBC.
+        """
+
+        if password:
+            encryption = serialization.BestAvailableEncryption(password.encode())
+        else:
+            encryption = serialization.NoEncryption()
+
+        pem_data = private_key.private_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PrivateFormat.PKCS8,
+            encryption_algorithm=encryption,
+        )
+        secure_save_key_to_file(pem_data, filepath)
+
+    def load_private_key(self, filepath: str, password: str | None = None):
+        """Load a private key from ``filepath``.
+
+        ``password`` should be provided if the key is encrypted.
+        """
+
+        if not path.exists(filepath):
+            raise FileNotFoundError(f"Private key file {filepath} does not exist.")
+
+        with open(filepath, "rb") as key_file:
+            pem_data = key_file.read()
+
+        pwd = password.encode() if password else None
+        try:
+            return serialization.load_pem_private_key(pem_data, password=pwd)
+        except Exception as exc:  # pragma: no cover - defensive
+            raise DecryptionError(f"Failed to load private key: {exc}") from exc
+
+    def rotate_keys(self, key_dir: str) -> None:
+        """Generate a new RSA key pair replacing any existing pair in ``key_dir``."""
+
+        private_path = os.path.join(key_dir, "private_key.pem")
+        public_path = os.path.join(key_dir, "public_key.pem")
+
+        if path.exists(private_path):
+            os.remove(private_path)
+        if path.exists(public_path):
+            os.remove(public_path)
+
+        private_key, public_key = generate_rsa_keypair()
+        self.save_private_key(private_key, private_path)
+        secure_save_key_to_file(
+            serialize_public_key(public_key),
+            public_path,
+        )

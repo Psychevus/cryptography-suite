@@ -136,6 +136,7 @@ from .protocols import (
     secure_save_key_to_file,
     verify_hotp,
     verify_totp,
+    KeyManager,
 )
 
 # Optional homomorphic encryption -------------------------------------------
@@ -281,6 +282,7 @@ __all__ = [
     "secure_zero",
     "generate_secure_random_string",
     "KeyVault",
+    "KeyManager",
     # Signal Protocol
     "SignalSender",
     "SignalReceiver",
