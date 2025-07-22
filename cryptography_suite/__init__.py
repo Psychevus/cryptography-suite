@@ -74,8 +74,8 @@ from .asymmetric.bls import (
 try:  # pragma: no cover - optional dependency
     from .pqc import (
         generate_kyber_keypair,
-        kyber_encapsulate,
-        kyber_decapsulate,
+        kyber_encrypt,
+        kyber_decrypt,
         generate_dilithium_keypair,
         dilithium_sign,
         dilithium_verify,
@@ -259,8 +259,8 @@ if PQCRYPTO_AVAILABLE:
     __all__.extend(
         [
             "generate_kyber_keypair",
-            "kyber_encapsulate",
-            "kyber_decapsulate",
+            "kyber_encrypt",
+            "kyber_decrypt",
             "generate_dilithium_keypair",
             "dilithium_sign",
             "dilithium_verify",

@@ -14,6 +14,8 @@ class DummyKEM:
     def decrypt(sk, ct):
         return b"ss"
 
+    CIPHERTEXT_SIZE = 2
+
 class DummySIG:
     @staticmethod
     def generate_keypair():
@@ -48,23 +50,11 @@ def reload_module(monkeypatch):
 def test_pqc_key_enc_sign(monkeypatch):
     pqc = reload_module(monkeypatch)
     pk, sk = pqc.generate_kyber_keypair()
-    ct, ss = pqc.kyber_encapsulate(pk)
-    assert pqc.kyber_decapsulate(ct, sk) == ss
+    ct, ss = pqc.kyber_encrypt(pk, b"m")
+    assert pqc.kyber_decrypt(sk, ct, ss) == b"m"
     pk2, sk2 = pqc.generate_dilithium_keypair()
-    sig = pqc.dilithium_sign(b"m", sk2)
-    assert pqc.dilithium_verify(b"m", sig, pk2)
-    with pytest.raises(ValueError):
-        pqc.generate_kyber_keypair(999)
-    with pytest.raises(ValueError):
-        pqc.kyber_encapsulate(pk, 999)
-    with pytest.raises(ValueError):
-        pqc.kyber_decapsulate(ct, sk, 999)
-    with pytest.raises(ValueError):
-        pqc.generate_dilithium_keypair(0)
-    with pytest.raises(ValueError):
-        pqc.dilithium_sign(b"m", sk2, 0)
-    with pytest.raises(ValueError):
-        pqc.dilithium_verify(b"m", b"x", pk2, 0)
+    sig = pqc.dilithium_sign(sk2, b"m")
+    assert pqc.dilithium_verify(pk2, b"m", sig)
 
 
 def test_pqc_import_error(monkeypatch):

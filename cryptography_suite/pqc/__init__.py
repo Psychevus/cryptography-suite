@@ -9,6 +9,9 @@ implementations from PQClean.
 from __future__ import annotations
 
 from typing import Tuple
+import os
+import hashlib
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 try:  # pragma: no cover - optional dependency
     from pqcrypto.kem import ml_kem_512, ml_kem_768, ml_kem_1024
@@ -25,26 +28,12 @@ _KYBER_LEVEL_MAP = {512: ml_kem_512, 768: ml_kem_768, 1024: ml_kem_1024}
 _DILITHIUM_LEVEL_MAP = {2: ml_dsa_44, 3: ml_dsa_65, 5: ml_dsa_87}
 
 
-def generate_kyber_keypair(level: int = 512) -> Tuple[bytes, bytes]:
-    """Generate an ML-KEM key pair.
-
-    Parameters
-    ----------
-    level:
-        Security level. One of ``512``, ``768``, or ``1024``.
-
-    Returns
-    -------
-    Tuple[bytes, bytes]
-        ``(public_key, secret_key)``.
-    """
+def generate_kyber_keypair() -> Tuple[bytes, bytes]:
+    """Generate a Kyber key pair using ML-KEM-512."""
     if not PQCRYPTO_AVAILABLE:
         raise ImportError("pqcrypto is required for Kyber functions")
 
-    alg = _KYBER_LEVEL_MAP.get(level)
-    if alg is None:
-        raise ValueError("Invalid Kyber level")
-    return alg.generate_keypair()
+    return ml_kem_512.generate_keypair()
 
 
 def kyber_encapsulate(public_key: bytes, level: int = 512) -> Tuple[bytes, bytes]:
@@ -97,83 +86,70 @@ def kyber_decapsulate(ciphertext: bytes, secret_key: bytes, level: int = 512) ->
     return alg.decrypt(secret_key, ciphertext)
 
 
-def generate_dilithium_keypair(level: int = 2) -> Tuple[bytes, bytes]:
-    """Generate a Dilithium key pair.
+def kyber_encrypt(public_key: bytes, plaintext: bytes) -> Tuple[bytes, bytes]:
+    """Encrypt ``plaintext`` using Kyber and AES-GCM.
 
-    Parameters
-    ----------
-    level:
-        Security level ``2``, ``3``, or ``5``.
-
-    Returns
-    -------
-    Tuple[bytes, bytes]
-        ``(public_key, secret_key)``.
+    The function first encapsulates a shared secret with ML-KEM-512 and then
+    derives an AES key from that secret to encrypt the plaintext. The returned
+    tuple contains the Kyber ciphertext followed by the AES-GCM output and the
+    shared secret used for encryption.
     """
+    if not PQCRYPTO_AVAILABLE:
+        raise ImportError("pqcrypto is required for Kyber functions")
+
+    kem_ct, ss = ml_kem_512.encrypt(public_key)
+    key = hashlib.sha256(ss).digest()
+    aesgcm = AESGCM(key)
+    nonce = os.urandom(12)
+    enc = nonce + aesgcm.encrypt(nonce, plaintext, None)
+    return kem_ct + enc, ss
+
+
+def kyber_decrypt(private_key: bytes, ciphertext: bytes, shared_secret: bytes) -> bytes:
+    """Decrypt data encrypted by :func:`kyber_encrypt`."""
+    if not PQCRYPTO_AVAILABLE:
+        raise ImportError("pqcrypto is required for Kyber functions")
+
+    ct_size = ml_kem_512.CIPHERTEXT_SIZE
+    if len(ciphertext) < ct_size + 12 + 16:
+        raise ValueError("Invalid ciphertext")
+
+    kem_ct = ciphertext[:ct_size]
+    enc = ciphertext[ct_size:]
+    ss_check = ml_kem_512.decrypt(private_key, kem_ct)
+    if ss_check != shared_secret:
+        raise ValueError("Shared secret mismatch")
+
+    key = hashlib.sha256(shared_secret).digest()
+    aesgcm = AESGCM(key)
+    nonce = enc[:12]
+    ct = enc[12:]
+    return aesgcm.decrypt(nonce, ct, None)
+
+
+def generate_dilithium_keypair() -> Tuple[bytes, bytes]:
+    """Generate a Dilithium key pair using level 2 parameters."""
     if not PQCRYPTO_AVAILABLE:
         raise ImportError("pqcrypto is required for Dilithium functions")
 
-    alg = _DILITHIUM_LEVEL_MAP.get(level)
-    if alg is None:
-        raise ValueError("Invalid Dilithium level")
-    return alg.generate_keypair()
+    return ml_dsa_44.generate_keypair()
 
 
-def dilithium_sign(message: bytes, secret_key: bytes, level: int = 2) -> bytes:
-    """Sign a message using Dilithium.
-
-    Parameters
-    ----------
-    message:
-        Message to sign.
-    secret_key:
-        Dilithium secret key.
-    level:
-        Security level matching the key.
-
-    Returns
-    -------
-    bytes
-        Signature bytes.
-    """
+def dilithium_sign(private_key: bytes, message: bytes) -> bytes:
+    """Sign a message using Dilithium level 2."""
     if not PQCRYPTO_AVAILABLE:
         raise ImportError("pqcrypto is required for Dilithium functions")
 
-    alg = _DILITHIUM_LEVEL_MAP.get(level)
-    if alg is None:
-        raise ValueError("Invalid Dilithium level")
-    return alg.sign(secret_key, message)
+    return ml_dsa_44.sign(private_key, message)
 
 
-def dilithium_verify(
-    message: bytes, signature: bytes, public_key: bytes, level: int = 2
-) -> bool:
-    """Verify a Dilithium signature.
-
-    Parameters
-    ----------
-    message:
-        Original message.
-    signature:
-        Signature to verify.
-    public_key:
-        Dilithium public key.
-    level:
-        Security level matching the key.
-
-    Returns
-    -------
-    bool
-        ``True`` if the signature is valid, ``False`` otherwise.
-    """
+def dilithium_verify(public_key: bytes, message: bytes, signature: bytes) -> bool:
+    """Verify a Dilithium signature using level 2."""
     if not PQCRYPTO_AVAILABLE:
         raise ImportError("pqcrypto is required for Dilithium functions")
 
-    alg = _DILITHIUM_LEVEL_MAP.get(level)
-    if alg is None:
-        raise ValueError("Invalid Dilithium level")
     try:
-        alg.verify(public_key, message, signature)
+        ml_dsa_44.verify(public_key, message, signature)
         return True
     except Exception:
         return False

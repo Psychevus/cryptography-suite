@@ -3,8 +3,8 @@ import unittest
 from cryptography_suite.pqc import (
     PQCRYPTO_AVAILABLE,
     generate_kyber_keypair,
-    kyber_encapsulate,
-    kyber_decapsulate,
+    kyber_encrypt,
+    kyber_decrypt,
     generate_dilithium_keypair,
     dilithium_sign,
     dilithium_verify,
@@ -12,18 +12,18 @@ from cryptography_suite.pqc import (
 
 
 @unittest.skipUnless(PQCRYPTO_AVAILABLE, "pqcrypto not installed")
-class TestPostQuantum(unittest.TestCase):
-    def test_kyber_kem(self):
+class TestPQC(unittest.TestCase):
+    def test_kyber_encrypt_decrypt(self):
         pk, sk = generate_kyber_keypair()
-        ct, ss1 = kyber_encapsulate(pk)
-        ss2 = kyber_decapsulate(ct, sk)
-        self.assertEqual(ss1, ss2)
+        msg = b"pqc test"
+        ct, ss = kyber_encrypt(pk, msg)
+        self.assertEqual(kyber_decrypt(sk, ct, ss), msg)
 
     def test_dilithium_signature(self):
         pk, sk = generate_dilithium_keypair()
-        message = b"test message"
-        sig = dilithium_sign(message, sk)
-        self.assertTrue(dilithium_verify(message, sig, pk))
+        msg = b"sign me"
+        sig = dilithium_sign(sk, msg)
+        self.assertTrue(dilithium_verify(pk, msg, sig))
 
 
 if __name__ == "__main__":
