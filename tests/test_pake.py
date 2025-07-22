@@ -24,9 +24,9 @@ class TestPAKE(unittest.TestCase):
 
     def test_spake2_with_empty_password(self):
         """Test SPAKE2 initialization with empty password."""
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError)):
             SPAKE2Client("")
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError)):
             SPAKE2Server("")
 
     def test_spake2_compute_shared_key_before_generate_message(self):
@@ -36,7 +36,7 @@ class TestPAKE(unittest.TestCase):
 
         # Attempt to compute shared key without generating messages
         server_public_bytes = server.generate_message()
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError)):
             # Client has not generated its own message yet
             client.compute_shared_key(server_public_bytes)
 
@@ -53,7 +53,7 @@ class TestPAKE(unittest.TestCase):
         """Test getting shared key before computation."""
         client = SPAKE2Client(self.password)
         client.generate_message()
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(CryptographySuiteError)) as context:
             client.get_shared_key()
         self.assertEqual(str(context.exception), "Shared key has not been computed yet.")
 
@@ -81,7 +81,7 @@ class TestPAKE(unittest.TestCase):
     def test_spake2_server_before_generate_message(self):
         """Server.compute_shared_key should fail if generate_message() not called."""
         server = SPAKE2Server(self.password)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError)):
             server.compute_shared_key(b"msg")
 
     def test_spake2_reflection_error(self):
@@ -107,12 +107,12 @@ class TestPAKE(unittest.TestCase):
         from cryptography_suite.protocols.pake import SPAKE2Party
 
         party = SPAKE2Party(self.password)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError)):
             party.compute_shared_key(b"x")
         party.generate_message()
         with self.assertRaises(InvalidKey):
             party.compute_shared_key(b"short")
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError)):
             SPAKE2Party("")
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError)):
             SPAKE2Party("pw").get_shared_key()

@@ -16,6 +16,7 @@ from cryptography_suite.asymmetric import (
     ec_decrypt,
 )
 from cryptography.hazmat.primitives.asymmetric import rsa, x25519, x448, ec
+from cryptography_suite.errors import CryptographySuiteError
 
 
 class TestAsymmetric(unittest.TestCase):
@@ -34,14 +35,14 @@ class TestAsymmetric(unittest.TestCase):
     def test_rsa_encrypt_with_empty_message(self):
         """Test RSA encryption with empty message."""
         _, public_key = generate_rsa_keypair()
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError)):
             rsa_encrypt(b'', public_key)
 
     def test_load_private_key_with_empty_password(self):
         """Test loading private key with empty password."""
         private_key, _ = generate_rsa_keypair()
         private_pem = serialize_private_key(private_key, self.password)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError)):
             load_private_key(private_pem, "")
 
     def test_derive_x25519_shared_key_with_invalid_private_key(self):
@@ -89,7 +90,7 @@ class TestAsymmetric(unittest.TestCase):
             generate_ecdsa_keypair,
         )
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError)):
             sign_message_ecdsa(self.message, invalid_private_key)
 
         # Generate valid private key for signing
@@ -99,13 +100,13 @@ class TestAsymmetric(unittest.TestCase):
         # Test verify_signature_ecdsa with invalid public key
         from cryptography_suite.asymmetric.signatures import verify_signature_ecdsa
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError)):
             verify_signature_ecdsa(self.message, signature, invalid_public_key)
 
     def test_rsa_decrypt_with_invalid_ciphertext(self):
         """Test RSA decryption with invalid ciphertext."""
         private_key, _ = generate_rsa_keypair()
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError)):
             rsa_decrypt(b"invalid_ciphertext", private_key)
 
     def test_rsa_serialize_and_load_keys(self):
@@ -198,29 +199,29 @@ class TestAsymmetric(unittest.TestCase):
         """Test loading private key with incorrect password."""
         private_key, _ = generate_rsa_keypair()
         private_pem = serialize_private_key(private_key, self.password)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError)):
             load_private_key(private_pem, "WrongPassword")
 
     def test_load_private_key_with_invalid_data(self):
         """Test loading private key with invalid data."""
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError)):
             load_private_key(b"invalid_data", self.password)
 
     def test_load_public_key_with_invalid_data(self):
         """Test loading public key with invalid data."""
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError)):
             load_public_key(b"invalid_data")
 
     def test_rsa_encrypt_with_none_message(self):
         """Test RSA encryption with None as message."""
         _, public_key = generate_rsa_keypair()
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError)):
             rsa_encrypt(None, public_key)
 
     def test_serialize_private_key_with_empty_password(self):
         """Test serializing private key with empty password."""
         private_key, _ = generate_rsa_keypair()
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(CryptographySuiteError)) as context:
             serialize_private_key(private_key, '')
         self.assertEqual(str(context.exception), "Password cannot be empty.")
 
@@ -233,7 +234,7 @@ class TestAsymmetric(unittest.TestCase):
     def test_rsa_encrypt_with_empty_plaintext(self):
         """Test RSA encryption with empty plaintext."""
         _, public_key = generate_rsa_keypair()
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(CryptographySuiteError)) as context:
             rsa_encrypt(b'', public_key)
         self.assertEqual(str(context.exception), "Plaintext cannot be empty.")
 
@@ -250,7 +251,7 @@ class TestAsymmetric(unittest.TestCase):
         priv, pub = generate_x25519_keypair()
         wrong_priv, _ = generate_x25519_keypair()
         ct = ec_encrypt(self.message, pub)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError)):
             ec_decrypt(ct, wrong_priv)
 
     def test_ecies_decrypt_tampered_ciphertext(self):
@@ -258,7 +259,7 @@ class TestAsymmetric(unittest.TestCase):
         priv, pub = generate_x25519_keypair()
         ct = ec_encrypt(self.message, pub)
         tampered = ct[:-1] + bytes([ct[-1] ^ 0x01])
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError)):
             ec_decrypt(tampered, priv)
 
 

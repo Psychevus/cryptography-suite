@@ -1,5 +1,15 @@
 """Cryptography Suite Package Initialization."""
 
+from .errors import (
+    CryptographySuiteError,
+    DecryptionError,
+    EncryptionError,
+    KeyDerivationError,
+    MissingDependencyError,
+    ProtocolError,
+    SignatureVerificationError,
+)
+
 __version__ = "2.0.0"
 
 # Symmetric primitives -------------------------------------------------------
@@ -254,6 +264,14 @@ __all__ = [
     "SignalSender",
     "SignalReceiver",
     "initialize_signal_session",
+    # Exceptions
+    "CryptographySuiteError",
+    "EncryptionError",
+    "DecryptionError",
+    "KeyDerivationError",
+    "SignatureVerificationError",
+    "MissingDependencyError",
+    "ProtocolError",
 ]
 
 # Conditional exports -------------------------------------------------------

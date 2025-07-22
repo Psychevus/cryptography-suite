@@ -13,7 +13,7 @@ class TestSecretSharing(unittest.TestCase):
 
     def test_create_shares_with_threshold_greater_than_num_shares(self):
         """Test creating shares with threshold greater than num_shares."""
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError)):
             create_shares(self.secret, self.num_shares + 1, self.num_shares)
 
     def test_create_and_reconstruct_secret(self):
@@ -35,7 +35,7 @@ class TestSecretSharing(unittest.TestCase):
 
     def test_create_shares_with_invalid_threshold(self):
         """Test creating shares with threshold greater than number of shares."""
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(CryptographySuiteError)) as context:
             create_shares(self.secret, 6, self.num_shares)
         self.assertEqual(
             str(context.exception),
@@ -45,7 +45,7 @@ class TestSecretSharing(unittest.TestCase):
     def test_create_shares_with_large_secret(self):
         """Test creating shares with a secret larger than prime."""
         large_secret = 2 ** 522
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError)):
             create_shares(large_secret, self.threshold, self.num_shares)
 
     def test_reconstruct_secret_with_invalid_shares(self):
@@ -56,7 +56,7 @@ class TestSecretSharing(unittest.TestCase):
 
     def test_create_shares_with_threshold_exceeding_num_shares(self):
         """Test creating shares with threshold exceeding number of shares."""
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(CryptographySuiteError)) as context:
             create_shares(self.secret, self.num_shares + 1, self.num_shares)
         self.assertEqual(
             str(context.exception),

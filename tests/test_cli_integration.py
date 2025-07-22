@@ -3,6 +3,7 @@ import sys
 import types
 
 import pytest
+from cryptography_suite.errors import MissingDependencyError
 
 import cryptography_suite.cli as cli
 
@@ -52,5 +53,5 @@ def test_zksnark_cli_sysargv_unavailable(monkeypatch):
     cli = reload_cli(monkeypatch)
     monkeypatch.setattr(cli, "ZKSNARK_AVAILABLE", False, raising=False)
     monkeypatch.setattr(sys, "argv", ["prog", "hi"])
-    with pytest.raises(RuntimeError):
+    with pytest.raises(MissingDependencyError):
         cli.zksnark_cli()

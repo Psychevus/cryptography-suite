@@ -9,6 +9,7 @@ implementations from PQClean.
 from __future__ import annotations
 
 from typing import Tuple
+from ..errors import EncryptionError, DecryptionError
 import os
 import hashlib
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
@@ -56,7 +57,7 @@ def kyber_encapsulate(public_key: bytes, level: int = 512) -> Tuple[bytes, bytes
 
     alg = _KYBER_LEVEL_MAP.get(level)
     if alg is None:
-        raise ValueError("Invalid Kyber level")
+        raise EncryptionError("Invalid Kyber level")
     return alg.encrypt(public_key)
 
 
@@ -82,7 +83,7 @@ def kyber_decapsulate(ciphertext: bytes, secret_key: bytes, level: int = 512) ->
 
     alg = _KYBER_LEVEL_MAP.get(level)
     if alg is None:
-        raise ValueError("Invalid Kyber level")
+        raise DecryptionError("Invalid Kyber level")
     return alg.decrypt(secret_key, ciphertext)
 
 
@@ -112,13 +113,13 @@ def kyber_decrypt(private_key: bytes, ciphertext: bytes, shared_secret: bytes) -
 
     ct_size = ml_kem_512.CIPHERTEXT_SIZE
     if len(ciphertext) < ct_size + 12 + 16:
-        raise ValueError("Invalid ciphertext")
+        raise DecryptionError("Invalid ciphertext")
 
     kem_ct = ciphertext[:ct_size]
     enc = ciphertext[ct_size:]
     ss_check = ml_kem_512.decrypt(private_key, kem_ct)
     if ss_check != shared_secret:
-        raise ValueError("Shared secret mismatch")
+        raise DecryptionError("Shared secret mismatch")
 
     key = hashlib.sha256(shared_secret).digest()
     aesgcm = AESGCM(key)

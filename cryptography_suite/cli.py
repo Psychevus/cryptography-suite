@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+from .errors import MissingDependencyError
 
 from .zk.bulletproof import prove as bp_prove, verify as bp_verify, setup as bp_setup
 
@@ -28,10 +29,10 @@ def zksnark_cli(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description="SHA256 pre-image proof")
     parser.add_argument("preimage", help="Preimage string")
     if not ZKSNARK_AVAILABLE and argv and not any(a in ("-h", "--help") for a in argv):
-        raise RuntimeError("PySNARK not installed")
+        raise MissingDependencyError("PySNARK not installed")
     args = parser.parse_args(argv)
     if not ZKSNARK_AVAILABLE:
-        raise RuntimeError("PySNARK not installed")
+        raise MissingDependencyError("PySNARK not installed")
     zksnark.setup()
     hash_hex, proof_path = zksnark.prove(args.preimage.encode())
     valid = zksnark.verify(hash_hex, proof_path)

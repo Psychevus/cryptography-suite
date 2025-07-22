@@ -2,6 +2,7 @@ import importlib
 import types
 import sys
 import pytest
+from cryptography_suite.errors import MissingDependencyError
 
 
 def get_cli(monkeypatch):
@@ -41,5 +42,5 @@ def test_zksnark_cli(monkeypatch, capsys):
 def test_zksnark_cli_runtime_error(monkeypatch):
     cli = get_cli(monkeypatch)
     monkeypatch.setattr(cli, "ZKSNARK_AVAILABLE", False, raising=False)
-    with pytest.raises(RuntimeError):
+    with pytest.raises(MissingDependencyError):
         cli.zksnark_cli(["data"])

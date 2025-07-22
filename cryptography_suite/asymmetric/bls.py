@@ -12,6 +12,7 @@ from os import urandom
 from typing import Iterable, List, Sequence, Tuple
 
 from py_ecc.bls import G2Basic
+from ..errors import KeyDerivationError, SignatureVerificationError
 
 
 def generate_bls_keypair(seed: bytes | None = None) -> Tuple[int, bytes]:
@@ -30,7 +31,7 @@ def generate_bls_keypair(seed: bytes | None = None) -> Tuple[int, bytes]:
         a byte string.
     """
     if seed is not None and len(seed) == 0:
-        raise ValueError("Seed cannot be empty.")
+        raise KeyDerivationError("Seed cannot be empty.")
 
     ikm = seed if seed is not None else urandom(32)
     sk = G2Basic.KeyGen(ikm)
@@ -54,7 +55,7 @@ def bls_sign(message: bytes, private_key: int) -> bytes:
         Signature for ``message``.
     """
     if not message:
-        raise ValueError("Message cannot be empty.")
+        raise SignatureVerificationError("Message cannot be empty.")
     if not isinstance(private_key, int):
         raise TypeError("Private key must be an int.")
     return G2Basic.Sign(private_key, message)
@@ -78,9 +79,9 @@ def bls_verify(message: bytes, signature: bytes, public_key: bytes) -> bool:
         ``True`` if the signature is valid, otherwise ``False``.
     """
     if not message:
-        raise ValueError("Message cannot be empty.")
+        raise SignatureVerificationError("Message cannot be empty.")
     if not signature:
-        raise ValueError("Signature cannot be empty.")
+        raise SignatureVerificationError("Signature cannot be empty.")
     if not isinstance(public_key, (bytes, bytearray)):
         raise TypeError("Public key must be bytes.")
     return G2Basic.Verify(public_key, message, signature)
@@ -101,7 +102,7 @@ def bls_aggregate(signatures: Iterable[bytes]) -> bytes:
     """
     sig_list: List[bytes] = list(signatures)
     if not sig_list:
-        raise ValueError("No signatures provided for aggregation.")
+        raise SignatureVerificationError("No signatures provided for aggregation.")
     return G2Basic.Aggregate(sig_list)
 
 
@@ -127,9 +128,9 @@ def bls_aggregate_verify(
         ``True`` if the aggregated signature is valid, otherwise ``False``.
     """
     if not public_keys or not messages:
-        raise ValueError("Public keys and messages cannot be empty.")
+        raise SignatureVerificationError("Public keys and messages cannot be empty.")
     if len(public_keys) != len(messages):
-        raise ValueError("Number of public keys must match number of messages.")
+        raise SignatureVerificationError("Number of public keys must match number of messages.")
     if not signature:
-        raise ValueError("Signature cannot be empty.")
+        raise SignatureVerificationError("Signature cannot be empty.")
     return G2Basic.AggregateVerify(list(public_keys), list(messages), signature)

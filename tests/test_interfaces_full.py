@@ -3,6 +3,7 @@ import sys
 import types
 
 import pytest
+from cryptography_suite.errors import DecryptionError
 from cryptography.exceptions import InvalidKey
 from cryptography.hazmat.primitives.asymmetric import x25519
 from cryptography.exceptions import InvalidTag
@@ -102,7 +103,7 @@ def test_ecies_wrong_key():
     priv, pub = generate_x25519_keypair()
     wrong_priv, _ = generate_x25519_keypair()
     ct = ec_encrypt(b"msg", pub)
-    with pytest.raises(ValueError):
+    with pytest.raises(DecryptionError):
         ec_decrypt(ct, wrong_priv)
 
 
@@ -110,7 +111,7 @@ def test_ecies_tamper(monkeypatch):
     priv, pub = generate_x25519_keypair()
     ct = ec_encrypt(b"msg", pub)
     tampered = ct[:-1] + bytes([ct[-1] ^ 1])
-    with pytest.raises(ValueError):
+    with pytest.raises(DecryptionError):
         ec_decrypt(tampered, priv)
 
 

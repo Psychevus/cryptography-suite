@@ -2,6 +2,7 @@ import importlib
 import sys
 import types
 import pytest
+from cryptography_suite.errors import EncryptionError
 
 class FakePyCtxt:
     def __init__(self, value):
@@ -46,5 +47,5 @@ def test_homomorphic_ckks_and_bfv(monkeypatch):
     he_bfv = h.keygen("BFV")
     ct2 = h.encrypt(he_bfv, 2)
     assert h.decrypt(he_bfv, ct2) == 2
-    with pytest.raises(ValueError):
+    with pytest.raises(EncryptionError):
         h.keygen("BAD")

@@ -77,7 +77,7 @@ class TestKeyManagement(unittest.TestCase):
         generate_rsa_keypair_and_save(
             self.private_key_path, self.public_key_path, self.password
         )
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError)):
             load_private_key_from_file(self.private_key_path, "WrongPassword")
 
     def test_load_private_key_from_nonexistent_file(self):

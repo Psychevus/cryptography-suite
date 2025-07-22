@@ -6,6 +6,7 @@ from os import urandom
 
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+from ..errors import EncryptionError, DecryptionError
 
 from .kdf import (
     NONCE_SIZE,
@@ -27,9 +28,9 @@ def aes_encrypt(plaintext: str, password: str, kdf: str = "argon2") -> str:
     compatibility with older data.
     """
     if not plaintext:
-        raise ValueError("Plaintext cannot be empty.")
+        raise EncryptionError("Plaintext cannot be empty.")
     if not password:
-        raise ValueError("Password cannot be empty.")
+        raise EncryptionError("Password cannot be empty.")
 
     salt = urandom(SALT_SIZE)
     if kdf == "scrypt":
@@ -39,7 +40,7 @@ def aes_encrypt(plaintext: str, password: str, kdf: str = "argon2") -> str:
     elif kdf == "argon2":
         key = derive_key_argon2(password, salt)
     else:
-        raise ValueError("Unsupported KDF specified.")
+        raise EncryptionError("Unsupported KDF specified.")
 
     aesgcm = AESGCM(key)
     nonce = urandom(NONCE_SIZE)
@@ -54,13 +55,16 @@ def aes_decrypt(encrypted_data: str, password: str, kdf: str = "argon2") -> str:
     compatibility with data encrypted using those KDFs.
     """
     if not encrypted_data:
-        raise ValueError("Encrypted data cannot be empty.")
+        raise DecryptionError("Encrypted data cannot be empty.")
     if not password:
-        raise ValueError("Password cannot be empty.")
+        raise DecryptionError("Password cannot be empty.")
 
-    encrypted_data_bytes = base64.b64decode(encrypted_data)
+    try:
+        encrypted_data_bytes = base64.b64decode(encrypted_data)
+    except Exception as exc:
+        raise DecryptionError(f"Invalid encrypted data: {exc}") from exc
     if len(encrypted_data_bytes) < SALT_SIZE + NONCE_SIZE:
-        raise ValueError("Invalid encrypted data.")
+        raise DecryptionError("Invalid encrypted data.")
 
     salt = encrypted_data_bytes[:SALT_SIZE]
     nonce = encrypted_data_bytes[SALT_SIZE : SALT_SIZE + NONCE_SIZE]
@@ -73,14 +77,14 @@ def aes_decrypt(encrypted_data: str, password: str, kdf: str = "argon2") -> str:
     elif kdf == "argon2":
         key = derive_key_argon2(password, salt)
     else:
-        raise ValueError("Unsupported KDF specified.")
+        raise DecryptionError("Unsupported KDF specified.")
 
     aesgcm = AESGCM(key)
     try:
         plaintext = aesgcm.decrypt(nonce, ciphertext, None)
         return plaintext.decode()
     except Exception as exc:  # pragma: no cover - high-level error handling
-        raise ValueError(f"Decryption failed: {exc}")
+        raise DecryptionError(f"Decryption failed: {exc}")
 
 
 def encrypt_file(
@@ -99,7 +103,7 @@ def encrypt_file(
     authentication tag.
     """
     if not password:
-        raise ValueError("Password cannot be empty.")
+        raise EncryptionError("Password cannot be empty.")
 
     salt = urandom(SALT_SIZE)
     if kdf == "scrypt":
@@ -109,7 +113,7 @@ def encrypt_file(
     elif kdf == "argon2":
         key = derive_key_argon2(password, salt)
     else:
-        raise ValueError("Unsupported KDF specified.")
+        raise EncryptionError("Unsupported KDF specified.")
 
     nonce = urandom(NONCE_SIZE)
     cipher = Cipher(algorithms.AES(key), modes.GCM(nonce))
@@ -144,7 +148,7 @@ def decrypt_file(
     The output file is removed if decryption fails.
     """
     if not password:
-        raise ValueError("Password cannot be empty.")
+        raise EncryptionError("Password cannot be empty.")
 
     try:
         file_size = os.path.getsize(encrypted_file_path)
@@ -154,7 +158,7 @@ def decrypt_file(
 
     with f_in:
         if file_size < SALT_SIZE + NONCE_SIZE + TAG_SIZE:
-            raise ValueError("Invalid encrypted file.")
+            raise DecryptionError("Invalid encrypted file.")
 
         salt = f_in.read(SALT_SIZE)
         nonce = f_in.read(NONCE_SIZE)
@@ -167,7 +171,7 @@ def decrypt_file(
         elif kdf == "argon2":
             key = derive_key_argon2(password, salt)
         else:
-            raise ValueError("Unsupported KDF specified.")
+            raise DecryptionError("Unsupported KDF specified.")
 
         cipher = Cipher(algorithms.AES(key), modes.GCM(nonce))
         decryptor = cipher.decryptor()
@@ -186,7 +190,7 @@ def decrypt_file(
         except Exception as exc:  # pragma: no cover - high-level error handling
             if os.path.exists(output_file_path):
                 os.remove(output_file_path)
-            raise ValueError(
+            raise DecryptionError(
                 "File decryption failed: Invalid password or corrupted file."
             ) from exc
 

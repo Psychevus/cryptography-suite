@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from typing import List
+from ..errors import EncryptionError, DecryptionError
 
 
 def _to_bytes(data: List[int]) -> bytes:
@@ -52,7 +53,7 @@ def _ascon_permutation(S: List[int], rounds: int) -> None:
 
 def _initialize(key: bytes, nonce: bytes) -> List[int]:
     if len(key) != 16 or len(nonce) != 16:
-        raise ValueError("Key and nonce must be 16 bytes each.")
+        raise EncryptionError("Key and nonce must be 16 bytes each.")
     iv = _to_bytes([128, 16 * 8, 12, 8]) + _zero_bytes(4)
     state_bytes = iv + key + nonce
     S = _bytes_to_state(state_bytes)
@@ -143,13 +144,13 @@ def encrypt(key: bytes, nonce: bytes, associated_data: bytes, plaintext: bytes) 
 def decrypt(key: bytes, nonce: bytes, associated_data: bytes, ciphertext: bytes) -> bytes:
     """Decrypt and verify using Ascon-128a."""
     if len(ciphertext) < 16:
-        raise ValueError("Ciphertext too short.")
+        raise DecryptionError("Ciphertext too short.")
     S = _initialize(key, nonce)
     _process_ad(S, associated_data)
     plaintext = _process_ciphertext(S, ciphertext[:-16])
     tag = _finalize(S, key)
     if tag != ciphertext[-16:]:
-        raise ValueError("Invalid authentication tag.")
+        raise DecryptionError("Invalid authentication tag.")
     return plaintext
 
 

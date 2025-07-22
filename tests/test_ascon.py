@@ -18,7 +18,7 @@ class TestAscon128a(unittest.TestCase):
     def test_invalid_tag(self):
         ct = encrypt(self.key, self.nonce, self.ad, self.msg)
         tampered = ct[:-1] + bytes([ct[-1] ^ 0x01])
-        with self.assertRaises(ValueError):
+        with self.assertRaises(CryptographySuiteError)):
             decrypt(self.key, self.nonce, self.ad, tampered)
 
     def test_reference_vectors(self):
