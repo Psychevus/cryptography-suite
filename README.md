@@ -350,6 +350,25 @@ Run each command with `-h` for detailed help.
 
 ---
 
+## 🏢 Enterprise Features
+
+### External Key Sources
+
+You can inject keys managed by hardware security modules (HSMs) or cloud key
+management services (KMS) by providing wrapper classes that mimic the standard
+private key interface. These wrappers allow the suite to call ``decrypt`` on the
+external key just like a locally generated one.
+
+```python
+from cryptography_suite.asymmetric import rsa_decrypt
+from my_hsm_wrapper import load_rsa_private_key
+
+private_key = load_rsa_private_key("enterprise-key-id")
+plaintext = rsa_decrypt(ciphertext, private_key)
+```
+
+---
+
 ## 📚 Project Structure
 
 ```plaintext
