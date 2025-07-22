@@ -67,3 +67,13 @@ class TestPAKE(unittest.TestCase):
         client.compute_shared_key(sm)
         server.compute_shared_key(cm)
         self.assertEqual(client.get_shared_key(), server.get_shared_key())
+
+    def test_spake2_mismatched_password(self):
+        """Clients with different passwords should derive different keys."""
+        client = SPAKE2Client(self.password)
+        server = SPAKE2Server("other_password")
+        client_msg = client.generate_message()
+        server_msg = server.generate_message()
+        ck = client.compute_shared_key(server_msg)
+        sk = server.compute_shared_key(client_msg)
+        self.assertNotEqual(ck, sk)
