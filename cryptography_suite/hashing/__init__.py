@@ -1,6 +1,6 @@
 from cryptography.hazmat.primitives import hashes
 
-from .symmetric.kdf import (  # noqa: F401
+from ..symmetric.kdf import (  # noqa: F401
     derive_key_scrypt,
     verify_derived_key_scrypt,
     derive_key_pbkdf2,

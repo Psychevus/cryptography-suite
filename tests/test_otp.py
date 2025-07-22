@@ -1,7 +1,7 @@
 import base64
 import unittest
 
-from cryptography_suite.otp import (
+from cryptography_suite.protocols import (
     generate_totp,
     verify_totp,
     generate_hotp,

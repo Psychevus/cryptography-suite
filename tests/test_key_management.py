@@ -3,7 +3,7 @@ import unittest
 
 from cryptography.hazmat.primitives.asymmetric import rsa, ec
 
-from cryptography_suite.key_management import (
+from cryptography_suite.protocols import (
     generate_aes_key,
     rotate_aes_key,
     secure_save_key_to_file,

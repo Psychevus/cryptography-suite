@@ -2,7 +2,7 @@ import unittest
 
 from cryptography.exceptions import InvalidKey
 
-from cryptography_suite.pake import SPAKE2Client, SPAKE2Server
+from cryptography_suite.protocols import SPAKE2Client, SPAKE2Server
 
 
 class TestPAKE(unittest.TestCase):

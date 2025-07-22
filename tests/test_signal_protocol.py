@@ -1,6 +1,6 @@
 import unittest
 
-from cryptography_suite.signal_protocol import initialize_signal_session
+from cryptography_suite.protocols import initialize_signal_session
 
 
 class TestSignalProtocol(unittest.TestCase):
