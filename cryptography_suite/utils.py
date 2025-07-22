@@ -47,3 +47,19 @@ def generate_secure_random_string(length: int = 32) -> str:
     """
     random_bytes = secrets.token_bytes(length)
     return base62_encode(random_bytes)
+
+
+class KeyVault:
+    """Context manager for sensitive key storage."""
+
+    def __init__(self, key: bytes | bytearray):
+        if not isinstance(key, (bytes, bytearray)):
+            raise TypeError("KeyVault expects key data as bytes or bytearray.")
+        self._key = bytearray(key)
+
+    def __enter__(self) -> bytearray:
+        return self._key
+
+    def __exit__(self, exc_type, exc, tb):
+        secure_zero(self._key)
+        return False

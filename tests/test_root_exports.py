@@ -5,3 +5,4 @@ import cryptography_suite as cs
 def test_root_exports_available():
     assert callable(cs.aes_encrypt)
     assert callable(cs.rsa_encrypt)
+    assert callable(cs.KeyVault)
