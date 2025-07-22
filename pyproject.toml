@@ -36,6 +36,7 @@ classifiers = [
 dependencies = [
     "cryptography>=41.0.3",
     "py_ecc",
+    "spake2",
 ]
 
 [project.urls]

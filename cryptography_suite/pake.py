@@ -1,6 +1,8 @@
 from cryptography.exceptions import InvalidKey
+from cryptography.exceptions import InvalidKey
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import x25519
+from spake2 import SPAKE2_A, SPAKE2_B, SPAKEError
 
 
 class SPAKE2Party:
@@ -53,11 +55,45 @@ class SPAKE2Client(SPAKE2Party):
     """
     Client-side implementation of the SPAKE2 protocol.
     """
-    pass
+    def __init__(self, password: str):
+        super().__init__(password)
+        self._spake = SPAKE2_A(password.encode())
+
+    def generate_message(self) -> bytes:
+        """Generates the client's SPAKE2 message."""
+        self.public_key = self._spake.start()
+        return self.public_key
+
+    def compute_shared_key(self, peer_public_bytes: bytes) -> bytes:
+        """Computes the shared key using the server's message."""
+        if self.public_key is None:
+            raise ValueError("generate_message() must be called before compute_shared_key().")
+        try:
+            self.shared_key = self._spake.finish(peer_public_bytes)
+        except SPAKEError as e:
+            raise InvalidKey(str(e))
+        return self.shared_key
 
 
 class SPAKE2Server(SPAKE2Party):
     """
     Server-side implementation of the SPAKE2 protocol.
     """
-    pass
+    def __init__(self, password: str):
+        super().__init__(password)
+        self._spake = SPAKE2_B(password.encode())
+
+    def generate_message(self) -> bytes:
+        """Generates the server's SPAKE2 message."""
+        self.public_key = self._spake.start()
+        return self.public_key
+
+    def compute_shared_key(self, peer_public_bytes: bytes) -> bytes:
+        """Computes the shared key using the client's message."""
+        if self.public_key is None:
+            raise ValueError("generate_message() must be called before compute_shared_key().")
+        try:
+            self.shared_key = self._spake.finish(peer_public_bytes)
+        except SPAKEError as e:
+            raise InvalidKey(str(e))
+        return self.shared_key
