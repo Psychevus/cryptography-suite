@@ -5,18 +5,23 @@ from os import urandom
 
 from cryptography.hazmat.primitives.ciphers.aead import ChaCha20Poly1305
 
-from .kdf import CHACHA20_KEY_SIZE, NONCE_SIZE, SALT_SIZE, derive_key_scrypt
+from .kdf import (
+    CHACHA20_KEY_SIZE,
+    NONCE_SIZE,
+    SALT_SIZE,
+    derive_key_argon2,
+)
 
 
 def chacha20_encrypt(plaintext: str, password: str) -> str:
-    """Encrypt using ChaCha20-Poly1305 with a Scrypt-derived key."""
+    """Encrypt using ChaCha20-Poly1305 with an Argon2-derived key."""
     if not plaintext:
         raise ValueError("Plaintext cannot be empty.")
     if not password:
         raise ValueError("Password cannot be empty.")
 
     salt = urandom(SALT_SIZE)
-    key = derive_key_scrypt(password, salt, key_size=CHACHA20_KEY_SIZE)
+    key = derive_key_argon2(password, salt, key_size=CHACHA20_KEY_SIZE)
     chacha = ChaCha20Poly1305(key)
     nonce = urandom(NONCE_SIZE)
 
@@ -39,7 +44,7 @@ def chacha20_decrypt(encrypted_data: str, password: str) -> str:
     nonce = encrypted_data_bytes[SALT_SIZE : SALT_SIZE + NONCE_SIZE]
     ciphertext = encrypted_data_bytes[SALT_SIZE + NONCE_SIZE :]
 
-    key = derive_key_scrypt(password, salt, key_size=CHACHA20_KEY_SIZE)
+    key = derive_key_argon2(password, salt, key_size=CHACHA20_KEY_SIZE)
     chacha = ChaCha20Poly1305(key)
     try:
         plaintext = chacha.decrypt(nonce, ciphertext, None)
