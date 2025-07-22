@@ -106,7 +106,14 @@ decrypt_file("secret.enc", "secret.out", password)
 Generate RSA key pairs and perform encryption/decryption.
 
 ```python
-from cryptography_suite.asymmetric import generate_rsa_keypair, rsa_encrypt, rsa_decrypt
+from cryptography_suite import ec_encrypt
+from cryptography_suite.asymmetric import (
+    generate_rsa_keypair,
+    rsa_encrypt,
+    rsa_decrypt,
+    ec_decrypt,
+    generate_x25519_keypair,
+)
 
 # Generate RSA key pair
 private_key, public_key = generate_rsa_keypair()
@@ -202,6 +209,40 @@ from cryptography_suite import zksnark
 zksnark.setup()
 hash_hex, proof_file = zksnark.prove(b"secret")
 print(zksnark.verify(hash_hex, proof_file))
+```
+
+## Advanced Protocols
+
+### SPAKE2 Key Exchange
+
+```python
+from cryptography_suite import SPAKE2Client, SPAKE2Server
+
+c, s = SPAKE2Client("pw"), SPAKE2Server("pw")
+ck = c.compute_shared_key(s.generate_message())
+sk = s.compute_shared_key(c.generate_message())
+print(ck == sk)
+```
+Requires the optional `spake2` package.
+
+### ECIES Encryption
+
+```python
+from cryptography_suite import ec_encrypt, ec_decrypt, generate_x25519_keypair
+
+priv, pub = generate_x25519_keypair()
+cipher = ec_encrypt(b"secret", pub)
+print(ec_decrypt(cipher, priv))
+```
+
+### Signal Protocol Messaging
+
+```python
+from cryptography_suite import initialize_signal_session
+
+sender, receiver = initialize_signal_session()
+msg = sender.encrypt(b"hi")
+print(receiver.decrypt(msg))
 ```
 
 ---
