@@ -1,6 +1,8 @@
 import os
 import unittest
 
+from cryptography_suite.errors import CryptographySuiteError
+
 from cryptography.hazmat.primitives.asymmetric import rsa, ec
 
 from cryptography_suite.protocols import (
@@ -77,7 +79,7 @@ class TestKeyManagement(unittest.TestCase):
         generate_rsa_keypair_and_save(
             self.private_key_path, self.public_key_path, self.password
         )
-        with self.assertRaises(CryptographySuiteError)):
+        with self.assertRaises(CryptographySuiteError):
             load_private_key_from_file(self.private_key_path, "WrongPassword")
 
     def test_load_private_key_from_nonexistent_file(self):

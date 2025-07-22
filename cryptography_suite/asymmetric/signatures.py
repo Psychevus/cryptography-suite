@@ -115,10 +115,13 @@ def load_ed25519_private_key(pem_data: bytes, password: str) -> ed25519.Ed25519P
     if not password:
         raise DecryptionError("Password cannot be empty.")
 
-    private_key = serialization.load_pem_private_key(
-        pem_data,
-        password=password.encode(),
-    )
+    try:
+        private_key = serialization.load_pem_private_key(
+            pem_data,
+            password=password.encode(),
+        )
+    except ValueError as exc:
+        raise DecryptionError("Invalid Ed25519 private key data.") from exc
     if not isinstance(private_key, ed25519.Ed25519PrivateKey):
         raise DecryptionError("Loaded key is not an Ed25519 private key.")
     return private_key
@@ -128,7 +131,10 @@ def load_ed25519_public_key(pem_data: bytes) -> ed25519.Ed25519PublicKey:
     """
     Loads an Ed25519 public key from PEM data.
     """
-    public_key = serialization.load_pem_public_key(pem_data)
+    try:
+        public_key = serialization.load_pem_public_key(pem_data)
+    except ValueError as exc:
+        raise DecryptionError("Invalid Ed25519 public key data.") from exc
     if not isinstance(public_key, ed25519.Ed25519PublicKey):
         raise DecryptionError("Loaded key is not an Ed25519 public key.")
     return public_key
@@ -209,10 +215,13 @@ def load_ecdsa_private_key(pem_data: bytes, password: str) -> ec.EllipticCurvePr
     if not password:
         raise DecryptionError("Password cannot be empty.")
 
-    private_key = serialization.load_pem_private_key(
-        pem_data,
-        password=password.encode(),
-    )
+    try:
+        private_key = serialization.load_pem_private_key(
+            pem_data,
+            password=password.encode(),
+        )
+    except ValueError as exc:
+        raise DecryptionError("Invalid ECDSA private key data.") from exc
     if not isinstance(private_key, ec.EllipticCurvePrivateKey):
         raise DecryptionError("Loaded key is not an ECDSA private key.")
     return private_key
@@ -222,7 +231,10 @@ def load_ecdsa_public_key(pem_data: bytes) -> ec.EllipticCurvePublicKey:
     """
     Loads an ECDSA public key from PEM data.
     """
-    public_key = serialization.load_pem_public_key(pem_data)
+    try:
+        public_key = serialization.load_pem_public_key(pem_data)
+    except ValueError as exc:
+        raise DecryptionError("Invalid ECDSA public key data.") from exc
     if not isinstance(public_key, ec.EllipticCurvePublicKey):
         raise DecryptionError("Loaded key is not an ECDSA public key.")
     return public_key

@@ -1,6 +1,8 @@
 import base64
 import unittest
 
+from cryptography_suite.errors import CryptographySuiteError
+
 from cryptography_suite.protocols import (
     generate_totp,
     verify_totp,
@@ -56,21 +58,21 @@ class TestOTP(unittest.TestCase):
 
     def test_generate_totp_with_invalid_secret(self):
         """Test TOTP generation with invalid secret."""
-        with self.assertRaises(CryptographySuiteError)):
+        with self.assertRaises(CryptographySuiteError):
             generate_totp("invalid_secret")
 
     def test_generate_hotp_with_invalid_secret(self):
         """Test generating HOTP with invalid secret."""
         invalid_secret = "invalid_base32_secret"
-        with self.assertRaises(CryptographySuiteError)) as context:
+        with self.assertRaises(CryptographySuiteError) as context:
             generate_hotp(invalid_secret, self.counter)
         self.assertIn("Invalid secret", str(context.exception))
 
 
     def test_invalid_algorithm(self):
-        with self.assertRaises(CryptographySuiteError)):
+        with self.assertRaises(CryptographySuiteError):
             generate_totp(self.secret, algorithm="md5")
-        with self.assertRaises(CryptographySuiteError)):
+        with self.assertRaises(CryptographySuiteError):
             generate_hotp(self.secret, self.counter, algorithm="md5")
 
     def test_verify_totp_with_timestamp(self):
