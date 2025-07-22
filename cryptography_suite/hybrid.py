@@ -20,21 +20,20 @@ def hybrid_encrypt(message: bytes, public_key: Any) -> Dict[str, str]:
     if not message:
         raise EncryptionError("Message cannot be empty.")
 
+    aes_key = urandom(32)
+
     if isinstance(public_key, rsa.RSAPublicKey):
-        key_encrypt = lambda k: rsa_encrypt(k, public_key)
+        encrypted_key = rsa_encrypt(aes_key, public_key)
     elif isinstance(public_key, x25519.X25519PublicKey):
-        key_encrypt = lambda k: ec_encrypt(k, public_key)
+        encrypted_key = ec_encrypt(aes_key, public_key)
     else:
         raise TypeError("Unsupported public key type.")
 
-    aes_key = urandom(32)
     aesgcm = AESGCM(aes_key)
     nonce = urandom(12)
     enc = aesgcm.encrypt(nonce, message, None)
     ciphertext = enc[:-16]
     tag = enc[-16:]
-
-    encrypted_key = key_encrypt(aes_key)
 
     return {
         "encrypted_key": encrypted_key,
