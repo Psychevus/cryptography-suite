@@ -38,6 +38,8 @@ dependencies = [
     "py_ecc",
     "spake2",
     "blake3",
+    "pynacl",
+    "pycryptodome",
 ]
 
 [project.urls]
