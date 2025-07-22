@@ -217,6 +217,17 @@ coverage report -m
 
 Our test suite achieves **95% code coverage**, guaranteeing reliability and robustness.
 
+## 🖥 Command Line Interface
+
+Two console scripts are provided for zero-knowledge proofs:
+
+```bash
+cryptosuite-bulletproof 42
+cryptosuite-zksnark secret
+```
+
+Run each command with `-h` for detailed help.
+
 ---
 
 ## 🔒 Security Best Practices

@@ -50,6 +50,10 @@ fhe = ["Pyfhel"]
 zk = ["pybulletproofs", "PySNARK"]
 dev = ["pytest", "pytest-cov", "coverage", "coveralls"]
 
+[project.scripts]
+cryptosuite-bulletproof = "cryptography_suite.cli:bulletproof_cli"
+cryptosuite-zksnark = "cryptography_suite.cli:zksnark_cli"
+
 [tool.black]
 line-length = 88
 target-version = ['py310']
