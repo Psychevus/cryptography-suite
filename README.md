@@ -21,6 +21,16 @@
 
 ---
 
+## ✨ Version 2.0.0 Highlights
+
+- **Post-Quantum Readiness**: Kyber KEM and Dilithium signature helpers.
+- **Hybrid Encryption**: Combine asymmetric encryption with AES-GCM.
+- **XChaCha20-Poly1305**: Modern stream cipher support when available.
+- **Key Management Enhancements**: `KeyVault` context manager and `KeyManager` utilities.
+- **Audit Logging**: Decorators for tracing operations with optional encrypted logs.
+
+---
+
 ## 📦 Installation
 
 ### Install via pip
@@ -31,7 +41,13 @@ Install the latest stable release from PyPI:
 pip install cryptography-suite
 ```
 
-> **Note**: Requires Python 3.10 or higher. Homomorphic encryption features need `Pyfhel` installed separately.
+For optional functionality install extras:
+
+```bash
+pip install "cryptography-suite[pqc,fhe,zk]"
+```
+
+> **Note**: Requires Python 3.10 or higher. Homomorphic encryption features need `Pyfhel` installed separately if the `fhe` extra is not used.
 
 ### Install from Source
 
@@ -41,9 +57,12 @@ Clone the repository and install manually:
 git clone https://github.com/Psychevus/cryptography-suite.git
 cd cryptography-suite
 pip install .
+# Optional extras for development and PQC
+pip install -e ".[dev,pqc]"
 ```
 
 ---
+
 
 ## 🔑 Key Features
 
@@ -53,6 +72,11 @@ pip install .
 - **Hashing Functions**: Implements SHA-256, SHA-384, SHA-512, SHA3-256, SHA3-512, BLAKE2b, and BLAKE3 hashing algorithms.
 - **Key Management**: Secure generation, storage, loading, and rotation of cryptographic keys.
 - **Secret Sharing**: Implementation of Shamir's Secret Sharing scheme for splitting and reconstructing secrets.
+- **Hybrid Encryption**: Combine RSA/ECIES with AES-GCM for performance and security.
+- **Post-Quantum Cryptography**: Kyber key encapsulation and Dilithium signatures for quantum-safe workflows.
+- **XChaCha20-Poly1305**: Modern stream cipher support when ``cryptography`` exposes ``XChaCha20Poly1305``.
+- **Audit Logging**: Decorators and helpers for encrypted audit trails.
+- **KeyVault Management**: Context manager to safely handle in-memory keys.
 - **Password-Authenticated Key Exchange (PAKE)**: SPAKE2 protocol implementation for secure password-based key exchange.
 - **One-Time Passwords (OTP)**: HOTP and TOTP algorithms for generating and verifying one-time passwords.
 - **Utility Functions**: Includes Base62 encoding/decoding, secure random string generation, and memory zeroing.
@@ -68,21 +92,18 @@ pip install .
 Encrypt and decrypt messages using AES-GCM with password-derived keys.
 
 ```python
-from cryptography_suite.encryption import aes_encrypt, aes_decrypt
+from cryptography_suite.symmetric import aes_encrypt, aes_decrypt
 
-message = "Highly Confidential Information"
-password = "ultra_secure_password"
+message: str = "Highly Confidential Information"
+password: str = "ultra_secure_password"
 
-# Encrypt the message
-encrypted_message = aes_encrypt(message, password)
+encrypted_message: str = aes_encrypt(message, password)
 print(f"Encrypted: {encrypted_message}")
 
-# Decrypt the message
-decrypted_message = aes_decrypt(encrypted_message, password)
+decrypted_message: str = aes_decrypt(encrypted_message, password)
 print(f"Decrypted: {decrypted_message}")
 
-# Use Scrypt key derivation for compatibility
-scrypt_encrypted = aes_encrypt(message, password, kdf="scrypt")
+scrypt_encrypted: str = aes_encrypt(message, password, kdf="scrypt")
 print(aes_decrypt(scrypt_encrypted, password, kdf="scrypt"))
 ```
 
@@ -95,8 +116,9 @@ Stream files of any size with AES-GCM. The functions read and write in
 chunks, so even large files can be processed efficiently.
 
 ```python
-from cryptography_suite import encrypt_file, decrypt_file
+from cryptography_suite.symmetric import encrypt_file, decrypt_file
 
+password: str = "file_password"
 encrypt_file("secret.txt", "secret.enc", password)
 decrypt_file("secret.enc", "secret.out", password)
 ```
@@ -118,17 +140,13 @@ from cryptography_suite.asymmetric import (
     generate_x25519_keypair,
 )
 
-# Generate RSA key pair
 private_key, public_key = generate_rsa_keypair()
+message: bytes = b"Secure Data Transfer"
 
-message = b"Secure Data Transfer"
-
-# Encrypt the message (Base64 encoded by default)
-encrypted_message = rsa_encrypt(message, public_key)
+encrypted_message: str = rsa_encrypt(message, public_key)
 print(f"Encrypted: {encrypted_message}")
 
-# Decrypt the message
-decrypted_message = rsa_decrypt(encrypted_message, private_key)
+decrypted_message: bytes = rsa_decrypt(encrypted_message, private_key)
 print(f"Decrypted: {decrypted_message}")
 ```
 
@@ -145,10 +163,9 @@ from cryptography_suite import (
 # X25519 exchange
 alice_priv, alice_pub = generate_x25519_keypair()
 bob_priv, bob_pub = generate_x25519_keypair()
-print(
-    derive_x25519_shared_key(alice_priv, bob_pub)
-    == derive_x25519_shared_key(bob_priv, alice_pub)
-)
+shared_a: bytes = derive_x25519_shared_key(alice_priv, bob_pub)
+shared_b: bytes = derive_x25519_shared_key(bob_priv, alice_pub)
+print(shared_a == shared_b)
 
 # X448 exchange
 a_priv, a_pub = generate_x448_keypair()
@@ -175,19 +192,19 @@ from cryptography_suite.signatures import (
 
 # Generate Ed25519 key pair
 ed_priv, ed_pub = generate_ed25519_keypair()
-signature = sign_message(b"Authenticate this message", ed_priv)
+signature: str = sign_message(b"Authenticate this message", ed_priv)
 print(verify_signature(b"Authenticate this message", signature, ed_pub))
 
 # Ed448 usage
 ed448_priv, ed448_pub = generate_ed448_keypair()
-sig448 = sign_message_ed448(b"Authenticate this message", ed448_priv)
+sig448: str = sign_message_ed448(b"Authenticate this message", ed448_priv)
 print(verify_signature_ed448(b"Authenticate this message", sig448, ed448_pub))
 
 from cryptography_suite.bls import generate_bls_keypair, bls_sign, bls_verify
 
 # Generate BLS key pair
 bls_sk, bls_pk = generate_bls_keypair()
-bls_sig = bls_sign(b"Authenticate this message", bls_sk)
+bls_sig: bytes = bls_sign(b"Authenticate this message", bls_sk)
 print(bls_verify(b"Authenticate this message", bls_sig, bls_pk))
 ```
 
@@ -198,16 +215,16 @@ Split and reconstruct secrets using Shamir's Secret Sharing.
 ```python
 from cryptography_suite.secret_sharing import create_shares, reconstruct_secret
 
-secret = 1234567890
-threshold = 3
-num_shares = 5
+secret: int = 1234567890
+threshold: int = 3
+num_shares: int = 5
 
 # Create shares
 shares = create_shares(secret, threshold, num_shares)
 
 # Reconstruct the secret
 selected_shares = shares[:threshold]
-recovered_secret = reconstruct_secret(selected_shares)
+recovered_secret: int = reconstruct_secret(selected_shares)
 print(f"Recovered secret: {recovered_secret}")
 ```
 
@@ -226,11 +243,11 @@ from cryptography_suite.homomorphic import (
 
 he = fhe_keygen("CKKS")
 
-ct1 = fhe_encrypt(he, 10.5)
-ct2 = fhe_encrypt(he, 5.25)
+ct1: bytes = fhe_encrypt(he, 10.5)
+ct2: bytes = fhe_encrypt(he, 5.25)
 
-sum_ct = fhe_add(he, ct1, ct2)
-prod_ct = fhe_multiply(he, ct1, ct2)
+sum_ct: bytes = fhe_add(he, ct1, ct2)
+prod_ct: bytes = fhe_multiply(he, ct1, ct2)
 
 print(f"Sum: {fhe_decrypt(he, sum_ct)}")
 print(f"Product: {fhe_decrypt(he, prod_ct)}")
@@ -245,8 +262,77 @@ functions require the optional `PySNARK` dependency.
 from cryptography_suite import zksnark
 
 zksnark.setup()
+hash_hex: str
+proof_file: str
 hash_hex, proof_file = zksnark.prove(b"secret")
 print(zksnark.verify(hash_hex, proof_file))
+```
+
+### Post-Quantum Cryptography
+
+Leverage Kyber and Dilithium for quantum-resistant operations. See
+[`tests/test_pqc.py`](tests/test_pqc.py) for thorough unit tests.
+
+```python
+from cryptography_suite.pqc import (
+    generate_kyber_keypair,
+    kyber_encrypt,
+    kyber_decrypt,
+    generate_dilithium_keypair,
+    dilithium_sign,
+    dilithium_verify,
+)
+
+ky_pub, ky_priv = generate_kyber_keypair()
+ct, ss = kyber_encrypt(ky_pub, b"hello pqc")
+assert kyber_decrypt(ky_priv, ct, ss) == b"hello pqc"
+
+dl_pub, dl_priv = generate_dilithium_keypair()
+sig = dilithium_sign(dl_priv, b"package")
+assert dilithium_verify(dl_pub, b"package", sig)
+```
+
+### Hybrid Encryption
+
+Combine asymmetric keys with AES-GCM for efficient encryption. See
+[`tests/test_hybrid.py`](tests/test_hybrid.py).
+
+```python
+from cryptography_suite import hybrid_encrypt, hybrid_decrypt
+from cryptography_suite.asymmetric import generate_rsa_keypair
+
+priv, pub = generate_rsa_keypair()
+payload = b"hybrid message"
+encrypted = hybrid_encrypt(payload, pub)
+decrypted = hybrid_decrypt(priv, encrypted)
+```
+
+### XChaCha20-Poly1305
+
+Additional stream cipher available when ``cryptography`` exposes
+``XChaCha20Poly1305``. Tested in
+[`tests/test_xchacha.py`](tests/test_xchacha.py).
+
+```python
+from cryptography_suite.symmetric import xchacha_encrypt, xchacha_decrypt
+
+key: bytes = os.urandom(32)
+nonce: bytes = os.urandom(24)
+data = xchacha_encrypt(b"secret", key, nonce)
+plain = xchacha_decrypt(data["ciphertext"], key, data["nonce"])
+```
+
+### Secure Key Vault
+
+Use ``KeyVault`` to erase keys from memory after use. Unit tests are
+located in [`tests/test_utils.py`](tests/test_utils.py).
+
+```python
+from cryptography_suite.utils import KeyVault
+
+key_material = b"supersecretkey"
+with KeyVault(key_material) as buf:
+    use_key(buf)
 ```
 
 ## Advanced Protocols
@@ -256,9 +342,10 @@ print(zksnark.verify(hash_hex, proof_file))
 ```python
 from cryptography_suite import SPAKE2Client, SPAKE2Server
 
-c, s = SPAKE2Client("pw"), SPAKE2Server("pw")
-ck = c.compute_shared_key(s.generate_message())
-sk = s.compute_shared_key(c.generate_message())
+c = SPAKE2Client("pw")
+s = SPAKE2Server("pw")
+ck: bytes = c.compute_shared_key(s.generate_message())
+sk: bytes = s.compute_shared_key(c.generate_message())
 print(ck == sk)
 ```
 Requires the optional `spake2` package.
@@ -270,7 +357,7 @@ from cryptography_suite import ec_encrypt, ec_decrypt, generate_x25519_keypair
 
 priv, pub = generate_x25519_keypair()
 # ``cipher`` is Base64 encoded by default. Use ``raw_output=True`` for bytes.
-cipher = ec_encrypt(b"secret", pub)
+cipher: str = ec_encrypt(b"secret", pub)
 print(ec_decrypt(cipher, priv))
 ```
 
@@ -280,7 +367,7 @@ print(ec_decrypt(cipher, priv))
 from cryptography_suite import initialize_signal_session
 
 sender, receiver = initialize_signal_session()
-msg = sender.encrypt(b"hi")
+msg: bytes = sender.encrypt(b"hi")
 print(receiver.decrypt(msg))
 ```
 
@@ -298,6 +385,7 @@ from cryptography_suite.hashing import (
 )
 
 data = "The quick brown fox jumps over the lazy dog"
+data: str = "The quick brown fox jumps over the lazy dog"
 print(sha256_hash(data))
 print(sha3_256_hash(data))
 print(sha3_512_hash(data))
@@ -338,6 +426,8 @@ Run each command with `-h` for detailed help.
 - **Key Rotation**: Regularly rotate cryptographic keys to minimize potential exposure.
 - **Environment Variables**: Use environment variables for sensitive configurations to prevent hardcoding secrets.
 - **Regular Updates**: Keep dependencies up to date to benefit from the latest security patches.
+- **Post-Quantum Algorithms**: Use Kyber and Dilithium for data requiring long-term secrecy, noting their larger key sizes.
+- **Hybrid Encryption**: Combine classical and PQC schemes during migration to mitigate potential weaknesses.
 
 ---
 
@@ -375,47 +465,50 @@ plaintext = rsa_decrypt(ciphertext, private_key)
 cryptography-suite/
 ├── cryptography_suite/
 │   ├── __init__.py
-│   ├── symmetric/
-│   │   ├── __init__.py
-│   │   ├── aes.py
-│   │   ├── chacha.py
-│   │   ├── ascon.py
-│   │   └── kdf.py
-│   ├── asymmetric/
-│   │   ├── __init__.py
-│   │   ├── bls.py
-│   │   └── signatures.py
+│   ├── audit.py
+│   ├── cli.py
+│   ├── debug.py
+│   ├── errors.py
+│   ├── hybrid.py
+│   ├── homomorphic.py
+│   ├── protocols/
 │   ├── pqc/
-│   │   └── __init__.py
+│   ├── symmetric/
+│   ├── asymmetric/
 │   ├── zk/
-│   │   ├── __init__.py
-│   │   ├── bulletproof.py
-│   │   └── zksnark.py
 │   ├── hashing.py
 │   ├── key_management.py
 │   ├── otp.py
 │   ├── pake.py
 │   ├── secret_sharing.py
-│   ├── homomorphic.py
 │   └── utils.py
 ├── tests/
-│   ├── test_asymmetric.py
-│   ├── test_encryption.py
-│   ├── test_hashing.py
-│   ├── test_key_management.py
-│   ├── test_otp.py
-│   ├── test_pake.py
-│   ├── test_secret_sharing.py
-│   ├── test_signatures.py
-│   └── test_utils.py
+│   ├── test_audit.py
+│   ├── test_hybrid.py
+│   ├── test_pqc.py
+│   ├── test_xchacha.py
+│   └── ...
 ├── README.md
+├── example_usage.py
 ├── demo_homomorphic.py
 ├── setup.py
-├── LICENSE
 └── .github/
     └── workflows/
         └── python-app.yml
 ```
+
+---
+
+## 🛤 Migration Guide from v1.x to v2.0.0
+
+- **Package Layout**: Functions are now organized in subpackages such as
+  ``cryptography_suite.pqc`` and ``cryptography_suite.protocols``.
+- **New Exceptions**: ``MissingDependencyError`` and ``ProtocolError`` extend
+  ``CryptographySuiteError``.
+- **Return Types**: Encryption helpers may return ``bytes`` when
+  ``raw_output=True``.
+- **Audit and Key Vault**: Use ``audit_log`` and ``KeyVault`` for logging and
+  secure key handling.
 
 ---
 
