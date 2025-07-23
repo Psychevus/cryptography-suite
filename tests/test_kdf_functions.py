@@ -30,6 +30,24 @@ class TestKdfFunctions(unittest.TestCase):
         out3 = kdf_pbkdf2(password, salt, 2000, 32)
         self.assertNotEqual(out1, out3)
 
+    def test_argon2_env_overrides(self):
+        import os, importlib
+
+        os.environ["CRYPTOSUITE_ARGON2_MEMORY_COST"] = "32768"
+        os.environ["CRYPTOSUITE_ARGON2_TIME_COST"] = "2"
+
+        import cryptography_suite.symmetric.kdf as kdf
+        importlib.reload(kdf)
+
+        self.assertEqual(kdf.ARGON2_MEMORY_COST, 32768)
+        self.assertEqual(kdf.ARGON2_TIME_COST, 2)
+        key = kdf.derive_key_argon2("pw", b"a" * 16)
+        self.assertEqual(len(key), 32)
+
+        os.environ.pop("CRYPTOSUITE_ARGON2_MEMORY_COST")
+        os.environ.pop("CRYPTOSUITE_ARGON2_TIME_COST")
+        importlib.reload(kdf)
+
 
 if __name__ == "__main__":
     unittest.main()

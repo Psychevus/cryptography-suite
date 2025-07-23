@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from os import urandom
+from os import urandom, getenv
 
 from cryptography.exceptions import InvalidKey
 from cryptography.hazmat.backends import default_backend
@@ -20,9 +20,11 @@ SCRYPT_N = 2 ** 14
 SCRYPT_R = 8
 SCRYPT_P = 1
 PBKDF2_ITERATIONS = 100_000
-ARGON2_MEMORY_COST = 65536  # 64 MiB
-ARGON2_TIME_COST = 3
-ARGON2_PARALLELISM = 1
+# Argon2 parameters can be tuned via environment variables to balance
+# security and performance.
+ARGON2_MEMORY_COST = int(getenv("CRYPTOSUITE_ARGON2_MEMORY_COST", "65536"))
+ARGON2_TIME_COST = int(getenv("CRYPTOSUITE_ARGON2_TIME_COST", "3"))
+ARGON2_PARALLELISM = int(getenv("CRYPTOSUITE_ARGON2_PARALLELISM", "1"))
 
 
 def generate_salt(size: int = SALT_SIZE) -> bytes:
@@ -98,7 +100,11 @@ def derive_key_argon2(
     time_cost: int = ARGON2_TIME_COST,
     parallelism: int = ARGON2_PARALLELISM,
 ) -> bytes:
-    """Derive a key using Argon2id."""
+    """Derive a key using Argon2id.
+
+    The cost parameters default to module constants which may be overridden via
+    the ``CRYPTOSUITE_ARGON2_*`` environment variables.
+    """
     if not password:
         raise KeyDerivationError("Password cannot be empty.")
     kdf = Argon2id(

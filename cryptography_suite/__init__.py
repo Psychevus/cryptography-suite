@@ -23,6 +23,7 @@ from .asymmetric import (
     ec_encrypt,
     generate_ec_keypair,
     generate_rsa_keypair,
+    generate_rsa_keypair_async,
     generate_x448_keypair,
     generate_x25519_keypair,
     load_private_key,
@@ -149,6 +150,22 @@ from .protocols import (
     KeyManager,
 )
 
+# Core utilities -------------------------------------------------------------
+from .utils import (
+    KeyVault,
+    base62_decode,
+    base62_encode,
+    generate_secure_random_string,
+    secure_zero,
+    to_pem,
+    from_pem,
+    pem_to_json,
+    encode_encrypted_message,
+    decode_encrypted_message,
+)
+from .audit import audit_log, set_audit_logger
+from .x509 import generate_csr, self_sign_certificate, load_certificate
+
 # Optional homomorphic encryption -------------------------------------------
 try:  # pragma: no cover - optional dependency
     from .homomorphic import add as fhe_add
@@ -181,21 +198,6 @@ try:  # pragma: no cover - optional dependency
 except Exception:  # pragma: no cover - handle missing dependency
     zksnark = None
     ZKSNARK_AVAILABLE = False
-
-from .utils import (
-    KeyVault,
-    base62_decode,
-    base62_encode,
-    generate_secure_random_string,
-    secure_zero,
-    to_pem,
-    from_pem,
-    pem_to_json,
-    encode_encrypted_message,
-    decode_encrypted_message,
-)
-from .audit import audit_log, set_audit_logger
-from .x509 import generate_csr, self_sign_certificate, load_certificate
 
 __all__ = [
     # Encryption
@@ -232,6 +234,7 @@ __all__ = [
     "generate_salt",
     # Asymmetric
     "generate_rsa_keypair",
+    "generate_rsa_keypair_async",
     "rsa_encrypt",
     "rsa_decrypt",
     "serialize_private_key",

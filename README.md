@@ -164,6 +164,13 @@ print(f"Encrypted: {encrypted_message}")
 decrypted_message: bytes = rsa_decrypt(encrypted_message, private_key)
 print(f"Decrypted: {decrypted_message}")
 
+# Non-blocking key generation using a ThreadPoolExecutor. The call returns a
+# ``Future`` which resolves to ``(private_key, public_key)``.
+from cryptography_suite.asymmetric import generate_rsa_keypair_async
+
+future = generate_rsa_keypair_async(key_size=2048)
+private_async, public_async = future.result()
+
 # Serializing keys
 from cryptography_suite.utils import to_pem, from_pem, pem_to_json
 
