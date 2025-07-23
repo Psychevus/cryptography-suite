@@ -25,6 +25,23 @@ except Exception:  # pragma: no cover - graceful fallback
     ml_kem_512 = ml_kem_768 = ml_kem_1024 = None
     ml_dsa_44 = ml_dsa_65 = ml_dsa_87 = None
 
+try:  # pragma: no cover - optional dependency
+    from pqcrypto.sign import (
+        sphincs_sha256_128s_simple as _sphincs_module,
+    )
+    SPHINCS_AVAILABLE = True
+except Exception:  # pragma: no cover - fallback
+    try:  # pragma: no cover - check alternative naming
+        from pqcrypto.sign import sphincs_sha2_128s_simple as _sphincs_module
+        SPHINCS_AVAILABLE = True
+    except Exception:  # pragma: no cover - final fallback
+        try:
+            from pqcrypto.sign import sphincs_shake_128s_simple as _sphincs_module
+            SPHINCS_AVAILABLE = True
+        except Exception:  # pragma: no cover - no sphincs available
+            _sphincs_module = None
+            SPHINCS_AVAILABLE = False
+
 
 _KYBER_LEVEL_MAP = {512: ml_kem_512, 768: ml_kem_768, 1024: ml_kem_1024}
 _DILITHIUM_LEVEL_MAP = {2: ml_dsa_44, 3: ml_dsa_65, 5: ml_dsa_87}
@@ -215,5 +232,32 @@ def dilithium_verify(
     try:
         ml_dsa_44.verify(public_key, message, signature)
         return True
+    except Exception:
+        return False
+
+
+def generate_sphincs_keypair() -> Tuple[bytes, bytes]:
+    """Generate a SPHINCS+ key pair using a 128-bit security level."""
+    if not PQCRYPTO_AVAILABLE or not SPHINCS_AVAILABLE:
+        raise ImportError("pqcrypto with SPHINCS+ support is required")
+
+    return _sphincs_module.generate_keypair()
+
+
+def sphincs_sign(private_key: bytes, message: bytes) -> bytes:
+    """Sign ``message`` with SPHINCS+ returning the raw signature bytes."""
+    if not PQCRYPTO_AVAILABLE or not SPHINCS_AVAILABLE:
+        raise ImportError("pqcrypto with SPHINCS+ support is required")
+
+    return _sphincs_module.sign(private_key, message)
+
+
+def sphincs_verify(public_key: bytes, message: bytes, signature: bytes) -> bool:
+    """Verify a SPHINCS+ signature."""
+    if not PQCRYPTO_AVAILABLE or not SPHINCS_AVAILABLE:
+        raise ImportError("pqcrypto with SPHINCS+ support is required")
+
+    try:
+        return bool(_sphincs_module.verify(public_key, message, signature))
     except Exception:
         return False

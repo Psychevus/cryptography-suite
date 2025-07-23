@@ -95,14 +95,18 @@ from .symmetric import (
 try:  # pragma: no cover - optional dependency
     from .pqc import (  # noqa: F401
         PQCRYPTO_AVAILABLE,
+        SPHINCS_AVAILABLE,
         dilithium_sign,
         dilithium_verify,
         generate_dilithium_keypair,
+        generate_sphincs_keypair,
         generate_kyber_keypair,
         kyber_decapsulate,
         kyber_decrypt,
         kyber_encapsulate,
         kyber_encrypt,
+        sphincs_sign,
+        sphincs_verify,
     )
 except Exception:  # pragma: no cover - fallback when pqcrypto is missing
     PQCRYPTO_AVAILABLE = False
@@ -329,6 +333,9 @@ if PQCRYPTO_AVAILABLE:
             "generate_dilithium_keypair",
             "dilithium_sign",
             "dilithium_verify",
+            "generate_sphincs_keypair",
+            "sphincs_sign",
+            "sphincs_verify",
         ]
     )
 
