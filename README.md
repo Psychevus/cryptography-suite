@@ -123,6 +123,21 @@ encrypt_file("secret.txt", "secret.enc", password)
 decrypt_file("secret.enc", "secret.out", password)
 ```
 
+For asynchronous applications install `aiofiles` and use the async variants:
+
+```python
+from cryptography_suite.symmetric import encrypt_file_async, decrypt_file_async
+import asyncio
+
+password = "file_password"
+
+async def main():
+    await encrypt_file_async("secret.txt", "secret.enc", password)
+    await decrypt_file_async("secret.enc", "secret.out", password)
+
+asyncio.run(main())
+```
+
 ### Asymmetric Encryption
 
 Generate RSA key pairs and perform encryption/decryption.

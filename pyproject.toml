@@ -52,6 +52,7 @@ pqc = ["pqcrypto"]
 fhe = ["Pyfhel"]
 zk = ["pybulletproofs", "PySNARK"]
 dev = ["pytest", "pytest-cov", "coverage", "coveralls"]
+async = ["aiofiles"]
 
 [project.scripts]
 cryptosuite-bulletproof = "cryptography_suite.cli:bulletproof_cli"

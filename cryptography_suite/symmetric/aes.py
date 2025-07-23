@@ -181,51 +181,172 @@ def decrypt_file(
 
     try:
         file_size = os.path.getsize(encrypted_file_path)
-        f_in = open(encrypted_file_path, "rb")
+        with open(encrypted_file_path, "rb") as f_in:
+            if file_size < SALT_SIZE + NONCE_SIZE + TAG_SIZE:
+                raise DecryptionError("Invalid encrypted file.")
+
+            salt = f_in.read(SALT_SIZE)
+            nonce = f_in.read(NONCE_SIZE)
+            ciphertext_len = file_size - SALT_SIZE - NONCE_SIZE - TAG_SIZE
+
+            if kdf == "scrypt":
+                key = derive_key_scrypt(password, salt)
+            elif kdf == "pbkdf2":
+                key = derive_key_pbkdf2(password, salt)
+            elif kdf == "argon2":
+                key = derive_key_argon2(password, salt)
+            else:
+                raise DecryptionError("Unsupported KDF specified.")
+
+            verbose_print(f"Derived key: {key.hex()}")
+            verbose_print(f"Nonce: {nonce.hex()}")
+            verbose_print("Mode: AES-GCM")
+
+            cipher = Cipher(algorithms.AES(key), modes.GCM(nonce))
+            decryptor = cipher.decryptor()
+
+            try:
+                with open(output_file_path, "wb") as f_out:
+                    processed = 0
+                    while processed < ciphertext_len:
+                        to_read = min(CHUNK_SIZE, ciphertext_len - processed)
+                        chunk = f_in.read(to_read)
+                        processed += len(chunk)
+                        f_out.write(decryptor.update(chunk))
+
+                    tag = f_in.read(TAG_SIZE)
+                    decryptor.finalize_with_tag(tag)
+            except Exception as exc:  # pragma: no cover - high-level error handling
+                if os.path.exists(output_file_path):
+                    os.remove(output_file_path)
+                raise DecryptionError(
+                    "File decryption failed: Invalid password or corrupted file."
+                ) from exc
+    except DecryptionError:
+        raise
     except Exception as exc:
         raise IOError(f"Failed to read encrypted file: {exc}") from exc
 
-    with f_in:
-        if file_size < SALT_SIZE + NONCE_SIZE + TAG_SIZE:
-            raise DecryptionError("Invalid encrypted file.")
 
-        salt = f_in.read(SALT_SIZE)
-        nonce = f_in.read(NONCE_SIZE)
-        ciphertext_len = file_size - SALT_SIZE - NONCE_SIZE - TAG_SIZE
+async def encrypt_file_async(
+    input_file_path: str,
+    output_file_path: str,
+    password: str,
+    kdf: str = "argon2",
+) -> None:
+    """Asynchronously encrypt a file using AES-GCM with a password-derived key.
 
-        if kdf == "scrypt":
-            key = derive_key_scrypt(password, salt)
-        elif kdf == "pbkdf2":
-            key = derive_key_pbkdf2(password, salt)
-        elif kdf == "argon2":
-            key = derive_key_argon2(password, salt)
-        else:
-            raise DecryptionError("Unsupported KDF specified.")
+    Requires the optional :mod:`aiofiles` package. The logic mirrors
+    :func:`encrypt_file` but performs non-blocking I/O.
+    """
 
-        verbose_print(f"Derived key: {key.hex()}")
-        verbose_print(f"Nonce: {nonce.hex()}")
-        verbose_print("Mode: AES-GCM")
+    if not password:
+        raise EncryptionError("Password cannot be empty.")
 
-        cipher = Cipher(algorithms.AES(key), modes.GCM(nonce))
-        decryptor = cipher.decryptor()
+    try:  # pragma: no cover - optional dependency
+        import aiofiles
+    except Exception as exc:  # pragma: no cover - fallback when aiofiles missing
+        raise MissingDependencyError("aiofiles is required for async operations") from exc
 
-        try:
-            with open(output_file_path, "wb") as f_out:
-                processed = 0
-                while processed < ciphertext_len:
-                    to_read = min(CHUNK_SIZE, ciphertext_len - processed)
-                    chunk = f_in.read(to_read)
-                    processed += len(chunk)
-                    f_out.write(decryptor.update(chunk))
+    salt = urandom(SALT_SIZE)
+    if kdf == "scrypt":
+        key = derive_key_scrypt(password, salt)
+    elif kdf == "pbkdf2":
+        key = derive_key_pbkdf2(password, salt)
+    elif kdf == "argon2":
+        key = derive_key_argon2(password, salt)
+    else:
+        raise EncryptionError("Unsupported KDF specified.")
 
-                tag = f_in.read(TAG_SIZE)
-                decryptor.finalize_with_tag(tag)
-        except Exception as exc:  # pragma: no cover - high-level error handling
-            if os.path.exists(output_file_path):
-                os.remove(output_file_path)
-            raise DecryptionError(
-                "File decryption failed: Invalid password or corrupted file."
-            ) from exc
+    verbose_print(f"Derived key: {key.hex()}")
+
+    nonce = urandom(NONCE_SIZE)
+    verbose_print(f"Nonce: {nonce.hex()}")
+    verbose_print("Mode: AES-GCM")
+    cipher = Cipher(algorithms.AES(key), modes.GCM(nonce))
+    encryptor = cipher.encryptor()
+
+    try:
+        async with aiofiles.open(input_file_path, "rb") as f_in, aiofiles.open(
+            output_file_path, "wb"
+        ) as f_out:
+            await f_out.write(salt + nonce)
+            while True:
+                chunk = await f_in.read(CHUNK_SIZE)
+                if not chunk:
+                    break
+                await f_out.write(encryptor.update(chunk))
+            encryptor.finalize()
+            await f_out.write(encryptor.tag)
+    except Exception as exc:  # pragma: no cover - high-level error handling
+        if os.path.exists(output_file_path):
+            os.remove(output_file_path)
+        raise IOError(f"File encryption failed: {exc}")
+
+
+async def decrypt_file_async(
+    encrypted_file_path: str,
+    output_file_path: str,
+    password: str,
+    kdf: str = "argon2",
+) -> None:
+    """Asynchronously decrypt a file encrypted with AES-GCM using a password-derived key."""
+
+    if not password:
+        raise EncryptionError("Password cannot be empty.")
+
+    try:  # pragma: no cover - optional dependency
+        import aiofiles
+    except Exception as exc:  # pragma: no cover - fallback when aiofiles missing
+        raise MissingDependencyError("aiofiles is required for async operations") from exc
+
+    try:
+        file_size = os.path.getsize(encrypted_file_path)
+        async with aiofiles.open(encrypted_file_path, "rb") as f_in:
+            if file_size < SALT_SIZE + NONCE_SIZE + TAG_SIZE:
+                raise DecryptionError("Invalid encrypted file.")
+
+            salt = await f_in.read(SALT_SIZE)
+            nonce = await f_in.read(NONCE_SIZE)
+            ciphertext_len = file_size - SALT_SIZE - NONCE_SIZE - TAG_SIZE
+
+            if kdf == "scrypt":
+                key = derive_key_scrypt(password, salt)
+            elif kdf == "pbkdf2":
+                key = derive_key_pbkdf2(password, salt)
+            elif kdf == "argon2":
+                key = derive_key_argon2(password, salt)
+            else:
+                raise DecryptionError("Unsupported KDF specified.")
+
+            verbose_print(f"Derived key: {key.hex()}")
+            verbose_print(f"Nonce: {nonce.hex()}")
+            verbose_print("Mode: AES-GCM")
+
+            cipher = Cipher(algorithms.AES(key), modes.GCM(nonce))
+            decryptor = cipher.decryptor()
+
+            try:
+                async with aiofiles.open(output_file_path, "wb") as f_out:
+                    processed = 0
+                    while processed < ciphertext_len:
+                        to_read = min(CHUNK_SIZE, ciphertext_len - processed)
+                        chunk = await f_in.read(to_read)
+                        processed += len(chunk)
+                        await f_out.write(decryptor.update(chunk))
+
+                    tag = await f_in.read(TAG_SIZE)
+                    decryptor.finalize_with_tag(tag)
+            except Exception as exc:  # pragma: no cover - high-level error handling
+                if os.path.exists(output_file_path):
+                    os.remove(output_file_path)
+                raise DecryptionError(
+                    "File decryption failed: Invalid password or corrupted file."
+                ) from exc
+    except DecryptionError:
+        raise
+    except Exception as exc:
+        raise IOError(f"Failed to read encrypted file: {exc}") from exc
 
 
 # Convenience wrappers -------------------------------------------------------
@@ -260,6 +381,8 @@ __all__ = [
     "aes_decrypt",
     "encrypt_file",
     "decrypt_file",
+    "encrypt_file_async",
+    "decrypt_file_async",
     "scrypt_encrypt",
     "scrypt_decrypt",
     "pbkdf2_encrypt",
