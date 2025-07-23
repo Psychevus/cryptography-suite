@@ -13,13 +13,16 @@ from cryptography_suite.pqc import (
 
 @unittest.skipUnless(PQCRYPTO_AVAILABLE, "pqcrypto not installed")
 class TestPQC(unittest.TestCase):
-    def test_kyber_encrypt_decrypt(self):
-        pk, sk = generate_kyber_keypair()
+    def test_kyber_encrypt_decrypt_levels(self):
         msg = b"pqc test"
-        ct, ss = kyber_encrypt(pk, msg)
-        self.assertIsInstance(ct, str)
-        self.assertIsInstance(ss, str)
-        self.assertEqual(kyber_decrypt(sk, ct, ss), msg)
+        for lvl in (512, 768, 1024):
+            pk, sk = generate_kyber_keypair(level=lvl)
+            ct, ss = kyber_encrypt(pk, msg, level=lvl)
+            self.assertIsInstance(ct, str)
+            self.assertIsInstance(ss, str)
+            self.assertEqual(kyber_decrypt(sk, ct, ss, level=lvl), msg)
+            # also validate auto-decapsulation path
+            self.assertEqual(kyber_decrypt(sk, ct, level=lvl), msg)
 
     def test_dilithium_signature(self):
         pk, sk = generate_dilithium_keypair()
