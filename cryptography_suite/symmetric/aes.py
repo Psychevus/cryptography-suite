@@ -7,6 +7,7 @@ from os import urandom
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from ..errors import EncryptionError, DecryptionError
+from ..debug import verbose_print
 
 from .kdf import (
     NONCE_SIZE,
@@ -42,8 +43,12 @@ def aes_encrypt(plaintext: str, password: str, kdf: str = "argon2") -> str:
     else:
         raise EncryptionError("Unsupported KDF specified.")
 
+    verbose_print(f"Derived key: {key.hex()}")
+
     aesgcm = AESGCM(key)
     nonce = urandom(NONCE_SIZE)
+    verbose_print(f"Nonce: {nonce.hex()}")
+    verbose_print("Mode: AES-GCM")
     ciphertext = aesgcm.encrypt(nonce, plaintext.encode(), None)
     return base64.b64encode(salt + nonce + ciphertext).decode()
 
@@ -78,6 +83,10 @@ def aes_decrypt(encrypted_data: str, password: str, kdf: str = "argon2") -> str:
         key = derive_key_argon2(password, salt)
     else:
         raise DecryptionError("Unsupported KDF specified.")
+
+    verbose_print(f"Derived key: {key.hex()}")
+    verbose_print(f"Nonce: {nonce.hex()}")
+    verbose_print("Mode: AES-GCM")
 
     aesgcm = AESGCM(key)
     try:
@@ -115,7 +124,11 @@ def encrypt_file(
     else:
         raise EncryptionError("Unsupported KDF specified.")
 
+    verbose_print(f"Derived key: {key.hex()}")
+
     nonce = urandom(NONCE_SIZE)
+    verbose_print(f"Nonce: {nonce.hex()}")
+    verbose_print("Mode: AES-GCM")
     cipher = Cipher(algorithms.AES(key), modes.GCM(nonce))
     encryptor = cipher.encryptor()
 
@@ -172,6 +185,10 @@ def decrypt_file(
             key = derive_key_argon2(password, salt)
         else:
             raise DecryptionError("Unsupported KDF specified.")
+
+        verbose_print(f"Derived key: {key.hex()}")
+        verbose_print(f"Nonce: {nonce.hex()}")
+        verbose_print("Mode: AES-GCM")
 
         cipher = Cipher(algorithms.AES(key), modes.GCM(nonce))
         decryptor = cipher.decryptor()
