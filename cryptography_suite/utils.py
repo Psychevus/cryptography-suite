@@ -180,4 +180,12 @@ def decode_encrypted_message(data: str):
     except Exception:
         pass
 
+    try:
+        from .hybrid import EncryptedHybridMessage
+
+        if set(out.keys()) == {"encrypted_key", "nonce", "ciphertext", "tag"}:
+            return EncryptedHybridMessage(**out)
+    except Exception:
+        pass
+
     return out
