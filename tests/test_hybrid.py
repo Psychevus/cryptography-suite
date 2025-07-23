@@ -1,7 +1,7 @@
-import base64
 import unittest
 
 from cryptography_suite import hybrid_decrypt, hybrid_encrypt
+from cryptography_suite.hybrid import EncryptedHybridMessage
 from cryptography_suite.pqc import (
     PQCRYPTO_AVAILABLE,
     generate_kyber_keypair,
@@ -17,7 +17,7 @@ class TestHybrid(unittest.TestCase):
         priv, pub = generate_rsa_keypair()
         msg = b"hybrid"
         data = hybrid_encrypt(msg, pub)
-        self.assertIsInstance(data, dict)
+        self.assertIsInstance(data, EncryptedHybridMessage)
         pt = hybrid_decrypt(priv, data)
         self.assertEqual(pt, msg)
 
@@ -25,7 +25,7 @@ class TestHybrid(unittest.TestCase):
         priv, pub = generate_x25519_keypair()
         msg = b"ecies"
         data = hybrid_encrypt(msg, pub)
-        self.assertIn("encrypted_key", data)
+        self.assertIsInstance(data, EncryptedHybridMessage)
         self.assertEqual(hybrid_decrypt(priv, data), msg)
 
     def test_hybrid_encrypt_empty_message(self):
@@ -43,8 +43,13 @@ class TestHybrid(unittest.TestCase):
     def test_hybrid_decrypt_tampered_ciphertext(self):
         priv, pub = generate_x25519_keypair()
         data = hybrid_encrypt(b"msg", pub)
-        ct = base64.b64decode(data["ciphertext"])
-        data["ciphertext"] = base64.b64encode(ct[:-1] + bytes([ct[-1] ^ 1])).decode()
+        ct = data.ciphertext
+        data = EncryptedHybridMessage(
+            encrypted_key=data.encrypted_key,
+            nonce=data.nonce,
+            ciphertext=ct[:-1] + bytes([ct[-1] ^ 1]),
+            tag=data.tag,
+        )
         with self.assertRaises(CryptographySuiteError):
             hybrid_decrypt(priv, data)
 

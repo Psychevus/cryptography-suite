@@ -12,6 +12,7 @@ from cryptography_suite.utils import (
     decode_encrypted_message,
 )
 from cryptography_suite.asymmetric import generate_rsa_keypair
+from cryptography_suite.hybrid import EncryptedHybridMessage
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography_suite.errors import DecryptionError
 
@@ -80,6 +81,18 @@ class TestUtils(unittest.TestCase):
         encoded = encode_encrypted_message(msg)
         decoded = decode_encrypted_message(encoded)
         self.assertEqual(decoded["ciphertext"], b"a")
+
+    def test_encode_decode_hybrid_dataclass(self):
+        msg = EncryptedHybridMessage(
+            encrypted_key=b"k",
+            nonce=b"n",
+            ciphertext=b"c",
+            tag=b"t",
+        )
+        encoded = encode_encrypted_message(msg)
+        decoded = decode_encrypted_message(encoded)
+        self.assertIsInstance(decoded, EncryptedHybridMessage)
+        self.assertEqual(decoded.nonce, b"n")
 
 
 if __name__ == "__main__":
