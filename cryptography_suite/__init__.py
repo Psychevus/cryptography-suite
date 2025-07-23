@@ -183,6 +183,7 @@ from .utils import (
     decode_encrypted_message,
 )
 from .audit import audit_log, set_audit_logger
+from .x509 import generate_csr, self_sign_certificate, load_certificate
 
 __all__ = [
     # Encryption
@@ -297,6 +298,9 @@ __all__ = [
     "encode_encrypted_message",
     "decode_encrypted_message",
     "KeyManager",
+    "generate_csr",
+    "self_sign_certificate",
+    "load_certificate",
     "audit_log",
     "set_audit_logger",
     # Signal Protocol
