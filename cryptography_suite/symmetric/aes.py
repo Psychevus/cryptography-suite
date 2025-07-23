@@ -6,7 +6,7 @@ from os import urandom
 
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-from ..errors import EncryptionError, DecryptionError
+from ..errors import EncryptionError, DecryptionError, MissingDependencyError
 from ..debug import verbose_print
 
 from .kdf import (
