@@ -127,7 +127,7 @@ def derive_hkdf(key: bytes, salt: bytes | None, info: bytes | None, length: int)
     return hkdf.derive(key)
 
 
-def derive_pbkdf2(password: str, salt: bytes, iterations: int, length: int) -> bytes:
+def kdf_pbkdf2(password: str, salt: bytes, iterations: int, length: int) -> bytes:
     """Derive a key using PBKDF2-HMAC-SHA256 with configurable iterations."""
 
     if not password:
@@ -144,6 +144,12 @@ def derive_pbkdf2(password: str, salt: bytes, iterations: int, length: int) -> b
     return kdf.derive(password.encode())
 
 
+def derive_pbkdf2(password: str, salt: bytes, iterations: int, length: int) -> bytes:
+    """Backward compatible alias for :func:`kdf_pbkdf2`."""
+
+    return kdf_pbkdf2(password, salt, iterations, length)
+
+
 __all__ = [
     "AES_KEY_SIZE",
     "CHACHA20_KEY_SIZE",
@@ -155,6 +161,7 @@ __all__ = [
     "verify_derived_key_pbkdf2",
     "derive_key_argon2",
     "derive_hkdf",
+    "kdf_pbkdf2",
     "derive_pbkdf2",
     "generate_salt",
 ]

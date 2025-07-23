@@ -49,11 +49,13 @@ def reload_module(monkeypatch):
 
 def test_pqc_key_enc_sign(monkeypatch):
     pqc = reload_module(monkeypatch)
-    pk, sk = pqc.generate_kyber_keypair()
-    ct, ss = pqc.kyber_encrypt(pk, b"m")
-    assert isinstance(ct, str)
-    assert isinstance(ss, str)
-    assert pqc.kyber_decrypt(sk, ct, ss) == b"m"
+    for lvl in (512, 768, 1024):
+        pk, sk = pqc.generate_kyber_keypair(level=lvl)
+        ct, ss = pqc.kyber_encrypt(pk, b"m", level=lvl)
+        assert isinstance(ct, str)
+        assert isinstance(ss, str)
+        assert pqc.kyber_decrypt(sk, ct, ss, level=lvl) == b"m"
+        assert pqc.kyber_decrypt(sk, ct, level=lvl) == b"m"
     pk2, sk2 = pqc.generate_dilithium_keypair()
     sig = pqc.dilithium_sign(sk2, b"m")
     assert isinstance(sig, str)

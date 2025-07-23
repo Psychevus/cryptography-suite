@@ -1,6 +1,6 @@
 import unittest
 
-from cryptography_suite.symmetric.kdf import derive_hkdf, derive_pbkdf2
+from cryptography_suite.symmetric.kdf import derive_hkdf, kdf_pbkdf2
 
 
 class TestKdfFunctions(unittest.TestCase):
@@ -23,11 +23,11 @@ class TestKdfFunctions(unittest.TestCase):
     def test_derive_pbkdf2_custom_iterations(self):
         password = "password"
         salt = b"salt"
-        out1 = derive_pbkdf2(password, salt, 1000, 32)
-        out2 = derive_pbkdf2(password, salt, 1000, 32)
+        out1 = kdf_pbkdf2(password, salt, 1000, 32)
+        out2 = kdf_pbkdf2(password, salt, 1000, 32)
         self.assertEqual(out1, out2)
         self.assertEqual(len(out1), 32)
-        out3 = derive_pbkdf2(password, salt, 2000, 32)
+        out3 = kdf_pbkdf2(password, salt, 2000, 32)
         self.assertNotEqual(out1, out3)
 
 

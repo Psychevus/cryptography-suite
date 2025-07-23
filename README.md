@@ -521,6 +521,13 @@ cryptography-suite/
   ``raw_output=True``.
 - **Audit and Key Vault**: Use ``audit_log`` and ``KeyVault`` for logging and
   secure key handling.
+- **Kyber API Updates**: ``kyber_encrypt`` and ``kyber_decrypt`` accept a
+  ``level`` parameter (512/768/1024). ``kyber_decrypt`` now computes the shared
+  secret automatically when omitted.
+- **Key Management**: ``KeyManager`` now provides ``generate_rsa_keypair_and_save``
+  and is used by the legacy function of the same name.
+- **KDF Naming**: ``derive_pbkdf2`` has been renamed to ``kdf_pbkdf2`` (the old
+  name is kept as an alias).
 
 ---
 

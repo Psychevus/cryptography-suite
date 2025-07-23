@@ -30,12 +30,15 @@ _KYBER_LEVEL_MAP = {512: ml_kem_512, 768: ml_kem_768, 1024: ml_kem_1024}
 _DILITHIUM_LEVEL_MAP = {2: ml_dsa_44, 3: ml_dsa_65, 5: ml_dsa_87}
 
 
-def generate_kyber_keypair() -> Tuple[bytes, bytes]:
-    """Generate a Kyber key pair using ML-KEM-512."""
+def generate_kyber_keypair(level: int = 512) -> Tuple[bytes, bytes]:
+    """Generate a Kyber key pair for the given ``level``."""
     if not PQCRYPTO_AVAILABLE:
         raise ImportError("pqcrypto is required for Kyber functions")
 
-    return ml_kem_512.generate_keypair()
+    alg = _KYBER_LEVEL_MAP.get(level)
+    if alg is None:
+        raise EncryptionError("Invalid Kyber level")
+    return alg.generate_keypair()
 
 
 def kyber_encapsulate(public_key: bytes, level: int = 512) -> Tuple[bytes, bytes]:
@@ -92,11 +95,13 @@ def kyber_encrypt(
     public_key: bytes,
     plaintext: bytes,
     *,
+    level: int = 512,
     raw_output: bool = False,
 ) -> Tuple[str | bytes, str | bytes]:
     """Encrypt ``plaintext`` using Kyber and AES-GCM.
 
-    The function first encapsulates a shared secret with ML-KEM-512 and then
+    ``level`` selects the ML-KEM security level (512, 768 or 1024).
+    The function encapsulates a shared secret with the chosen level and then
     derives an AES key from that secret to encrypt the plaintext. The returned
     tuple contains the Kyber ciphertext followed by the AES-GCM output and the
     shared secret used for encryption.
@@ -104,7 +109,11 @@ def kyber_encrypt(
     if not PQCRYPTO_AVAILABLE:
         raise ImportError("pqcrypto is required for Kyber functions")
 
-    kem_ct, ss = ml_kem_512.encrypt(public_key)
+    alg = _KYBER_LEVEL_MAP.get(level)
+    if alg is None:
+        raise EncryptionError("Invalid Kyber level")
+
+    kem_ct, ss = alg.encrypt(public_key)
     key = hashlib.sha256(ss).digest()
     aesgcm = AESGCM(key)
     nonce = os.urandom(12)
@@ -118,30 +127,44 @@ def kyber_encrypt(
 def kyber_decrypt(
     private_key: bytes,
     ciphertext: bytes | str,
-    shared_secret: bytes | str,
+    shared_secret: bytes | str | None = None,
+    *,
+    level: int = 512,
 ) -> bytes:
-    """Decrypt data encrypted by :func:`kyber_encrypt`."""
+    """Decrypt data encrypted by :func:`kyber_encrypt`.
+
+    ``shared_secret`` becomes optional. When omitted the function decapsulates
+    it from ``ciphertext`` using the provided Kyber ``level``.
+    """
     if not PQCRYPTO_AVAILABLE:
         raise ImportError("pqcrypto is required for Kyber functions")
 
-    ct_size = ml_kem_512.CIPHERTEXT_SIZE
+    alg = _KYBER_LEVEL_MAP.get(level)
+    if alg is None:
+        raise DecryptionError("Invalid Kyber level")
+
+    ct_size = alg.CIPHERTEXT_SIZE
     if isinstance(ciphertext, str):
         try:
             ciphertext = base64.b64decode(ciphertext)
         except Exception as exc:  # pragma: no cover - defensive
             raise DecryptionError(f"Invalid ciphertext: {exc}") from exc
+
     if isinstance(shared_secret, str):
         try:
             shared_secret = base64.b64decode(shared_secret)
         except Exception as exc:  # pragma: no cover - defensive
             raise DecryptionError(f"Invalid shared secret: {exc}") from exc
+
     if len(ciphertext) < ct_size + 12 + 16:
         raise DecryptionError("Invalid ciphertext")
 
     kem_ct = ciphertext[:ct_size]
     enc = ciphertext[ct_size:]
-    ss_check = ml_kem_512.decrypt(private_key, kem_ct)
-    if ss_check != shared_secret:
+    ss_check = alg.decrypt(private_key, kem_ct)
+    if shared_secret is None:
+        shared_secret = ss_check
+    elif ss_check != shared_secret:
         raise DecryptionError("Shared secret mismatch")
 
     key = hashlib.sha256(shared_secret).digest()

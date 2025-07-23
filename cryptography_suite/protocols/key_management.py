@@ -79,15 +79,11 @@ def generate_rsa_keypair_and_save(
     password: str,
     key_size: int = 4096,
 ):
-    """
-    Generates an RSA key pair and saves them to files.
-    """
-    private_key, public_key = generate_rsa_keypair(key_size=key_size)
-    private_pem = serialize_private_key(private_key, password)
-    public_pem = serialize_public_key(public_key)
-
-    secure_save_key_to_file(private_pem, private_key_path)
-    secure_save_key_to_file(public_pem, public_key_path)
+    """Legacy wrapper for :class:`KeyManager` RSA key generation."""
+    km = KeyManager()
+    return km.generate_rsa_keypair_and_save(
+        private_key_path, public_key_path, password, key_size
+    )
 
 
 def generate_ec_keypair_and_save(
@@ -165,3 +161,19 @@ class KeyManager:
             serialize_public_key(public_key),
             public_path,
         )
+
+    def generate_rsa_keypair_and_save(
+        self,
+        private_key_path: str,
+        public_key_path: str,
+        password: str,
+        key_size: int = 4096,
+    ):
+        """Generate an RSA key pair and save to ``private_key_path`` and ``public_key_path``."""
+
+        private_key, public_key = generate_rsa_keypair(key_size=key_size)
+        private_pem = serialize_private_key(private_key, password)
+        public_pem = serialize_public_key(public_key)
+        secure_save_key_to_file(private_pem, private_key_path)
+        secure_save_key_to_file(public_pem, public_key_path)
+        return private_key, public_key

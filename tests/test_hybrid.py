@@ -2,6 +2,12 @@ import base64
 import unittest
 
 from cryptography_suite import hybrid_decrypt, hybrid_encrypt
+from cryptography_suite.pqc import (
+    PQCRYPTO_AVAILABLE,
+    generate_kyber_keypair,
+    kyber_encrypt,
+    kyber_decrypt,
+)
 from cryptography_suite.asymmetric import generate_rsa_keypair, generate_x25519_keypair
 from cryptography_suite.errors import CryptographySuiteError
 
@@ -41,6 +47,15 @@ class TestHybrid(unittest.TestCase):
         data["ciphertext"] = base64.b64encode(ct[:-1] + bytes([ct[-1] ^ 1])).decode()
         with self.assertRaises(CryptographySuiteError):
             hybrid_decrypt(priv, data)
+
+    @unittest.skipUnless(PQCRYPTO_AVAILABLE, "pqcrypto not installed")
+    def test_kyber_aes_gcm_roundtrip(self):
+        msg = b"kyber hybrid"
+        for lvl in (512, 768, 1024):
+            pk, sk = generate_kyber_keypair(level=lvl)
+            ct, ss = kyber_encrypt(pk, msg, level=lvl)
+            self.assertEqual(kyber_decrypt(sk, ct, ss, level=lvl), msg)
+            self.assertEqual(kyber_decrypt(sk, ct, level=lvl), msg)
 
 
 if __name__ == "__main__":

@@ -14,11 +14,13 @@ from cryptography_suite.protocols import (
     key_exists,
     generate_rsa_keypair_and_save,
     generate_ec_keypair_and_save,
+    KeyManager,
 )
 
 
 class TestKeyManagement(unittest.TestCase):
     def setUp(self):
+        self.km = KeyManager()
         self.password = "KeyManagementPassword"
         self.private_key_path = "private_key.pem"
         self.public_key_path = "public_key.pem"
@@ -43,7 +45,7 @@ class TestKeyManagement(unittest.TestCase):
 
     def test_secure_save_and_load_rsa_keys(self):
         """Test generating, saving, and loading RSA keys."""
-        generate_rsa_keypair_and_save(
+        self.km.generate_rsa_keypair_and_save(
             self.private_key_path, self.public_key_path, self.password
         )
         self.assertTrue(key_exists(self.private_key_path))
@@ -76,7 +78,7 @@ class TestKeyManagement(unittest.TestCase):
 
     def test_load_private_key_with_wrong_password(self):
         """Test loading private key with incorrect password."""
-        generate_rsa_keypair_and_save(
+        self.km.generate_rsa_keypair_and_save(
             self.private_key_path, self.public_key_path, self.password
         )
         with self.assertRaises(CryptographySuiteError):
