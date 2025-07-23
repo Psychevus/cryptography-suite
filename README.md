@@ -148,6 +148,13 @@ print(f"Encrypted: {encrypted_message}")
 
 decrypted_message: bytes = rsa_decrypt(encrypted_message, private_key)
 print(f"Decrypted: {decrypted_message}")
+
+# Serializing keys
+from cryptography_suite.utils import to_pem, from_pem, pem_to_json
+
+pem_priv: str = to_pem(private_key)
+loaded_priv = from_pem(pem_priv)
+json_pub: str = pem_to_json(public_key)
 ```
 
 ### Key Exchange
@@ -305,6 +312,11 @@ priv, pub = generate_rsa_keypair()
 payload = b"hybrid message"
 encrypted = hybrid_encrypt(payload, pub)
 decrypted = hybrid_decrypt(priv, encrypted)
+
+from cryptography_suite.utils import encode_encrypted_message, decode_encrypted_message
+
+blob: str = encode_encrypted_message(encrypted)
+parsed = decode_encrypted_message(blob)
 ```
 
 ### XChaCha20-Poly1305

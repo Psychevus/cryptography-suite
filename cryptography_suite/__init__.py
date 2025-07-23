@@ -177,6 +177,9 @@ from .utils import (
     secure_zero,
     to_pem,
     from_pem,
+    pem_to_json,
+    encode_encrypted_message,
+    decode_encrypted_message,
 )
 from .audit import audit_log, set_audit_logger
 
@@ -288,6 +291,9 @@ __all__ = [
     "KeyVault",
     "to_pem",
     "from_pem",
+    "pem_to_json",
+    "encode_encrypted_message",
+    "decode_encrypted_message",
     "KeyManager",
     "audit_log",
     "set_audit_logger",

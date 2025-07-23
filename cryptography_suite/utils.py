@@ -131,3 +131,53 @@ def from_pem(pem_str: str):
             from .errors import DecryptionError
 
             raise DecryptionError(f"Invalid PEM data: {exc}") from exc
+
+
+def pem_to_json(key) -> str:
+    """Serialize a key to a JSON object containing a PEM string."""
+    import json
+
+    pem = to_pem(key)
+    return json.dumps({"pem": pem})
+
+
+def encode_encrypted_message(message) -> str:
+    """Convert a hybrid or Signal encrypted message into a Base64 string."""
+    import json
+    import base64
+    from dataclasses import asdict, is_dataclass
+
+    if is_dataclass(message):
+        data = asdict(message)
+    else:
+        data = dict(message)
+
+    enc = {}
+    for k, v in data.items():
+        if isinstance(v, (bytes, bytearray)):
+            enc[k] = base64.b64encode(bytes(v)).decode()
+        else:
+            enc[k] = v
+
+    json_bytes = json.dumps(enc).encode()
+    return base64.b64encode(json_bytes).decode()
+
+
+def decode_encrypted_message(data: str):
+    """Parse a Base64 string produced by :func:`encode_encrypted_message`."""
+    import json
+    import base64
+
+    json_bytes = base64.b64decode(data)
+    parsed = json.loads(json_bytes.decode())
+    out = {k: base64.b64decode(v) if isinstance(v, str) else v for k, v in parsed.items()}
+
+    try:  # Return EncryptedMessage if fields match
+        from .protocols.signal_protocol import EncryptedMessage
+
+        if set(out.keys()) == {"dh_public", "nonce", "ciphertext"}:
+            return EncryptedMessage(**out)
+    except Exception:
+        pass
+
+    return out

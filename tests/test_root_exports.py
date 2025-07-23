@@ -9,3 +9,6 @@ def test_root_exports_available():
     assert callable(cs.KeyVault)
     assert callable(cs.to_pem)
     assert callable(cs.from_pem)
+    assert callable(cs.pem_to_json)
+    assert callable(cs.encode_encrypted_message)
+    assert callable(cs.decode_encrypted_message)
