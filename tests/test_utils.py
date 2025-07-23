@@ -7,6 +7,9 @@ from cryptography_suite.utils import (
     KeyVault,
     to_pem,
     from_pem,
+    pem_to_json,
+    encode_encrypted_message,
+    decode_encrypted_message,
 )
 from cryptography_suite.asymmetric import generate_rsa_keypair
 from cryptography.hazmat.primitives.asymmetric import rsa
@@ -67,6 +70,16 @@ class TestUtils(unittest.TestCase):
         """Invalid PEM data should raise DecryptionError."""
         with self.assertRaises(DecryptionError):
             from_pem("NOT A VALID PEM")
+
+    def test_pem_to_json_and_decode_message(self):
+        _, pub = generate_rsa_keypair()
+        json_blob = pem_to_json(pub)
+        self.assertIn("pem", json_blob)
+
+        msg = {"ciphertext": b"a", "nonce": b"b"}
+        encoded = encode_encrypted_message(msg)
+        decoded = decode_encrypted_message(encoded)
+        self.assertEqual(decoded["ciphertext"], b"a")
 
 
 if __name__ == "__main__":

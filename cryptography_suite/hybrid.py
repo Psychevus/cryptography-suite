@@ -11,7 +11,12 @@ from .asymmetric import ec_decrypt, ec_encrypt, rsa_decrypt, rsa_encrypt
 from .errors import DecryptionError, EncryptionError
 
 
-def hybrid_encrypt(message: bytes, public_key: Any) -> Dict[str, str]:
+def hybrid_encrypt(
+    message: bytes,
+    public_key: Any,
+    *,
+    raw_output: bool = False,
+) -> Dict[str, str | bytes]:
     """Encrypt ``message`` using hybrid RSA/ECIES + AES-GCM.
 
     The AES key is randomly generated and encrypted with the recipient's
@@ -23,9 +28,9 @@ def hybrid_encrypt(message: bytes, public_key: Any) -> Dict[str, str]:
     aes_key = urandom(32)
 
     if isinstance(public_key, rsa.RSAPublicKey):
-        encrypted_key = rsa_encrypt(aes_key, public_key)
+        encrypted_key = rsa_encrypt(aes_key, public_key, raw_output=raw_output)
     elif isinstance(public_key, x25519.X25519PublicKey):
-        encrypted_key = ec_encrypt(aes_key, public_key)
+        encrypted_key = ec_encrypt(aes_key, public_key, raw_output=raw_output)
     else:
         raise TypeError("Unsupported public key type.")
 
@@ -35,15 +40,25 @@ def hybrid_encrypt(message: bytes, public_key: Any) -> Dict[str, str]:
     ciphertext = enc[:-16]
     tag = enc[-16:]
 
+    if raw_output:
+        return {
+            "encrypted_key": encrypted_key,
+            "nonce": nonce,
+            "ciphertext": ciphertext,
+            "tag": tag,
+        }
+
     return {
-        "encrypted_key": encrypted_key,
+        "encrypted_key": encrypted_key
+        if isinstance(encrypted_key, str)
+        else base64.b64encode(encrypted_key).decode(),
         "nonce": base64.b64encode(nonce).decode(),
         "ciphertext": base64.b64encode(ciphertext).decode(),
         "tag": base64.b64encode(tag).decode(),
     }
 
 
-def hybrid_decrypt(private_key: Any, data: Dict[str, str]) -> bytes:
+def hybrid_decrypt(private_key: Any, data: Dict[str, str | bytes]) -> bytes:
     """Decrypt data produced by :func:`hybrid_encrypt`."""
 
     for field in ("encrypted_key", "nonce", "ciphertext", "tag"):
@@ -51,9 +66,9 @@ def hybrid_decrypt(private_key: Any, data: Dict[str, str]) -> bytes:
             raise DecryptionError("Invalid encrypted payload.")
 
     enc_key = data["encrypted_key"]
-    nonce_b64 = data["nonce"]
-    ct_b64 = data["ciphertext"]
-    tag_b64 = data["tag"]
+    nonce_data = data["nonce"]
+    ct_data = data["ciphertext"]
+    tag_data = data["tag"]
 
     if isinstance(private_key, rsa.RSAPrivateKey):
         aes_key = rsa_decrypt(enc_key, private_key)
@@ -63,9 +78,9 @@ def hybrid_decrypt(private_key: Any, data: Dict[str, str]) -> bytes:
         raise TypeError("Unsupported private key type.")
 
     try:
-        nonce = base64.b64decode(nonce_b64)
-        ciphertext = base64.b64decode(ct_b64)
-        tag = base64.b64decode(tag_b64)
+        nonce = base64.b64decode(nonce_data) if isinstance(nonce_data, str) else nonce_data
+        ciphertext = base64.b64decode(ct_data) if isinstance(ct_data, str) else ct_data
+        tag = base64.b64decode(tag_data) if isinstance(tag_data, str) else tag_data
     except Exception as exc:  # pragma: no cover - defensive parsing
         raise DecryptionError(f"Invalid encoded data: {exc}") from exc
 

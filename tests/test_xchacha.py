@@ -35,7 +35,7 @@ class TestXChaCha20(unittest.TestCase):
         message = b"Secret"
         enc = xchacha_encrypt(message, key, nonce)
         with self.assertRaises(DecryptionError):
-            xchacha_decrypt(enc["ciphertext"], os.urandom(32), nonce)
+            xchacha_decrypt(enc["ciphertext"], os.urandom(32), enc["nonce"])
 
 
 if __name__ == "__main__":

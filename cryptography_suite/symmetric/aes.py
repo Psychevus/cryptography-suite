@@ -22,7 +22,13 @@ CHUNK_SIZE = 4096
 TAG_SIZE = 16  # AES-GCM authentication tag size
 
 
-def aes_encrypt(plaintext: str, password: str, kdf: str = "argon2") -> str:
+def aes_encrypt(
+    plaintext: str,
+    password: str,
+    kdf: str = "argon2",
+    *,
+    raw_output: bool = False,
+) -> str | bytes:
     """Encrypt plaintext using AES-GCM with a password-derived key.
 
     Argon2id is used by default. Pass ``kdf='scrypt'`` or ``kdf='pbkdf2'`` for
@@ -50,10 +56,17 @@ def aes_encrypt(plaintext: str, password: str, kdf: str = "argon2") -> str:
     verbose_print(f"Nonce: {nonce.hex()}")
     verbose_print("Mode: AES-GCM")
     ciphertext = aesgcm.encrypt(nonce, plaintext.encode(), None)
-    return base64.b64encode(salt + nonce + ciphertext).decode()
+    data = salt + nonce + ciphertext
+    if raw_output:
+        return data
+    return base64.b64encode(data).decode()
 
 
-def aes_decrypt(encrypted_data: str, password: str, kdf: str = "argon2") -> str:
+def aes_decrypt(
+    encrypted_data: bytes | str,
+    password: str,
+    kdf: str = "argon2",
+) -> str:
     """Decrypt AES-GCM encrypted data using a password-derived key.
 
     Argon2id is used by default. Pass ``kdf='scrypt'`` or ``kdf='pbkdf2'`` for
@@ -64,10 +77,13 @@ def aes_decrypt(encrypted_data: str, password: str, kdf: str = "argon2") -> str:
     if not password:
         raise DecryptionError("Password cannot be empty.")
 
-    try:
-        encrypted_data_bytes = base64.b64decode(encrypted_data)
-    except Exception as exc:
-        raise DecryptionError(f"Invalid encrypted data: {exc}") from exc
+    if isinstance(encrypted_data, str):
+        try:
+            encrypted_data_bytes = base64.b64decode(encrypted_data)
+        except Exception as exc:
+            raise DecryptionError(f"Invalid encrypted data: {exc}") from exc
+    else:
+        encrypted_data_bytes = encrypted_data
     if len(encrypted_data_bytes) < SALT_SIZE + NONCE_SIZE:
         raise DecryptionError("Invalid encrypted data.")
 
