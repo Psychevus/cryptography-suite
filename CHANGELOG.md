@@ -14,11 +14,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 - Signal Protocol messaging utilities.
 - BLAKE3 and SHA3 hashing options.
 - Command line interface tools.
+- Post-quantum cryptography support via Kyber KEM and Dilithium signatures.
+- Hybrid RSA/ECIES + AES-GCM encryption helpers.
+- XChaCha20-Poly1305 stream cipher when available.
+- Audit logging utilities for tracing cryptographic operations.
+- `KeyVault` context manager for secure in-memory key handling.
 ### Changed
 - Major refactor into a modular package structure.
 - Argon2id is now the default key derivation function.
 ### Fixed
 - Test suite expanded to 100% coverage.
+
+### Migration Guide (1.x -> 2.0.0)
+- **Argon2id Default**: Password-based encryption now derives keys with
+  Argon2id. Set ``kdf="pbkdf2"`` to retain the previous behavior.
+- **Package Layout**: Modules reorganized into subpackages like
+  ``cryptography_suite.pqc`` and ``cryptography_suite.protocols``.
+- **Breaking Changes**: Some helper functions return ``bytes`` when
+  ``raw_output=True`` and new exceptions ``MissingDependencyError`` and
+  ``ProtocolError`` are raised in edge cases.
 
 ## [1.0.0] - 2024-12-04
 ### Added
