@@ -50,12 +50,17 @@ def base62_decode(data: str) -> bytes:
     return value.to_bytes(byte_length, byteorder="big")
 
 
-def secure_zero(data: bytearray):
-    """
-    Overwrites the contents of a bytearray with zeros to clear sensitive data from memory.
-    """
-    for i in range(len(data)):
-        data[i] = 0
+def secure_zero(data: bytearray) -> None:
+    """Overwrite ``data`` with zeros in-place."""
+
+    if not isinstance(data, bytearray):
+        raise TypeError("secure_zero expects a bytearray")
+
+    # Use a memoryview for efficient bulk assignment without Python loops.
+    view = memoryview(data)
+    view[:] = b"\x00" * len(data)
+    if hasattr(view, "release"):
+        view.release()
 
 
 def generate_secure_random_string(length: int = 32) -> str:

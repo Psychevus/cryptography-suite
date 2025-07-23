@@ -1,4 +1,5 @@
-from typing import Tuple
+from typing import Tuple, Callable, Optional
+from concurrent.futures import Future, ThreadPoolExecutor
 from ..errors import EncryptionError, DecryptionError
 import base64
 
@@ -33,6 +34,39 @@ def generate_rsa_keypair(
     private_key = rsa.generate_private_key(public_exponent=65537, key_size=key_size)
     public_key = private_key.public_key()
     return private_key, public_key
+
+
+def generate_rsa_keypair_async(
+    key_size: int = DEFAULT_RSA_KEY_SIZE,
+    *,
+    executor: Optional[ThreadPoolExecutor] = None,
+    callback: Optional[Callable[[rsa.RSAPrivateKey, rsa.RSAPublicKey], None]] = None,
+) -> Future:
+    """Generate an RSA key pair in a background thread.
+
+    The returned :class:`~concurrent.futures.Future` resolves to a tuple
+    ``(private_key, public_key)``. Supplying ``callback`` will invoke the
+    callable with these arguments once generation completes. If ``executor`` is
+    omitted a temporary :class:`ThreadPoolExecutor` is created and shut down
+    automatically.
+    """
+
+    own_exec = executor is None
+    executor = executor or ThreadPoolExecutor(max_workers=1)
+    fut = executor.submit(generate_rsa_keypair, key_size=key_size)
+
+    if callback is not None:
+        def _cb(f: Future) -> None:
+            priv, pub = f.result()
+            callback(priv, pub)
+        fut.add_done_callback(_cb)
+
+    if own_exec:
+        def _shutdown(f: Future) -> None:
+            executor.shutdown(wait=False)
+        fut.add_done_callback(_shutdown)
+
+    return fut
 
 
 def rsa_encrypt(

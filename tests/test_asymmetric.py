@@ -2,6 +2,7 @@ import unittest
 import base64
 from cryptography_suite.asymmetric import (
     generate_rsa_keypair,
+    generate_rsa_keypair_async,
     rsa_encrypt,
     rsa_decrypt,
     serialize_private_key,
@@ -266,6 +267,26 @@ class TestAsymmetric(unittest.TestCase):
         tampered_b64 = base64.b64encode(tampered).decode()
         with self.assertRaises(CryptographySuiteError):
             ec_decrypt(tampered_b64, priv)
+
+    def test_generate_rsa_keypair_async_future(self):
+        """Asynchronous RSA key generation returns a Future."""
+        fut = generate_rsa_keypair_async(key_size=2048)
+        priv, pub = fut.result(timeout=30)
+        self.assertIsInstance(priv, rsa.RSAPrivateKey)
+        self.assertIsInstance(pub, rsa.RSAPublicKey)
+
+    def test_generate_rsa_keypair_async_callback(self):
+        """Callback is invoked with the generated keys."""
+        out: dict[str, rsa.RSAPrivateKey | rsa.RSAPublicKey] = {}
+
+        def cb(priv: rsa.RSAPrivateKey, pub: rsa.RSAPublicKey) -> None:
+            out["priv"] = priv
+            out["pub"] = pub
+
+        fut = generate_rsa_keypair_async(key_size=2048, callback=cb)
+        fut.result(timeout=30)
+        self.assertIsInstance(out.get("priv"), rsa.RSAPrivateKey)
+        self.assertIsInstance(out.get("pub"), rsa.RSAPublicKey)
 
 
 if __name__ == "__main__":

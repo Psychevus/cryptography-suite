@@ -23,6 +23,7 @@ from .asymmetric import (
     ec_encrypt,
     generate_ec_keypair,
     generate_rsa_keypair,
+    generate_rsa_keypair_async,
     generate_x448_keypair,
     generate_x25519_keypair,
     load_private_key,
@@ -232,6 +233,7 @@ __all__ = [
     "generate_salt",
     # Asymmetric
     "generate_rsa_keypair",
+    "generate_rsa_keypair_async",
     "rsa_encrypt",
     "rsa_decrypt",
     "serialize_private_key",
