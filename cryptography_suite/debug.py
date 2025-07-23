@@ -13,4 +13,5 @@ def verbose_print(message: str) -> None:
     if VERBOSE_MODE:
         print(message)
 
+
 __all__ = ["VERBOSE_MODE", "verbose_print"]
