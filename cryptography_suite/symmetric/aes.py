@@ -6,6 +6,7 @@ from os import urandom
 
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+from typing import cast
 from ..errors import EncryptionError, DecryptionError, MissingDependencyError
 from ..debug import verbose_print
 
@@ -246,7 +247,9 @@ async def encrypt_file_async(
     try:  # pragma: no cover - optional dependency
         import aiofiles
     except Exception as exc:  # pragma: no cover - fallback when aiofiles missing
-        raise MissingDependencyError("aiofiles is required for async operations") from exc
+        raise MissingDependencyError(
+            "aiofiles is required for async operations"
+        ) from exc
 
     salt = urandom(SALT_SIZE)
     if kdf == "scrypt":
@@ -267,9 +270,10 @@ async def encrypt_file_async(
     encryptor = cipher.encryptor()
 
     try:
-        async with aiofiles.open(input_file_path, "rb") as f_in, aiofiles.open(
-            output_file_path, "wb"
-        ) as f_out:
+        async with (
+            aiofiles.open(input_file_path, "rb") as f_in,
+            aiofiles.open(output_file_path, "wb") as f_out,
+        ):
             await f_out.write(salt + nonce)
             while True:
                 chunk = await f_in.read(CHUNK_SIZE)
@@ -298,7 +302,9 @@ async def decrypt_file_async(
     try:  # pragma: no cover - optional dependency
         import aiofiles
     except Exception as exc:  # pragma: no cover - fallback when aiofiles missing
-        raise MissingDependencyError("aiofiles is required for async operations") from exc
+        raise MissingDependencyError(
+            "aiofiles is required for async operations"
+        ) from exc
 
     try:
         file_size = os.path.getsize(encrypted_file_path)
@@ -353,27 +359,27 @@ async def decrypt_file_async(
 
 
 def scrypt_encrypt(plaintext: str, password: str) -> str:
-    return aes_encrypt(plaintext, password, kdf="scrypt")
+    return cast(str, aes_encrypt(plaintext, password, kdf="scrypt"))
 
 
 def scrypt_decrypt(encrypted_data: str, password: str) -> str:
-    return aes_decrypt(encrypted_data, password, kdf="scrypt")
+    return cast(str, aes_decrypt(encrypted_data, password, kdf="scrypt"))
 
 
 def pbkdf2_encrypt(plaintext: str, password: str) -> str:
-    return aes_encrypt(plaintext, password, kdf="pbkdf2")
+    return cast(str, aes_encrypt(plaintext, password, kdf="pbkdf2"))
 
 
 def pbkdf2_decrypt(encrypted_data: str, password: str) -> str:
-    return aes_decrypt(encrypted_data, password, kdf="pbkdf2")
+    return cast(str, aes_decrypt(encrypted_data, password, kdf="pbkdf2"))
 
 
 def argon2_encrypt(plaintext: str, password: str) -> str:
-    return aes_encrypt(plaintext, password, kdf="argon2")
+    return cast(str, aes_encrypt(plaintext, password, kdf="argon2"))
 
 
 def argon2_decrypt(encrypted_data: str, password: str) -> str:
-    return aes_decrypt(encrypted_data, password, kdf="argon2")
+    return cast(str, aes_decrypt(encrypted_data, password, kdf="argon2"))
 
 
 __all__ = [

@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import ec, rsa
 from cryptography.x509.oid import NameOID
 
 from .errors import CryptographySuiteError
@@ -13,14 +14,17 @@ __all__ = [
 ]
 
 
-def generate_csr(common_name: str, private_key) -> bytes:
+def generate_csr(
+    common_name: str,
+    private_key: rsa.RSAPrivateKey | ec.EllipticCurvePrivateKey,
+) -> bytes:
     """Generate a Certificate Signing Request (CSR).
 
     Parameters
     ----------
     common_name : str
         The Common Name to include in the CSR.
-    private_key : Any
+    private_key : RSAPrivateKey | EllipticCurvePrivateKey
         Private key used to sign the CSR.
 
     Returns
@@ -43,14 +47,18 @@ def generate_csr(common_name: str, private_key) -> bytes:
         raise CryptographySuiteError(f"Failed to generate CSR: {exc}") from exc
 
 
-def self_sign_certificate(common_name: str, private_key, days_valid: int = 365) -> bytes:
+def self_sign_certificate(
+    common_name: str,
+    private_key: rsa.RSAPrivateKey | ec.EllipticCurvePrivateKey,
+    days_valid: int = 365,
+) -> bytes:
     """Generate a self-signed X.509 certificate.
 
     Parameters
     ----------
     common_name : str
         Common Name for the certificate.
-    private_key : Any
+    private_key : RSAPrivateKey | EllipticCurvePrivateKey
         Private key to sign the certificate with.
     days_valid : int, optional
         Number of days the certificate is valid for. Defaults to ``365``.

@@ -115,7 +115,9 @@ class KeyManager:
         """
 
         if password:
-            encryption = serialization.BestAvailableEncryption(password.encode())
+            encryption: serialization.KeySerializationEncryption = (
+                serialization.BestAvailableEncryption(password.encode())
+            )
         else:
             encryption = serialization.NoEncryption()
 

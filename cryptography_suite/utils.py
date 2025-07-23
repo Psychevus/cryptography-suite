@@ -1,5 +1,13 @@
+from __future__ import annotations
+
 import string
 import secrets
+from typing import Any, Mapping, TypedDict, TypeAlias, cast, TYPE_CHECKING
+
+from .hybrid import EncryptedHybridMessage
+
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    from .protocols.signal_protocol import EncryptedMessage
 
 BASE62_ALPHABET = string.digits + string.ascii_letters
 
@@ -65,17 +73,39 @@ class KeyVault:
         return False
 
 
-def to_pem(key) -> str:
+from cryptography.hazmat.primitives.asymmetric import (
+    rsa,
+    ec,
+    ed25519,
+    ed448,
+    x25519,
+    x448,
+)
+from typing import cast
+
+
+PrivateKeyTypes: TypeAlias = (
+    rsa.RSAPrivateKey
+    | ec.EllipticCurvePrivateKey
+    | ed25519.Ed25519PrivateKey
+    | ed448.Ed448PrivateKey
+    | x25519.X25519PrivateKey
+    | x448.X448PrivateKey
+)
+
+PublicKeyTypes: TypeAlias = (
+    rsa.RSAPublicKey
+    | ec.EllipticCurvePublicKey
+    | ed25519.Ed25519PublicKey
+    | ed448.Ed448PublicKey
+    | x25519.X25519PublicKey
+    | x448.X448PublicKey
+)
+
+
+def to_pem(key: PrivateKeyTypes | PublicKeyTypes) -> str:
     """Return a PEM-formatted string for a key."""
     from cryptography.hazmat.primitives import serialization
-    from cryptography.hazmat.primitives.asymmetric import (
-        rsa,
-        ec,
-        ed25519,
-        ed448,
-        x25519,
-        x448,
-    )
 
     if isinstance(
         key,
@@ -114,7 +144,7 @@ def to_pem(key) -> str:
     return pem_bytes.decode()
 
 
-def from_pem(pem_str: str):
+def from_pem(pem_str: str) -> PrivateKeyTypes | PublicKeyTypes:
     """Load a key object from a PEM-formatted string."""
     from cryptography.hazmat.primitives import serialization
 
@@ -123,17 +153,23 @@ def from_pem(pem_str: str):
 
     pem_bytes = pem_str.encode()
     try:
-        return serialization.load_pem_private_key(pem_bytes, password=None)
+        return cast(
+            PrivateKeyTypes | PublicKeyTypes,
+            serialization.load_pem_private_key(pem_bytes, password=None),
+        )
     except ValueError:
         try:
-            return serialization.load_pem_public_key(pem_bytes)
+            return cast(
+                PrivateKeyTypes | PublicKeyTypes,
+                serialization.load_pem_public_key(pem_bytes),
+            )
         except ValueError as exc:
             from .errors import DecryptionError
 
             raise DecryptionError(f"Invalid PEM data: {exc}") from exc
 
 
-def pem_to_json(key) -> str:
+def pem_to_json(key: PrivateKeyTypes | PublicKeyTypes) -> str:
     """Serialize a key to a JSON object containing a PEM string."""
     import json
 
@@ -141,16 +177,25 @@ def pem_to_json(key) -> str:
     return json.dumps({"pem": pem})
 
 
-def encode_encrypted_message(message) -> str:
+class EncryptedPayload(TypedDict):
+    encrypted_key: bytes
+    nonce: bytes
+    ciphertext: bytes
+    tag: bytes
+
+
+def encode_encrypted_message(
+    message: EncryptedHybridMessage | Mapping[str, bytes | bytearray],
+) -> str:
     """Convert a hybrid or Signal encrypted message into a Base64 string."""
     import json
     import base64
     from dataclasses import asdict, is_dataclass
 
     if is_dataclass(message):
-        data = asdict(message)
+        data = asdict(cast(Any, message))
     else:
-        data = dict(message)
+        data = dict(cast(Mapping[str, bytes | bytearray], message))
 
     enc = {}
     for k, v in data.items():
@@ -163,14 +208,18 @@ def encode_encrypted_message(message) -> str:
     return base64.b64encode(json_bytes).decode()
 
 
-def decode_encrypted_message(data: str):
+def decode_encrypted_message(
+    data: str,
+) -> EncryptedHybridMessage | Mapping[str, bytes] | EncryptedMessage:
     """Parse a Base64 string produced by :func:`encode_encrypted_message`."""
     import json
     import base64
 
     json_bytes = base64.b64decode(data)
     parsed = json.loads(json_bytes.decode())
-    out = {k: base64.b64decode(v) if isinstance(v, str) else v for k, v in parsed.items()}
+    out = {
+        k: base64.b64decode(v) if isinstance(v, str) else v for k, v in parsed.items()
+    }
 
     try:  # Return EncryptedMessage if fields match
         from .protocols.signal_protocol import EncryptedMessage

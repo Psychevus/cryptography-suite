@@ -3,7 +3,10 @@ from __future__ import annotations
 import base64
 from dataclasses import dataclass
 from os import urandom
-from typing import Any, Dict
+from typing import Dict, Mapping, TYPE_CHECKING, cast
+
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    from .protocols.signal_protocol import EncryptedMessage
 
 from cryptography.hazmat.primitives.asymmetric import rsa, x25519
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
@@ -24,7 +27,7 @@ class EncryptedHybridMessage:
 
 def hybrid_encrypt(
     message: bytes,
-    public_key: Any,
+    public_key: rsa.RSAPublicKey | x25519.X25519PublicKey,
     *,
     raw_output: bool = False,
 ) -> EncryptedHybridMessage:
@@ -39,9 +42,9 @@ def hybrid_encrypt(
     aes_key = urandom(32)
 
     if isinstance(public_key, rsa.RSAPublicKey):
-        encrypted_key = rsa_encrypt(aes_key, public_key, raw_output=True)
+        encrypted_key = cast(bytes, rsa_encrypt(aes_key, public_key, raw_output=True))
     elif isinstance(public_key, x25519.X25519PublicKey):
-        encrypted_key = ec_encrypt(aes_key, public_key, raw_output=True)
+        encrypted_key = cast(bytes, ec_encrypt(aes_key, public_key, raw_output=True))
     else:
         raise TypeError("Unsupported public key type.")
 
@@ -60,15 +63,18 @@ def hybrid_encrypt(
 
 
 def hybrid_decrypt(
-    private_key: Any,
-    data: EncryptedHybridMessage | Dict[str, str | bytes] | str,
+    private_key: rsa.RSAPrivateKey | x25519.X25519PrivateKey,
+    data: EncryptedHybridMessage | Mapping[str, str | bytes] | str | EncryptedMessage,
 ) -> bytes:
     """Decrypt data produced by :func:`hybrid_encrypt`."""
 
     if isinstance(data, str):
         from .utils import decode_encrypted_message
 
-        data = decode_encrypted_message(data)
+        data = cast(
+            EncryptedHybridMessage | Mapping[str, bytes] | EncryptedMessage,
+            decode_encrypted_message(data),
+        )
 
     if isinstance(data, EncryptedHybridMessage):
         enc_key = data.encrypted_key
@@ -92,9 +98,7 @@ def hybrid_decrypt(
                 else nonce_data
             )
             ciphertext = (
-                base64.b64decode(ct_data)
-                if isinstance(ct_data, str)
-                else ct_data
+                base64.b64decode(ct_data) if isinstance(ct_data, str) else ct_data
             )
             tag = base64.b64decode(tag_data) if isinstance(tag_data, str) else tag_data
         except Exception as exc:  # pragma: no cover - defensive parsing
