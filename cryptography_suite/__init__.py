@@ -9,6 +9,7 @@ from .errors import (
     ProtocolError,
     SignatureVerificationError,
 )
+from .debug import VERBOSE_MODE, verbose_print
 
 __version__ = "2.0.0"
 

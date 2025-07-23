@@ -10,6 +10,7 @@ try:  # pragma: no cover - optional algorithm
 except Exception:  # pragma: no cover - old cryptography versions
     XChaCha20Poly1305 = None
 from ..errors import EncryptionError, DecryptionError, MissingDependencyError
+from ..debug import verbose_print
 
 from .kdf import (
     CHACHA20_KEY_SIZE,
@@ -28,8 +29,11 @@ def chacha20_encrypt(plaintext: str, password: str) -> str:
 
     salt = urandom(SALT_SIZE)
     key = derive_key_argon2(password, salt, key_size=CHACHA20_KEY_SIZE)
+    verbose_print(f"Derived key: {key.hex()}")
     chacha = ChaCha20Poly1305(key)
     nonce = urandom(NONCE_SIZE)
+    verbose_print(f"Nonce: {nonce.hex()}")
+    verbose_print("Mode: ChaCha20-Poly1305")
 
     ciphertext = chacha.encrypt(nonce, plaintext.encode(), None)
     return base64.b64encode(salt + nonce + ciphertext).decode()
@@ -54,7 +58,10 @@ def chacha20_decrypt(encrypted_data: str, password: str) -> str:
     ciphertext = encrypted_data_bytes[SALT_SIZE + NONCE_SIZE :]
 
     key = derive_key_argon2(password, salt, key_size=CHACHA20_KEY_SIZE)
+    verbose_print(f"Derived key: {key.hex()}")
     chacha = ChaCha20Poly1305(key)
+    verbose_print(f"Nonce: {nonce.hex()}")
+    verbose_print("Mode: ChaCha20-Poly1305")
     try:
         plaintext = chacha.decrypt(nonce, ciphertext, None)
         return plaintext.decode()
@@ -76,6 +83,9 @@ def xchacha_encrypt(message: bytes, key: bytes, nonce: bytes) -> dict:
         raise EncryptionError("Nonce must be 24 bytes.")
 
     cipher = XChaCha20Poly1305(bytes(key))
+    verbose_print(f"Derived key: {bytes(key).hex()}")
+    verbose_print(f"Nonce: {bytes(nonce).hex()}")
+    verbose_print("Mode: XChaCha20-Poly1305")
     ciphertext = cipher.encrypt(bytes(nonce), bytes(message), None)
     return {"nonce": bytes(nonce), "ciphertext": ciphertext}
 
@@ -94,6 +104,9 @@ def xchacha_decrypt(ciphertext: bytes, key: bytes, nonce: bytes) -> bytes:
         raise DecryptionError("Nonce must be 24 bytes.")
 
     cipher = XChaCha20Poly1305(bytes(key))
+    verbose_print(f"Derived key: {bytes(key).hex()}")
+    verbose_print(f"Nonce: {bytes(nonce).hex()}")
+    verbose_print("Mode: XChaCha20-Poly1305")
     try:
         return cipher.decrypt(bytes(nonce), ciphertext, None)
     except Exception as exc:  # pragma: no cover - high-level error handling
