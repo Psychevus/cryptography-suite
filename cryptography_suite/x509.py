@@ -103,4 +103,3 @@ def load_certificate(pem_data: bytes) -> x509.Certificate:
         return x509.load_pem_x509_certificate(pem_data)
     except Exception as exc:  # pragma: no cover - high level
         raise CryptographySuiteError(f"Failed to load certificate: {exc}") from exc
-
