@@ -8,6 +8,9 @@ from typing import Any, Dict
 from cryptography.hazmat.primitives.asymmetric import rsa, x25519
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
+from .asymmetric import ec_decrypt, ec_encrypt, rsa_decrypt, rsa_encrypt
+from .errors import DecryptionError, EncryptionError
+
 
 @dataclass
 class EncryptedHybridMessage:
@@ -17,9 +20,6 @@ class EncryptedHybridMessage:
     nonce: bytes
     ciphertext: bytes
     tag: bytes
-
-from .asymmetric import ec_decrypt, ec_encrypt, rsa_decrypt, rsa_encrypt
-from .errors import DecryptionError, EncryptionError
 
 
 def hybrid_encrypt(
