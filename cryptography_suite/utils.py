@@ -24,7 +24,7 @@ def base62_decode(data: str) -> bytes:
     Decodes a Base62-encoded string into bytes.
     """
     if not data or data == "0":
-        return b''
+        return b""
 
     value = 0
     for char in data:
@@ -63,3 +63,71 @@ class KeyVault:
     def __exit__(self, exc_type, exc, tb):
         secure_zero(self._key)
         return False
+
+
+def to_pem(key) -> str:
+    """Return a PEM-formatted string for a key."""
+    from cryptography.hazmat.primitives import serialization
+    from cryptography.hazmat.primitives.asymmetric import (
+        rsa,
+        ec,
+        ed25519,
+        ed448,
+        x25519,
+        x448,
+    )
+
+    if isinstance(
+        key,
+        (
+            rsa.RSAPrivateKey,
+            ec.EllipticCurvePrivateKey,
+            ed25519.Ed25519PrivateKey,
+            ed448.Ed448PrivateKey,
+            x25519.X25519PrivateKey,
+            x448.X448PrivateKey,
+        ),
+    ):
+        pem_bytes = key.private_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PrivateFormat.PKCS8,
+            encryption_algorithm=serialization.NoEncryption(),
+        )
+    elif isinstance(
+        key,
+        (
+            rsa.RSAPublicKey,
+            ec.EllipticCurvePublicKey,
+            ed25519.Ed25519PublicKey,
+            ed448.Ed448PublicKey,
+            x25519.X25519PublicKey,
+            x448.X448PublicKey,
+        ),
+    ):
+        pem_bytes = key.public_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PublicFormat.SubjectPublicKeyInfo,
+        )
+    else:
+        raise TypeError("Unsupported key type for PEM conversion.")
+
+    return pem_bytes.decode()
+
+
+def from_pem(pem_str: str):
+    """Load a key object from a PEM-formatted string."""
+    from cryptography.hazmat.primitives import serialization
+
+    if not isinstance(pem_str, str):
+        raise TypeError("PEM data must be provided as a string.")
+
+    pem_bytes = pem_str.encode()
+    try:
+        return serialization.load_pem_private_key(pem_bytes, password=None)
+    except ValueError:
+        try:
+            return serialization.load_pem_public_key(pem_bytes)
+        except ValueError as exc:
+            from .errors import DecryptionError
+
+            raise DecryptionError(f"Invalid PEM data: {exc}") from exc

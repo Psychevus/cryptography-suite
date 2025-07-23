@@ -5,7 +5,12 @@ from cryptography_suite.utils import (
     secure_zero,
     generate_secure_random_string,
     KeyVault,
+    to_pem,
+    from_pem,
 )
+from cryptography_suite.asymmetric import generate_rsa_keypair
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography_suite.errors import DecryptionError
 
 
 class TestUtils(unittest.TestCase):
@@ -45,6 +50,23 @@ class TestUtils(unittest.TestCase):
             self.assertIsInstance(key, bytearray)
             self.assertEqual(bytes(key), data)
         self.assertTrue(all(b == 0 for b in key))
+
+    def test_to_pem_and_from_pem(self):
+        """Round trip conversion to and from PEM."""
+        priv, pub = generate_rsa_keypair()
+        priv_pem = to_pem(priv)
+        pub_pem = to_pem(pub)
+        self.assertIsInstance(priv_pem, str)
+        self.assertIsInstance(pub_pem, str)
+        loaded_priv = from_pem(priv_pem)
+        loaded_pub = from_pem(pub_pem)
+        self.assertIsInstance(loaded_priv, rsa.RSAPrivateKey)
+        self.assertIsInstance(loaded_pub, rsa.RSAPublicKey)
+
+    def test_from_pem_invalid(self):
+        """Invalid PEM data should raise DecryptionError."""
+        with self.assertRaises(DecryptionError):
+            from_pem("NOT A VALID PEM")
 
 
 if __name__ == "__main__":
