@@ -3,7 +3,7 @@ from __future__ import annotations
 import base64
 from dataclasses import dataclass
 from os import urandom
-from typing import Dict, Mapping, TYPE_CHECKING, cast
+from typing import Mapping, TYPE_CHECKING, cast
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from .protocols.signal_protocol import EncryptedMessage

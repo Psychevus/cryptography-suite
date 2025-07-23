@@ -4,6 +4,15 @@ import string
 import secrets
 from typing import Any, Mapping, TypedDict, TypeAlias, cast, TYPE_CHECKING
 
+from cryptography.hazmat.primitives.asymmetric import (
+    rsa,
+    ec,
+    ed25519,
+    ed448,
+    x25519,
+    x448,
+)
+
 from .hybrid import EncryptedHybridMessage
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
@@ -71,17 +80,6 @@ class KeyVault:
     def __exit__(self, exc_type, exc, tb):
         secure_zero(self._key)
         return False
-
-
-from cryptography.hazmat.primitives.asymmetric import (
-    rsa,
-    ec,
-    ed25519,
-    ed448,
-    x25519,
-    x448,
-)
-from typing import cast
 
 
 PrivateKeyTypes: TypeAlias = (

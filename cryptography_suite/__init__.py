@@ -1,5 +1,7 @@
 """Cryptography Suite Package Initialization."""
 
+from typing import Any
+
 from .errors import (
     CryptographySuiteError,
     DecryptionError,
@@ -160,18 +162,22 @@ except Exception:  # pragma: no cover - handle missing Pyfhel
     FHE_AVAILABLE = False
 
 # Zero-knowledge proofs ------------------------------------------------------
+bulletproof: Any
 try:  # pragma: no cover - optional dependency
-    from .zk import bulletproof
+    from .zk import bulletproof as bulletproof_module
 
+    bulletproof = bulletproof_module
     BULLETPROOF_AVAILABLE = True
 except Exception:  # pragma: no cover - handle missing dependency
     bulletproof = None
     BULLETPROOF_AVAILABLE = False
 
+zksnark: Any
 try:  # pragma: no cover - optional dependency
-    from .zk import zksnark
+    from .zk import zksnark as zksnark_module
 
-    ZKSNARK_AVAILABLE = getattr(zksnark, "ZKSNARK_AVAILABLE", False)
+    zksnark = zksnark_module
+    ZKSNARK_AVAILABLE = getattr(zksnark_module, "ZKSNARK_AVAILABLE", False)
 except Exception:  # pragma: no cover - handle missing dependency
     zksnark = None
     ZKSNARK_AVAILABLE = False
