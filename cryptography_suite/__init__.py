@@ -175,6 +175,8 @@ from .utils import (
     base62_encode,
     generate_secure_random_string,
     secure_zero,
+    to_pem,
+    from_pem,
 )
 from .audit import audit_log, set_audit_logger
 
@@ -284,6 +286,8 @@ __all__ = [
     "secure_zero",
     "generate_secure_random_string",
     "KeyVault",
+    "to_pem",
+    "from_pem",
     "KeyManager",
     "audit_log",
     "set_audit_logger",
