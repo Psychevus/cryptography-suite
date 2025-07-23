@@ -37,3 +37,64 @@ def zksnark_cli(argv: list[str] | None = None) -> None:
     hash_hex, proof_path = zksnark.prove(args.preimage.encode())
     valid = zksnark.verify(hash_hex, proof_path)
     print(f"Hash: {hash_hex}\nProof valid: {valid}")
+
+
+def file_cli(argv: list[str] | None = None) -> None:
+    """Encrypt or decrypt files using AES-GCM."""
+
+    parser = argparse.ArgumentParser(
+        description="Encrypt or decrypt files"
+    )
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    enc_parser = subparsers.add_parser("encrypt", help="Encrypt a file")
+    enc_parser.add_argument(
+        "--in",
+        dest="input_file",
+        required=True,
+        help="Path to the input file",
+    )
+    enc_parser.add_argument(
+        "--out",
+        dest="output_file",
+        required=True,
+        help="Path for the encrypted file",
+    )
+    enc_parser.add_argument(
+        "--password",
+        required=True,
+        help="Password to derive encryption key",
+    )
+
+    dec_parser = subparsers.add_parser("decrypt", help="Decrypt a file")
+    dec_parser.add_argument(
+        "--in",
+        dest="input_file",
+        required=True,
+        help="Path to the encrypted file",
+    )
+    dec_parser.add_argument(
+        "--out",
+        dest="output_file",
+        required=True,
+        help="Destination for the decrypted file",
+    )
+    dec_parser.add_argument(
+        "--password",
+        required=True,
+        help="Password used during encryption",
+    )
+
+    args = parser.parse_args(argv)
+
+    from .symmetric import encrypt_file, decrypt_file
+
+    try:
+        if args.command == "encrypt":
+            encrypt_file(args.input_file, args.output_file, args.password)
+            print(f"Encrypted file written to {args.output_file}")
+        else:
+            decrypt_file(args.input_file, args.output_file, args.password)
+            print(f"Decrypted file written to {args.output_file}")
+    except Exception as exc:  # pragma: no cover - high-level error reporting
+        print(f"Error: {exc}")

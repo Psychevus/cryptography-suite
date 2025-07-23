@@ -56,6 +56,7 @@ dev = ["pytest", "pytest-cov", "coverage", "coveralls"]
 [project.scripts]
 cryptosuite-bulletproof = "cryptography_suite.cli:bulletproof_cli"
 cryptosuite-zksnark = "cryptography_suite.cli:zksnark_cli"
+cryptosuite-file = "cryptography_suite.cli:file_cli"
 
 [tool.black]
 line-length = 88
