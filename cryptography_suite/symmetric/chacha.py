@@ -6,7 +6,7 @@ from os import urandom
 from cryptography.hazmat.primitives.ciphers.aead import ChaCha20Poly1305
 
 try:  # pragma: no cover - optional algorithm
-    from cryptography.hazmat.primitives.ciphers.aead import XChaCha20Poly1305
+    from cryptography.hazmat.primitives.ciphers.aead import XChaCha20Poly1305  # type: ignore[attr-defined]
 except Exception:  # pragma: no cover - old cryptography versions
     XChaCha20Poly1305 = None
 from ..errors import EncryptionError, DecryptionError, MissingDependencyError
