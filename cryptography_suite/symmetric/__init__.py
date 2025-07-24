@@ -21,12 +21,12 @@ from .chacha import (
     xchacha_decrypt,
 )
 from .stream import (
-    salsa20_encrypt,
-    salsa20_decrypt,
+    salsa20_encrypt as _salsa20_encrypt,
+    salsa20_decrypt as _salsa20_decrypt,
     chacha20_stream_encrypt,
     chacha20_stream_decrypt,
 )
-from .ascon import encrypt as ascon_encrypt, decrypt as ascon_decrypt
+from .ascon import encrypt as _ascon_encrypt, decrypt as _ascon_decrypt
 from .kdf import (
     derive_key_scrypt,
     verify_derived_key_scrypt,
@@ -35,9 +35,17 @@ from .kdf import (
     derive_key_argon2,
     derive_hkdf,
     kdf_pbkdf2,
-    derive_pbkdf2,
+    derive_pbkdf2 as _derive_pbkdf2,
     generate_salt,
 )
+
+derive_pbkdf2 = _derive_pbkdf2
+
+# re-export deprecated ciphers
+salsa20_encrypt = _salsa20_encrypt
+salsa20_decrypt = _salsa20_decrypt
+ascon_encrypt = _ascon_encrypt
+ascon_decrypt = _ascon_decrypt
 
 __all__ = [
     "aes_encrypt",
@@ -56,12 +64,8 @@ __all__ = [
     "chacha20_decrypt",
     "xchacha_encrypt",
     "xchacha_decrypt",
-    "salsa20_encrypt",
-    "salsa20_decrypt",
     "chacha20_stream_encrypt",
     "chacha20_stream_decrypt",
-    "ascon_encrypt",
-    "ascon_decrypt",
     "derive_key_scrypt",
     "verify_derived_key_scrypt",
     "derive_key_pbkdf2",
@@ -69,6 +73,5 @@ __all__ = [
     "derive_key_argon2",
     "derive_hkdf",
     "kdf_pbkdf2",
-    "derive_pbkdf2",
     "generate_salt",
 ]

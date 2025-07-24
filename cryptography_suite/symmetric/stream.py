@@ -1,5 +1,11 @@
 from __future__ import annotations
 
+"""Stream cipher utilities.
+
+Salsa20 support is provided only for reference and is **not recommended for
+production**.
+"""
+
 from Crypto.Cipher import Salsa20, ChaCha20
 
 from ..errors import EncryptionError, DecryptionError
@@ -14,6 +20,8 @@ SALSA20_NONCE_SIZE = 8
 @deprecated("Salsa20 is deprecated and not recommended for production.")
 def salsa20_encrypt(message: bytes, key: bytes, nonce: bytes) -> bytes:
     """Encrypt ``message`` using Salsa20.
+
+    .. warning:: This cipher is deprecated and **not recommended for production**.
 
     The ``key`` must be 32 bytes and ``nonce`` must be 8 bytes.
     Encryption is deterministic for a given key and nonce.
@@ -31,7 +39,10 @@ def salsa20_encrypt(message: bytes, key: bytes, nonce: bytes) -> bytes:
 
 @deprecated("Salsa20 is deprecated and not recommended for production.")
 def salsa20_decrypt(ciphertext: bytes, key: bytes, nonce: bytes) -> bytes:
-    """Decrypt data encrypted with :func:`salsa20_encrypt`."""
+    """Decrypt data encrypted with :func:`salsa20_encrypt`.
+
+    .. warning:: This cipher is deprecated and **not recommended for production**.
+    """
     if not ciphertext:
         raise DecryptionError("Ciphertext cannot be empty.")
     if not isinstance(key, (bytes, bytearray)) or len(key) != CHACHA20_KEY_SIZE:
@@ -70,8 +81,6 @@ def chacha20_stream_decrypt(ciphertext: bytes, key: bytes, nonce: bytes) -> byte
 
 
 __all__ = [
-    "salsa20_encrypt",
-    "salsa20_decrypt",
     "chacha20_stream_encrypt",
     "chacha20_stream_decrypt",
 ]

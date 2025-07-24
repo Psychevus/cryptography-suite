@@ -10,6 +10,7 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives.kdf.argon2 import Argon2id
 from ..errors import KeyDerivationError
+from ..utils import deprecated
 
 # Constants
 AES_KEY_SIZE = 32  # 256 bits
@@ -150,8 +151,9 @@ def kdf_pbkdf2(password: str, salt: bytes, iterations: int, length: int) -> byte
     return kdf.derive(password.encode())
 
 
+@deprecated("derive_pbkdf2 is deprecated; use kdf_pbkdf2")
 def derive_pbkdf2(password: str, salt: bytes, iterations: int, length: int) -> bytes:
-    """Backward compatible alias for :func:`kdf_pbkdf2`."""
+    """Deprecated alias for :func:`kdf_pbkdf2`."""
 
     return kdf_pbkdf2(password, salt, iterations, length)
 
@@ -168,6 +170,5 @@ __all__ = [
     "derive_key_argon2",
     "derive_hkdf",
     "kdf_pbkdf2",
-    "derive_pbkdf2",
     "generate_salt",
 ]
