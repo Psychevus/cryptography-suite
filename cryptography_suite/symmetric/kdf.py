@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from os import urandom, getenv
+from os import urandom
 
 from cryptography.exceptions import InvalidKey
 from cryptography.hazmat.backends import default_backend
@@ -11,18 +11,21 @@ from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives.kdf.argon2 import Argon2id
 from ..errors import KeyDerivationError
 from ..utils import deprecated
+from ..constants import (
+    AES_KEY_SIZE,
+    CHACHA20_KEY_SIZE,
+    SALT_SIZE,
+    NONCE_SIZE,
+    SCRYPT_N,
+    SCRYPT_R,
+    SCRYPT_P,
+    PBKDF2_ITERATIONS,
+)
+from os import getenv
 
-# Constants
-AES_KEY_SIZE = 32  # 256 bits
-CHACHA20_KEY_SIZE = 32
-SALT_SIZE = 16
-NONCE_SIZE = 12
-SCRYPT_N = 2 ** 14
-SCRYPT_R = 8
-SCRYPT_P = 1
-PBKDF2_ITERATIONS = 100_000
-# Argon2 parameters can be tuned via environment variables to balance
-# security and performance.
+# Argon2 parameters can be tuned via environment variables to balance security
+# and performance. These values are loaded at import time so tests can
+# override them by setting environment variables before reloading this module.
 ARGON2_MEMORY_COST = int(getenv("CRYPTOSUITE_ARGON2_MEMORY_COST", "65536"))
 ARGON2_TIME_COST = int(getenv("CRYPTOSUITE_ARGON2_TIME_COST", "3"))
 ARGON2_PARALLELISM = int(getenv("CRYPTOSUITE_ARGON2_PARALLELISM", "1"))
@@ -158,6 +161,22 @@ def derive_pbkdf2(password: str, salt: bytes, iterations: int, length: int) -> b
     return kdf_pbkdf2(password, salt, iterations, length)
 
 
+def select_kdf(password: str, salt: bytes, kdf: str = "argon2", *, key_size: int = AES_KEY_SIZE) -> bytes:
+    """Return a key derived using the specified KDF.
+
+    Supported values for ``kdf`` are ``"argon2"`` (default), ``"scrypt"`` and
+    ``"pbkdf2"``.
+    """
+
+    if kdf == "scrypt":
+        return derive_key_scrypt(password, salt, key_size=key_size)
+    if kdf == "pbkdf2":
+        return derive_key_pbkdf2(password, salt, key_size=key_size)
+    if kdf == "argon2":
+        return derive_key_argon2(password, salt, key_size=key_size)
+    raise KeyDerivationError("Unsupported KDF specified.")
+
+
 __all__ = [
     "AES_KEY_SIZE",
     "CHACHA20_KEY_SIZE",
@@ -170,5 +189,6 @@ __all__ = [
     "derive_key_argon2",
     "derive_hkdf",
     "kdf_pbkdf2",
+    "select_kdf",
     "generate_salt",
 ]

@@ -12,12 +12,8 @@ except Exception:  # pragma: no cover - old cryptography versions
 from ..errors import EncryptionError, DecryptionError, MissingDependencyError
 from ..debug import verbose_print
 
-from .kdf import (
-    CHACHA20_KEY_SIZE,
-    NONCE_SIZE,
-    SALT_SIZE,
-    derive_key_argon2,
-)
+from ..constants import CHACHA20_KEY_SIZE, NONCE_SIZE, SALT_SIZE
+from .kdf import derive_key_argon2
 
 
 def chacha20_encrypt(
