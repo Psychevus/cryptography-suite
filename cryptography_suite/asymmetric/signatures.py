@@ -1,5 +1,6 @@
 from cryptography.hazmat.primitives.asymmetric import ed25519, ed448, ec
 from cryptography.hazmat.primitives import serialization, hashes
+import base64
 from cryptography.exceptions import InvalidSignature
 from typing import Tuple
 from ..errors import (
@@ -9,7 +10,9 @@ from ..errors import (
 )
 
 
-def generate_ed25519_keypair() -> Tuple[ed25519.Ed25519PrivateKey, ed25519.Ed25519PublicKey]:
+def generate_ed25519_keypair() -> (
+    Tuple[ed25519.Ed25519PrivateKey, ed25519.Ed25519PublicKey]
+):
     """
     Generates an Ed25519 private and public key pair.
     """
@@ -18,20 +21,28 @@ def generate_ed25519_keypair() -> Tuple[ed25519.Ed25519PrivateKey, ed25519.Ed255
     return private_key, public_key
 
 
-def sign_message(message: bytes, private_key: ed25519.Ed25519PrivateKey) -> bytes:
-    """
-    Signs a message using Ed25519.
-    """
+def sign_message(
+    message: bytes,
+    private_key: ed25519.Ed25519PrivateKey,
+    *,
+    raw_output: bool = False,
+) -> str | bytes:
+    """Sign ``message`` using Ed25519 and return Base64 by default."""
+
     if not message:
         raise SignatureVerificationError("Message cannot be empty.")
     if not isinstance(private_key, ed25519.Ed25519PrivateKey):
         raise SignatureVerificationError("Invalid Ed25519 private key.")
 
-    signature = private_key.sign(message)
-    return signature
+    sig = private_key.sign(message)
+    if raw_output:
+        return sig
+    return base64.b64encode(sig).decode()
 
 
-def verify_signature(message: bytes, signature: bytes, public_key: ed25519.Ed25519PublicKey) -> bool:
+def verify_signature(
+    message: bytes, signature: bytes | str, public_key: ed25519.Ed25519PublicKey
+) -> bool:
     """
     Verifies an Ed25519 signature.
     """
@@ -41,6 +52,12 @@ def verify_signature(message: bytes, signature: bytes, public_key: ed25519.Ed255
         raise SignatureVerificationError("Signature cannot be empty.")
     if not isinstance(public_key, ed25519.Ed25519PublicKey):
         raise SignatureVerificationError("Invalid Ed25519 public key.")
+
+    if isinstance(signature, str):
+        try:
+            signature = base64.b64decode(signature)
+        except Exception:
+            return False
 
     try:
         public_key.verify(signature, message)
@@ -56,17 +73,24 @@ def generate_ed448_keypair() -> Tuple[ed448.Ed448PrivateKey, ed448.Ed448PublicKe
     return private_key, public_key
 
 
-def sign_message_ed448(message: bytes, private_key: ed448.Ed448PrivateKey) -> bytes:
-    """Signs a message using Ed448."""
+def sign_message_ed448(
+    message: bytes, private_key: ed448.Ed448PrivateKey, *, raw_output: bool = False
+) -> str | bytes:
+    """Sign a message using Ed448 and return Base64 by default."""
     if not message:
         raise SignatureVerificationError("Message cannot be empty.")
     if not isinstance(private_key, ed448.Ed448PrivateKey):
         raise SignatureVerificationError("Invalid Ed448 private key.")
 
-    return private_key.sign(message)
+    sig = private_key.sign(message)
+    if raw_output:
+        return sig
+    return base64.b64encode(sig).decode()
 
 
-def verify_signature_ed448(message: bytes, signature: bytes, public_key: ed448.Ed448PublicKey) -> bool:
+def verify_signature_ed448(
+    message: bytes, signature: bytes | str, public_key: ed448.Ed448PublicKey
+) -> bool:
     """Verifies an Ed448 signature."""
     if not message:
         raise SignatureVerificationError("Message cannot be empty.")
@@ -75,6 +99,12 @@ def verify_signature_ed448(message: bytes, signature: bytes, public_key: ed448.E
     if not isinstance(public_key, ed448.Ed448PublicKey):
         raise SignatureVerificationError("Invalid Ed448 public key.")
 
+    if isinstance(signature, str):
+        try:
+            signature = base64.b64decode(signature)
+        except Exception:
+            return False
+
     try:
         public_key.verify(signature, message)
         return True
@@ -82,7 +112,9 @@ def verify_signature_ed448(message: bytes, signature: bytes, public_key: ed448.E
         return False
 
 
-def serialize_ed25519_private_key(private_key: ed25519.Ed25519PrivateKey, password: str) -> bytes:
+def serialize_ed25519_private_key(
+    private_key: ed25519.Ed25519PrivateKey, password: str
+) -> bytes:
     """
     Serializes an Ed25519 private key to PEM format with encryption.
     """
@@ -108,7 +140,9 @@ def serialize_ed25519_public_key(public_key: ed25519.Ed25519PublicKey) -> bytes:
     return pem_data
 
 
-def load_ed25519_private_key(pem_data: bytes, password: str) -> ed25519.Ed25519PrivateKey:
+def load_ed25519_private_key(
+    pem_data: bytes, password: str
+) -> ed25519.Ed25519PrivateKey:
     """
     Loads an Ed25519 private key from PEM data.
     """
@@ -151,20 +185,27 @@ def generate_ecdsa_keypair(
     return private_key, public_key
 
 
-def sign_message_ecdsa(message: bytes, private_key: ec.EllipticCurvePrivateKey) -> bytes:
-    """
-    Signs a message using ECDSA.
-    """
+def sign_message_ecdsa(
+    message: bytes,
+    private_key: ec.EllipticCurvePrivateKey,
+    *,
+    raw_output: bool = False,
+) -> str | bytes:
+    """Sign a message using ECDSA and return Base64 by default."""
     if not message:
         raise SignatureVerificationError("Message cannot be empty.")
     if not isinstance(private_key, ec.EllipticCurvePrivateKey):
         raise SignatureVerificationError("Invalid ECDSA private key.")
 
-    signature = private_key.sign(message, ec.ECDSA(hashes.SHA256()))
-    return signature
+    sig = private_key.sign(message, ec.ECDSA(hashes.SHA256()))
+    if raw_output:
+        return sig
+    return base64.b64encode(sig).decode()
 
 
-def verify_signature_ecdsa(message: bytes, signature: bytes, public_key: ec.EllipticCurvePublicKey) -> bool:
+def verify_signature_ecdsa(
+    message: bytes, signature: bytes | str, public_key: ec.EllipticCurvePublicKey
+) -> bool:
     """
     Verifies an ECDSA signature.
     """
@@ -175,6 +216,12 @@ def verify_signature_ecdsa(message: bytes, signature: bytes, public_key: ec.Elli
     if not isinstance(public_key, ec.EllipticCurvePublicKey):
         raise SignatureVerificationError("Invalid ECDSA public key.")
 
+    if isinstance(signature, str):
+        try:
+            signature = base64.b64decode(signature)
+        except Exception:
+            return False
+
     try:
         public_key.verify(signature, message, ec.ECDSA(hashes.SHA256()))
         return True
@@ -182,7 +229,9 @@ def verify_signature_ecdsa(message: bytes, signature: bytes, public_key: ec.Elli
         return False
 
 
-def serialize_ecdsa_private_key(private_key: ec.EllipticCurvePrivateKey, password: str) -> bytes:
+def serialize_ecdsa_private_key(
+    private_key: ec.EllipticCurvePrivateKey, password: str
+) -> bytes:
     """
     Serializes an ECDSA private key to PEM format with encryption.
     """
@@ -208,7 +257,9 @@ def serialize_ecdsa_public_key(public_key: ec.EllipticCurvePublicKey) -> bytes:
     return pem_data
 
 
-def load_ecdsa_private_key(pem_data: bytes, password: str) -> ec.EllipticCurvePrivateKey:
+def load_ecdsa_private_key(
+    pem_data: bytes, password: str
+) -> ec.EllipticCurvePrivateKey:
     """
     Loads an ECDSA private key from PEM data.
     """

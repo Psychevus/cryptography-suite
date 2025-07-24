@@ -31,14 +31,17 @@ try:  # pragma: no cover - optional dependency
     from pqcrypto.sign import (
         sphincs_sha256_128s_simple as _sphincs_module,
     )
+
     SPHINCS_AVAILABLE = True
 except Exception:  # pragma: no cover - fallback
     try:  # pragma: no cover - check alternative naming
         from pqcrypto.sign import sphincs_sha2_128s_simple as _sphincs_module
+
         SPHINCS_AVAILABLE = True
     except Exception:  # pragma: no cover - final fallback
         try:
             from pqcrypto.sign import sphincs_shake_128s_simple as _sphincs_module
+
             SPHINCS_AVAILABLE = True
         except Exception:  # pragma: no cover - no sphincs available
             _sphincs_module = None
@@ -131,8 +134,8 @@ def kyber_decrypt(
         raise DecryptionError("Invalid ciphertext")
 
     kem_ct = ciphertext[:ct_size]
-    salt = ciphertext[ct_size:ct_size + 16]
-    enc = ciphertext[ct_size + 16:]
+    salt = ciphertext[ct_size : ct_size + 16]
+    enc = ciphertext[ct_size + 16 :]
     ss_check = alg.decrypt(private_key, kem_ct)
     if shared_secret is None:
         shared_secret = ss_check
@@ -200,19 +203,29 @@ def generate_sphincs_keypair() -> Tuple[bytes, bytes]:
     return _sphincs_module.generate_keypair()
 
 
-def sphincs_sign(private_key: bytes, message: bytes) -> bytes:
-    """Sign ``message`` with SPHINCS+ returning the raw signature bytes."""
+def sphincs_sign(
+    private_key: bytes, message: bytes, *, raw_output: bool = False
+) -> str | bytes:
+    """Sign ``message`` with SPHINCS+ returning Base64 by default."""
     if not PQCRYPTO_AVAILABLE or not SPHINCS_AVAILABLE:
         raise ImportError("pqcrypto with SPHINCS+ support is required")
 
-    return _sphincs_module.sign(private_key, message)
+    sig = _sphincs_module.sign(private_key, message)
+    if raw_output:
+        return sig
+    return base64.b64encode(sig).decode()
 
 
-def sphincs_verify(public_key: bytes, message: bytes, signature: bytes) -> bool:
+def sphincs_verify(public_key: bytes, message: bytes, signature: bytes | str) -> bool:
     """Verify a SPHINCS+ signature."""
     if not PQCRYPTO_AVAILABLE or not SPHINCS_AVAILABLE:
         raise ImportError("pqcrypto with SPHINCS+ support is required")
 
+    if isinstance(signature, str):
+        try:
+            signature = base64.b64decode(signature)
+        except Exception:
+            return False
     try:
         return bool(_sphincs_module.verify(public_key, message, signature))
     except Exception:

@@ -40,7 +40,7 @@ class TestPQC(unittest.TestCase):
         pk, sk = generate_sphincs_keypair()
         msg = b"sphincs test"
         sig = sphincs_sign(sk, msg)
-        self.assertIsInstance(sig, bytes)
+        self.assertIsInstance(sig, str)
         self.assertTrue(sphincs_verify(pk, msg, sig))
 
     @unittest.skipUnless(SPHINCS_AVAILABLE, "SPHINCS+ not available")

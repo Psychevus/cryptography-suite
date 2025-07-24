@@ -32,6 +32,7 @@ class TestSignatures(unittest.TestCase):
         """Test Ed25519 signature generation and verification."""
         private_key, public_key = generate_ed25519_keypair()
         signature = sign_message(self.message, private_key)
+        self.assertIsInstance(signature, str)
         is_valid = verify_signature(self.message, signature, public_key)
         self.assertTrue(is_valid)
 
@@ -64,6 +65,7 @@ class TestSignatures(unittest.TestCase):
         """Test Ed448 signature generation and verification."""
         private_key, public_key = generate_ed448_keypair()
         signature = sign_message_ed448(self.message, private_key)
+        self.assertIsInstance(signature, str)
         is_valid = verify_signature_ed448(self.message, signature, public_key)
         self.assertTrue(is_valid)
 
@@ -85,6 +87,7 @@ class TestSignatures(unittest.TestCase):
         """Test ECDSA signature generation and verification."""
         private_key, public_key = generate_ecdsa_keypair()
         signature = sign_message_ecdsa(self.message, private_key)
+        self.assertIsInstance(signature, str)
         is_valid = verify_signature_ecdsa(self.message, signature, public_key)
         self.assertTrue(is_valid)
 
@@ -180,7 +183,7 @@ class TestSignatures(unittest.TestCase):
         """Test signing message with empty message using Ed25519."""
         private_key, _ = generate_ed25519_keypair()
         with self.assertRaises(CryptographySuiteError) as context:
-            sign_message(b'', private_key)
+            sign_message(b"", private_key)
         self.assertEqual(str(context.exception), "Message cannot be empty.")
 
     def test_sign_message_with_invalid_private_key(self):
@@ -194,7 +197,7 @@ class TestSignatures(unittest.TestCase):
         """Test signing message with empty message using ECDSA."""
         private_key, _ = generate_ecdsa_keypair()
         with self.assertRaises(CryptographySuiteError) as context:
-            sign_message_ecdsa(b'', private_key)
+            sign_message_ecdsa(b"", private_key)
         self.assertEqual(str(context.exception), "Message cannot be empty.")
 
     def test_sign_message_ecdsa_with_invalid_private_key(self):

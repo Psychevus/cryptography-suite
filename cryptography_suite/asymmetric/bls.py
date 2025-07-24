@@ -10,6 +10,7 @@ the ``py_ecc`` library which offers a well-vetted pairing implementation.
 
 from os import urandom
 from typing import Iterable, List, Sequence, Tuple
+import base64
 
 from py_ecc.bls import G2Basic
 from ..errors import KeyDerivationError, SignatureVerificationError
@@ -39,7 +40,9 @@ def generate_bls_keypair(seed: bytes | None = None) -> Tuple[int, bytes]:
     return sk, pk
 
 
-def bls_sign(message: bytes, private_key: int) -> bytes:
+def bls_sign(
+    message: bytes, private_key: int, *, raw_output: bool = False
+) -> str | bytes:
     """Sign a message using the BLS signature scheme.
 
     Parameters
@@ -58,10 +61,13 @@ def bls_sign(message: bytes, private_key: int) -> bytes:
         raise SignatureVerificationError("Message cannot be empty.")
     if not isinstance(private_key, int):
         raise TypeError("Private key must be an int.")
-    return G2Basic.Sign(private_key, message)
+    sig = G2Basic.Sign(private_key, message)
+    if raw_output:
+        return sig
+    return base64.b64encode(sig).decode()
 
 
-def bls_verify(message: bytes, signature: bytes, public_key: bytes) -> bool:
+def bls_verify(message: bytes, signature: bytes | str, public_key: bytes) -> bool:
     """Verify a BLS signature.
 
     Parameters
@@ -84,10 +90,17 @@ def bls_verify(message: bytes, signature: bytes, public_key: bytes) -> bool:
         raise SignatureVerificationError("Signature cannot be empty.")
     if not isinstance(public_key, (bytes, bytearray)):
         raise TypeError("Public key must be bytes.")
+    if isinstance(signature, str):
+        try:
+            signature = base64.b64decode(signature)
+        except Exception:
+            return False
     return G2Basic.Verify(public_key, message, signature)
 
 
-def bls_aggregate(signatures: Iterable[bytes]) -> bytes:
+def bls_aggregate(
+    signatures: Iterable[bytes], *, raw_output: bool = False
+) -> str | bytes:
     """Aggregate multiple BLS signatures into one.
 
     Parameters
@@ -100,16 +113,26 @@ def bls_aggregate(signatures: Iterable[bytes]) -> bytes:
     bytes
         Aggregated signature value.
     """
-    sig_list: List[bytes] = list(signatures)
+    sig_list: List[bytes] = []
+    for sig in signatures:
+        if isinstance(sig, str):
+            try:
+                sig = base64.b64decode(sig)
+            except Exception:
+                raise SignatureVerificationError("Invalid signature")
+        sig_list.append(sig)
     if not sig_list:
         raise SignatureVerificationError("No signatures provided for aggregation.")
-    return G2Basic.Aggregate(sig_list)
+    agg = G2Basic.Aggregate(sig_list)
+    if raw_output:
+        return agg
+    return base64.b64encode(agg).decode()
 
 
 def bls_aggregate_verify(
     public_keys: Sequence[bytes],
     messages: Sequence[bytes],
-    signature: bytes,
+    signature: bytes | str,
 ) -> bool:
     """Verify an aggregated BLS signature against multiple messages.
 
@@ -130,7 +153,14 @@ def bls_aggregate_verify(
     if not public_keys or not messages:
         raise SignatureVerificationError("Public keys and messages cannot be empty.")
     if len(public_keys) != len(messages):
-        raise SignatureVerificationError("Number of public keys must match number of messages.")
+        raise SignatureVerificationError(
+            "Number of public keys must match number of messages."
+        )
     if not signature:
         raise SignatureVerificationError("Signature cannot be empty.")
+    if isinstance(signature, str):
+        try:
+            signature = base64.b64decode(signature)
+        except Exception:
+            return False
     return G2Basic.AggregateVerify(list(public_keys), list(messages), signature)

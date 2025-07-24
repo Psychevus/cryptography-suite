@@ -58,6 +58,7 @@ async = ["aiofiles"]
 cryptosuite-bulletproof = "cryptography_suite.cli:bulletproof_cli"
 cryptosuite-zksnark = "cryptography_suite.cli:zksnark_cli"
 cryptosuite-file = "cryptography_suite.cli:file_cli"
+cryptography-suite = "cryptography_suite.cli:main"
 
 [tool.black]
 line-length = 88
