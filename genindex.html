@@ -1,0 +1,746 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="#" /><link rel="search" title="Search" href="search.html" />
+
+    <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 --><title>Index - cryptography-suite 2.0.0 documentation</title>
+<link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=25af2a20" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">cryptography-suite 2.0.0 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  <span class="sidebar-brand-text">cryptography-suite 2.0.0 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Package Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/modules.html">API Reference</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          
+<section class="genindex-section">
+  <h1 id="index">Index</h1>
+  <div class="genindex-jumpbox"><a href="#A"><strong>A</strong></a> | <a href="#B"><strong>B</strong></a> | <a href="#C"><strong>C</strong></a> | <a href="#D"><strong>D</strong></a> | <a href="#E"><strong>E</strong></a> | <a href="#F"><strong>F</strong></a> | <a href="#G"><strong>G</strong></a> | <a href="#H"><strong>H</strong></a> | <a href="#I"><strong>I</strong></a> | <a href="#K"><strong>K</strong></a> | <a href="#L"><strong>L</strong></a> | <a href="#M"><strong>M</strong></a> | <a href="#P"><strong>P</strong></a> | <a href="#R"><strong>R</strong></a> | <a href="#S"><strong>S</strong></a> | <a href="#T"><strong>T</strong></a> | <a href="#V"><strong>V</strong></a> | <a href="#X"><strong>X</strong></a></div>
+</section>
+<section id="A" class="genindex-section">
+  <h2>A</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.aes_decrypt">aes_decrypt() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.aes_encrypt">aes_encrypt() (in module cryptography_suite)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.argon2_decrypt">argon2_decrypt() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.argon2_encrypt">argon2_encrypt() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.audit_log">audit_log() (in module cryptography_suite)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="B" class="genindex-section">
+  <h2>B</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.base62_decode">base62_decode() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.base62_encode">base62_encode() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.blake2b_hash">blake2b_hash() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.blake3_hash">blake3_hash() (in module cryptography_suite)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.blake3_hash_v2">blake3_hash_v2() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.bls_aggregate">bls_aggregate() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.bls_aggregate_verify">bls_aggregate_verify() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.bls_sign">bls_sign() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.bls_verify">bls_verify() (in module cryptography_suite)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="C" class="genindex-section">
+  <h2>C</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.chacha20_decrypt">chacha20_decrypt() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.chacha20_encrypt">chacha20_encrypt() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.chacha20_stream_decrypt">chacha20_stream_decrypt() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.chacha20_stream_encrypt">chacha20_stream_encrypt() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.SPAKE2Client.compute_shared_key">compute_shared_key() (cryptography_suite.SPAKE2Client method)</a>
+
+        <ul>
+          <li><a href="api/modules.html#cryptography_suite.SPAKE2Server.compute_shared_key">(cryptography_suite.SPAKE2Server method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.create_shares">create_shares() (in module cryptography_suite)</a>
+</li>
+        <li>
+    cryptography_suite
+
+        <ul>
+          <li><a href="api/modules.html#module-cryptography_suite">module</a>
+</li>
+        </ul></li>
+        <li><a href="api/modules.html#cryptography_suite.CryptographySuiteError">CryptographySuiteError</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="D" class="genindex-section">
+  <h2>D</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.decode_encrypted_message">decode_encrypted_message() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.HybridEncryptor.decrypt">decrypt() (cryptography_suite.HybridEncryptor method)</a>
+
+        <ul>
+          <li><a href="api/modules.html#cryptography_suite.SignalReceiver.decrypt">(cryptography_suite.SignalReceiver method)</a>
+</li>
+          <li><a href="api/modules.html#cryptography_suite.SignalSender.decrypt">(cryptography_suite.SignalSender method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/modules.html#cryptography_suite.decrypt_file">decrypt_file() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.decrypt_file_async">decrypt_file_async() (in module cryptography_suite)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.DecryptionError">DecryptionError</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.derive_hkdf">derive_hkdf() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.derive_key_argon2">derive_key_argon2() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.derive_key_pbkdf2">derive_key_pbkdf2() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.derive_key_scrypt">derive_key_scrypt() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.derive_x25519_shared_key">derive_x25519_shared_key() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.derive_x448_shared_key">derive_x448_shared_key() (in module cryptography_suite)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="E" class="genindex-section">
+  <h2>E</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.ec_decrypt">ec_decrypt() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.ec_encrypt">ec_encrypt() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.encode_encrypted_message">encode_encrypted_message() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.HybridEncryptor.encrypt">encrypt() (cryptography_suite.HybridEncryptor method)</a>
+
+        <ul>
+          <li><a href="api/modules.html#cryptography_suite.SignalReceiver.encrypt">(cryptography_suite.SignalReceiver method)</a>
+</li>
+          <li><a href="api/modules.html#cryptography_suite.SignalSender.encrypt">(cryptography_suite.SignalSender method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.encrypt_file">encrypt_file() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.encrypt_file_async">encrypt_file_async() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.EncryptionError">EncryptionError</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="F" class="genindex-section">
+  <h2>F</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.from_pem">from_pem() (in module cryptography_suite)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="G" class="genindex-section">
+  <h2>G</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.generate_aes_key">generate_aes_key() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.generate_bls_keypair">generate_bls_keypair() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.generate_csr">generate_csr() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.generate_ec_keypair">generate_ec_keypair() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.generate_ec_keypair_and_save">generate_ec_keypair_and_save() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.generate_ecdsa_keypair">generate_ecdsa_keypair() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.generate_ed25519_keypair">generate_ed25519_keypair() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.generate_ed448_keypair">generate_ed448_keypair() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.generate_hotp">generate_hotp() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.SPAKE2Client.generate_message">generate_message() (cryptography_suite.SPAKE2Client method)</a>
+
+        <ul>
+          <li><a href="api/modules.html#cryptography_suite.SPAKE2Server.generate_message">(cryptography_suite.SPAKE2Server method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.generate_rsa_keypair">generate_rsa_keypair() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.KeyManager.generate_rsa_keypair_and_save">generate_rsa_keypair_and_save() (cryptography_suite.KeyManager method)</a>
+
+        <ul>
+          <li><a href="api/modules.html#cryptography_suite.generate_rsa_keypair_and_save">(in module cryptography_suite)</a>
+</li>
+        </ul></li>
+        <li><a href="api/modules.html#cryptography_suite.generate_rsa_keypair_async">generate_rsa_keypair_async() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.generate_salt">generate_salt() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.generate_secure_random_string">generate_secure_random_string() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.generate_totp">generate_totp() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.generate_x25519_keypair">generate_x25519_keypair() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.generate_x448_keypair">generate_x448_keypair() (in module cryptography_suite)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="H" class="genindex-section">
+  <h2>H</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.SignalSender.handshake_public">handshake_public (cryptography_suite.SignalSender property)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.hybrid_decrypt">hybrid_decrypt() (in module cryptography_suite)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.hybrid_encrypt">hybrid_encrypt() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.HybridEncryptor">HybridEncryptor (class in cryptography_suite)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="I" class="genindex-section">
+  <h2>I</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.SignalReceiver.initialize_session">initialize_session() (cryptography_suite.SignalReceiver method)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.initialize_signal_session">initialize_signal_session() (in module cryptography_suite)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="K" class="genindex-section">
+  <h2>K</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.kdf_pbkdf2">kdf_pbkdf2() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.key_exists">key_exists() (in module cryptography_suite)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.KeyDerivationError">KeyDerivationError</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.KeyManager">KeyManager (class in cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.KeyVault">KeyVault (class in cryptography_suite)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="L" class="genindex-section">
+  <h2>L</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.load_certificate">load_certificate() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.load_ecdsa_private_key">load_ecdsa_private_key() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.load_ecdsa_public_key">load_ecdsa_public_key() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.load_ed25519_private_key">load_ed25519_private_key() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.load_ed25519_public_key">load_ed25519_public_key() (in module cryptography_suite)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.KeyManager.load_private_key">load_private_key() (cryptography_suite.KeyManager method)</a>
+
+        <ul>
+          <li><a href="api/modules.html#cryptography_suite.load_private_key">(in module cryptography_suite)</a>
+</li>
+        </ul></li>
+        <li><a href="api/modules.html#cryptography_suite.load_private_key_from_file">load_private_key_from_file() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.load_public_key">load_public_key() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.load_public_key_from_file">load_public_key_from_file() (in module cryptography_suite)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="M" class="genindex-section">
+  <h2>M</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.MissingDependencyError">MissingDependencyError</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li>
+    module
+
+        <ul>
+          <li><a href="api/modules.html#module-cryptography_suite">cryptography_suite</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="P" class="genindex-section">
+  <h2>P</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.pbkdf2_decrypt">pbkdf2_decrypt() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.pbkdf2_encrypt">pbkdf2_encrypt() (in module cryptography_suite)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.pem_to_json">pem_to_json() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.ProtocolError">ProtocolError</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.SignalReceiver.public_bundle">public_bundle (cryptography_suite.SignalReceiver property)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="R" class="genindex-section">
+  <h2>R</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.reconstruct_secret">reconstruct_secret() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.rotate_aes_key">rotate_aes_key() (in module cryptography_suite)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.KeyManager.rotate_keys">rotate_keys() (cryptography_suite.KeyManager method)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.rsa_decrypt">rsa_decrypt() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.rsa_encrypt">rsa_encrypt() (in module cryptography_suite)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="S" class="genindex-section">
+  <h2>S</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.KeyManager.save_private_key">save_private_key() (cryptography_suite.KeyManager method)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.scrypt_decrypt">scrypt_decrypt() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.scrypt_encrypt">scrypt_encrypt() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.secure_save_key_to_file">secure_save_key_to_file() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.secure_zero">secure_zero() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.self_sign_certificate">self_sign_certificate() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.serialize_ecdsa_private_key">serialize_ecdsa_private_key() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.serialize_ecdsa_public_key">serialize_ecdsa_public_key() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.serialize_ed25519_private_key">serialize_ed25519_private_key() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.serialize_ed25519_public_key">serialize_ed25519_public_key() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.serialize_private_key">serialize_private_key() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.serialize_public_key">serialize_public_key() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.set_audit_logger">set_audit_logger() (in module cryptography_suite)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.sha256_hash">sha256_hash() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.sha384_hash">sha384_hash() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.sha3_256_hash">sha3_256_hash() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.sha3_512_hash">sha3_512_hash() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.sha512_hash">sha512_hash() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.sign_message">sign_message() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.sign_message_ecdsa">sign_message_ecdsa() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.sign_message_ed448">sign_message_ed448() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.SignalReceiver">SignalReceiver (class in cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.SignalSender">SignalSender (class in cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.SignatureVerificationError">SignatureVerificationError</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.SPAKE2Client">SPAKE2Client (class in cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.SPAKE2Server">SPAKE2Server (class in cryptography_suite)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="T" class="genindex-section">
+  <h2>T</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.to_pem">to_pem() (in module cryptography_suite)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="V" class="genindex-section">
+  <h2>V</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.verify_derived_key_pbkdf2">verify_derived_key_pbkdf2() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.verify_derived_key_scrypt">verify_derived_key_scrypt() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.verify_hotp">verify_hotp() (in module cryptography_suite)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.verify_signature">verify_signature() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.verify_signature_ecdsa">verify_signature_ecdsa() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.verify_signature_ed448">verify_signature_ed448() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.verify_totp">verify_totp() (in module cryptography_suite)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="X" class="genindex-section">
+  <h2>X</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.xchacha_decrypt">xchacha_decrypt() (in module cryptography_suite)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.xchacha_encrypt">xchacha_encrypt() (in module cryptography_suite)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, Mojtaba Zaferanloo
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=51b770b3"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
+</html>
