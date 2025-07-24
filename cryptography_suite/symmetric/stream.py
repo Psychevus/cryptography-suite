@@ -9,7 +9,6 @@ from .kdf import CHACHA20_KEY_SIZE
 
 
 SALSA20_NONCE_SIZE = 8
-CHACHA20_NONCE_SIZE = 8  # also accepts 12 or 24 bytes for XChaCha20
 
 
 @deprecated("Salsa20 is deprecated and not recommended for production.")

@@ -7,7 +7,7 @@ from cryptography_suite.errors import ProtocolError
 
 def test_bulletproof_prove_verify(monkeypatch):
     stub = types.SimpleNamespace(
-        zkrp_prove=lambda val, bits: (b"proof", b"commit", b"nonce"),
+        zkrp_prove=lambda val, _bits: (b"proof", b"commit", b"nonce"),
         zkrp_verify=lambda proof, commit: True,
     )
     monkeypatch.setitem(sys.modules, "pybulletproofs", stub)

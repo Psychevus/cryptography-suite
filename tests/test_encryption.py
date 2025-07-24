@@ -24,7 +24,6 @@ class TestEncryption(unittest.TestCase):
     def setUp(self):
         self.message = "Confidential Message"
         self.password = "StrongPassword123!"
-        self.empty_password = ""
         self.empty_message = ""
 
     def test_aes_encrypt_decrypt_scrypt(self):

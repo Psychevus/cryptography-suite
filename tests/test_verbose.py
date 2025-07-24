@@ -11,6 +11,7 @@ def reload_modules():
 
 
 def test_verbose_mode_env_variable(tmp_path):
+    _ = tmp_path  # unused fixture to satisfy vulture
     os.environ['VERBOSE_MODE'] = '1'
     reload_modules()
     from cryptography_suite.symmetric import aes_encrypt

@@ -4,7 +4,7 @@ import string
 import secrets
 import warnings
 from functools import wraps
-from typing import Any, Mapping, TypedDict, TypeAlias, cast, TYPE_CHECKING
+from typing import Any, Mapping, TypeAlias, cast, TYPE_CHECKING
 
 from cryptography.hazmat.primitives.asymmetric import (
     rsa,
@@ -97,7 +97,8 @@ class KeyVault:
     def __enter__(self) -> bytearray:
         return self._key
 
-    def __exit__(self, exc_type, exc, tb):
+    def __exit__(self, _exc_type, _exc, _tb):
+        """Zero the stored key on exit."""
         secure_zero(self._key)
         return False
 
@@ -193,13 +194,6 @@ def pem_to_json(key: PrivateKeyTypes | PublicKeyTypes) -> str:
 
     pem = to_pem(key)
     return json.dumps({"pem": pem})
-
-
-class EncryptedPayload(TypedDict):
-    encrypted_key: bytes
-    nonce: bytes
-    ciphertext: bytes
-    tag: bytes
 
 
 def encode_encrypted_message(
