@@ -6,9 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 ## [Unreleased]
 
-- Nothing yet.
-
-## [2.0.0] - 2025-07-22
+## [2.0.0] - 2025-07-24
 ### Added
 - SPAKE2 password-authenticated key exchange implementation.
 - Signal Protocol messaging utilities.
