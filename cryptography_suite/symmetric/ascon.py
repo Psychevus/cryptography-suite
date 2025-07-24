@@ -1,4 +1,7 @@
-"""Ascon-128a authenticated encryption based on the NIST specification."""
+"""Ascon-128a authenticated encryption based on the NIST specification.
+
+This implementation is experimental and **not recommended for production use**.
+"""
 
 from __future__ import annotations
 
@@ -136,7 +139,10 @@ def _finalize(S: List[int], key: bytes) -> bytes:
 
 @deprecated("Ascon is experimental and not recommended for production.")
 def encrypt(key: bytes, nonce: bytes, associated_data: bytes, plaintext: bytes) -> bytes:
-    """Encrypt and authenticate using Ascon-128a."""
+    """Encrypt and authenticate using Ascon-128a.
+
+    .. warning:: This cipher is experimental and **not recommended for production**.
+    """
     S = _initialize(key, nonce)
     _process_ad(S, associated_data)
     ciphertext = _process_plaintext(S, plaintext)
@@ -146,7 +152,10 @@ def encrypt(key: bytes, nonce: bytes, associated_data: bytes, plaintext: bytes) 
 
 @deprecated("Ascon is experimental and not recommended for production.")
 def decrypt(key: bytes, nonce: bytes, associated_data: bytes, ciphertext: bytes) -> bytes:
-    """Decrypt and verify using Ascon-128a."""
+    """Decrypt and verify using Ascon-128a.
+
+    .. warning:: This cipher is experimental and **not recommended for production**.
+    """
     if len(ciphertext) < 16:
         raise DecryptionError("Ciphertext too short.")
     S = _initialize(key, nonce)
@@ -158,4 +167,4 @@ def decrypt(key: bytes, nonce: bytes, associated_data: bytes, ciphertext: bytes)
     return plaintext
 
 
-__all__ = ["encrypt", "decrypt"]
+__all__: list[str] = []

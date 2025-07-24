@@ -75,7 +75,7 @@ pip install -e ".[dev,pqc]"
 - **Hybrid Encryption**: Combine RSA/ECIES with AES-GCM for performance and security.
 - **Post-Quantum Cryptography**: Kyber key encapsulation and Dilithium signatures for quantum-safe workflows.
 - **XChaCha20-Poly1305**: Modern stream cipher support when ``cryptography`` exposes ``XChaCha20Poly1305``.
-- **Salsa20 and Ascon**: Provided for reference only. **Not recommended for production**.
+- **Salsa20 and Ascon**: Provided for reference only. **Not recommended for production** and no longer exported via ``__all__``.
 - **Audit Logging**: Decorators and helpers for encrypted audit trails.
 - **KeyVault Management**: Context manager to safely handle in-memory keys.
 - **Password-Authenticated Key Exchange (PAKE)**: SPAKE2 protocol implementation for secure password-based key exchange.
@@ -550,10 +550,10 @@ cryptography-suite/
 - **Kyber API Updates**: ``kyber_encrypt`` and ``kyber_decrypt`` accept a
   ``level`` parameter (512/768/1024). ``kyber_decrypt`` now computes the shared
   secret automatically when omitted.
-- **Key Management**: ``KeyManager`` now provides ``generate_rsa_keypair_and_save``
-  and is used by the legacy function of the same name.
-- **KDF Naming**: ``derive_pbkdf2`` has been renamed to ``kdf_pbkdf2`` (the old
-  name is kept as an alias).
+- **Key Management**: ``KeyManager`` now provides ``generate_rsa_keypair_and_save``.
+  The standalone ``generate_rsa_keypair_and_save`` helper is deprecated.
+- **KDF Naming**: ``derive_pbkdf2`` has been renamed to ``kdf_pbkdf2`` and the old
+  name is deprecated.
 
 ---
 

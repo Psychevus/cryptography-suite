@@ -1,5 +1,5 @@
 import os
-import warnings
+from ..utils import deprecated
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ec
 from os import path
@@ -74,6 +74,7 @@ def key_exists(filepath: str) -> bool:
     return path.exists(filepath)
 
 
+@deprecated("generate_rsa_keypair_and_save is deprecated; use KeyManager.generate_rsa_keypair_and_save")
 def generate_rsa_keypair_and_save(
     private_key_path: str,
     public_key_path: str,
@@ -86,11 +87,6 @@ def generate_rsa_keypair_and_save(
        Use :class:`KeyManager.generate_rsa_keypair_and_save` instead.
     """
 
-    warnings.warn(
-        "generate_rsa_keypair_and_save is deprecated; use KeyManager.generate_rsa_keypair_and_save",
-        DeprecationWarning,
-        stacklevel=2,
-    )
     km = KeyManager()
     return km.generate_rsa_keypair_and_save(
         private_key_path, public_key_path, password, key_size

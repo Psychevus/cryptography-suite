@@ -23,6 +23,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 ### Fixed
 - Test suite expanded to 100% coverage.
 
+### Deprecated
+- ``derive_pbkdf2`` alias in ``symmetric.kdf``. Use ``kdf_pbkdf2`` instead.
+- Legacy ``generate_rsa_keypair_and_save`` helper. Use ``KeyManager.generate_rsa_keypair_and_save``.
+- Experimental ciphers ``Salsa20`` and ``Ascon`` are not exported via ``__all__``.
+
 ### Migration Guide (1.x -> 2.0.0)
 - **Argon2id Default**: Password-based encryption now derives keys with
   Argon2id. Set ``kdf="pbkdf2"`` to retain the previous behavior.
