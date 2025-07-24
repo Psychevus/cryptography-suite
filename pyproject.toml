@@ -53,6 +53,12 @@ fhe = ["Pyfhel"]
 zk = ["pybulletproofs", "PySNARK"]
 dev = ["pytest", "pytest-cov", "coverage", "coveralls"]
 async = ["aiofiles"]
+docs = [
+    "sphinx",
+    "furo",
+    "myst-parser",
+    "sphinxcontrib-mermaid",
+]
 
 [project.scripts]
 cryptosuite-bulletproof = "cryptography_suite.cli:bulletproof_cli"
