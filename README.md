@@ -146,8 +146,8 @@ Ciphertext and related binary outputs are returned as Base64 strings by
 default. Pass ``raw_output=True`` to obtain raw bytes instead.
 
 ```python
-from cryptography_suite import ec_encrypt
 from cryptography_suite.asymmetric import (
+    ec_encrypt,
     generate_rsa_keypair,
     rsa_encrypt,
     rsa_decrypt,
@@ -182,7 +182,7 @@ json_pub: str = pem_to_json(public_key)
 ### Key Exchange
 
 ```python
-from cryptography_suite import (
+from cryptography_suite.asymmetric import (
     generate_x25519_keypair,
     derive_x25519_shared_key,
     generate_x448_keypair,
@@ -210,7 +210,7 @@ print(
 Sign and verify messages using Ed25519, Ed448 or BLS.
 
 ```python
-from cryptography_suite.signatures import (
+from cryptography_suite.asymmetric.signatures import (
     generate_ed25519_keypair,
     generate_ed448_keypair,
     sign_message,
@@ -242,7 +242,7 @@ print(bls_verify(b"Authenticate this message", bls_sig, bls_pk))
 Split and reconstruct secrets using Shamir's Secret Sharing.
 
 ```python
-from cryptography_suite.secret_sharing import create_shares, reconstruct_secret
+from cryptography_suite.protocols import create_shares, reconstruct_secret
 
 secret: int = 1234567890
 threshold: int = 3
@@ -288,7 +288,7 @@ Prove knowledge of a SHA-256 preimage without revealing it. These
 functions require the optional `PySNARK` dependency.
 
 ```python
-from cryptography_suite import zksnark
+from cryptography_suite.zk import zksnark
 
 zksnark.setup()
 hash_hex: str
@@ -327,7 +327,7 @@ Combine asymmetric keys with AES-GCM for efficient encryption. See
 [`tests/test_hybrid.py`](tests/test_hybrid.py).
 
 ```python
-from cryptography_suite import hybrid_encrypt, hybrid_decrypt
+from cryptography_suite.hybrid import hybrid_encrypt, hybrid_decrypt
 from cryptography_suite.asymmetric import generate_rsa_keypair
 
 priv, pub = generate_rsa_keypair()
@@ -374,7 +374,7 @@ with KeyVault(key_material) as buf:
 ### SPAKE2 Key Exchange
 
 ```python
-from cryptography_suite import SPAKE2Client, SPAKE2Server
+from cryptography_suite.protocols import SPAKE2Client, SPAKE2Server
 
 c = SPAKE2Client("pw")
 s = SPAKE2Server("pw")
@@ -387,7 +387,7 @@ Requires the optional `spake2` package.
 ### ECIES Encryption
 
 ```python
-from cryptography_suite import ec_encrypt, ec_decrypt, generate_x25519_keypair
+from cryptography_suite.asymmetric import ec_encrypt, ec_decrypt, generate_x25519_keypair
 
 priv, pub = generate_x25519_keypair()
 # ``cipher`` is Base64 encoded by default. Use ``raw_output=True`` for bytes.
@@ -398,7 +398,7 @@ print(ec_decrypt(cipher, priv))
 ### Signal Protocol Messaging
 
 ```python
-from cryptography_suite import initialize_signal_session
+from cryptography_suite.protocols import initialize_signal_session
 
 sender, receiver = initialize_signal_session()
 msg: bytes = sender.encrypt(b"hi")
@@ -499,23 +499,26 @@ plaintext = rsa_decrypt(ciphertext, private_key)
 cryptography-suite/
 ├── cryptography_suite/
 │   ├── __init__.py
+│   ├── asymmetric/
 │   ├── audit.py
 │   ├── cli.py
 │   ├── debug.py
 │   ├── errors.py
-│   ├── hybrid.py
+│   ├── hashing/
 │   ├── homomorphic.py
-│   ├── protocols/
+│   ├── hybrid.py
 │   ├── pqc/
+│   ├── protocols/
+│   │   ├── __init__.py
+│   │   ├── key_management.py
+│   │   ├── otp.py
+│   │   ├── pake.py
+│   │   ├── secret_sharing.py
+│   │   └── signal/
 │   ├── symmetric/
-│   ├── asymmetric/
-│   ├── zk/
-│   ├── hashing.py
-│   ├── key_management.py
-│   ├── otp.py
-│   ├── pake.py
-│   ├── secret_sharing.py
-│   └── utils.py
+│   ├── utils.py
+│   ├── x509.py
+│   └── zk/
 ├── tests/
 │   ├── test_audit.py
 │   ├── test_hybrid.py

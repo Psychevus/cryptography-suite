@@ -3,7 +3,7 @@
 from .otp import generate_totp, verify_totp, generate_hotp, verify_hotp
 from .secret_sharing import create_shares, reconstruct_secret
 from .pake import SPAKE2Client, SPAKE2Server
-from .signal_protocol import (
+from .signal import (
     SignalSender,
     SignalReceiver,
     initialize_signal_session,

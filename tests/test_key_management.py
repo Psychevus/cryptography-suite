@@ -12,7 +12,6 @@ from cryptography_suite.protocols import (
     load_private_key_from_file,
     load_public_key_from_file,
     key_exists,
-    generate_rsa_keypair_and_save,
     generate_ec_keypair_and_save,
     KeyManager,
 )
@@ -97,7 +96,7 @@ class TestKeyManagement(unittest.TestCase):
     def test_key_exists_function(self):
         """Test key_exists function."""
         self.assertFalse(key_exists(self.private_key_path))
-        open(self.private_key_path, 'a').close()
+        open(self.private_key_path, "a").close()
         self.assertTrue(key_exists(self.private_key_path))
 
     def test_generate_ec_keypair_and_save_with_invalid_curve(self):
@@ -107,7 +106,7 @@ class TestKeyManagement(unittest.TestCase):
                 self.private_key_path,
                 self.public_key_path,
                 self.password,
-                curve="invalid_curve"
+                curve="invalid_curve",
             )
 
 

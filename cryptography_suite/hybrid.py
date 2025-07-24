@@ -6,7 +6,7 @@ from os import urandom
 from typing import Mapping, TYPE_CHECKING, cast
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
-    from .protocols.signal_protocol import EncryptedMessage
+    from .protocols.signal import EncryptedMessage
 
 from cryptography.hazmat.primitives.asymmetric import rsa, x25519
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM

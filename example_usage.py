@@ -5,6 +5,7 @@ This script demonstrates the usage of various cryptographic functions
 provided by the library, including encryption, decryption, key management,
 digital signatures, hashing, secret sharing, PAKE, and OTP.
 """
+
 import base64
 import os
 from time import sleep
@@ -41,9 +42,9 @@ from cryptography_suite import (
     # Key Management
     generate_aes_key,
     rotate_aes_key,
-    generate_rsa_keypair_and_save,
     load_private_key_from_file,
     load_public_key_from_file,
+    KeyManager,
     # Secret Sharing
     create_shares,
     reconstruct_secret,
@@ -61,6 +62,7 @@ from cryptography_suite import (
     generate_secure_random_string,
 )
 
+
 def main():
     # Symmetric Encryption Example
     print("=== Symmetric Encryption ===")
@@ -68,8 +70,8 @@ def main():
     symmetric_password = "strong_password"
 
     # AES Encryption with Scrypt KDF
-    encrypted_aes = aes_encrypt(plaintext, symmetric_password, kdf='scrypt')
-    decrypted_aes = aes_decrypt(encrypted_aes, symmetric_password, kdf='scrypt')
+    encrypted_aes = aes_encrypt(plaintext, symmetric_password, kdf="scrypt")
+    decrypted_aes = aes_decrypt(encrypted_aes, symmetric_password, kdf="scrypt")
     print(f"AES Encrypted: {encrypted_aes}")
     print(f"AES Decrypted: {decrypted_aes}")
 
@@ -177,7 +179,7 @@ def main():
 
     # One-Time Passwords (OTP)
     print("\n=== One-Time Passwords ===")
-    otp_secret = base64.b32encode(os.urandom(10)).decode('utf-8')
+    otp_secret = base64.b32encode(os.urandom(10)).decode("utf-8")
     totp_code = generate_totp(otp_secret)
     print(f"Generated TOTP Code: {totp_code}")
     is_valid_totp = verify_totp(totp_code, otp_secret)
@@ -207,7 +209,8 @@ def main():
     private_key_path = "rsa_private.pem"
     public_key_path = "rsa_public.pem"
 
-    generate_rsa_keypair_and_save(private_key_path, public_key_path, key_password)
+    km = KeyManager()
+    km.generate_rsa_keypair_and_save(private_key_path, public_key_path, key_password)
     loaded_private_key = load_private_key_from_file(private_key_path, key_password)
     loaded_public_key = load_public_key_from_file(public_key_path)
     print("RSA keys generated, saved, and loaded from files successfully.")
@@ -240,6 +243,7 @@ def main():
         print("Decrypted Product:", fhe_decrypt(fhe, fhe_multiply(fhe, c1, c2)))
     except ImportError:
         print("Pyfhel not installed; skipping homomorphic encryption demo.")
+
 
 if __name__ == "__main__":
     main()
