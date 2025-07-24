@@ -17,6 +17,7 @@ class TestBLS(unittest.TestCase):
     def test_sign_and_verify(self):
         sk, pk = generate_bls_keypair()
         signature = bls_sign(self.message1, sk)
+        self.assertIsInstance(signature, str)
         self.assertTrue(bls_verify(self.message1, signature, pk))
 
     def test_sign_with_empty_message(self):
@@ -66,7 +67,10 @@ class TestBLS(unittest.TestCase):
         self.assertEqual(pk, expected_pk)
 
         sig = bls_sign(b"hello world", sk)
-        self.assertEqual(sig, expected_sig)
+        self.assertEqual(
+            sig,
+            "oAjH3yFrdcdJfb3hDSGI+2uUP5mbZU34KgZMEHI7kkmT2dSTPEZw5+LlNt3Ie5p6Dg+Oz1+u2+2l7i6nvuQGX0rv7Y9NZlVp7GNrBPNv9v2FP2YoPUE4Q3Yay9plL9Q9",
+        )
         self.assertTrue(bls_verify(b"hello world", sig, pk))
 
 
