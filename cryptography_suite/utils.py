@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import string
 import secrets
+import warnings
+from functools import wraps
 from typing import Any, Mapping, TypedDict, TypeAlias, cast, TYPE_CHECKING
 
 from cryptography.hazmat.primitives.asymmetric import (
@@ -13,10 +15,9 @@ from cryptography.hazmat.primitives.asymmetric import (
     x448,
 )
 
-from .hybrid import EncryptedHybridMessage
-
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from .protocols.signal import EncryptedMessage
+    from .hybrid import EncryptedHybridMessage
 
 BASE62_ALPHABET = string.digits + string.ascii_letters
 
@@ -61,6 +62,20 @@ def secure_zero(data: bytearray) -> None:
     view[:] = b"\x00" * len(data)
     if hasattr(view, "release"):
         view.release()
+
+
+def deprecated(message: str = "This function is deprecated."):
+    """Decorator to mark functions as deprecated."""
+
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            warnings.warn(message, DeprecationWarning, stacklevel=2)
+            return func(*args, **kwargs)
+
+        return wrapper
+
+    return decorator
 
 
 def generate_secure_random_string(length: int = 32) -> str:

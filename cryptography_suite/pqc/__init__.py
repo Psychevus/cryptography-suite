@@ -10,8 +10,10 @@ from __future__ import annotations
 
 from typing import Tuple
 from ..errors import EncryptionError, DecryptionError
+from ..symmetric.kdf import derive_hkdf
+from ..utils import KeyVault
 import os
-import hashlib
+import hmac
 import base64
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
@@ -131,11 +133,13 @@ def kyber_encrypt(
         raise EncryptionError("Invalid Kyber level")
 
     kem_ct, ss = alg.encrypt(public_key)
-    key = hashlib.sha256(ss).digest()
-    aesgcm = AESGCM(key)
-    nonce = os.urandom(12)
-    enc = nonce + aesgcm.encrypt(nonce, plaintext, None)
-    ct = kem_ct + enc
+    salt = os.urandom(16)
+    key = derive_hkdf(ss, salt, b"kyber-aes-key", 32)
+    with KeyVault(key) as key_buf:
+        aesgcm = AESGCM(bytes(key_buf))
+        nonce = os.urandom(12)
+        enc = nonce + aesgcm.encrypt(nonce, plaintext, None)
+    ct = kem_ct + salt + enc
     if raw_output:
         return ct, ss
     return base64.b64encode(ct).decode(), base64.b64encode(ss).decode()
@@ -177,18 +181,20 @@ def kyber_decrypt(
         raise DecryptionError("Invalid ciphertext")
 
     kem_ct = ciphertext[:ct_size]
-    enc = ciphertext[ct_size:]
+    salt = ciphertext[ct_size:ct_size + 16]
+    enc = ciphertext[ct_size + 16:]
     ss_check = alg.decrypt(private_key, kem_ct)
     if shared_secret is None:
         shared_secret = ss_check
-    elif ss_check != shared_secret:
+    elif not hmac.compare_digest(ss_check, shared_secret):
         raise DecryptionError("Shared secret mismatch")
 
-    key = hashlib.sha256(shared_secret).digest()
-    aesgcm = AESGCM(key)
-    nonce = enc[:12]
-    ct = enc[12:]
-    return aesgcm.decrypt(nonce, ct, None)
+    key = derive_hkdf(shared_secret, salt, b"kyber-aes-key", 32)
+    with KeyVault(key) as key_buf:
+        aesgcm = AESGCM(bytes(key_buf))
+        nonce = enc[:12]
+        ct = enc[12:]
+        return aesgcm.decrypt(nonce, ct, None)
 
 
 def generate_dilithium_keypair() -> Tuple[bytes, bytes]:

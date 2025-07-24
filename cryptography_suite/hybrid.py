@@ -10,6 +10,7 @@ if TYPE_CHECKING:  # pragma: no cover - typing only
 
 from cryptography.hazmat.primitives.asymmetric import rsa, x25519
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+from .utils import KeyVault
 
 from .asymmetric import ec_decrypt, ec_encrypt, rsa_decrypt, rsa_encrypt
 from .errors import DecryptionError, EncryptionError
@@ -113,11 +114,12 @@ def hybrid_decrypt(
     else:
         raise TypeError("Unsupported private key type.")
 
-    aesgcm = AESGCM(aes_key)
-    try:
-        return aesgcm.decrypt(nonce, ciphertext + tag, None)
-    except Exception as exc:  # pragma: no cover - high-level error handling
-        raise DecryptionError(f"Decryption failed: {exc}") from exc
+    with KeyVault(aes_key) as key_buf:
+        aesgcm = AESGCM(bytes(key_buf))
+        try:
+            return aesgcm.decrypt(nonce, ciphertext + tag, None)
+        except Exception as exc:  # pragma: no cover - high-level error handling
+            raise DecryptionError(f"Decryption failed: {exc}") from exc
 
 
 __all__ = ["EncryptedHybridMessage", "hybrid_encrypt", "hybrid_decrypt"]

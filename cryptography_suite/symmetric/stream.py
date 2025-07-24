@@ -3,6 +3,7 @@ from __future__ import annotations
 from Crypto.Cipher import Salsa20, ChaCha20
 
 from ..errors import EncryptionError, DecryptionError
+from ..utils import deprecated
 
 from .kdf import CHACHA20_KEY_SIZE
 
@@ -11,6 +12,7 @@ SALSA20_NONCE_SIZE = 8
 CHACHA20_NONCE_SIZE = 8  # also accepts 12 or 24 bytes for XChaCha20
 
 
+@deprecated("Salsa20 is deprecated and not recommended for production.")
 def salsa20_encrypt(message: bytes, key: bytes, nonce: bytes) -> bytes:
     """Encrypt ``message`` using Salsa20.
 
@@ -28,6 +30,7 @@ def salsa20_encrypt(message: bytes, key: bytes, nonce: bytes) -> bytes:
     return cipher.encrypt(bytes(message))
 
 
+@deprecated("Salsa20 is deprecated and not recommended for production.")
 def salsa20_decrypt(ciphertext: bytes, key: bytes, nonce: bytes) -> bytes:
     """Decrypt data encrypted with :func:`salsa20_encrypt`."""
     if not ciphertext:
