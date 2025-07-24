@@ -1,4 +1,5 @@
 import os
+import warnings
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ec
 from os import path
@@ -79,7 +80,17 @@ def generate_rsa_keypair_and_save(
     password: str,
     key_size: int = 4096,
 ):
-    """Legacy wrapper for :class:`KeyManager` RSA key generation."""
+    """Legacy wrapper for :class:`KeyManager` RSA key generation.
+
+    .. deprecated:: 2.0.0
+       Use :class:`KeyManager.generate_rsa_keypair_and_save` instead.
+    """
+
+    warnings.warn(
+        "generate_rsa_keypair_and_save is deprecated; use KeyManager.generate_rsa_keypair_and_save",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     km = KeyManager()
     return km.generate_rsa_keypair_and_save(
         private_key_path, public_key_path, password, key_size
