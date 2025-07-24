@@ -26,6 +26,33 @@ class EncryptedHybridMessage:
     tag: bytes
 
 
+class HybridEncryptor:
+    """Object-oriented helper for hybrid encryption."""
+
+    def encrypt(
+        self,
+        message: bytes,
+        public_key: rsa.RSAPublicKey | x25519.X25519PublicKey,
+        *,
+        raw_output: bool = False,
+    ) -> EncryptedHybridMessage:
+        """Encrypt ``message`` using :func:`hybrid_encrypt`."""
+
+        return hybrid_encrypt(message, public_key, raw_output=raw_output)
+
+    def decrypt(
+        self,
+        private_key: rsa.RSAPrivateKey | x25519.X25519PrivateKey,
+        data: EncryptedHybridMessage
+        | Mapping[str, str | bytes]
+        | str
+        | "EncryptedMessage",
+    ) -> bytes:
+        """Decrypt data produced by :meth:`encrypt`."""
+
+        return hybrid_decrypt(private_key, data)
+
+
 def hybrid_encrypt(
     message: bytes,
     public_key: rsa.RSAPublicKey | x25519.X25519PublicKey,
@@ -122,4 +149,9 @@ def hybrid_decrypt(
             raise DecryptionError(f"Decryption failed: {exc}") from exc
 
 
-__all__ = ["EncryptedHybridMessage", "hybrid_encrypt", "hybrid_decrypt"]
+__all__ = [
+    "EncryptedHybridMessage",
+    "hybrid_encrypt",
+    "hybrid_decrypt",
+    "HybridEncryptor",
+]

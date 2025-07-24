@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from . import __version__
+
 import argparse
 from .errors import MissingDependencyError, DecryptionError
 from .protocols import generate_totp
@@ -213,6 +215,11 @@ def main(argv: list[str] | None = None) -> None:
     """Unified command line interface for the cryptography suite."""
 
     parser = argparse.ArgumentParser(description=main.__doc__)
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"%(prog)s {__version__}",
+    )
     sub = parser.add_subparsers(dest="cmd", required=True)
 
     keygen_parser = sub.add_parser(
