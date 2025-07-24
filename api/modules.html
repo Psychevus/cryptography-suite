@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="prev" title="Package Architecture" href="../architecture.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="prev" title="Security Considerations" href="../security.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
         <title>API Reference - cryptography-suite 2.0.0 documentation</title>
@@ -200,6 +200,7 @@
   <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../architecture.html">Package Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../security.html">Security Considerations</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">API Reference</a></li>
 </ul>
 
@@ -594,21 +595,34 @@ compatibility with older data.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="cryptography_suite.chacha20_decrypt_aead">
+<span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">chacha20_decrypt_aead</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ciphertext</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nonce</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">associated_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="headerlink" href="#cryptography_suite.chacha20_decrypt_aead" title="Link to this definition">¶</a></dt>
+<dd><p>Decrypt data encrypted with <a class="reference internal" href="#cryptography_suite.chacha20_encrypt_aead" title="cryptography_suite.chacha20_encrypt_aead"><code class="xref py py-func docutils literal notranslate"><span class="pre">chacha20_encrypt_aead()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="cryptography_suite.chacha20_encrypt">
 <span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">chacha20_encrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plaintext</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></span><a class="headerlink" href="#cryptography_suite.chacha20_encrypt" title="Link to this definition">¶</a></dt>
 <dd><p>Encrypt using ChaCha20-Poly1305 with an Argon2-derived key.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="cryptography_suite.chacha20_encrypt_aead">
+<span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">chacha20_encrypt_aead</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plaintext</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nonce</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">associated_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="headerlink" href="#cryptography_suite.chacha20_encrypt_aead" title="Link to this definition">¶</a></dt>
+<dd><p>Encrypt <code class="docutils literal notranslate"><span class="pre">plaintext</span></code> using ChaCha20-Poly1305.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">key</span></code> must be 32 bytes and the <code class="docutils literal notranslate"><span class="pre">nonce</span></code> 12 bytes.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="cryptography_suite.chacha20_stream_decrypt">
 <span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">chacha20_stream_decrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ciphertext</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nonce</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="headerlink" href="#cryptography_suite.chacha20_stream_decrypt" title="Link to this definition">¶</a></dt>
-<dd><p>Decrypt data encrypted with <a class="reference internal" href="#cryptography_suite.chacha20_stream_encrypt" title="cryptography_suite.chacha20_stream_encrypt"><code class="xref py py-func docutils literal notranslate"><span class="pre">chacha20_stream_encrypt()</span></code></a>.</p>
+<dd><p>INSECURE: Decrypt data encrypted with <a class="reference internal" href="#cryptography_suite.chacha20_stream_encrypt" title="cryptography_suite.chacha20_stream_encrypt"><code class="xref py py-func docutils literal notranslate"><span class="pre">chacha20_stream_encrypt()</span></code></a>.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cryptography_suite.chacha20_stream_encrypt">
 <span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">chacha20_stream_encrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nonce</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="headerlink" href="#cryptography_suite.chacha20_stream_encrypt" title="Link to this definition">¶</a></dt>
-<dd><p>Encrypt <code class="docutils literal notranslate"><span class="pre">message</span></code> using ChaCha20 without Poly1305.</p>
+<dd><p>INSECURE: Encrypt <code class="docutils literal notranslate"><span class="pre">message</span></code> using ChaCha20 without Poly1305.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -1212,14 +1226,14 @@ and <code class="docutils literal notranslate"><span class="pre">key</span></cod
         
         <div class="related-pages">
           
-          <a class="prev-page" href="../architecture.html">
+          <a class="prev-page" href="../security.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Package Architecture</div>
+                <div class="title">Security Considerations</div>
                 
               </div>
             </a>
@@ -1312,7 +1326,9 @@ and <code class="docutils literal notranslate"><span class="pre">key</span></cod
 <li><a class="reference internal" href="#cryptography_suite.bls_sign"><code class="docutils literal notranslate"><span class="pre">bls_sign()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.bls_verify"><code class="docutils literal notranslate"><span class="pre">bls_verify()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.chacha20_decrypt"><code class="docutils literal notranslate"><span class="pre">chacha20_decrypt()</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.chacha20_decrypt_aead"><code class="docutils literal notranslate"><span class="pre">chacha20_decrypt_aead()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.chacha20_encrypt"><code class="docutils literal notranslate"><span class="pre">chacha20_encrypt()</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.chacha20_encrypt_aead"><code class="docutils literal notranslate"><span class="pre">chacha20_encrypt_aead()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.chacha20_stream_decrypt"><code class="docutils literal notranslate"><span class="pre">chacha20_stream_decrypt()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.chacha20_stream_encrypt"><code class="docutils literal notranslate"><span class="pre">chacha20_stream_encrypt()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.create_shares"><code class="docutils literal notranslate"><span class="pre">create_shares()</span></code></a></li>

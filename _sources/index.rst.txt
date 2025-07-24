@@ -17,5 +17,6 @@ documentation for details.
    :caption: Contents:
 
    architecture.md
+   security.rst
    api/modules
 

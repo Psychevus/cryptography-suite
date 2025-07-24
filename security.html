@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Security Considerations" href="security.html" /><link rel="prev" title="cryptography-suite documentation" href="index.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="API Reference" href="api/modules.html" /><link rel="prev" title="Package Architecture" href="architecture.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
-        <title>Package Architecture - cryptography-suite 2.0.0 documentation</title>
+        <title>Security Considerations - cryptography-suite 2.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -199,8 +199,8 @@
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Package Architecture</a></li>
-<li class="toctree-l1"><a class="reference internal" href="security.html">Security Considerations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Package Architecture</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Security Considerations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/modules.html">API Reference</a></li>
 </ul>
 
@@ -222,7 +222,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="_sources/architecture.md.txt" title="View this page">
+  <a class="muted-link" href="_sources/security.rst.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -242,26 +242,21 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="package-architecture">
-<h1>Package Architecture<a class="headerlink" href="#package-architecture" title="Link to this heading">¶</a></h1>
-<div class="highlight-mermaid notranslate"><div class="highlight"><pre><span></span>graph TD
-    CS[cryptography_suite]
-    CS --&gt; asymmetric
-    CS --&gt; symmetric
-    CS --&gt; hashing
-    CS --&gt; pqc
-    CS --&gt; protocols
-    CS --&gt; zk
-    CS --&gt; utils
-    CS --&gt; x509
-    CS --&gt; hybrid
-    protocols --&gt; key_management
-    protocols --&gt; otp
-    protocols --&gt; pake
-    protocols --&gt; secret_sharing
-    protocols --&gt; signal
-</pre></div>
+          <section id="security-considerations">
+<h1>Security Considerations<a class="headerlink" href="#security-considerations" title="Link to this heading">¶</a></h1>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The following notes highlight important aspects for using <code class="docutils literal notranslate"><span class="pre">cryptography-suite</span></code> safely.</p>
 </div>
+<ul class="simple">
+<li><p>Insecure primitives like <code class="docutils literal notranslate"><span class="pre">salsa20_encrypt</span></code> and <code class="docutils literal notranslate"><span class="pre">chacha20_stream_encrypt</span></code> provide
+no authentication and are for educational purposes only.</p></li>
+<li><p>Enabling <code class="docutils literal notranslate"><span class="pre">VERBOSE_MODE</span></code> prints derived keys and nonces to stdout. Do <strong>not</strong> enable
+this in production environments.</p></li>
+<li><p>When serializing private keys with <a class="reference internal" href="api/modules.html#cryptography_suite.serialize_private_key" title="cryptography_suite.serialize_private_key"><code class="xref py py-func docutils literal notranslate"><span class="pre">cryptography_suite.serialize_private_key()</span></code></a>
+or using <a class="reference internal" href="api/modules.html#cryptography_suite.KeyManager" title="cryptography_suite.protocols.key_management.KeyManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">cryptography_suite.protocols.key_management.KeyManager</span></code></a>, always
+supply a password so the key material is encrypted.</p></li>
+</ul>
 </section>
 
         </article>
@@ -269,23 +264,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="security.html">
+          <a class="next-page" href="api/modules.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Security Considerations</div>
+                <div class="title">API Reference</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="index.html">
+          <a class="prev-page" href="architecture.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Home</div>
+                <div class="title">Package Architecture</div>
                 
               </div>
             </a>

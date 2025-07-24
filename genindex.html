@@ -198,6 +198,7 @@
   <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="architecture.html">Package Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="security.html">Security Considerations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/modules.html">API Reference</a></li>
 </ul>
 
@@ -292,20 +293,24 @@
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/modules.html#cryptography_suite.chacha20_decrypt">chacha20_decrypt() (in module cryptography_suite)</a>
 </li>
+        <li><a href="api/modules.html#cryptography_suite.chacha20_decrypt_aead">chacha20_decrypt_aead() (in module cryptography_suite)</a>
+</li>
         <li><a href="api/modules.html#cryptography_suite.chacha20_encrypt">chacha20_encrypt() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.chacha20_encrypt_aead">chacha20_encrypt_aead() (in module cryptography_suite)</a>
 </li>
         <li><a href="api/modules.html#cryptography_suite.chacha20_stream_decrypt">chacha20_stream_decrypt() (in module cryptography_suite)</a>
 </li>
         <li><a href="api/modules.html#cryptography_suite.chacha20_stream_encrypt">chacha20_stream_encrypt() (in module cryptography_suite)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/modules.html#cryptography_suite.SPAKE2Client.compute_shared_key">compute_shared_key() (cryptography_suite.SPAKE2Client method)</a>
 
         <ul>
           <li><a href="api/modules.html#cryptography_suite.SPAKE2Server.compute_shared_key">(cryptography_suite.SPAKE2Server method)</a>
 </li>
         </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/modules.html#cryptography_suite.create_shares">create_shares() (in module cryptography_suite)</a>
 </li>
         <li>
@@ -742,5 +747,13 @@
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=46bd48cc"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+    <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
     </body>
 </html>
