@@ -328,13 +328,14 @@ Combine asymmetric keys with AES-GCM for efficient encryption. See
 [`tests/test_hybrid.py`](tests/test_hybrid.py).
 
 ```python
-from cryptography_suite.hybrid import hybrid_encrypt, hybrid_decrypt
+from cryptography_suite.hybrid import HybridEncryptor
 from cryptography_suite.asymmetric import generate_rsa_keypair
 
+encryptor = HybridEncryptor()
 priv, pub = generate_rsa_keypair()
 payload = b"hybrid message"
-encrypted = hybrid_encrypt(payload, pub)
-decrypted = hybrid_decrypt(priv, encrypted)
+encrypted = encryptor.encrypt(payload, pub)
+decrypted = encryptor.decrypt(priv, encrypted)
 
 from cryptography_suite.utils import encode_encrypted_message, decode_encrypted_message
 
@@ -368,6 +369,17 @@ from cryptography_suite.utils import KeyVault
 key_material = b"supersecretkey"
 with KeyVault(key_material) as buf:
     use_key(buf)
+```
+
+### KeyManager File Handling
+
+Persist RSA keys to disk with the high-level ``KeyManager`` helper.
+
+```python
+from cryptography_suite.protocols import KeyManager
+
+km = KeyManager()
+km.generate_rsa_keypair_and_save("priv.pem", "pub.pem", "password")
 ```
 
 ## Advanced Protocols

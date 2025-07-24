@@ -59,7 +59,7 @@ from .asymmetric.signatures import (
     verify_signature_ecdsa,
     verify_signature_ed448,
 )
-from .hybrid import hybrid_decrypt, hybrid_encrypt
+from .hybrid import hybrid_decrypt, hybrid_encrypt, HybridEncryptor
 
 # Symmetric primitives -------------------------------------------------------
 from .symmetric import (
@@ -238,6 +238,7 @@ __all__ = [
     "ec_decrypt",
     "hybrid_encrypt",
     "hybrid_decrypt",
+    "HybridEncryptor",
     # Signatures
     "generate_ed25519_keypair",
     "generate_ed448_keypair",
