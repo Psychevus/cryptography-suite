@@ -1,6 +1,8 @@
 include LICENSE
 include README.md
+include cryptography_suite/py.typed
 exclude example_usage.py
 exclude demo_homomorphic.py
 prune docs
 prune tests
+prune tools

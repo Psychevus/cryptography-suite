@@ -22,7 +22,12 @@ from .pqc import (
 )
 from .protocols.key_management import KeyManager
 
-from .zk.bulletproof import prove as bp_prove, verify as bp_verify, setup as bp_setup
+from .zk.bulletproof import (
+    prove as bp_prove,
+    verify as bp_verify,
+    setup as bp_setup,
+    BULLETPROOF_AVAILABLE,
+)
 
 try:
     from . import zksnark
@@ -37,10 +42,17 @@ def bulletproof_cli(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description="Bulletproof range proof")
     parser.add_argument("value", type=int, help="Integer in [0, 2^32)")
     args = parser.parse_args(argv)
-    bp_setup()
-    proof, commitment, nonce = bp_prove(args.value)
-    ok = bp_verify(proof, commitment)
-    print(f"Proof valid: {ok}")
+    try:
+        if not BULLETPROOF_AVAILABLE:
+            raise MissingDependencyError(
+                "Bulletproof ZKP requires 'petlib'. Install it with: pip install cryptography-suite[zkp]"
+            )
+        bp_setup()
+        proof, commitment, nonce = bp_prove(args.value)
+        ok = bp_verify(proof, commitment)
+        print(f"Proof valid: {ok}")
+    except Exception as exc:  # pragma: no cover - graceful CLI errors
+        _handle_cli_error(exc)
 
 
 def zksnark_cli(argv: list[str] | None = None) -> None:
@@ -120,7 +132,7 @@ def _handle_cli_error(exc: Exception) -> None:
     """Display user-friendly CLI error messages."""
 
     if isinstance(exc, MissingDependencyError):
-        print(f"Missing dependency: {exc}. Please install the required module.")
+        print(exc)
     elif isinstance(exc, DecryptionError):
         print("Password is incorrect or file corrupted.")
     else:

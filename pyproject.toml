@@ -34,7 +34,7 @@ classifiers = [
 ]
 
 dependencies = [
-    "cryptography>=44.0.0",
+    "cryptography>=41.0.3",
     "py_ecc",
     "spake2",
     "blake3",
@@ -64,6 +64,10 @@ cryptography-suite = "cryptography_suite.cli:main"
 line-length = 88
 target-version = ['py310']
 
+[tool.setuptools]
+include-package-data = true
+license-files = ["LICENSE"]
+
 [tool.isort]
 profile = "black"
 
@@ -71,3 +75,10 @@ profile = "black"
 where = ["."]
 include = ["cryptography_suite*"]
 exclude = ["tests*", "docs*"]
+
+[tool.setuptools.package-data]
+"cryptography_suite" = ["py.typed"]
+"*" = ["README.md"]
+
+[tool.setuptools.data-files]
+"" = ["README.md"]

@@ -13,6 +13,7 @@ def get_cli(monkeypatch):
     monkeypatch.setitem(sys.modules, "cryptography_suite.bulletproof", bp_mod)
     import cryptography_suite.cli as cli
     importlib.reload(cli)
+    monkeypatch.setattr(cli, "BULLETPROOF_AVAILABLE", True, raising=False)
     return cli
 
 

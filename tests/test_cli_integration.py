@@ -13,6 +13,7 @@ import cryptography_suite.cli as cli
 def reload_cli(monkeypatch):
     """Reload :mod:`cryptography_suite.cli` while keeping monkeypatched stubs."""
     importlib.reload(cli)
+    monkeypatch.setattr(cli, "BULLETPROOF_AVAILABLE", True, raising=False)
     return cli
 
 
