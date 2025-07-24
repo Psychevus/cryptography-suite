@@ -31,7 +31,6 @@ ARGON2_TIME_COST = int(getenv("CRYPTOSUITE_ARGON2_TIME_COST", "3"))
 ARGON2_PARALLELISM = int(getenv("CRYPTOSUITE_ARGON2_PARALLELISM", "1"))
 
 
-
 def generate_salt(size: int = SALT_SIZE) -> bytes:
     """Generate a cryptographically secure random salt."""
     return urandom(size)
