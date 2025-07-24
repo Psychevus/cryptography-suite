@@ -11,7 +11,7 @@ from .errors import (
     ProtocolError,
     SignatureVerificationError,
 )
-from .debug import VERBOSE_MODE, verbose_print
+
 
 __version__ = "2.0.0"
 
@@ -67,14 +67,10 @@ from .symmetric import (
     aes_encrypt,
     argon2_decrypt,
     argon2_encrypt,
-    ascon_decrypt,
-    ascon_encrypt,
     chacha20_decrypt,
     chacha20_encrypt,
     chacha20_stream_encrypt,
     chacha20_stream_decrypt,
-    salsa20_encrypt,
-    salsa20_decrypt,
     xchacha_encrypt,
     xchacha_decrypt,
     encrypt_file_async,
@@ -85,7 +81,6 @@ from .symmetric import (
     derive_key_scrypt,
     derive_hkdf,
     kdf_pbkdf2,
-    derive_pbkdf2,
     encrypt_file,
     generate_salt,
     pbkdf2_decrypt,
@@ -166,11 +161,11 @@ from .x509 import generate_csr, self_sign_certificate, load_certificate
 
 # Optional homomorphic encryption -------------------------------------------
 try:  # pragma: no cover - optional dependency
-    from .homomorphic import add as fhe_add
-    from .homomorphic import decrypt as fhe_decrypt
-    from .homomorphic import encrypt as fhe_encrypt
+    from .homomorphic import add as fhe_add  # noqa: F401
+    from .homomorphic import decrypt as fhe_decrypt  # noqa: F401
+    from .homomorphic import encrypt as fhe_encrypt  # noqa: F401
     from .homomorphic import keygen as fhe_keygen  # noqa: F401
-    from .homomorphic import multiply as fhe_multiply
+    from .homomorphic import multiply as fhe_multiply  # noqa: F401
 
     FHE_AVAILABLE = True
 except Exception:  # pragma: no cover - handle missing Pyfhel
