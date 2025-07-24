@@ -26,7 +26,6 @@ from .stream import (
     chacha20_stream_encrypt,
     chacha20_stream_decrypt,
 )
-from .ascon import encrypt as _ascon_encrypt, decrypt as _ascon_decrypt
 from .kdf import (
     derive_key_scrypt,
     verify_derived_key_scrypt,
@@ -44,8 +43,6 @@ derive_pbkdf2 = _derive_pbkdf2
 # re-export deprecated ciphers
 salsa20_encrypt = _salsa20_encrypt
 salsa20_decrypt = _salsa20_decrypt
-ascon_encrypt = _ascon_encrypt
-ascon_decrypt = _ascon_decrypt
 
 __all__ = [
     "aes_encrypt",
