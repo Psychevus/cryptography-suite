@@ -17,7 +17,7 @@
 - **High Security Standards**: Implements industry-leading algorithms with best practices, ensuring your data is safeguarded with the highest level of security.
 - **Developer-Friendly API**: Offers intuitive and well-documented APIs that simplify integration and accelerate development.
 - **Cross-Platform Compatibility**: Fully compatible with macOS, Linux, and Windows environments.
-- **Rigorous Testing**: Achieves **95% code coverage** with a comprehensive test suite, guaranteeing reliability and robustness.
+- **Rigorous Testing**: Achieves **99% code coverage** with a comprehensive test suite, guaranteeing reliability and robustness.
 
 ---
 
@@ -59,6 +59,18 @@ cd cryptography-suite
 pip install .
 # Optional extras for development and PQC
 pip install -e ".[dev,pqc]"
+```
+
+### Quick Start CLI
+
+```bash
+pip install cryptography-suite
+
+# Encrypt a file
+cryptography-suite encrypt --file input.txt --out encrypted.bin
+
+# Decrypt it back
+cryptography-suite decrypt --file encrypted.bin --out output.txt
 ```
 
 ---
@@ -451,7 +463,14 @@ coverage run -m unittest discover
 coverage report -m
 ```
 
-Our test suite achieves **95% code coverage**, guaranteeing reliability and robustness.
+Some tests rely on optional dependencies such as `petlib` for zero-knowledge proofs.
+Install extras before running them:
+
+```bash
+pip install .[zkp]
+```
+
+Our test suite achieves **99% code coverage**, guaranteeing reliability and robustness.
 
 ## 🖥 Command Line Interface
 
@@ -463,6 +482,13 @@ cryptosuite-zksnark secret
 ```
 
 Run each command with `-h` for detailed help.
+
+File encryption and decryption are available via the main CLI:
+
+```bash
+cryptography-suite encrypt --file secret.txt --out secret.enc
+cryptography-suite decrypt --file secret.enc --out decrypted.txt
+```
 
 ---
 
