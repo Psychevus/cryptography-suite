@@ -11,7 +11,7 @@ from Crypto.Cipher import Salsa20, ChaCha20
 from ..errors import EncryptionError, DecryptionError
 from ..utils import deprecated
 
-from .kdf import CHACHA20_KEY_SIZE
+from ..constants import CHACHA20_KEY_SIZE
 
 
 SALSA20_NONCE_SIZE = 8
@@ -19,9 +19,10 @@ SALSA20_NONCE_SIZE = 8
 
 @deprecated("Salsa20 is deprecated and not recommended for production.")
 def salsa20_encrypt(message: bytes, key: bytes, nonce: bytes) -> bytes:
-    """Encrypt ``message`` using Salsa20.
+    """INSECURE: Encrypt ``message`` using Salsa20.
 
-    .. warning:: This cipher is deprecated and **not recommended for production**.
+    .. warning:: This cipher provides no authentication and is **not recommended**
+       for production use.
 
     The ``key`` must be 32 bytes and ``nonce`` must be 8 bytes.
     Encryption is deterministic for a given key and nonce.
@@ -39,10 +40,7 @@ def salsa20_encrypt(message: bytes, key: bytes, nonce: bytes) -> bytes:
 
 @deprecated("Salsa20 is deprecated and not recommended for production.")
 def salsa20_decrypt(ciphertext: bytes, key: bytes, nonce: bytes) -> bytes:
-    """Decrypt data encrypted with :func:`salsa20_encrypt`.
-
-    .. warning:: This cipher is deprecated and **not recommended for production**.
-    """
+    """INSECURE: Decrypt data encrypted with :func:`salsa20_encrypt`."""
     if not ciphertext:
         raise DecryptionError("Ciphertext cannot be empty.")
     if not isinstance(key, (bytes, bytearray)) or len(key) != CHACHA20_KEY_SIZE:
@@ -55,7 +53,7 @@ def salsa20_decrypt(ciphertext: bytes, key: bytes, nonce: bytes) -> bytes:
 
 
 def chacha20_stream_encrypt(message: bytes, key: bytes, nonce: bytes) -> bytes:
-    """Encrypt ``message`` using ChaCha20 without Poly1305."""
+    """INSECURE: Encrypt ``message`` using ChaCha20 without Poly1305."""
     if not message:
         raise EncryptionError("Message cannot be empty.")
     if not isinstance(key, (bytes, bytearray)) or len(key) != CHACHA20_KEY_SIZE:
@@ -68,7 +66,7 @@ def chacha20_stream_encrypt(message: bytes, key: bytes, nonce: bytes) -> bytes:
 
 
 def chacha20_stream_decrypt(ciphertext: bytes, key: bytes, nonce: bytes) -> bytes:
-    """Decrypt data encrypted with :func:`chacha20_stream_encrypt`."""
+    """INSECURE: Decrypt data encrypted with :func:`chacha20_stream_encrypt`."""
     if not ciphertext:
         raise DecryptionError("Ciphertext cannot be empty.")
     if not isinstance(key, (bytes, bytearray)) or len(key) != CHACHA20_KEY_SIZE:

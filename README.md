@@ -3,6 +3,8 @@
 [![Python Version](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-macOS%20|%20Linux%20|%20Windows-informational)]()
+[![PyPI Version](https://img.shields.io/pypi/v/cryptography-suite)](https://pypi.org/project/cryptography-suite/)
+[![PyPI Downloads](https://img.shields.io/pypi/dm/cryptography-suite)](https://pypi.org/project/cryptography-suite/)
 [![Build Status](https://github.com/Psychevus/cryptography-suite/actions/workflows/python-app.yml/badge.svg)](https://github.com/Psychevus/cryptography-suite/actions)
 [![Coverage Status](https://coveralls.io/repos/github/Psychevus/cryptography-suite/badge.svg?branch=main)](https://coveralls.io/github/Psychevus/cryptography-suite?branch=main)
 [![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.md)
@@ -99,6 +101,17 @@ cryptography-suite decrypt --file encrypted.bin --out output.txt
 - **Utility Functions**: Includes Base62 encoding/decoding, secure random string generation, and memory zeroing.
 - **Homomorphic Encryption**: Wrapper around Pyfhel supporting CKKS and BFV schemes.
 - **Zero-Knowledge Proofs**: Bulletproof range proofs and zk-SNARK preimage proofs (optional dependencies).
+
+---
+
+## ⚠️ Security Considerations
+
+- **Insecure Ciphers**: Functions such as `salsa20_encrypt` and `chacha20_stream_encrypt`
+  do not provide authentication and should only be used for educational purposes.
+- **Verbose Mode**: Enabling `VERBOSE_MODE` leaks sensitive information to stdout; never
+  enable it in production.
+- **Private Key Protection**: Always supply a password when saving private keys to PEM
+  with `serialize_private_key` or `KeyManager.save_private_key`.
 
 ---
 

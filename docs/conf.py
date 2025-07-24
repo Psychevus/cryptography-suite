@@ -25,6 +25,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
     'myst_parser',
+    'sphinxcontrib.mermaid',
 ]
 
 # Paths that contain templates here, relative to this directory.

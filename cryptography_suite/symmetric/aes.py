@@ -7,16 +7,16 @@ from os import urandom
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from typing import cast
-from ..errors import EncryptionError, DecryptionError, MissingDependencyError
+from ..errors import (
+    EncryptionError,
+    DecryptionError,
+    MissingDependencyError,
+    KeyDerivationError,
+)
 from ..debug import verbose_print
 
-from .kdf import (
-    NONCE_SIZE,
-    SALT_SIZE,
-    derive_key_argon2,
-    derive_key_pbkdf2,
-    derive_key_scrypt,
-)
+from ..constants import NONCE_SIZE, SALT_SIZE
+from .kdf import select_kdf
 
 # Constants for streaming file encryption
 CHUNK_SIZE = 4096
@@ -41,14 +41,10 @@ def aes_encrypt(
         raise EncryptionError("Password cannot be empty.")
 
     salt = urandom(SALT_SIZE)
-    if kdf == "scrypt":
-        key = derive_key_scrypt(password, salt)
-    elif kdf == "pbkdf2":
-        key = derive_key_pbkdf2(password, salt)
-    elif kdf == "argon2":
-        key = derive_key_argon2(password, salt)
-    else:
-        raise EncryptionError("Unsupported KDF specified.")
+    try:
+        key = select_kdf(password, salt, kdf)
+    except KeyDerivationError as exc:
+        raise EncryptionError(str(exc)) from exc
 
     verbose_print(f"Derived key: {key.hex()}")
 
@@ -92,14 +88,10 @@ def aes_decrypt(
     nonce = encrypted_data_bytes[SALT_SIZE : SALT_SIZE + NONCE_SIZE]
     ciphertext = encrypted_data_bytes[SALT_SIZE + NONCE_SIZE :]
 
-    if kdf == "scrypt":
-        key = derive_key_scrypt(password, salt)
-    elif kdf == "pbkdf2":
-        key = derive_key_pbkdf2(password, salt)
-    elif kdf == "argon2":
-        key = derive_key_argon2(password, salt)
-    else:
-        raise DecryptionError("Unsupported KDF specified.")
+    try:
+        key = select_kdf(password, salt, kdf)
+    except KeyDerivationError as exc:
+        raise DecryptionError(str(exc)) from exc
 
     verbose_print(f"Derived key: {key.hex()}")
     verbose_print(f"Nonce: {nonce.hex()}")
@@ -132,30 +124,23 @@ def encrypt_file(
         raise EncryptionError("Password cannot be empty.")
 
     salt = urandom(SALT_SIZE)
-    if kdf == "scrypt":
-        key = derive_key_scrypt(password, salt)
-    elif kdf == "pbkdf2":
-        key = derive_key_pbkdf2(password, salt)
-    elif kdf == "argon2":
-        key = derive_key_argon2(password, salt)
-    else:
-        raise EncryptionError("Unsupported KDF specified.")
+    try:
+        key = select_kdf(password, salt, kdf)
+    except KeyDerivationError as exc:
+        raise EncryptionError(str(exc)) from exc
 
     verbose_print(f"Derived key: {key.hex()}")
 
     nonce = urandom(NONCE_SIZE)
     verbose_print(f"Nonce: {nonce.hex()}")
     verbose_print("Mode: AES-GCM")
-    cipher = Cipher(algorithms.AES(key), modes.GCM(nonce))
-    encryptor = cipher.encryptor()
+    aesgcm = AESGCM(key)
 
     try:
         with open(input_file_path, "rb") as f_in, open(output_file_path, "wb") as f_out:
-            f_out.write(salt + nonce)
-            while chunk := f_in.read(CHUNK_SIZE):
-                f_out.write(encryptor.update(chunk))
-            encryptor.finalize()
-            f_out.write(encryptor.tag)
+            data = f_in.read()
+            ct = aesgcm.encrypt(nonce, data, None)
+            f_out.write(salt + nonce + ct)
     except Exception as exc:
         # Remove potentially partial output on error
         if os.path.exists(output_file_path):
@@ -190,33 +175,22 @@ def decrypt_file(
             nonce = f_in.read(NONCE_SIZE)
             ciphertext_len = file_size - SALT_SIZE - NONCE_SIZE - TAG_SIZE
 
-            if kdf == "scrypt":
-                key = derive_key_scrypt(password, salt)
-            elif kdf == "pbkdf2":
-                key = derive_key_pbkdf2(password, salt)
-            elif kdf == "argon2":
-                key = derive_key_argon2(password, salt)
-            else:
-                raise DecryptionError("Unsupported KDF specified.")
+            try:
+                key = select_kdf(password, salt, kdf)
+            except KeyDerivationError as exc:
+                raise DecryptionError(str(exc)) from exc
 
             verbose_print(f"Derived key: {key.hex()}")
             verbose_print(f"Nonce: {nonce.hex()}")
             verbose_print("Mode: AES-GCM")
 
-            cipher = Cipher(algorithms.AES(key), modes.GCM(nonce))
-            decryptor = cipher.decryptor()
+            aesgcm = AESGCM(key)
 
             try:
                 with open(output_file_path, "wb") as f_out:
-                    processed = 0
-                    while processed < ciphertext_len:
-                        to_read = min(CHUNK_SIZE, ciphertext_len - processed)
-                        chunk = f_in.read(to_read)
-                        processed += len(chunk)
-                        f_out.write(decryptor.update(chunk))
-
-                    tag = f_in.read(TAG_SIZE)
-                    decryptor.finalize_with_tag(tag)
+                    ciphertext = f_in.read(ciphertext_len + TAG_SIZE)
+                    data = aesgcm.decrypt(nonce, ciphertext, None)
+                    f_out.write(data)
             except Exception as exc:  # pragma: no cover - high-level error handling
                 if os.path.exists(output_file_path):
                     os.remove(output_file_path)
@@ -252,36 +226,26 @@ async def encrypt_file_async(
         ) from exc
 
     salt = urandom(SALT_SIZE)
-    if kdf == "scrypt":
-        key = derive_key_scrypt(password, salt)
-    elif kdf == "pbkdf2":
-        key = derive_key_pbkdf2(password, salt)
-    elif kdf == "argon2":
-        key = derive_key_argon2(password, salt)
-    else:
-        raise EncryptionError("Unsupported KDF specified.")
+    try:
+        key = select_kdf(password, salt, kdf)
+    except KeyDerivationError as exc:
+        raise EncryptionError(str(exc)) from exc
 
     verbose_print(f"Derived key: {key.hex()}")
 
     nonce = urandom(NONCE_SIZE)
     verbose_print(f"Nonce: {nonce.hex()}")
     verbose_print("Mode: AES-GCM")
-    cipher = Cipher(algorithms.AES(key), modes.GCM(nonce))
-    encryptor = cipher.encryptor()
+    aesgcm = AESGCM(key)
 
     try:
         async with (
             aiofiles.open(input_file_path, "rb") as f_in,
             aiofiles.open(output_file_path, "wb") as f_out,
         ):
-            await f_out.write(salt + nonce)
-            while True:
-                chunk = await f_in.read(CHUNK_SIZE)
-                if not chunk:
-                    break
-                await f_out.write(encryptor.update(chunk))
-            encryptor.finalize()
-            await f_out.write(encryptor.tag)
+            data = await f_in.read()
+            ct = aesgcm.encrypt(nonce, data, None)
+            await f_out.write(salt + nonce + ct)
     except Exception as exc:  # pragma: no cover - high-level error handling
         if os.path.exists(output_file_path):
             os.remove(output_file_path)
@@ -316,33 +280,22 @@ async def decrypt_file_async(
             nonce = await f_in.read(NONCE_SIZE)
             ciphertext_len = file_size - SALT_SIZE - NONCE_SIZE - TAG_SIZE
 
-            if kdf == "scrypt":
-                key = derive_key_scrypt(password, salt)
-            elif kdf == "pbkdf2":
-                key = derive_key_pbkdf2(password, salt)
-            elif kdf == "argon2":
-                key = derive_key_argon2(password, salt)
-            else:
-                raise DecryptionError("Unsupported KDF specified.")
+            try:
+                key = select_kdf(password, salt, kdf)
+            except KeyDerivationError as exc:
+                raise DecryptionError(str(exc)) from exc
 
             verbose_print(f"Derived key: {key.hex()}")
             verbose_print(f"Nonce: {nonce.hex()}")
             verbose_print("Mode: AES-GCM")
 
-            cipher = Cipher(algorithms.AES(key), modes.GCM(nonce))
-            decryptor = cipher.decryptor()
+            aesgcm = AESGCM(key)
 
             try:
                 async with aiofiles.open(output_file_path, "wb") as f_out:
-                    processed = 0
-                    while processed < ciphertext_len:
-                        to_read = min(CHUNK_SIZE, ciphertext_len - processed)
-                        chunk = await f_in.read(to_read)
-                        processed += len(chunk)
-                        await f_out.write(decryptor.update(chunk))
-
-                    tag = await f_in.read(TAG_SIZE)
-                    decryptor.finalize_with_tag(tag)
+                    ciphertext = await f_in.read(ciphertext_len + TAG_SIZE)
+                    data = aesgcm.decrypt(nonce, ciphertext, None)
+                    await f_out.write(data)
             except Exception as exc:  # pragma: no cover - high-level error handling
                 if os.path.exists(output_file_path):
                     os.remove(output_file_path)

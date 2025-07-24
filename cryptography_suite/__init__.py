@@ -60,6 +60,7 @@ from .asymmetric.signatures import (
     verify_signature_ed448,
 )
 from .hybrid import hybrid_decrypt, hybrid_encrypt, HybridEncryptor
+from .aead import chacha20_encrypt_aead, chacha20_decrypt_aead
 
 # Symmetric primitives -------------------------------------------------------
 from .symmetric import (
@@ -198,6 +199,8 @@ __all__ = [
     "aes_decrypt",
     "chacha20_encrypt",
     "chacha20_decrypt",
+    "chacha20_encrypt_aead",
+    "chacha20_decrypt_aead",
     "chacha20_stream_encrypt",
     "chacha20_stream_decrypt",
     "xchacha_encrypt",
