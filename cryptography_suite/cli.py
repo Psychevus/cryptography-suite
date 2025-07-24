@@ -16,6 +16,7 @@ from .pqc import (
     generate_dilithium_keypair,
     generate_sphincs_keypair,
     PQCRYPTO_AVAILABLE,
+    SPHINCS_AVAILABLE,
 )
 from .protocols.key_management import KeyManager
 
@@ -138,7 +139,7 @@ def keygen_cli(argv: list[str] | None = None) -> None:
     if PQCRYPTO_AVAILABLE:
         sub.add_parser("dilithium", help="Generate a Dilithium key pair")
         sub.add_parser("kyber", help="Generate a Kyber key pair")
-        if generate_sphincs_keypair:
+        if SPHINCS_AVAILABLE:
             sub.add_parser("sphincs", help="Generate a SPHINCS+ key pair")
 
     args = parser.parse_args(argv)
