@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 from typing import List
+import hmac
 from ..errors import EncryptionError, DecryptionError
+from ..utils import deprecated
 
 
 def _to_bytes(data: List[int]) -> bytes:
@@ -132,6 +134,7 @@ def _finalize(S: List[int], key: bytes) -> bytes:
     return _int_to_bytes(S[3], 8) + _int_to_bytes(S[4], 8)
 
 
+@deprecated("Ascon is experimental and not recommended for production.")
 def encrypt(key: bytes, nonce: bytes, associated_data: bytes, plaintext: bytes) -> bytes:
     """Encrypt and authenticate using Ascon-128a."""
     S = _initialize(key, nonce)
@@ -141,6 +144,7 @@ def encrypt(key: bytes, nonce: bytes, associated_data: bytes, plaintext: bytes) 
     return ciphertext + tag
 
 
+@deprecated("Ascon is experimental and not recommended for production.")
 def decrypt(key: bytes, nonce: bytes, associated_data: bytes, ciphertext: bytes) -> bytes:
     """Decrypt and verify using Ascon-128a."""
     if len(ciphertext) < 16:
@@ -149,7 +153,7 @@ def decrypt(key: bytes, nonce: bytes, associated_data: bytes, ciphertext: bytes)
     _process_ad(S, associated_data)
     plaintext = _process_ciphertext(S, ciphertext[:-16])
     tag = _finalize(S, key)
-    if tag != ciphertext[-16:]:
+    if not hmac.compare_digest(tag, ciphertext[-16:]):
         raise DecryptionError("Invalid authentication tag.")
     return plaintext
 

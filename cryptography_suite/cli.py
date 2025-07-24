@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import argparse
-from .errors import MissingDependencyError
+from .errors import MissingDependencyError, DecryptionError
 
 from .zk.bulletproof import prove as bp_prove, verify as bp_verify, setup as bp_setup
 
@@ -97,4 +97,15 @@ def file_cli(argv: list[str] | None = None) -> None:
             decrypt_file(args.input_file, args.output_file, args.password)
             print(f"Decrypted file written to {args.output_file}")
     except Exception as exc:  # pragma: no cover - high-level error reporting
+        _handle_cli_error(exc)
+
+
+def _handle_cli_error(exc: Exception) -> None:
+    """Display user-friendly CLI error messages."""
+
+    if isinstance(exc, MissingDependencyError):
+        print(f"Missing dependency: {exc}. Please install the required module.")
+    elif isinstance(exc, DecryptionError):
+        print("Password is incorrect or file corrupted.")
+    else:
         print(f"Error: {exc}")

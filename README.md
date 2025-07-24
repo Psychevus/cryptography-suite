@@ -75,6 +75,7 @@ pip install -e ".[dev,pqc]"
 - **Hybrid Encryption**: Combine RSA/ECIES with AES-GCM for performance and security.
 - **Post-Quantum Cryptography**: Kyber key encapsulation and Dilithium signatures for quantum-safe workflows.
 - **XChaCha20-Poly1305**: Modern stream cipher support when ``cryptography`` exposes ``XChaCha20Poly1305``.
+- **Salsa20 and Ascon**: Provided for reference only. **Not recommended for production**.
 - **Audit Logging**: Decorators and helpers for encrypted audit trails.
 - **KeyVault Management**: Context manager to safely handle in-memory keys.
 - **Password-Authenticated Key Exchange (PAKE)**: SPAKE2 protocol implementation for secure password-based key exchange.
