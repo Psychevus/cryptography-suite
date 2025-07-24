@@ -1,0 +1,6 @@
+include LICENSE
+include README.md
+exclude example_usage.py
+exclude demo_homomorphic.py
+prune docs
+prune tests

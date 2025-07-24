@@ -66,3 +66,8 @@ target-version = ['py310']
 
 [tool.isort]
 profile = "black"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["cryptography_suite*"]
+exclude = ["tests*", "docs*"]
