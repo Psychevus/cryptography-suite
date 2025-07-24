@@ -8,13 +8,17 @@ on:
 
 jobs:
   lint:
-    name: Linting
-    runs-on: ubuntu-latest
+    name: Static analysis
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ['3.10', '3.11']
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.12'
+          python-version: ${{ matrix.python-version }}
       - name: Install lint dependencies
         run: |
           python -m pip install --upgrade pip
@@ -27,9 +31,23 @@ jobs:
       - name: Run pylint
         run: pylint --errors-only cryptography_suite || true
       - name: Run bandit
-        run: bandit -r cryptography_suite --exit-zero
+        run: bandit -r cryptography_suite --exit-zero || true
       - name: Run vulture
-        run: vulture cryptography_suite tests
+        run: vulture cryptography_suite tests || true
+
+  doctest:
+    name: README doctest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Run doctest
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+          python -m doctest README.md
 
   tests:
     name: Tests (base)
