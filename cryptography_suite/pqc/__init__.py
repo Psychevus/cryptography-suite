@@ -60,56 +60,6 @@ def generate_kyber_keypair(level: int = 512) -> Tuple[bytes, bytes]:
     return alg.generate_keypair()
 
 
-def kyber_encapsulate(public_key: bytes, level: int = 512) -> Tuple[bytes, bytes]:
-    """Encapsulate a shared secret using ML-KEM.
-
-    Parameters
-    ----------
-    public_key:
-        Public key bytes.
-    level:
-        Security level matching the key.
-
-    Returns
-    -------
-    Tuple[bytes, bytes]
-        ``(ciphertext, shared_secret)``.
-    """
-    if not PQCRYPTO_AVAILABLE:
-        raise ImportError("pqcrypto is required for Kyber functions")
-
-    alg = _KYBER_LEVEL_MAP.get(level)
-    if alg is None:
-        raise EncryptionError("Invalid Kyber level")
-    return alg.encrypt(public_key)
-
-
-def kyber_decapsulate(ciphertext: bytes, secret_key: bytes, level: int = 512) -> bytes:
-    """Decapsulate a shared secret using ML-KEM.
-
-    Parameters
-    ----------
-    ciphertext:
-        Ciphertext produced by :func:`kyber_encapsulate`.
-    secret_key:
-        Secret key bytes.
-    level:
-        Security level matching the key.
-
-    Returns
-    -------
-    bytes
-        The shared secret.
-    """
-    if not PQCRYPTO_AVAILABLE:
-        raise ImportError("pqcrypto is required for Kyber functions")
-
-    alg = _KYBER_LEVEL_MAP.get(level)
-    if alg is None:
-        raise DecryptionError("Invalid Kyber level")
-    return alg.decrypt(secret_key, ciphertext)
-
-
 def kyber_encrypt(
     public_key: bytes,
     plaintext: bytes,

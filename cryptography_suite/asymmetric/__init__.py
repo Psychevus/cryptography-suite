@@ -18,7 +18,6 @@ from os import urandom
 
 # Constants
 DEFAULT_RSA_KEY_SIZE = 4096  # 4096 bits for enhanced security
-DEFAULT_EC_CURVE = ec.SECP256R1()  # NIST P-256 curve
 
 
 def generate_rsa_keypair(

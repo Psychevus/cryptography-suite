@@ -106,9 +106,7 @@ try:  # pragma: no cover - optional dependency
         generate_dilithium_keypair,
         generate_sphincs_keypair,
         generate_kyber_keypair,
-        kyber_decapsulate,
         kyber_decrypt,
-        kyber_encapsulate,
         kyber_encrypt,
         sphincs_sign,
         sphincs_verify,
@@ -339,8 +337,6 @@ if PQCRYPTO_AVAILABLE:
     __all__.extend(
         [
             "generate_kyber_keypair",
-            "kyber_encapsulate",
-            "kyber_decapsulate",
             "kyber_encrypt",
             "kyber_decrypt",
             "generate_dilithium_keypair",
