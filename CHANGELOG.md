@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 ## [Unreleased]
 
+## [2.0.1] - 2025-07-25
+### Fixed
+- Auto-padding for base32 secrets in OTP to prevent Incorrect padding error
+- Improved handling of lowercase and unpadded OTP secrets
+### Added
+- Tests for real-world OTP misuse and malformed inputs
+
 ## [2.0.0] - 2025-07-24
 ### Added
 - SPAKE2 password-authenticated key exchange implementation.

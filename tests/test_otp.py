@@ -79,3 +79,17 @@ class TestOTP(unittest.TestCase):
         ts = 1000000000
         code = generate_totp(self.secret, timestamp=ts)
         self.assertTrue(verify_totp(code, self.secret, timestamp=ts))
+
+    def test_totp_with_missing_padding(self):
+        secret = base64.b32encode(b'123456789').decode('utf-8').rstrip('=')
+        code = generate_totp(secret)
+        self.assertTrue(verify_totp(code, secret))
+
+    def test_totp_with_lowercase_secret(self):
+        secret = self.secret.lower()
+        code = generate_totp(secret)
+        self.assertTrue(verify_totp(code, secret))
+
+    def test_totp_invalid_secret_should_raise(self):
+        with self.assertRaises(CryptographySuiteError):
+            generate_totp('%%%%')

@@ -13,7 +13,7 @@ from .errors import (
 )
 
 
-__version__ = "2.0.0"
+__version__ = "2.0.1"
 
 # Asymmetric primitives ------------------------------------------------------
 from .asymmetric import (
