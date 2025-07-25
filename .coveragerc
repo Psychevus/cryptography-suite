@@ -1,6 +1,7 @@
 [run]
 branch = True
-source = cryptography_suite
+source =
+    cryptography_suite
 
 [report]
 omit =
@@ -8,5 +9,5 @@ omit =
 
 [paths]
 source =
-    cryptography_suite/
-    */site-packages/
+    cryptography_suite
+    */site-packages/cryptography_suite
