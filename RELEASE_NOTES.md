@@ -1,3 +1,17 @@
+# Release Notes - Cryptography Suite 2.0.1
+
+Cryptography Suite 2.0.1 is a maintenance release focused on reliability improvements and documentation updates.
+
+## Highlights
+
+- **OTP Auto-Padding Fix**: Base32 secrets for TOTP/HOTP are now auto-padded internally to prevent decoding errors.
+- **Expanded Test Coverage** for OTP edge cases.
+- **Internal cleanup and doc updates.**
+
+Enjoy the improvements and minor fixes introduced in version 2.0.1.
+
+---
+
 # Release Notes - Cryptography Suite 2.0.0
 
 Cryptography Suite 2.0.0 delivers a major update with post-quantum readiness and enhanced tooling.

@@ -15,8 +15,8 @@ project = 'cryptography-suite'
 copyright = '2025, Mojtaba Zaferanloo'
 author = 'Mojtaba Zaferanloo'
 
-version = '2.0.0'
-release = '2.0.0'
+version = '2.0.1'
+release = '2.0.1'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

@@ -6,7 +6,7 @@ import re
 import subprocess
 from pathlib import Path
 
-VERSION = "2.0.0"
+VERSION = "2.0.1"
 CHANGELOG = Path(__file__).resolve().parents[1] / "CHANGELOG.md"
 
 

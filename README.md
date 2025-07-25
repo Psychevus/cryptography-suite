@@ -3,6 +3,7 @@
 [![Python Version](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-macOS%20|%20Linux%20|%20Windows-informational)]()
+[![Version](https://img.shields.io/badge/version-2.0.1-blue)](https://github.com/Psychevus/cryptography-suite/releases/tag/v2.0.1)
 [![PyPI Version](https://img.shields.io/pypi/v/cryptography-suite)](https://pypi.org/project/cryptography-suite/)
 [![PyPI Downloads](https://img.shields.io/pypi/dm/cryptography-suite)](https://pypi.org/project/cryptography-suite/)
 [![Build Status](https://github.com/Psychevus/cryptography-suite/actions/workflows/python-app.yml/badge.svg)](https://github.com/Psychevus/cryptography-suite/actions)
@@ -26,6 +27,13 @@
 - **Rigorous Testing**: Achieves **99% code coverage** with a comprehensive test suite, guaranteeing reliability and robustness.
 
 ---
+
+## ✨ Version 2.0.1 Highlights
+
+- ✅ **OTP Auto-Padding Fix**: Base32 secrets for TOTP/HOTP are now auto-padded internally to prevent decoding errors.
+- 🧪 **Expanded Test Coverage** for OTP edge cases.
+- 🛠 Internal cleanup and doc updates.
+
 
 ## ✨ Version 2.0.0 Highlights
 
