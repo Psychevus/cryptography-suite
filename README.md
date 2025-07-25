@@ -97,7 +97,8 @@ cryptography-suite decrypt --file encrypted.bin --out output.txt
 - **Audit Logging**: Decorators and helpers for encrypted audit trails.
 - **KeyVault Management**: Context manager to safely handle in-memory keys.
 - **Password-Authenticated Key Exchange (PAKE)**: SPAKE2 protocol implementation for secure password-based key exchange.
-- **One-Time Passwords (OTP)**: HOTP and TOTP algorithms for generating and verifying one-time passwords.
+ - **One-Time Passwords (OTP)**: HOTP and TOTP algorithms for generating and verifying one-time passwords.
+   > ⚠️ Secrets used for OTP (TOTP/HOTP) will now be auto-padded to prevent base32 decoding issues. No manual padding is required.
 - **Utility Functions**: Includes Base62 encoding/decoding, secure random string generation, and memory zeroing.
 - **Homomorphic Encryption**: Wrapper around Pyfhel supporting CKKS and BFV schemes.
 - **Zero-Knowledge Proofs**: Bulletproof range proofs and zk-SNARK preimage proofs (optional dependencies).

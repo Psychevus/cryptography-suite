@@ -7,12 +7,21 @@ from typing import Optional
 from ..errors import ProtocolError
 
 
+def _pad_base32(secret: str) -> str:
+    """Return a base32 string padded for decoding."""
+    secret = secret.upper()
+    missing = len(secret) % 8
+    if missing:
+        secret += "=" * (8 - missing)
+    return secret
+
+
 def generate_hotp(secret: str, counter: int, digits: int = 6, algorithm: str = 'sha1') -> str:
     """
     Generates an HOTP code based on a shared secret and counter.
     """
     try:
-        key = base64.b32decode(secret.upper(), casefold=True)
+        key = base64.b32decode(_pad_base32(secret), casefold=True)
     except Exception as e:
         raise ProtocolError(f"Invalid secret: {e}")
 
