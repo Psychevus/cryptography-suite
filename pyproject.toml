@@ -9,7 +9,9 @@ description = "A comprehensive and secure cryptographic toolkit."
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
-authors = [{name = "Mojtaba Zaferanloo", email = "psychevus@gmail.com"}]
+authors = [
+    {name = "Mojtaba Zaferanloo", email = "psychevus@gmail.com"}
+]
 keywords = [
     "cryptography",
     "encryption",
@@ -22,15 +24,18 @@ keywords = [
     "hashing",
     "PAKE",
     "OTP",
-    "secret sharing",
+    "secret sharing"
 ]
 classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Topic :: Security :: Cryptography",
     "Development Status :: 5 - Production/Stable",
-    "Intended Audience :: Developers",
+    "Intended Audience :: Developers"
 ]
 
 dependencies = [
@@ -39,13 +44,8 @@ dependencies = [
     "spake2",
     "blake3",
     "pynacl",
-    "pycryptodome",
+    "pycryptodome"
 ]
-
-[project.urls]
-Documentation = "https://github.com/Psychevus/cryptography-suite#readme"
-Source = "https://github.com/Psychevus/cryptography-suite"
-Tracker = "https://github.com/Psychevus/cryptography-suite/issues"
 
 [project.optional-dependencies]
 pqc = ["pqcrypto"]
@@ -53,38 +53,32 @@ fhe = ["Pyfhel"]
 zk = ["pybulletproofs", "PySNARK"]
 dev = ["pytest", "pytest-cov", "coverage", "coveralls"]
 async = ["aiofiles"]
-docs = [
-    "sphinx",
-    "furo",
-    "myst-parser",
-    "sphinxcontrib-mermaid",
-]
+docs = ["sphinx", "furo", "myst-parser", "sphinxcontrib-mermaid"]
 
 [project.scripts]
-cryptosuite-bulletproof = "cryptography_suite.cli:bulletproof_cli"
-cryptosuite-zksnark = "cryptography_suite.cli:zksnark_cli"
-cryptosuite-file = "cryptography_suite.cli:file_cli"
 cryptography-suite = "cryptography_suite.cli:main"
 
-[tool.black]
-line-length = 88
-target-version = ['py310']
+[project.urls]
+Homepage = "https://github.com/Psychevus/cryptography-suite"
+Documentation = "https://psychevus.github.io/cryptography-suite"
+Source = "https://github.com/Psychevus/cryptography-suite"
+Tracker = "https://github.com/Psychevus/cryptography-suite/issues"
 
 [tool.setuptools]
 include-package-data = true
 license-files = ["LICENSE"]
 
-[tool.isort]
-profile = "black"
-
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["cryptography_suite*"]
-exclude = ["tests*", "docs*"]
+exclude = ["tests*", "docs*", "examples*", "demo*"]
 
 [tool.setuptools.package-data]
 "cryptography_suite" = ["py.typed"]
-"*" = ["README.md"]
 
-[tool.setuptools.data-files]
-"" = ["README.md"]
+[tool.black]
+line-length = 88
+target-version = ['py310']
+
+[tool.isort]
+profile = "black"
