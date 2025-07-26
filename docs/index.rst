@@ -21,6 +21,7 @@ documentation for details.
    pipeline.md
    formal.md
    mypy_plugin.md
+   visualization.md
    security.rst
    api/modules
 

@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Generic, Protocol, TypeVar, Callable, Iterable, Any
+from typing import Any, Callable, Generic, Iterable, Protocol, TypeVar
 import json
+import logging
+
+from .rich_logging import PipelineProgress, get_rich_logger
 
 Input = TypeVar("Input", contravariant=True)
 Output = TypeVar("Output", covariant=True)
@@ -45,6 +48,20 @@ class Pipeline(Generic[Input, Output]):
         result = data
         for mod in self.modules:
             result = mod.run(result)
+        return result
+
+    def run_with_logging(
+        self, data: Any, logger: logging.Logger | None = None
+    ) -> Any:
+        """Run modules with Rich progress logging."""
+
+        logger = logger or get_rich_logger(__name__)
+        result = data
+        with PipelineProgress(len(self.modules)) as prog:
+            for mod in self.modules:
+                logger.info("Running %s", mod.__class__.__name__)
+                result = mod.run(result)
+                prog.step()
         return result
 
     # introspection -------------------------------------------------------
