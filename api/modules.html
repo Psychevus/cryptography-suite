@@ -204,6 +204,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../pipeline.html">Pipeline API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../formal.html">Formal Verification Support</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../mypy_plugin.html">Misuse-Resistant Checking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../visualization.html">Visualization Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../security.html">Security Notes</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">API Reference</a></li>
 </ul>
@@ -271,6 +272,18 @@
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="cryptography_suite.HandshakeFlowWidget">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">HandshakeFlowWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cryptography_suite.HandshakeFlowWidget" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">VBox</span></code></p>
+<p>Animated visualization of a handshake protocol.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cryptography_suite.HandshakeFlowWidget.next_step">
+<span class="sig-name descname"><span class="pre">next_step</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cryptography_suite.HandshakeFlowWidget.next_step" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="cryptography_suite.HybridEncryptor">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">HybridEncryptor</span></span><a class="headerlink" href="#cryptography_suite.HybridEncryptor" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
@@ -294,6 +307,18 @@
 <em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">KeyDerivationError</span></span><a class="headerlink" href="#cryptography_suite.KeyDerivationError" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#cryptography_suite.CryptographySuiteError" title="cryptography_suite.errors.CryptographySuiteError"><code class="xref py py-class docutils literal notranslate"><span class="pre">CryptographySuiteError</span></code></a></p>
 <p>Raised when a key derivation operation fails.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cryptography_suite.KeyGraphWidget">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">KeyGraphWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cryptography_suite.KeyGraphWidget" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">VBox</span></code></p>
+<p>Display key relationships as a graph.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cryptography_suite.KeyGraphWidget.add_edge">
+<span class="sig-name descname"><span class="pre">add_edge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dst</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cryptography_suite.KeyGraphWidget.add_edge" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
@@ -372,6 +397,12 @@
 <dt class="sig sig-object py" id="cryptography_suite.Pipeline.run">
 <span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#cryptography_suite.Pipeline.run" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cryptography_suite.Pipeline.run_with_logging">
+<span class="sig-name descname"><span class="pre">run_with_logging</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#cryptography_suite.Pipeline.run_with_logging" title="Link to this definition">¶</a></dt>
+<dd><p>Run modules with Rich progress logging.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cryptography_suite.Pipeline.to_json">
@@ -457,6 +488,18 @@
 <span class="sig-name descname"><span class="pre">generate_message</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="headerlink" href="#cryptography_suite.SPAKE2Server.generate_message" title="Link to this definition">¶</a></dt>
 <dd><p>Generates the server’s SPAKE2 message.</p>
 </dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cryptography_suite.SessionTimelineWidget">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">SessionTimelineWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cryptography_suite.SessionTimelineWidget" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">VBox</span></code></p>
+<p>Visualize message and key events over time.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cryptography_suite.SessionTimelineWidget.add_event">
+<span class="sig-name descname"><span class="pre">add_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cryptography_suite.SessionTimelineWidget.add_event" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -976,6 +1019,12 @@ automatically.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="cryptography_suite.get_rich_logger">
+<span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">get_rich_logger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'cryptography-suite'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Logger</span></span></span><a class="headerlink" href="#cryptography_suite.get_rich_logger" title="Link to this definition">¶</a></dt>
+<dd><p>Return a configured Rich logger.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="cryptography_suite.hybrid_decrypt">
 <span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">hybrid_decrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">private_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rsa.RSAPrivateKey</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">x25519.X25519PrivateKey</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">EncryptedHybridMessage</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">EncryptedMessage</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="headerlink" href="#cryptography_suite.hybrid_decrypt" title="Link to this definition">¶</a></dt>
 <dd><p>Decrypt data produced by <a class="reference internal" href="#cryptography_suite.hybrid_encrypt" title="cryptography_suite.hybrid_encrypt"><code class="xref py py-func docutils literal notranslate"><span class="pre">hybrid_encrypt()</span></code></a>.</p>
@@ -1370,12 +1419,20 @@ and <code class="docutils literal notranslate"><span class="pre">key</span></cod
 <li><a class="reference internal" href="#cryptography_suite.CryptographySuiteError"><code class="docutils literal notranslate"><span class="pre">CryptographySuiteError</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.DecryptionError"><code class="docutils literal notranslate"><span class="pre">DecryptionError</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.EncryptionError"><code class="docutils literal notranslate"><span class="pre">EncryptionError</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.HandshakeFlowWidget"><code class="docutils literal notranslate"><span class="pre">HandshakeFlowWidget</span></code></a><ul>
+<li><a class="reference internal" href="#cryptography_suite.HandshakeFlowWidget.next_step"><code class="docutils literal notranslate"><span class="pre">HandshakeFlowWidget.next_step()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#cryptography_suite.HybridEncryptor"><code class="docutils literal notranslate"><span class="pre">HybridEncryptor</span></code></a><ul>
 <li><a class="reference internal" href="#cryptography_suite.HybridEncryptor.decrypt"><code class="docutils literal notranslate"><span class="pre">HybridEncryptor.decrypt()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.HybridEncryptor.encrypt"><code class="docutils literal notranslate"><span class="pre">HybridEncryptor.encrypt()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#cryptography_suite.KeyDerivationError"><code class="docutils literal notranslate"><span class="pre">KeyDerivationError</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.KeyGraphWidget"><code class="docutils literal notranslate"><span class="pre">KeyGraphWidget</span></code></a><ul>
+<li><a class="reference internal" href="#cryptography_suite.KeyGraphWidget.add_edge"><code class="docutils literal notranslate"><span class="pre">KeyGraphWidget.add_edge()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#cryptography_suite.KeyManager"><code class="docutils literal notranslate"><span class="pre">KeyManager</span></code></a><ul>
 <li><a class="reference internal" href="#cryptography_suite.KeyManager.generate_rsa_keypair_and_save"><code class="docutils literal notranslate"><span class="pre">KeyManager.generate_rsa_keypair_and_save()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.KeyManager.load_private_key"><code class="docutils literal notranslate"><span class="pre">KeyManager.load_private_key()</span></code></a></li>
@@ -1391,6 +1448,7 @@ and <code class="docutils literal notranslate"><span class="pre">key</span></cod
 <li><a class="reference internal" href="#cryptography_suite.Pipeline.from_config"><code class="docutils literal notranslate"><span class="pre">Pipeline.from_config()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.Pipeline.modules"><code class="docutils literal notranslate"><span class="pre">Pipeline.modules</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.Pipeline.run"><code class="docutils literal notranslate"><span class="pre">Pipeline.run()</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.Pipeline.run_with_logging"><code class="docutils literal notranslate"><span class="pre">Pipeline.run_with_logging()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.Pipeline.to_json"><code class="docutils literal notranslate"><span class="pre">Pipeline.to_json()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.Pipeline.to_proverif"><code class="docutils literal notranslate"><span class="pre">Pipeline.to_proverif()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.Pipeline.to_tamarin"><code class="docutils literal notranslate"><span class="pre">Pipeline.to_tamarin()</span></code></a></li>
@@ -1411,6 +1469,10 @@ and <code class="docutils literal notranslate"><span class="pre">key</span></cod
 <li><a class="reference internal" href="#cryptography_suite.SPAKE2Server"><code class="docutils literal notranslate"><span class="pre">SPAKE2Server</span></code></a><ul>
 <li><a class="reference internal" href="#cryptography_suite.SPAKE2Server.compute_shared_key"><code class="docutils literal notranslate"><span class="pre">SPAKE2Server.compute_shared_key()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.SPAKE2Server.generate_message"><code class="docutils literal notranslate"><span class="pre">SPAKE2Server.generate_message()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cryptography_suite.SessionTimelineWidget"><code class="docutils literal notranslate"><span class="pre">SessionTimelineWidget</span></code></a><ul>
+<li><a class="reference internal" href="#cryptography_suite.SessionTimelineWidget.add_event"><code class="docutils literal notranslate"><span class="pre">SessionTimelineWidget.add_event()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#cryptography_suite.SignalReceiver"><code class="docutils literal notranslate"><span class="pre">SignalReceiver</span></code></a><ul>
@@ -1483,6 +1545,7 @@ and <code class="docutils literal notranslate"><span class="pre">key</span></cod
 <li><a class="reference internal" href="#cryptography_suite.generate_totp"><code class="docutils literal notranslate"><span class="pre">generate_totp()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.generate_x25519_keypair"><code class="docutils literal notranslate"><span class="pre">generate_x25519_keypair()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.generate_x448_keypair"><code class="docutils literal notranslate"><span class="pre">generate_x448_keypair()</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.get_rich_logger"><code class="docutils literal notranslate"><span class="pre">get_rich_logger()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.hybrid_decrypt"><code class="docutils literal notranslate"><span class="pre">hybrid_decrypt()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.hybrid_encrypt"><code class="docutils literal notranslate"><span class="pre">hybrid_encrypt()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.initialize_signal_session"><code class="docutils literal notranslate"><span class="pre">initialize_signal_session()</span></code></a></li>
