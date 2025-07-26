@@ -15,6 +15,10 @@ from .errors import (
 
 __version__ = "2.0.2"
 
+# Backend registry -----------------------------------------------------------------
+from .crypto_backends import available_backends, use_backend  # noqa: E402
+from .crypto_backends import pyca_backend  # noqa: F401  - registers default backend
+
 # Asymmetric primitives ------------------------------------------------------
 from .asymmetric import (
     derive_x448_shared_key,
@@ -324,6 +328,8 @@ __all__ = [
     "SignatureVerificationError",
     "MissingDependencyError",
     "ProtocolError",
+    "available_backends",
+    "use_backend",
 ]
 
 # Conditional exports -------------------------------------------------------
