@@ -201,6 +201,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../architecture.html">Package Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../protocols.html">Protocol Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pipeline.html">Pipeline API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../security.html">Security Considerations</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">API Reference</a></li>
 </ul>
@@ -338,6 +339,55 @@
 <em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">MissingDependencyError</span></span><a class="headerlink" href="#cryptography_suite.MissingDependencyError" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#cryptography_suite.CryptographySuiteError" title="cryptography_suite.errors.CryptographySuiteError"><code class="xref py py-class docutils literal notranslate"><span class="pre">CryptographySuiteError</span></code></a></p>
 <p>Raised when an optional dependency is missing.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cryptography_suite.Pipeline">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">Pipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">modules:</span> <span class="pre">list[~cryptography_suite.pipeline.CryptoModule[~typing.Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">~typing.Any]]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cryptography_suite.Pipeline" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">Input</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">Output</span></code>]</p>
+<p>Composable cryptographic pipeline.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cryptography_suite.Pipeline.describe">
+<span class="sig-name descname"><span class="pre">describe</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#cryptography_suite.Pipeline.describe" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cryptography_suite.Pipeline.dry_run">
+<span class="sig-name descname"><span class="pre">dry_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#cryptography_suite.Pipeline.dry_run" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cryptography_suite.Pipeline.from_config">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">CryptoModule</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#cryptography_suite.Pipeline" title="cryptography_suite.pipeline.Pipeline"><span class="pre">Pipeline</span></a></span></span><a class="headerlink" href="#cryptography_suite.Pipeline.from_config" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cryptography_suite.Pipeline.modules">
+<span class="sig-name descname"><span class="pre">modules</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">CryptoModule</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cryptography_suite.Pipeline.modules" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cryptography_suite.Pipeline.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#cryptography_suite.Pipeline.run" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cryptography_suite.Pipeline.to_json">
+<span class="sig-name descname"><span class="pre">to_json</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#cryptography_suite.Pipeline.to_json" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cryptography_suite.PipelineVisualizer">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">PipelineVisualizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pipeline</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cryptography_suite.Pipeline" title="cryptography_suite.pipeline.Pipeline"><span class="pre">Pipeline</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cryptography_suite.PipelineVisualizer" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Simple ASCII pipeline visualizer.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cryptography_suite.PipelineVisualizer.render_ascii">
+<span class="sig-name descname"><span class="pre">render_ascii</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#cryptography_suite.PipelineVisualizer.render_ascii" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="py exception">
@@ -1304,6 +1354,19 @@ and <code class="docutils literal notranslate"><span class="pre">key</span></cod
 </li>
 <li><a class="reference internal" href="#cryptography_suite.KeyVault"><code class="docutils literal notranslate"><span class="pre">KeyVault</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.MissingDependencyError"><code class="docutils literal notranslate"><span class="pre">MissingDependencyError</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.Pipeline"><code class="docutils literal notranslate"><span class="pre">Pipeline</span></code></a><ul>
+<li><a class="reference internal" href="#cryptography_suite.Pipeline.describe"><code class="docutils literal notranslate"><span class="pre">Pipeline.describe()</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.Pipeline.dry_run"><code class="docutils literal notranslate"><span class="pre">Pipeline.dry_run()</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.Pipeline.from_config"><code class="docutils literal notranslate"><span class="pre">Pipeline.from_config()</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.Pipeline.modules"><code class="docutils literal notranslate"><span class="pre">Pipeline.modules</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.Pipeline.run"><code class="docutils literal notranslate"><span class="pre">Pipeline.run()</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.Pipeline.to_json"><code class="docutils literal notranslate"><span class="pre">Pipeline.to_json()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cryptography_suite.PipelineVisualizer"><code class="docutils literal notranslate"><span class="pre">PipelineVisualizer</span></code></a><ul>
+<li><a class="reference internal" href="#cryptography_suite.PipelineVisualizer.render_ascii"><code class="docutils literal notranslate"><span class="pre">PipelineVisualizer.render_ascii()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#cryptography_suite.ProtocolError"><code class="docutils literal notranslate"><span class="pre">ProtocolError</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.SPAKE2Client"><code class="docutils literal notranslate"><span class="pre">SPAKE2Client</span></code></a><ul>
 <li><a class="reference internal" href="#cryptography_suite.SPAKE2Client.compute_shared_key"><code class="docutils literal notranslate"><span class="pre">SPAKE2Client.compute_shared_key()</span></code></a></li>

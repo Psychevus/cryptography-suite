@@ -199,6 +199,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="architecture.html">Package Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="protocols.html">Protocol Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pipeline.html">Pipeline API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="security.html">Security Considerations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/modules.html">API Reference</a></li>
 </ul>
@@ -347,10 +348,10 @@
 </li>
         <li><a href="api/modules.html#cryptography_suite.decrypt_file_async">decrypt_file_async() (in module cryptography_suite)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/modules.html#cryptography_suite.DecryptionError">DecryptionError</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/modules.html#cryptography_suite.derive_hkdf">derive_hkdf() (in module cryptography_suite)</a>
 </li>
         <li><a href="api/modules.html#cryptography_suite.derive_key_argon2">derive_key_argon2() (in module cryptography_suite)</a>
@@ -362,6 +363,10 @@
         <li><a href="api/modules.html#cryptography_suite.derive_x25519_shared_key">derive_x25519_shared_key() (in module cryptography_suite)</a>
 </li>
         <li><a href="api/modules.html#cryptography_suite.derive_x448_shared_key">derive_x448_shared_key() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.Pipeline.describe">describe() (cryptography_suite.Pipeline method)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.Pipeline.dry_run">dry_run() (cryptography_suite.Pipeline method)</a>
 </li>
     </ul></td>
   </tr></table>
@@ -400,6 +405,10 @@
 <section id="F" class="genindex-section">
   <h2>F</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.Pipeline.from_config">from_config() (cryptography_suite.Pipeline class method)</a>
+</li>
+    </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/modules.html#cryptography_suite.from_pem">from_pem() (in module cryptography_suite)</a>
 </li>
@@ -553,8 +562,6 @@
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/modules.html#cryptography_suite.MissingDependencyError">MissingDependencyError</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li>
     module
 
@@ -562,6 +569,10 @@
           <li><a href="api/modules.html#module-cryptography_suite">cryptography_suite</a>
 </li>
         </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.Pipeline.modules">modules (cryptography_suite.Pipeline attribute)</a>
+</li>
     </ul></td>
   </tr></table>
 </section>
@@ -574,9 +585,13 @@
 </li>
         <li><a href="api/modules.html#cryptography_suite.pbkdf2_encrypt">pbkdf2_encrypt() (in module cryptography_suite)</a>
 </li>
+        <li><a href="api/modules.html#cryptography_suite.pem_to_json">pem_to_json() (in module cryptography_suite)</a>
+</li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="api/modules.html#cryptography_suite.pem_to_json">pem_to_json() (in module cryptography_suite)</a>
+        <li><a href="api/modules.html#cryptography_suite.Pipeline">Pipeline (class in cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.PipelineVisualizer">PipelineVisualizer (class in cryptography_suite)</a>
 </li>
         <li><a href="api/modules.html#cryptography_suite.ProtocolError">ProtocolError</a>
 </li>
@@ -592,6 +607,8 @@
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/modules.html#cryptography_suite.reconstruct_secret">reconstruct_secret() (in module cryptography_suite)</a>
 </li>
+        <li><a href="api/modules.html#cryptography_suite.PipelineVisualizer.render_ascii">render_ascii() (cryptography_suite.PipelineVisualizer method)</a>
+</li>
         <li><a href="api/modules.html#cryptography_suite.rotate_aes_key">rotate_aes_key() (in module cryptography_suite)</a>
 </li>
     </ul></td>
@@ -601,6 +618,8 @@
         <li><a href="api/modules.html#cryptography_suite.rsa_decrypt">rsa_decrypt() (in module cryptography_suite)</a>
 </li>
         <li><a href="api/modules.html#cryptography_suite.rsa_encrypt">rsa_encrypt() (in module cryptography_suite)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.Pipeline.run">run() (cryptography_suite.Pipeline method)</a>
 </li>
     </ul></td>
   </tr></table>
@@ -671,6 +690,10 @@
 <section id="T" class="genindex-section">
   <h2>T</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.Pipeline.to_json">to_json() (cryptography_suite.Pipeline method)</a>
+</li>
+    </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/modules.html#cryptography_suite.to_pem">to_pem() (in module cryptography_suite)</a>
 </li>
