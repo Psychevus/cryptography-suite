@@ -459,7 +459,7 @@ def main(argv: list[str] | None = None) -> None:
             action_args.append(args.action)
         backends_cli(action_args)
     elif args.cmd == "fuzz":
-        argv2: list[str] = []
+        argv2 = []  # reuse argument list without redeclaring type
         if args.pipeline:
             argv2.extend(["--pipeline", args.pipeline])
         argv2.extend(["--runs", str(args.runs)])
