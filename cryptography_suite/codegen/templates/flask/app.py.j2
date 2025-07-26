@@ -1,0 +1,12 @@
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+@app.route('/run', methods=['POST'])
+def run():
+    value = request.json.get('data', '')
+{% for step in steps %}
+    # {{ step }}
+    value = {{ step }}(value)
+{% endfor %}
+    return jsonify(result=value)
