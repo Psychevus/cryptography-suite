@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="API Reference" href="api/modules.html" /><link rel="prev" title="Misuse-Resistant Checking" href="mypy_plugin.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
-        <title>Security Considerations - cryptography-suite 2.0.2 documentation</title>
+        <title>Security Notes - cryptography-suite 2.0.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -203,7 +203,7 @@
 <li class="toctree-l1"><a class="reference internal" href="protocols.html">Protocol Notes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline.html">Pipeline API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mypy_plugin.html">Misuse-Resistant Checking</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Security Considerations</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Security Notes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/modules.html">API Reference</a></li>
 </ul>
 
@@ -225,7 +225,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="_sources/security.rst.txt" title="View this page">
+  <a class="muted-link" href="_sources/security.md.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -245,21 +245,19 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="security-considerations">
-<h1>Security Considerations<a class="headerlink" href="#security-considerations" title="Link to this heading">¶</a></h1>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>The following notes highlight important aspects for using <code class="docutils literal notranslate"><span class="pre">cryptography-suite</span></code> safely.</p>
-</div>
+          <section id="security-notes">
+<h1>Security Notes<a class="headerlink" href="#security-notes" title="Link to this heading">¶</a></h1>
+<p>This project aims to carefully handle sensitive data in memory. Key features:</p>
 <ul class="simple">
-<li><p>Insecure primitives like <code class="docutils literal notranslate"><span class="pre">salsa20_encrypt</span></code> and <code class="docutils literal notranslate"><span class="pre">chacha20_stream_encrypt</span></code> provide
-no authentication and are for educational purposes only.</p></li>
-<li><p>Enabling <code class="docutils literal notranslate"><span class="pre">VERBOSE_MODE</span></code> prints derived keys and nonces to stdout. Do <strong>not</strong> enable
-this in production environments.</p></li>
-<li><p>When serializing private keys with <a class="reference internal" href="api/modules.html#cryptography_suite.serialize_private_key" title="cryptography_suite.serialize_private_key"><code class="xref py py-func docutils literal notranslate"><span class="pre">cryptography_suite.serialize_private_key()</span></code></a>
-or using <a class="reference internal" href="api/modules.html#cryptography_suite.KeyManager" title="cryptography_suite.protocols.key_management.KeyManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">cryptography_suite.protocols.key_management.KeyManager</span></code></a>, always
-supply a password so the key material is encrypted.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">KeyVault</span></code> now cleans up secrets not only on context exit but also when the
+object is garbage collected.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">secure_zero</span></code> utilises <code class="docutils literal notranslate"><span class="pre">memset_s</span></code> from the system C library when available to
+erase memory. A fallback to <code class="docutils literal notranslate"><span class="pre">ctypes.memset</span></code> is used otherwise.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">constant_time_compare</span></code> provides a timing-attack resistant equality check.</p></li>
 </ul>
+<p>While these mechanisms help reduce residual secrets in memory, absolute
+zeroization cannot be guaranteed on all operating systems and Python
+implementations.</p>
 </section>
 
         </article>

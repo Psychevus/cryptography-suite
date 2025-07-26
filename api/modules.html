@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="prev" title="Security Considerations" href="../security.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="prev" title="Security Notes" href="../security.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
         <title>API Reference - cryptography-suite 2.0.2 documentation</title>
@@ -203,7 +203,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../protocols.html">Protocol Notes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pipeline.html">Pipeline API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../mypy_plugin.html">Misuse-Resistant Checking</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../security.html">Security Considerations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../security.html">Security Notes</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">API Reference</a></li>
 </ul>
 
@@ -689,6 +689,12 @@ compatibility with older data.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="cryptography_suite.constant_time_compare">
+<span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">constant_time_compare</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytearray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytearray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#cryptography_suite.constant_time_compare" title="Link to this definition">¶</a></dt>
+<dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if <code class="docutils literal notranslate"><span class="pre">val1</span></code> equals <code class="docutils literal notranslate"><span class="pre">val2</span></code> using a timing-safe check.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="cryptography_suite.create_shares">
 <span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">create_shares</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">secret</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_shares</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prime</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">6864797660130609714981900799081393217269435300143305409394463459185543183397656052122559640661454554977296311391480858037121987999716643812574028291115057151</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#cryptography_suite.create_shares" title="Link to this definition">¶</a></dt>
 <dd><p>Splits a secret into shares using Shamir’s Secret Sharing.</p>
@@ -1104,7 +1110,7 @@ sequence instead.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="cryptography_suite.secure_zero">
 <span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">secure_zero</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytearray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cryptography_suite.secure_zero" title="Link to this definition">¶</a></dt>
-<dd><p>Overwrite <code class="docutils literal notranslate"><span class="pre">data</span></code> with zeros in-place.</p>
+<dd><p>Overwrite <code class="docutils literal notranslate"><span class="pre">data</span></code> with zeros in-place using <code class="docutils literal notranslate"><span class="pre">memset_s</span></code> if available.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -1302,7 +1308,7 @@ and <code class="docutils literal notranslate"><span class="pre">key</span></cod
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Security Considerations</div>
+                <div class="title">Security Notes</div>
                 
               </div>
             </a>
@@ -1415,6 +1421,7 @@ and <code class="docutils literal notranslate"><span class="pre">key</span></cod
 <li><a class="reference internal" href="#cryptography_suite.chacha20_encrypt_aead"><code class="docutils literal notranslate"><span class="pre">chacha20_encrypt_aead()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.chacha20_stream_decrypt"><code class="docutils literal notranslate"><span class="pre">chacha20_stream_decrypt()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.chacha20_stream_encrypt"><code class="docutils literal notranslate"><span class="pre">chacha20_stream_encrypt()</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.constant_time_compare"><code class="docutils literal notranslate"><span class="pre">constant_time_compare()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.create_shares"><code class="docutils literal notranslate"><span class="pre">create_shares()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.decode_encrypted_message"><code class="docutils literal notranslate"><span class="pre">decode_encrypted_message()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.decrypt_file"><code class="docutils literal notranslate"><span class="pre">decrypt_file()</span></code></a></li>
