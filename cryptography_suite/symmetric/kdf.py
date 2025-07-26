@@ -8,8 +8,13 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
-from cryptography.hazmat.primitives.kdf.argon2 import Argon2id
-from ..errors import KeyDerivationError
+try:  # pragma: no cover - optional dependency
+    from cryptography.hazmat.primitives.kdf.argon2 import Argon2id
+    ARGON2_AVAILABLE = True
+except Exception:  # pragma: no cover - gracefully handle missing support
+    ARGON2_AVAILABLE = False
+    Argon2id = None  # type: ignore
+from ..errors import KeyDerivationError, MissingDependencyError
 from ..utils import deprecated
 from ..constants import (
     AES_KEY_SIZE,
@@ -109,6 +114,8 @@ def derive_key_argon2(
     The cost parameters default to module constants which may be overridden via
     the ``CRYPTOSUITE_ARGON2_*`` environment variables.
     """
+    if not ARGON2_AVAILABLE:
+        raise MissingDependencyError("Argon2id KDF is not supported in this environment")
     if not password:
         raise KeyDerivationError("Password cannot be empty.")
     kdf = Argon2id(
