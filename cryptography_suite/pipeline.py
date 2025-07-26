@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from typing import Generic, Protocol, TypeVar, Callable, Iterable, Any
 import json
 
@@ -81,4 +81,3 @@ class PipelineVisualizer:
     def render_ascii(self) -> str:
         parts = [mod.__class__.__name__ for mod in self.pipeline.modules]
         return " -> ".join(parts)
-
