@@ -60,7 +60,6 @@ dev = [
     "pytest",
     "pytest-cov",
     "coverage",
-    "coveralls",
     "mypy",
     "types-PyYAML",
     "hypothesis",
