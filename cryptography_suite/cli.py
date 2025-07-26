@@ -237,6 +237,48 @@ def backends_cli(argv: list[str] | None = None) -> None:
             print(name)
 
 
+def export_cli(argv: list[str] | None = None) -> None:
+    """Export a pipeline definition to a formal verification model."""
+
+    parser = argparse.ArgumentParser(description=export_cli.__doc__)
+    parser.add_argument("pipeline", help="Path to pipeline YAML file")
+    parser.add_argument("--format", choices=["proverif", "tamarin"], default="proverif")
+    parser.add_argument("--track", action="append", default=[], help="Secret names to monitor")
+    args = parser.parse_args(argv)
+
+    import yaml  # type: ignore
+    from typing import Any
+    from .pipeline import Pipeline, CryptoModule
+
+    class Stub:
+        def __init__(self, name: str) -> None:
+            self._name = name
+
+        def run(self, data: bytes) -> bytes:  # pragma: no cover - stub
+            return data
+
+        def to_proverif(self) -> str:
+            return f"(* {self._name} *)"
+
+        def to_tamarin(self) -> str:
+            return f"# {self._name}"
+
+    with open(args.pipeline, "r", encoding="utf-8") as f:
+        config = yaml.safe_load(f) or []
+
+    modules: list[CryptoModule[Any, Any]] = [
+        Stub(item["module"] if isinstance(item, dict) else str(item))
+        for item in config
+    ]
+    pipe: Pipeline[Any, Any] = Pipeline(modules)
+    for name in args.track:
+        pipe.track_secret(name)
+    if args.format == "proverif":
+        print(pipe.to_proverif())
+    else:
+        print(pipe.to_tamarin())
+
+
 def main(argv: list[str] | None = None) -> None:
     """Unified command line interface for the cryptography suite."""
 
@@ -280,6 +322,13 @@ def main(argv: list[str] | None = None) -> None:
         default="sha1",
     )
 
+    export_parser = sub.add_parser(
+        "export", help="Export pipeline", description=export_cli.__doc__
+    )
+    export_parser.add_argument("pipeline")
+    export_parser.add_argument("--format", choices=["proverif", "tamarin"], default="proverif")
+    export_parser.add_argument("--track", action="append", default=[], help="Secret names to monitor")
+
     back_parser = sub.add_parser(
         "backends", help="Manage crypto backends", description=backends_cli.__doc__
     )
@@ -298,6 +347,11 @@ def main(argv: list[str] | None = None) -> None:
         keygen_cli(argv2)
     elif args.cmd == "hash":
         hash_cli([args.file, f"--algorithm={args.algorithm}"])
+    elif args.cmd == "export":
+        argv2 = [args.pipeline, f"--format={args.format}"]
+        for sec in args.track:
+            argv2.extend(["--track", sec])
+        export_cli(argv2)
     elif args.cmd == "backends":
         action_args: list[str] = []
         if args.action:

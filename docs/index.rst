@@ -19,6 +19,7 @@ documentation for details.
    architecture.md
    protocols.md
    pipeline.md
+   formal.md
    mypy_plugin.md
    security.rst
    api/modules

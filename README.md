@@ -86,6 +86,9 @@ cryptography-suite encrypt --file input.txt --out encrypted.bin
 
 # Decrypt it back
 cryptography-suite decrypt --file encrypted.bin --out output.txt
+
+# Export a pipeline for formal verification
+cryptography-suite export examples/formal/pipeline.yaml --format proverif
 ```
 
 ---
