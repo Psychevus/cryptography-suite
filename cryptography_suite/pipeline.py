@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Generic, Protocol, TypeVar, Callable, Iterable, Any
 import json
 
-Input = TypeVar("Input")
-Output = TypeVar("Output")
+Input = TypeVar("Input", contravariant=True)
+Output = TypeVar("Output", covariant=True)
 
 
 class CryptoModule(Protocol[Input, Output]):
@@ -20,11 +20,7 @@ class CryptoModule(Protocol[Input, Output]):
 class Pipeline(Generic[Input, Output]):
     """Composable cryptographic pipeline."""
 
-    modules: list[CryptoModule[Any, Any]] | None = None
-
-    def __post_init__(self) -> None:
-        if self.modules is None:
-            self.modules = []
+    modules: list[CryptoModule[Any, Any]] = field(default_factory=list)
 
     # operator overloads -------------------------------------------------
     def __rshift__(self, other: CryptoModule[Any, Any] | "Pipeline") -> "Pipeline":
@@ -46,7 +42,7 @@ class Pipeline(Generic[Input, Output]):
     def describe(self) -> list[dict[str, Any]]:
         desc: list[dict[str, Any]] = []
         for mod in self.modules:
-            info = {
+            info: dict[str, Any] = {
                 "module": mod.__class__.__name__,
             }
             if hasattr(mod, "__dict__"):
