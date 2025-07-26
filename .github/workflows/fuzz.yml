@@ -1,0 +1,33 @@
+name: Fuzzing
+
+on:
+  schedule:
+    - cron: '0 5 * * 0'
+  workflow_dispatch:
+
+jobs:
+  fuzz:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12']
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .[dev]
+          pip install atheris
+      - name: Run fuzzing
+        run: |
+          python fuzz/fuzz_aes.py -runs=1000
+      - name: Upload Crashers
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: fuzz-crashers-${{ matrix.python-version }}
+          path: | 
+            fuzz/crash* || true

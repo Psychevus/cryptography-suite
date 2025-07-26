@@ -8,6 +8,7 @@
 [![PyPI Downloads](https://img.shields.io/pypi/dm/cryptography-suite)](https://pypi.org/project/cryptography-suite/)
 [![Build Status](https://github.com/Psychevus/cryptography-suite/actions/workflows/python-app.yml/badge.svg)](https://github.com/Psychevus/cryptography-suite/actions)
 [![Coverage Status](https://coveralls.io/repos/github/Psychevus/cryptography-suite/badge.svg?branch=main)](https://coveralls.io/github/Psychevus/cryptography-suite?branch=main)
+[![Fuzzed & Property-Tested](https://img.shields.io/badge/fuzzed--property--tested-true-brightgreen)](docs/fuzzing.md)
 [![Misuse-Resistant](https://img.shields.io/badge/misuse--resistant-enabled-success)](docs/mypy_plugin.md)
 [![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
@@ -89,6 +90,14 @@ cryptography-suite decrypt --file encrypted.bin --out output.txt
 
 # Export a pipeline for formal verification
 cryptography-suite export examples/formal/pipeline.yaml --format proverif
+```
+
+### Fuzzing
+
+Execute the fuzz harness locally:
+
+```bash
+cryptosuite-fuzz --runs 1000
 ```
 
 ---

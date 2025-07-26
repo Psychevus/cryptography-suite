@@ -5,6 +5,8 @@ from __future__ import annotations
 from . import __version__
 
 import argparse
+import subprocess
+import sys
 from .errors import MissingDependencyError, DecryptionError
 from .protocols import generate_totp
 from .hashing import (
@@ -331,6 +333,21 @@ def gen_cli(argv: list[str] | None = None) -> None:
     generate(args.target, args.pipeline, args.output)
 
 
+def fuzz_cli(argv: list[str] | None = None) -> None:
+    """Run Atheris fuzzing harnesses."""
+
+    parser = argparse.ArgumentParser(description=fuzz_cli.__doc__)
+    parser.add_argument("--pipeline", help="Pipeline config YAML")
+    parser.add_argument("--runs", type=int, default=1000)
+    args = parser.parse_args(argv)
+
+    script = "fuzz/fuzz_aes.py" if not args.pipeline else "fuzz/fuzz_pipeline.py"
+    cmd = [sys.executable, script, f"-runs={args.runs}"]
+    if args.pipeline:
+        cmd.append(args.pipeline)
+    subprocess.run(cmd, check=False)
+
+
 def main(argv: list[str] | None = None) -> None:
     """Unified command line interface for the cryptography suite."""
 
@@ -393,6 +410,12 @@ def main(argv: list[str] | None = None) -> None:
     )
     back_parser.add_argument("action", choices=["list"], nargs="?")
 
+    fuzz_parser = sub.add_parser(
+        "fuzz", help="Run fuzzing", description=fuzz_cli.__doc__
+    )
+    fuzz_parser.add_argument("--pipeline")
+    fuzz_parser.add_argument("--runs", type=int, default=1000)
+
     ks_parser = sub.add_parser(
         "keystore", help="Manage keystores", description=keystore_cli.__doc__
     )
@@ -435,6 +458,12 @@ def main(argv: list[str] | None = None) -> None:
         if args.action:
             action_args.append(args.action)
         backends_cli(action_args)
+    elif args.cmd == "fuzz":
+        argv2 = []  # reuse argument list without redeclaring type
+        if args.pipeline:
+            argv2.extend(["--pipeline", args.pipeline])
+        argv2.extend(["--runs", str(args.runs)])
+        fuzz_cli(argv2)
     else:
         otp_cli(
             [

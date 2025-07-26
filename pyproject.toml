@@ -56,13 +56,21 @@ dependencies = [
 pqc = ["pqcrypto"]
 fhe = ["Pyfhel"]
 zk = ["pybulletproofs", "PySNARK"]
-dev = ["pytest", "pytest-cov", "coverage", "coveralls", "mypy", "types-PyYAML"]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "coverage",
+    "mypy",
+    "types-PyYAML",
+    "hypothesis",
+]
 async = ["aiofiles"]
 docs = ["sphinx", "furo", "myst-parser", "sphinxcontrib-mermaid"]
 viz = ["rich", "ipywidgets", "networkx"]
 
 [project.scripts]
 cryptography-suite = "cryptography_suite.cli:main"
+cryptosuite-fuzz = "cryptography_suite.cli:fuzz_cli"
 
 [project.urls]
 Homepage = "https://github.com/Psychevus/cryptography-suite"

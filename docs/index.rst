@@ -20,6 +20,7 @@ documentation for details.
    protocols.md
    pipeline.md
    formal.md
+   fuzzing.md
    mypy_plugin.md
    visualization.md
    security.rst
