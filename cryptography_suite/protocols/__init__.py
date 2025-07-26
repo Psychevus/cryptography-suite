@@ -8,6 +8,7 @@ from .signal import (
     SignalReceiver,
     initialize_signal_session,
 )
+from .signal.init_session import verify_signed_prekey
 from .key_management import (
     generate_aes_key,
     rotate_aes_key,
@@ -32,6 +33,7 @@ __all__ = [
     "SignalSender",
     "SignalReceiver",
     "initialize_signal_session",
+    "verify_signed_prekey",
     "generate_aes_key",
     "rotate_aes_key",
     "secure_save_key_to_file",

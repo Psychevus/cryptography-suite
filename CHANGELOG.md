@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 ## [Unreleased]
 
+## [2.0.2] - 2025-07-26
+### Added
+- Signed prekey verification during X3DH session setup.
+- Optional one-time prekey support with debug logging of DH steps.
+
 ## [2.0.1] - 2025-07-25
 ### Fixed
 - Auto-padding for base32 secrets in OTP to prevent Incorrect padding error
