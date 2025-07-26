@@ -246,8 +246,9 @@ def export_cli(argv: list[str] | None = None) -> None:
     parser.add_argument("--track", action="append", default=[], help="Secret names to monitor")
     args = parser.parse_args(argv)
 
-    import yaml
-    from .pipeline import Pipeline
+    import yaml  # type: ignore
+    from typing import Any
+    from .pipeline import Pipeline, CryptoModule
 
     class Stub:
         def __init__(self, name: str) -> None:
@@ -265,8 +266,11 @@ def export_cli(argv: list[str] | None = None) -> None:
     with open(args.pipeline, "r", encoding="utf-8") as f:
         config = yaml.safe_load(f) or []
 
-    modules = [Stub(item["module"] if isinstance(item, dict) else str(item)) for item in config]
-    pipe = Pipeline(modules)
+    modules: list[CryptoModule[Any, Any]] = [
+        Stub(item["module"] if isinstance(item, dict) else str(item))
+        for item in config
+    ]
+    pipe: Pipeline[Any, Any] = Pipeline(modules)
     for name in args.track:
         pipe.track_secret(name)
     if args.format == "proverif":
