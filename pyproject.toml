@@ -47,6 +47,9 @@ dependencies = [
     "pycryptodome"
     , "PyYAML"
     , "Jinja2"
+    , "rich"
+    , "ipywidgets"
+    , "networkx"
 ]
 
 [project.optional-dependencies]
@@ -56,6 +59,7 @@ zk = ["pybulletproofs", "PySNARK"]
 dev = ["pytest", "pytest-cov", "coverage", "coveralls", "mypy", "types-PyYAML"]
 async = ["aiofiles"]
 docs = ["sphinx", "furo", "myst-parser", "sphinxcontrib-mermaid"]
+viz = ["rich", "ipywidgets", "networkx"]
 
 [project.scripts]
 cryptography-suite = "cryptography_suite.cli:main"

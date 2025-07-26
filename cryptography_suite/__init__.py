@@ -128,6 +128,8 @@ from .hashing import (
     sha512_hash,
 )
 from .pipeline import Pipeline, PipelineVisualizer
+from .rich_logging import get_rich_logger
+from .viz import HandshakeFlowWidget, KeyGraphWidget, SessionTimelineWidget
 from .protocols import (
     KeyManager,
     SignalReceiver,
@@ -320,6 +322,10 @@ __all__ = [
     "load_certificate",
     "Pipeline",
     "PipelineVisualizer",
+    "get_rich_logger",
+    "HandshakeFlowWidget",
+    "KeyGraphWidget",
+    "SessionTimelineWidget",
     "audit_log",
     "set_audit_logger",
     # Signal Protocol

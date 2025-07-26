@@ -6,3 +6,6 @@ blake3
 pynacl
 pycryptodome
 PyYAML
+rich
+ipywidgets
+networkx
