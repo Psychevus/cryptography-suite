@@ -487,6 +487,11 @@ compatibility with older data.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="cryptography_suite.available_backends">
+<span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">available_backends</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#cryptography_suite.available_backends" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="cryptography_suite.base62_decode">
 <span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">base62_decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="headerlink" href="#cryptography_suite.base62_decode" title="Link to this definition">¶</a></dt>
 <dd><p>Decodes a Base62-encoded string into bytes.</p>
@@ -1172,6 +1177,12 @@ and <code class="docutils literal notranslate"><span class="pre">key</span></cod
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="cryptography_suite.use_backend">
+<span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">use_backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cryptography_suite.use_backend" title="Link to this definition">¶</a></dt>
+<dd><p>Select the backend to use at runtime.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="cryptography_suite.verify_derived_key_pbkdf2">
 <span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">verify_derived_key_pbkdf2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">salt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#cryptography_suite.verify_derived_key_pbkdf2" title="Link to this definition">¶</a></dt>
 <dd><p>Verify a password against a previously derived PBKDF2 key.</p>
@@ -1324,6 +1335,7 @@ and <code class="docutils literal notranslate"><span class="pre">key</span></cod
 <li><a class="reference internal" href="#cryptography_suite.argon2_decrypt"><code class="docutils literal notranslate"><span class="pre">argon2_decrypt()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.argon2_encrypt"><code class="docutils literal notranslate"><span class="pre">argon2_encrypt()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.audit_log"><code class="docutils literal notranslate"><span class="pre">audit_log()</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.available_backends"><code class="docutils literal notranslate"><span class="pre">available_backends()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.base62_decode"><code class="docutils literal notranslate"><span class="pre">base62_decode()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.base62_encode"><code class="docutils literal notranslate"><span class="pre">base62_encode()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.blake2b_hash"><code class="docutils literal notranslate"><span class="pre">blake2b_hash()</span></code></a></li>
@@ -1414,6 +1426,7 @@ and <code class="docutils literal notranslate"><span class="pre">key</span></cod
 <li><a class="reference internal" href="#cryptography_suite.sign_message_ecdsa"><code class="docutils literal notranslate"><span class="pre">sign_message_ecdsa()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.sign_message_ed448"><code class="docutils literal notranslate"><span class="pre">sign_message_ed448()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.to_pem"><code class="docutils literal notranslate"><span class="pre">to_pem()</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.use_backend"><code class="docutils literal notranslate"><span class="pre">use_backend()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.verify_derived_key_pbkdf2"><code class="docutils literal notranslate"><span class="pre">verify_derived_key_pbkdf2()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.verify_derived_key_scrypt"><code class="docutils literal notranslate"><span class="pre">verify_derived_key_scrypt()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.verify_hotp"><code class="docutils literal notranslate"><span class="pre">verify_hotp()</span></code></a></li>
