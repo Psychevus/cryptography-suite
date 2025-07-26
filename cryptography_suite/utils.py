@@ -1,23 +1,26 @@
 from __future__ import annotations
 
-import string
+import ctypes
+import ctypes.util
+import hmac
 import secrets
+import string
 import warnings
 from functools import wraps
-from typing import Any, Mapping, TypeAlias, cast, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Mapping, TypeAlias, cast
 
 from cryptography.hazmat.primitives.asymmetric import (
-    rsa,
     ec,
-    ed25519,
     ed448,
-    x25519,
+    ed25519,
+    rsa,
     x448,
+    x25519,
 )
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
-    from .protocols.signal import EncryptedMessage
     from .hybrid import EncryptedHybridMessage
+    from .protocols.signal import EncryptedMessage
 
 BASE62_ALPHABET = string.digits + string.ascii_letters
 
@@ -52,16 +55,39 @@ def base62_decode(data: str) -> bytes:
 
 
 def secure_zero(data: bytearray) -> None:
-    """Overwrite ``data`` with zeros in-place."""
+    """Overwrite ``data`` with zeros in-place using ``memset_s`` if available."""
 
     if not isinstance(data, bytearray):
         raise TypeError("secure_zero expects a bytearray")
 
-    # Use a memoryview for efficient bulk assignment without Python loops.
-    view = memoryview(data)
-    view[:] = b"\x00" * len(data)
-    if hasattr(view, "release"):
-        view.release()
+    buf = (ctypes.c_char * len(data)).from_buffer(data)
+
+    libc_name = ctypes.util.find_library("c")
+    memset_s = None
+    if libc_name:
+        libc = ctypes.CDLL(libc_name)
+        memset_s = getattr(libc, "memset_s", None)
+
+    if memset_s:
+        memset_s.argtypes = [
+            ctypes.c_void_p,
+            ctypes.c_size_t,
+            ctypes.c_int,
+            ctypes.c_size_t,
+        ]
+        memset_s.restype = ctypes.c_int
+        memset_s(ctypes.addressof(buf), len(data), 0, len(data))
+    else:  # Fallback to ctypes.memset
+        ctypes.memset(ctypes.addressof(buf), 0, len(data))
+
+    if hasattr(buf, "release"):
+        buf.release()
+
+
+def constant_time_compare(val1: bytes | bytearray, val2: bytes | bytearray) -> bool:
+    """Return ``True`` if ``val1`` equals ``val2`` using a timing-safe check."""
+
+    return hmac.compare_digest(bytes(val1), bytes(val2))
 
 
 def deprecated(message: str = "This function is deprecated."):
@@ -101,6 +127,12 @@ class KeyVault:
         """Zero the stored key on exit."""
         secure_zero(self._key)
         return False
+
+    def __del__(self):  # pragma: no cover - best effort cleanup
+        try:
+            secure_zero(self._key)
+        except Exception:
+            pass
 
 
 PrivateKeyTypes: TypeAlias = (
@@ -200,8 +232,8 @@ def encode_encrypted_message(
     message: EncryptedHybridMessage | Mapping[str, bytes | bytearray],
 ) -> str:
     """Convert a hybrid or Signal encrypted message into a Base64 string."""
-    import json
     import base64
+    import json
     from dataclasses import asdict, is_dataclass
 
     if is_dataclass(message):
@@ -224,8 +256,8 @@ def decode_encrypted_message(
     data: str,
 ) -> EncryptedHybridMessage | Mapping[str, bytes] | EncryptedMessage:
     """Parse a Base64 string produced by :func:`encode_encrypted_message`."""
-    import json
     import base64
+    import json
 
     json_bytes = base64.b64decode(data)
     parsed = json.loads(json_bytes.decode())

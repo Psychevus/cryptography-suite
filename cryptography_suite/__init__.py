@@ -12,12 +12,9 @@ from .errors import (
     SignatureVerificationError,
 )
 
-
 __version__ = "2.0.2"
 
-# Backend registry -----------------------------------------------------------------
-from .crypto_backends import available_backends, use_backend  # noqa: E402
-from .crypto_backends import pyca_backend  # noqa: F401  - registers default backend
+from .aead import chacha20_decrypt_aead, chacha20_encrypt_aead
 
 # Asymmetric primitives ------------------------------------------------------
 from .asymmetric import (
@@ -63,8 +60,11 @@ from .asymmetric.signatures import (
     verify_signature_ecdsa,
     verify_signature_ed448,
 )
-from .hybrid import hybrid_decrypt, hybrid_encrypt, HybridEncryptor
-from .aead import chacha20_encrypt_aead, chacha20_decrypt_aead
+
+# Backend registry -----------------------------------------------------------------
+from .crypto_backends import pyca_backend  # noqa: F401  - registers default backend
+from .crypto_backends import available_backends, use_backend  # noqa: E402
+from .hybrid import HybridEncryptor, hybrid_decrypt, hybrid_encrypt
 
 # Symmetric primitives -------------------------------------------------------
 from .symmetric import (
@@ -74,26 +74,26 @@ from .symmetric import (
     argon2_encrypt,
     chacha20_decrypt,
     chacha20_encrypt,
-    chacha20_stream_encrypt,
     chacha20_stream_decrypt,
-    xchacha_encrypt,
-    xchacha_decrypt,
-    encrypt_file_async,
-    decrypt_file_async,
+    chacha20_stream_encrypt,
     decrypt_file,
+    decrypt_file_async,
+    derive_hkdf,
     derive_key_argon2,
     derive_key_pbkdf2,
     derive_key_scrypt,
-    derive_hkdf,
-    kdf_pbkdf2,
     encrypt_file,
+    encrypt_file_async,
     generate_salt,
+    kdf_pbkdf2,
     pbkdf2_decrypt,
     pbkdf2_encrypt,
     scrypt_decrypt,
     scrypt_encrypt,
     verify_derived_key_pbkdf2,
     verify_derived_key_scrypt,
+    xchacha_decrypt,
+    xchacha_encrypt,
 )
 
 # Post-quantum cryptography --------------------------------------------------
@@ -104,8 +104,8 @@ try:  # pragma: no cover - optional dependency
         dilithium_sign,
         dilithium_verify,
         generate_dilithium_keypair,
-        generate_sphincs_keypair,
         generate_kyber_keypair,
+        generate_sphincs_keypair,
         kyber_decrypt,
         kyber_encrypt,
         sphincs_sign,
@@ -113,6 +113,8 @@ try:  # pragma: no cover - optional dependency
     )
 except Exception:  # pragma: no cover - fallback when pqcrypto is missing
     PQCRYPTO_AVAILABLE = False
+
+from .audit import audit_log, set_audit_logger
 
 # Hashing and utilities ------------------------------------------------------
 from .hashing import (
@@ -125,7 +127,9 @@ from .hashing import (
     sha384_hash,
     sha512_hash,
 )
+from .pipeline import Pipeline, PipelineVisualizer
 from .protocols import (
+    KeyManager,
     SignalReceiver,
     SignalSender,
     SPAKE2Client,
@@ -145,7 +149,6 @@ from .protocols import (
     secure_save_key_to_file,
     verify_hotp,
     verify_totp,
-    KeyManager,
 )
 
 # Core utilities -------------------------------------------------------------
@@ -153,17 +156,16 @@ from .utils import (
     KeyVault,
     base62_decode,
     base62_encode,
+    constant_time_compare,
+    decode_encrypted_message,
+    encode_encrypted_message,
+    from_pem,
     generate_secure_random_string,
+    pem_to_json,
     secure_zero,
     to_pem,
-    from_pem,
-    pem_to_json,
-    encode_encrypted_message,
-    decode_encrypted_message,
 )
-from .audit import audit_log, set_audit_logger
-from .x509 import generate_csr, self_sign_certificate, load_certificate
-from .pipeline import Pipeline, PipelineVisualizer
+from .x509 import generate_csr, load_certificate, self_sign_certificate
 
 # Optional homomorphic encryption -------------------------------------------
 try:  # pragma: no cover - optional dependency
@@ -304,6 +306,7 @@ __all__ = [
     "base62_encode",
     "base62_decode",
     "secure_zero",
+    "constant_time_compare",
     "generate_secure_random_string",
     "KeyVault",
     "to_pem",
