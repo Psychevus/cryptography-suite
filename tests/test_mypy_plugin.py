@@ -3,6 +3,7 @@ import sys
 
 import pytest
 
+pytest.importorskip("mypy")
 
 def run_mypy(path: str) -> subprocess.CompletedProcess:
     return subprocess.run(

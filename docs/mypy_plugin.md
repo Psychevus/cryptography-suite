@@ -23,5 +23,11 @@ You can run the check locally with:
 mypy examples/vulnerable.py
 ```
 
+Install the development extras to get ``mypy``:
+
+```bash
+pip install -e ".[dev]"
+```
+
 IDE integration works out of the box in PyCharm and VSCode when using the
 project's `setup.cfg`.

@@ -72,7 +72,7 @@ Clone the repository and install manually:
 git clone https://github.com/Psychevus/cryptography-suite.git
 cd cryptography-suite
 pip install .
-# Optional extras for development and PQC
+# Optional extras for development (pytest, mypy, etc.) and PQC
 pip install -e ".[dev,pqc]"
 ```
 

@@ -66,7 +66,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -e .
-          pip install pytest pytest-cov coverage
+          pip install pytest pytest-cov coverage mypy
       - name: Run Tests with Coverage
         run: |
           coverage run --rcfile=.coveragerc -m pytest
@@ -93,7 +93,7 @@ jobs:
           pip install -e .
           pip install pqcrypto pybulletproofs
           pip install Pyfhel || echo "⚠️ Pyfhel build failed"
-          pip install pytest pytest-cov coverage
+          pip install pytest pytest-cov coverage mypy
       - name: Run Extended Tests
         run: |
           coverage run --rcfile=.coveragerc -m pytest
