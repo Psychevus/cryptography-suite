@@ -237,6 +237,44 @@ def backends_cli(argv: list[str] | None = None) -> None:
             print(name)
 
 
+def keystore_cli(argv: list[str] | None = None) -> None:
+    """Manage registered keystores."""
+
+    from .keystores import load_plugins, list_keystores, get_keystore
+
+    parser = argparse.ArgumentParser(description="Keystore management")
+    sub = parser.add_subparsers(dest="action", required=True)
+    sub.add_parser("list", help="List available keystores")
+    sub.add_parser("test", help="Test keystore connectivity")
+    mig = sub.add_parser("migrate", help="Migrate keys between keystores")
+    mig.add_argument("--from", dest="src", required=True)
+    mig.add_argument("--to", dest="dst", required=True)
+    args = parser.parse_args(argv)
+
+    load_plugins()
+
+    if args.action == "list":
+        for name in list_keystores():
+            print(name)
+    elif args.action == "test":
+        for name in list_keystores():
+            cls = get_keystore(name)
+            try:
+                ok = cls().test_connection()
+            except Exception:
+                ok = False
+            print(f"{name}: {'ok' if ok else 'fail'}")
+    else:  # migrate
+        src_cls = get_keystore(args.src)
+        dst_cls = get_keystore(args.dst)
+        src = src_cls()
+        dst = dst_cls()
+        if hasattr(src, "export_all_to"):
+            src.export_all_to(dst)  # type: ignore[attr-defined]
+        else:
+            print(f"Migration from {args.src} to {args.dst} not implemented")
+
+
 def export_cli(argv: list[str] | None = None) -> None:
     """Export a pipeline definition to a formal verification model."""
 
@@ -355,6 +393,13 @@ def main(argv: list[str] | None = None) -> None:
     )
     back_parser.add_argument("action", choices=["list"], nargs="?")
 
+    ks_parser = sub.add_parser(
+        "keystore", help="Manage keystores", description=keystore_cli.__doc__
+    )
+    ks_parser.add_argument("action", choices=["list", "test", "migrate"])
+    ks_parser.add_argument("--from", dest="src")
+    ks_parser.add_argument("--to", dest="dst")
+
     args = parser.parse_args(argv)
 
     if args.cmd == "keygen":
@@ -378,6 +423,13 @@ def main(argv: list[str] | None = None) -> None:
         if args.output:
             argv2.extend(["--output", args.output])
         gen_cli(argv2)
+    elif args.cmd == "keystore":
+        argv2 = [args.action]
+        if args.src:
+            argv2.extend(["--from", args.src])
+        if args.dst:
+            argv2.extend(["--to", args.dst])
+        keystore_cli(argv2)
     elif args.cmd == "backends":
         action_args: list[str] = []
         if args.action:
