@@ -51,7 +51,7 @@ dependencies = [
 pqc = ["pqcrypto"]
 fhe = ["Pyfhel"]
 zk = ["pybulletproofs", "PySNARK"]
-dev = ["pytest", "pytest-cov", "coverage", "coveralls"]
+dev = ["pytest", "pytest-cov", "coverage", "coveralls", "mypy"]
 async = ["aiofiles"]
 docs = ["sphinx", "furo", "myst-parser", "sphinxcontrib-mermaid"]
 
@@ -70,7 +70,7 @@ license-files = ["LICENSE"]
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["cryptography_suite*"]
+include = ["cryptography_suite*", "tools*"]
 exclude = ["tests*", "docs*", "examples*", "demo*"]
 
 [tool.setuptools.package-data]
