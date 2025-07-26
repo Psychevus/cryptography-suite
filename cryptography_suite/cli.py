@@ -28,6 +28,7 @@ from .zk.bulletproof import (
     setup as bp_setup,
     BULLETPROOF_AVAILABLE,
 )
+from .crypto_backends import available_backends
 
 try:
     from . import zksnark
@@ -223,6 +224,19 @@ def otp_cli(argv: list[str] | None = None) -> None:
     print(code)
 
 
+def backends_cli(argv: list[str] | None = None) -> None:
+    """Manage registered crypto backends."""
+
+    parser = argparse.ArgumentParser(description="Backend management")
+    sub = parser.add_subparsers(dest="action", required=True)
+    sub.add_parser("list", help="List available backends")
+    args = parser.parse_args(argv)
+
+    if args.action == "list":
+        for name in available_backends():
+            print(name)
+
+
 def main(argv: list[str] | None = None) -> None:
     """Unified command line interface for the cryptography suite."""
 
@@ -266,6 +280,11 @@ def main(argv: list[str] | None = None) -> None:
         default="sha1",
     )
 
+    back_parser = sub.add_parser(
+        "backends", help="Manage crypto backends", description=backends_cli.__doc__
+    )
+    back_parser.add_argument("action", choices=["list"], nargs="?")
+
     args = parser.parse_args(argv)
 
     if args.cmd == "keygen":
@@ -279,6 +298,11 @@ def main(argv: list[str] | None = None) -> None:
         keygen_cli(argv2)
     elif args.cmd == "hash":
         hash_cli([args.file, f"--algorithm={args.algorithm}"])
+    elif args.cmd == "backends":
+        action_args: list[str] = []
+        if args.action:
+            action_args.append(args.action)
+        backends_cli(action_args)
     else:
         otp_cli(
             [
