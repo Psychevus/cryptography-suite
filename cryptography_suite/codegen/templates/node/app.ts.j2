@@ -1,0 +1,16 @@
+import express from 'express'
+import bodyParser from 'body-parser'
+
+const app = express()
+app.use(bodyParser.json())
+
+app.post('/run', (req, res) => {
+  let value = req.body.data as string
+{% for step in steps %}
+  // {{ step }}
+  value = {{ step }}(value)
+{% endfor %}
+  res.json({ result: value })
+})
+
+export default app

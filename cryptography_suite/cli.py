@@ -279,6 +279,20 @@ def export_cli(argv: list[str] | None = None) -> None:
         print(pipe.to_tamarin())
 
 
+def gen_cli(argv: list[str] | None = None) -> None:
+    """Generate application skeletons from a pipeline."""
+
+    parser = argparse.ArgumentParser(description=gen_cli.__doc__)
+    parser.add_argument("--target", choices=["fastapi", "flask", "node"], required=True)
+    parser.add_argument("--pipeline", required=True, help="Pipeline YAML file")
+    parser.add_argument("--output", help="Output directory")
+    args = parser.parse_args(argv)
+
+    from .codegen import generate
+
+    generate(args.target, args.pipeline, args.output)
+
+
 def main(argv: list[str] | None = None) -> None:
     """Unified command line interface for the cryptography suite."""
 
@@ -329,6 +343,13 @@ def main(argv: list[str] | None = None) -> None:
     export_parser.add_argument("--format", choices=["proverif", "tamarin"], default="proverif")
     export_parser.add_argument("--track", action="append", default=[], help="Secret names to monitor")
 
+    gen_parser = sub.add_parser(
+        "gen", help="Generate application skeleton", description=gen_cli.__doc__
+    )
+    gen_parser.add_argument("--target", choices=["fastapi", "flask", "node"], required=True)
+    gen_parser.add_argument("--pipeline", required=True)
+    gen_parser.add_argument("--output")
+
     back_parser = sub.add_parser(
         "backends", help="Manage crypto backends", description=backends_cli.__doc__
     )
@@ -352,6 +373,11 @@ def main(argv: list[str] | None = None) -> None:
         for sec in args.track:
             argv2.extend(["--track", sec])
         export_cli(argv2)
+    elif args.cmd == "gen":
+        argv2 = [f"--target={args.target}", f"--pipeline={args.pipeline}"]
+        if args.output:
+            argv2.extend(["--output", args.output])
+        gen_cli(argv2)
     elif args.cmd == "backends":
         action_args: list[str] = []
         if args.action:

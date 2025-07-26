@@ -1,0 +1,16 @@
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI(title="Crypto Pipeline")
+
+class Input(BaseModel):
+    data: str
+
+@app.post("/run")
+def run(data: Input):
+    value = data.data
+{% for step in steps %}
+    # {{ step }}
+    value = {{ step }}(value)
+{% endfor %}
+    return {"result": value}

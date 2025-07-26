@@ -46,6 +46,7 @@ dependencies = [
     "pynacl",
     "pycryptodome"
     , "PyYAML"
+    , "Jinja2"
 ]
 
 [project.optional-dependencies]
@@ -76,6 +77,7 @@ exclude = ["tests*", "docs*", "examples*", "demo*"]
 
 [tool.setuptools.package-data]
 "cryptography_suite" = ["py.typed"]
+"cryptography_suite.codegen" = ["templates/**"]
 
 [tool.black]
 line-length = 88
