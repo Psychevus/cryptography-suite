@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Security Notes" href="security.html" /><link rel="prev" title="Formal Verification Support" href="formal.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Misuse-Resistant Checking" href="mypy_plugin.html" /><link rel="prev" title="Pipeline API" href="pipeline.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
-        <title>Misuse-Resistant Checking - cryptography-suite 2.0.2 documentation</title>
+        <title>Formal Verification Support - cryptography-suite 2.0.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -202,8 +202,8 @@
 <li class="toctree-l1"><a class="reference internal" href="architecture.html">Package Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="protocols.html">Protocol Notes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline.html">Pipeline API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="formal.html">Formal Verification Support</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Misuse-Resistant Checking</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Formal Verification Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mypy_plugin.html">Misuse-Resistant Checking</a></li>
 <li class="toctree-l1"><a class="reference internal" href="security.html">Security Notes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/modules.html">API Reference</a></li>
 </ul>
@@ -226,7 +226,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="_sources/mypy_plugin.md.txt" title="View this page">
+  <a class="muted-link" href="_sources/formal.md.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -246,32 +246,31 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="misuse-resistant-checking">
-<h1>Misuse-Resistant Checking<a class="headerlink" href="#misuse-resistant-checking" title="Link to this heading">¶</a></h1>
-<p>The project ships with a custom <strong>mypy</strong> plugin that performs static
-analysis to detect insecure cryptographic API usage. The plugin runs as
-part of the type checking stage and will fail the build if dangerous
-patterns are found.</p>
-<p>Detected issues include:</p>
+          <section id="formal-verification-support">
+<h1>Formal Verification Support<a class="headerlink" href="#formal-verification-support" title="Link to this heading">¶</a></h1>
+<p>Pipelines can be exported to simple ProVerif or Tamarin models using the
+<code class="docutils literal notranslate"><span class="pre">export</span></code> CLI command. The exported files are intentionally lightweight and only
+capture the order of pipeline steps and any secrets you choose to track.
+They are suitable for quick syntax checking but <strong>do not</strong> automatically encode
+complex protocol semantics.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cryptography</span><span class="o">-</span><span class="n">suite</span> <span class="n">export</span> <span class="n">examples</span><span class="o">/</span><span class="n">formal</span><span class="o">/</span><span class="n">pipeline</span><span class="o">.</span><span class="n">yaml</span> <span class="o">--</span><span class="nb">format</span> <span class="n">proverif</span>
+</pre></div>
+</div>
+<p>Known limitations:</p>
 <ul class="simple">
-<li><p>Use of weak hash functions like <code class="docutils literal notranslate"><span class="pre">md5</span></code> or <code class="docutils literal notranslate"><span class="pre">sha1</span></code>.</p></li>
-<li><p>Creating AES ciphers in <code class="docutils literal notranslate"><span class="pre">ECB</span></code> mode.</p></li>
+<li><p>Only the names of pipeline modules are exported. No cryptographic operations
+are modeled beyond the provided stubs.</p></li>
+<li><p>Claims such as secrecy or authentication are not generated automatically.</p></li>
+<li><p>For anything more than syntax checking, you will need to edit the model
+manually.</p></li>
 </ul>
-<p>To enable the plugin manually add <code class="docutils literal notranslate"><span class="pre">tools.mypy_crypto_checker</span></code> to the
-<code class="docutils literal notranslate"><span class="pre">plugins</span></code> option in your <code class="docutils literal notranslate"><span class="pre">mypy</span></code> configuration. The repository has this
-enabled by default via <code class="docutils literal notranslate"><span class="pre">setup.cfg</span></code>.</p>
-<p>Code snippets that trigger the plugin can be found in
-<code class="docutils literal notranslate"><span class="pre">examples/vulnerable.py</span></code>.</p>
-<p>You can run the check locally with:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mypy<span class="w"> </span>examples/vulnerable.py
-</pre></div>
-</div>
-<p>Install the development extras to get <code class="docutils literal notranslate"><span class="pre">mypy</span></code>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[dev]&quot;</span>
-</pre></div>
-</div>
-<p>IDE integration works out of the box in PyCharm and VSCode when using the
-project’s <code class="docutils literal notranslate"><span class="pre">setup.cfg</span></code>.</p>
+<p>Typical queries you may want to add by hand include:</p>
+<ul class="simple">
+<li><p>confidentiality of generated keys or plaintexts</p></li>
+<li><p>authentication of communicating parties</p></li>
+<li><p>replay resistance</p></li>
+</ul>
 </section>
 
         </article>
@@ -279,23 +278,23 @@ project’s <code class="docutils literal notranslate"><span class="pre">setup.c
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="security.html">
+          <a class="next-page" href="mypy_plugin.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Security Notes</div>
+                <div class="title">Misuse-Resistant Checking</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="formal.html">
+          <a class="prev-page" href="pipeline.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Formal Verification Support</div>
+                <div class="title">Pipeline API</div>
                 
               </div>
             </a>
