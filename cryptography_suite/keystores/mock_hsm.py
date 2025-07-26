@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import List
 
 from . import register_keystore
-from .base import KeyStore
 from ..audit import audit_log
 
 

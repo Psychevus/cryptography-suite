@@ -29,7 +29,6 @@ from .zk.bulletproof import (
     BULLETPROOF_AVAILABLE,
 )
 from .crypto_backends import available_backends
-from .keystores import load_plugins  # ensure plugins can be loaded in CLI
 
 try:
     from . import zksnark

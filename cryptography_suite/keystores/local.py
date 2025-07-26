@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import List
 
 from . import register_keystore
-from .base import KeyStore
 from ..audit import audit_log
 from ..asymmetric import load_private_key, rsa_decrypt
 from ..asymmetric.signatures import sign_message

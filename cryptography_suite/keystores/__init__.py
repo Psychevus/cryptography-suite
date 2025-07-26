@@ -60,6 +60,7 @@ def load_plugins(directory: str | None = None) -> None:
     except Exception:
         pass
 
+
 __all__ = [
     "KeyStore",
     "register_keystore",
