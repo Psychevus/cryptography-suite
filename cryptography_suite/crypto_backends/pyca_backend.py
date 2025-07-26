@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Any
-
 from .abc import AEAD, KDF
 from . import register_backend
 from ..aead import chacha20_encrypt_aead, chacha20_decrypt_aead
@@ -46,4 +44,3 @@ class PyCABackend:
     def __init__(self) -> None:
         self.aead: AEAD = PyCABackend.AEADImpl()
         self.kdf: KDF = PyCABackend.KDFImpl()
-

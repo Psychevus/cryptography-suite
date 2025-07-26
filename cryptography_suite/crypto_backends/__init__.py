@@ -46,7 +46,7 @@ def get_backend() -> Any:
 
 
 # register built-in backends
-from . import pyca_backend  # noqa: F401
+from . import pyca_backend  # noqa: F401,E402
 
 __all__ = [
     "register_backend",
@@ -54,4 +54,3 @@ __all__ = [
     "use_backend",
     "get_backend",
 ]
-
