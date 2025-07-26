@@ -9,3 +9,4 @@ PyYAML
 rich
 ipywidgets
 networkx
+jinja2

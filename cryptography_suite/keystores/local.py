@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import List
+from typing import List, cast
 
 from . import register_keystore
 from ..audit import audit_log
-from ..asymmetric import load_private_key, rsa_decrypt
+from ..asymmetric import rsa_decrypt
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import ed25519, rsa
 from ..asymmetric.signatures import sign_message
 
 
@@ -31,8 +33,11 @@ class LocalKeyStore:
         if not key_path.exists():
             raise FileNotFoundError(key_path)
         with open(key_path, "rb") as f:
-            priv = load_private_key(f.read(), None)
-        return sign_message(data, priv, raw_output=True)
+            pem = f.read()
+            priv = cast(ed25519.Ed25519PrivateKey,
+                        serialization.load_pem_private_key(pem, password=None))
+        signature = cast(bytes, sign_message(data, priv, raw_output=True))
+        return signature
 
     @audit_log
     def decrypt(self, key_id: str, data: bytes) -> bytes:
@@ -40,7 +45,9 @@ class LocalKeyStore:
         if not key_path.exists():
             raise FileNotFoundError(key_path)
         with open(key_path, "rb") as f:
-            priv = load_private_key(f.read(), None)
+            pem = f.read()
+            priv = cast(rsa.RSAPrivateKey,
+                        serialization.load_pem_private_key(pem, password=None))
         return rsa_decrypt(data, priv)
 
     @audit_log
