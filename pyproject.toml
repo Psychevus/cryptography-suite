@@ -70,7 +70,7 @@ license-files = ["LICENSE"]
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["cryptography_suite*"]
+include = ["cryptography_suite*", "tools*"]
 exclude = ["tests*", "docs*", "examples*", "demo*"]
 
 [tool.setuptools.package-data]
