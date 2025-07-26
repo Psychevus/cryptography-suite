@@ -72,11 +72,13 @@ jobs:
           coverage run --rcfile=.coveragerc -m pytest
           coverage xml
       - name: Upload Coverage to Coveralls
-        run: coveralls report coverage.xml --format cobertura
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          COVERALLS_FLAG_NAME: OS-${{ matrix.os }}-py${{ matrix.python-version }}
-          COVERALLS_PARALLEL: true
+        uses: coverallsapp/github-action@v2.2.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          file: coverage.xml
+          format: cobertura
+          flag-name: OS-${{ matrix.os }}-py${{ matrix.python-version }}
+          parallel: true
 
   tests-extras:
     name: Tests (With Extras)
@@ -98,11 +100,13 @@ jobs:
           coverage run --rcfile=.coveragerc -m pytest
           coverage xml
       - name: Upload Extended Coverage to Coveralls
-        run: coveralls report coverage.xml --format cobertura
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          COVERALLS_FLAG_NAME: extras
-          COVERALLS_PARALLEL: true
+        uses: coverallsapp/github-action@v2.2.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          file: coverage.xml
+          format: cobertura
+          flag-name: extras
+          parallel: true
 
   coveralls:
     name: Finalize Coverage Merge
