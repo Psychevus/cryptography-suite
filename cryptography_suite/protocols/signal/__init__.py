@@ -7,9 +7,11 @@ from dataclasses import dataclass
 from typing import Tuple
 
 from cryptography.hazmat.primitives import hashes, hmac
-from cryptography.hazmat.primitives.asymmetric import x25519
+from cryptography.hazmat.primitives.asymmetric import x25519, ed25519
 from cryptography.hazmat.primitives import serialization
-from ...errors import ProtocolError
+from ...errors import ProtocolError, SignatureVerificationError
+from ...debug import verbose_print
+from ...asymmetric.signatures import sign_message, verify_signature
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 
@@ -55,13 +57,21 @@ def x3dh_initiator(
     eph_priv: x25519.X25519PrivateKey,
     peer_id_pub: x25519.X25519PublicKey,
     peer_prekey_pub: x25519.X25519PublicKey,
+    opk_priv: x25519.X25519PrivateKey | None = None,
 ) -> bytes:
     """Perform the initiator side of the X3DH key agreement."""
 
     dh1 = id_priv.exchange(peer_prekey_pub)
+    verbose_print(f"DH1: {dh1.hex()}")
     dh2 = eph_priv.exchange(peer_id_pub)
+    verbose_print(f"DH2: {dh2.hex()}")
     dh3 = eph_priv.exchange(peer_prekey_pub)
+    verbose_print(f"DH3: {dh3.hex()}")
     master = dh1 + dh2 + dh3
+    if opk_priv is not None:
+        dh4 = opk_priv.exchange(peer_id_pub)
+        verbose_print(f"DH4: {dh4.hex()}")
+        master += dh4
     return _hkdf(master, None, b"x3dh", 32)
 
 
@@ -70,13 +80,21 @@ def x3dh_responder(
     prekey_priv: x25519.X25519PrivateKey,
     peer_id_pub: x25519.X25519PublicKey,
     peer_eph_pub: x25519.X25519PublicKey,
+    peer_opk_pub: x25519.X25519PublicKey | None = None,
 ) -> bytes:
     """Perform the responder side of the X3DH key agreement."""
 
     dh1 = prekey_priv.exchange(peer_id_pub)
+    verbose_print(f"DH1: {dh1.hex()}")
     dh2 = id_priv.exchange(peer_eph_pub)
+    verbose_print(f"DH2: {dh2.hex()}")
     dh3 = prekey_priv.exchange(peer_eph_pub)
+    verbose_print(f"DH3: {dh3.hex()}")
     master = dh1 + dh2 + dh3
+    if peer_opk_pub is not None:
+        dh4 = id_priv.exchange(peer_opk_pub)
+        verbose_print(f"DH4: {dh4.hex()}")
+        master += dh4
     return _hkdf(master, None, b"x3dh", 32)
 
 
@@ -168,28 +186,73 @@ class SignalSender:
         identity_priv: x25519.X25519PrivateKey,
         peer_identity_pub: x25519.X25519PublicKey,
         peer_prekey_pub: x25519.X25519PublicKey,
+        *,
+        use_one_time_prekey: bool = False,
     ) -> None:
         self.identity_priv = identity_priv
         self.identity_pub = identity_priv.public_key()
         self.ephemeral_priv = x25519.X25519PrivateKey.generate()
+        self.signed_prekey_priv = x25519.X25519PrivateKey.generate()
+        self.one_time_priv = x25519.X25519PrivateKey.generate() if use_one_time_prekey else None
+        sign_key = ed25519.Ed25519PrivateKey.from_private_bytes(
+            self.identity_priv.private_bytes(
+                encoding=serialization.Encoding.Raw,
+                format=serialization.PrivateFormat.Raw,
+                encryption_algorithm=serialization.NoEncryption(),
+            )
+        )
+        self.sign_pub = sign_key.public_key()
+        self.signed_prekey_sig = sign_message(
+            self.signed_prekey_priv.public_key().public_bytes(
+                encoding=serialization.Encoding.Raw,
+                format=serialization.PublicFormat.Raw,
+            ),
+            sign_key,
+            raw_output=True,
+        )
         root = x3dh_initiator(
             self.identity_priv,
             self.ephemeral_priv,
             peer_identity_pub,
             peer_prekey_pub,
+            self.one_time_priv,
         )
         self.ratchet = DoubleRatchet(root, self.ephemeral_priv, peer_prekey_pub, True)
 
     @property
-    def handshake_public(self) -> Tuple[bytes, bytes]:
-        """Return identity and ephemeral public bytes for the handshake."""
+    def handshake_public(self) -> Tuple[bytes, bytes, bytes, bytes, bytes | None, bytes]:
+        """Return all public handshake bytes including signatures."""
 
+        return self.handshake_bundle
+
+    @property
+    def handshake_bundle(self) -> Tuple[bytes, bytes, bytes, bytes, bytes | None, bytes]:
+        """Return all public handshake data including signatures."""
+
+        opk = (
+            self.one_time_priv.public_key().public_bytes(
+                encoding=serialization.Encoding.Raw,
+                format=serialization.PublicFormat.Raw,
+            )
+            if self.one_time_priv
+            else None
+        )
         return (
             self.identity_pub.public_bytes(
                 encoding=serialization.Encoding.Raw,
                 format=serialization.PublicFormat.Raw,
             ),
             self.ephemeral_priv.public_key().public_bytes(
+                encoding=serialization.Encoding.Raw,
+                format=serialization.PublicFormat.Raw,
+            ),
+            self.signed_prekey_priv.public_key().public_bytes(
+                encoding=serialization.Encoding.Raw,
+                format=serialization.PublicFormat.Raw,
+            ),
+            self.signed_prekey_sig,
+            opk,
+            self.sign_pub.public_bytes(
                 encoding=serialization.Encoding.Raw,
                 format=serialization.PublicFormat.Raw,
             ),
@@ -232,13 +295,34 @@ class SignalReceiver:
         )
 
     def initialize_session(
-        self, sender_identity_pub: bytes, sender_eph_pub: bytes
+        self,
+        sender_identity_pub: bytes,
+        sender_eph_pub: bytes,
+        sender_signed_prekey: bytes,
+        prekey_signature: bytes,
+        sender_one_time_prekey: bytes | None = None,
+        sender_signing_pub: bytes = b"",
     ) -> None:
         """Complete the handshake using the sender's public keys."""
 
+        id_verify = ed25519.Ed25519PublicKey.from_public_bytes(sender_signing_pub or sender_identity_pub)
+        if not verify_signature(sender_signed_prekey, prekey_signature, id_verify):
+            raise SignatureVerificationError("Invalid signed_prekey signature")
+
         sid_pub = x25519.X25519PublicKey.from_public_bytes(sender_identity_pub)
         seph_pub = x25519.X25519PublicKey.from_public_bytes(sender_eph_pub)
-        root = x3dh_responder(self.identity_priv, self.prekey_priv, sid_pub, seph_pub)
+        opk_pub = (
+            x25519.X25519PublicKey.from_public_bytes(sender_one_time_prekey)
+            if sender_one_time_prekey
+            else None
+        )
+        root = x3dh_responder(
+            self.identity_priv,
+            self.prekey_priv,
+            sid_pub,
+            seph_pub,
+            opk_pub,
+        )
         self.ratchet = DoubleRatchet(root, self.prekey_priv, seph_pub, False)
 
     def encrypt(self, plaintext: bytes) -> EncryptedMessage:
@@ -256,7 +340,7 @@ class SignalReceiver:
         return self.ratchet.decrypt(message)
 
 
-def initialize_signal_session() -> Tuple[SignalSender, SignalReceiver]:
+def initialize_signal_session(*, use_one_time_prekey: bool = False) -> Tuple[SignalSender, SignalReceiver]:
     """Convenience function to create two parties with a shared session."""
 
     sender_id_priv = x25519.X25519PrivateKey.generate()
@@ -266,6 +350,7 @@ def initialize_signal_session() -> Tuple[SignalSender, SignalReceiver]:
         sender_id_priv,
         x25519.X25519PublicKey.from_public_bytes(receiver.public_bundle[0]),
         x25519.X25519PublicKey.from_public_bytes(receiver.public_bundle[1]),
+        use_one_time_prekey=use_one_time_prekey,
     )
-    receiver.initialize_session(*sender.handshake_public)
+    receiver.initialize_session(*sender.handshake_bundle)
     return sender, receiver
