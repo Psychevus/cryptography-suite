@@ -76,6 +76,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           file: coverage.xml
+          format: cobertura
           flag-name: OS-${{ matrix.os }}-py${{ matrix.python-version }}
           parallel: true
 
@@ -103,6 +104,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           file: coverage.xml
+          format: cobertura
           flag-name: extras
           parallel: true
 
