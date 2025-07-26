@@ -163,6 +163,7 @@ from .utils import (
 )
 from .audit import audit_log, set_audit_logger
 from .x509 import generate_csr, self_sign_certificate, load_certificate
+from .pipeline import Pipeline, PipelineVisualizer
 
 # Optional homomorphic encryption -------------------------------------------
 try:  # pragma: no cover - optional dependency
@@ -314,6 +315,8 @@ __all__ = [
     "generate_csr",
     "self_sign_certificate",
     "load_certificate",
+    "Pipeline",
+    "PipelineVisualizer",
     "audit_log",
     "set_audit_logger",
     # Signal Protocol

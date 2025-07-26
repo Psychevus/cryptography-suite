@@ -18,6 +18,7 @@ documentation for details.
 
    architecture.md
    protocols.md
+   pipeline.md
    security.rst
    api/modules
 
