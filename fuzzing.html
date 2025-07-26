@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Protocol Notes" href="protocols.html" /><link rel="prev" title="cryptography-suite documentation" href="index.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Misuse-Resistant Checking" href="mypy_plugin.html" /><link rel="prev" title="Formal Verification Support" href="formal.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
-        <title>Package Architecture - cryptography-suite 2.0.2 documentation</title>
+        <title>Fuzzing and Property Testing - cryptography-suite 2.0.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -178,7 +178,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -199,11 +199,11 @@
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Package Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Package Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="protocols.html">Protocol Notes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline.html">Pipeline API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="formal.html">Formal Verification Support</a></li>
-<li class="toctree-l1"><a class="reference internal" href="fuzzing.html">Fuzzing and Property Testing</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Fuzzing and Property Testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mypy_plugin.html">Misuse-Resistant Checking</a></li>
 <li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="security.html">Security Notes</a></li>
@@ -228,7 +228,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="_sources/architecture.md.txt" title="View this page">
+  <a class="muted-link" href="_sources/fuzzing.md.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -242,32 +242,32 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="package-architecture">
-<h1>Package Architecture<a class="headerlink" href="#package-architecture" title="Link to this heading">¶</a></h1>
-<div class="highlight-mermaid notranslate"><div class="highlight"><pre><span></span>graph TD
-    CS[cryptography_suite]
-    CS --&gt; asymmetric
-    CS --&gt; symmetric
-    CS --&gt; hashing
-    CS --&gt; pqc
-    CS --&gt; protocols
-    CS --&gt; zk
-    CS --&gt; utils
-    CS --&gt; x509
-    CS --&gt; hybrid
-    protocols --&gt; key_management
-    protocols --&gt; otp
-    protocols --&gt; pake
-    protocols --&gt; secret_sharing
-    protocols --&gt; signal
+          <section id="fuzzing-and-property-testing">
+<h1>Fuzzing and Property Testing<a class="headerlink" href="#fuzzing-and-property-testing" title="Link to this heading">¶</a></h1>
+<p>This project includes fuzzing harnesses powered by <a class="reference external" href="https://github.com/google/atheris">Google Atheris</a> and property-based tests built with <a class="reference external" href="https://hypothesis.readthedocs.io/">Hypothesis</a>.</p>
+<section id="local-usage">
+<h2>Local Usage<a class="headerlink" href="#local-usage" title="Link to this heading">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="o">[</span>dev<span class="o">]</span>
+cryptosuite-fuzz<span class="w"> </span>--runs<span class="w"> </span><span class="m">500</span>
 </pre></div>
 </div>
+<p>Use <code class="docutils literal notranslate"><span class="pre">--pipeline</span> <span class="pre">pipeline.yaml</span></code> to fuzz a custom pipeline.</p>
+</section>
+<section id="continuous-integration">
+<h2>Continuous Integration<a class="headerlink" href="#continuous-integration" title="Link to this heading">¶</a></h2>
+<p>GitHub Actions runs the fuzzing harness weekly and on demand. Crashes are stored as workflow artifacts for regression checking.</p>
+<p>Coverage from fuzzing is merged with the standard coverage report when possible.</p>
+</section>
+<section id="limitations">
+<h2>Limitations<a class="headerlink" href="#limitations" title="Link to this heading">¶</a></h2>
+<p>Argon2-based functionality is skipped when the underlying cryptography backend does not provide Argon2.</p>
+</section>
 </section>
 
         </article>
@@ -275,23 +275,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="protocols.html">
+          <a class="next-page" href="mypy_plugin.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Protocol Notes</div>
+                <div class="title">Misuse-Resistant Checking</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="index.html">
+          <a class="prev-page" href="formal.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Home</div>
+                <div class="title">Formal Verification Support</div>
                 
               </div>
             </a>
@@ -313,8 +313,29 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Fuzzing and Property Testing</a><ul>
+<li><a class="reference internal" href="#local-usage">Local Usage</a></li>
+<li><a class="reference internal" href="#continuous-integration">Continuous Integration</a></li>
+<li><a class="reference internal" href="#limitations">Limitations</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
