@@ -53,7 +53,7 @@ dependencies = [
 pqc = ["pqcrypto"]
 fhe = ["Pyfhel"]
 zk = ["pybulletproofs", "PySNARK"]
-dev = ["pytest", "pytest-cov", "coverage", "coveralls", "mypy"]
+dev = ["pytest", "pytest-cov", "coverage", "coveralls", "mypy", "types-PyYAML"]
 async = ["aiofiles"]
 docs = ["sphinx", "furo", "myst-parser", "sphinxcontrib-mermaid"]
 
