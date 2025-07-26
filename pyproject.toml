@@ -45,6 +45,7 @@ dependencies = [
     "blake3",
     "pynacl",
     "pycryptodome"
+    , "PyYAML"
 ]
 
 [project.optional-dependencies]

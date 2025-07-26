@@ -1,0 +1,24 @@
+name: Formal Model
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  export-models:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install package
+        run: |
+          python -m pip install --upgrade pip
+          pip install . PyYAML
+      - name: Run export
+        run: |
+          cryptography-suite export examples/formal/pipeline.yaml --format proverif > /dev/null
+          cryptography-suite export examples/formal/pipeline.yaml --format tamarin > /dev/null
