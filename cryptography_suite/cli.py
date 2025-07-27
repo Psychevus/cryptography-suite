@@ -283,7 +283,9 @@ def export_cli(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description=export_cli.__doc__)
     parser.add_argument("pipeline", help="Path to pipeline YAML file")
     parser.add_argument("--format", choices=["proverif", "tamarin"], default="proverif")
-    parser.add_argument("--track", action="append", default=[], help="Secret names to monitor")
+    parser.add_argument(
+        "--track", action="append", default=[], help="Secret names to monitor"
+    )
     args = parser.parse_args(argv)
 
     import yaml  # type: ignore
@@ -307,8 +309,7 @@ def export_cli(argv: list[str] | None = None) -> None:
         config = yaml.safe_load(f) or []
 
     modules: list[CryptoModule[Any, Any]] = [
-        Stub(item["module"] if isinstance(item, dict) else str(item))
-        for item in config
+        Stub(item["module"] if isinstance(item, dict) else str(item)) for item in config
     ]
     pipe: Pipeline[Any, Any] = Pipeline(modules)
     for name in args.track:
@@ -395,13 +396,19 @@ def main(argv: list[str] | None = None) -> None:
         "export", help="Export pipeline", description=export_cli.__doc__
     )
     export_parser.add_argument("pipeline")
-    export_parser.add_argument("--format", choices=["proverif", "tamarin"], default="proverif")
-    export_parser.add_argument("--track", action="append", default=[], help="Secret names to monitor")
+    export_parser.add_argument(
+        "--format", choices=["proverif", "tamarin"], default="proverif"
+    )
+    export_parser.add_argument(
+        "--track", action="append", default=[], help="Secret names to monitor"
+    )
 
     gen_parser = sub.add_parser(
         "gen", help="Generate application skeleton", description=gen_cli.__doc__
     )
-    gen_parser.add_argument("--target", choices=["fastapi", "flask", "node"], required=True)
+    gen_parser.add_argument(
+        "--target", choices=["fastapi", "flask", "node"], required=True
+    )
     gen_parser.add_argument("--pipeline", required=True)
     gen_parser.add_argument("--output")
 
@@ -422,6 +429,40 @@ def main(argv: list[str] | None = None) -> None:
     ks_parser.add_argument("action", choices=["list", "test", "migrate"])
     ks_parser.add_argument("--from", dest="src")
     ks_parser.add_argument("--to", dest="dst")
+
+    # File operations subcommand
+    file_parser = sub.add_parser(
+        "file",
+        help="Encrypt or decrypt files",
+        description=file_cli.__doc__,
+    )
+    file_sub = file_parser.add_subparsers(dest="file_cmd", required=True)
+    f_enc = file_sub.add_parser("encrypt", help="Encrypt a file")
+    f_enc.add_argument("--in", dest="input_file", required=True)
+    f_enc.add_argument("--out", dest="output_file", required=True)
+    f_enc.add_argument("--password", required=True)
+    f_dec = file_sub.add_parser("decrypt", help="Decrypt a file")
+    f_dec.add_argument("--in", dest="input_file", required=True)
+    f_dec.add_argument("--out", dest="output_file", required=True)
+    f_dec.add_argument("--password", required=True)
+
+    # Backward compatibility aliases
+    enc_alias = sub.add_parser(
+        "encrypt",
+        help=argparse.SUPPRESS,
+        description="Alias for 'file encrypt'",
+    )
+    enc_alias.add_argument("--in", dest="input_file", required=True)
+    enc_alias.add_argument("--out", dest="output_file", required=True)
+    enc_alias.add_argument("--password", required=True)
+    dec_alias = sub.add_parser(
+        "decrypt",
+        help=argparse.SUPPRESS,
+        description="Alias for 'file decrypt'",
+    )
+    dec_alias.add_argument("--in", dest="input_file", required=True)
+    dec_alias.add_argument("--out", dest="output_file", required=True)
+    dec_alias.add_argument("--password", required=True)
 
     args = parser.parse_args(argv)
 
@@ -453,6 +494,21 @@ def main(argv: list[str] | None = None) -> None:
         if args.dst:
             argv2.extend(["--to", args.dst])
         keystore_cli(argv2)
+    elif args.cmd in ("file", "encrypt", "decrypt"):
+        if args.cmd == "file":
+            mode = args.file_cmd
+        else:
+            mode = args.cmd
+        argv2 = [
+            mode,
+            "--in",
+            args.input_file,
+            "--out",
+            args.output_file,
+            "--password",
+            args.password,
+        ]
+        file_cli(argv2)
     elif args.cmd == "backends":
         action_args: list[str] = []
         if args.action:
