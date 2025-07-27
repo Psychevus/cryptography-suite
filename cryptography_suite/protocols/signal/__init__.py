@@ -9,9 +9,9 @@ from typing import Tuple
 from cryptography.hazmat.primitives import hashes, hmac
 from cryptography.hazmat.primitives.asymmetric import x25519, ed25519
 from cryptography.hazmat.primitives import serialization
-from ...errors import ProtocolError, SignatureVerificationError
+from ...errors import ProtocolError
 from ...debug import verbose_print
-from ...asymmetric.signatures import sign_message, verify_signature
+from ...asymmetric.signatures import sign_message
 from .init_session import verify_signed_prekey
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
