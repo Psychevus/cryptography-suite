@@ -22,6 +22,8 @@ documentation for details.
    formal.md
    fuzzing.md
    mypy_plugin.md
+   release_process.md
+   threat_model.md
    visualization.md
    security.rst
    api/modules

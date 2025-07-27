@@ -8,6 +8,8 @@
 [![PyPI Downloads](https://img.shields.io/pypi/dm/cryptography-suite)](https://pypi.org/project/cryptography-suite/)
 [![Build Status](https://github.com/Psychevus/cryptography-suite/actions/workflows/python-app.yml/badge.svg)](https://github.com/Psychevus/cryptography-suite/actions)
 [![Coverage Status](https://coveralls.io/repos/github/Psychevus/cryptography-suite/badge.svg?branch=main)](https://coveralls.io/github/Psychevus/cryptography-suite?branch=main)
+[![Provenance](https://img.shields.io/badge/provenance-signed-blue)](docs/release_process.md)
+[![Signed Releases](https://img.shields.io/badge/releases-signed-brightgreen)](docs/release_process.md)
 [![Fuzzed & Property-Tested](https://img.shields.io/badge/fuzzed--property--tested-true-brightgreen)](docs/fuzzing.md)
 [![Misuse-Resistant](https://img.shields.io/badge/misuse--resistant-enabled-success)](docs/mypy_plugin.md)
 [![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.md)
@@ -568,6 +570,16 @@ from my_hsm_wrapper import load_rsa_private_key
 private_key = load_rsa_private_key("enterprise-key-id")
 plaintext = rsa_decrypt(ciphertext, private_key)
 ```
+
+---
+
+## 🔐 Supply Chain Security
+
+This project provides deterministic builds and signed release artifacts.
+Every GitHub release includes a CycloneDX SBOM and a `cosign` signature.
+Reproducibility is tested in CI via `reproducibility.yml`. See
+[release process documentation](docs/release_process.md) for details on
+verifying artifacts with `tools/verify_artifact.py`.
 
 ---
 

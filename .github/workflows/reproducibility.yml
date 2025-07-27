@@ -1,0 +1,30 @@
+name: Reproducible Build
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install build tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install build
+      - name: Build once
+        run: |
+          python tools/reproducible_build.py
+          sha256sum dist/* > hash1.txt
+      - name: Clean and build again
+        run: |
+          rm -rf dist
+          python tools/reproducible_build.py
+          sha256sum dist/* > hash2.txt
+      - name: Compare hashes
+        run: diff -u hash1.txt hash2.txt
