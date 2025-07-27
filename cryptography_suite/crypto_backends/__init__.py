@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from typing import Callable, Dict, Type, Optional, Any
+import warnings
 
 
 _backend_registry: Dict[str, Type[Any]] = {}
@@ -24,13 +25,32 @@ def available_backends() -> list[str]:
 
 
 def use_backend(name: str) -> None:
-    """Select the backend to use at runtime."""
+    """Select the backend to use at runtime.
+
+    Example
+    -------
+
+    >>> from cryptography_suite.crypto_backends import use_backend
+    >>> use_backend("pyca")
+    >>> use_backend("sodium")  # doctest: +SKIP
+    >>> use_backend("rust")    # doctest: +SKIP
+    """
     global _current_backend
     try:
         backend_cls = _backend_registry[name]
     except KeyError as exc:  # pragma: no cover - defensive
         raise ValueError(f"Unknown backend: {name}") from exc
     _current_backend = backend_cls()
+
+
+def select_backend(name: str) -> None:
+    """Deprecated alias for :func:`use_backend`."""
+    warnings.warn(
+        "select_backend is deprecated; use use_backend instead",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    use_backend(name)
 
 
 def get_backend() -> Any:
@@ -52,5 +72,6 @@ __all__ = [
     "register_backend",
     "available_backends",
     "use_backend",
+    "select_backend",
     "get_backend",
 ]
