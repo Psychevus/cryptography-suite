@@ -12,6 +12,7 @@ from cryptography.hazmat.primitives import serialization
 from ...errors import ProtocolError, SignatureVerificationError
 from ...debug import verbose_print
 from ...asymmetric.signatures import sign_message, verify_signature
+from .init_session import verify_signed_prekey
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 
@@ -305,9 +306,10 @@ class SignalReceiver:
     ) -> None:
         """Complete the handshake using the sender's public keys."""
 
-        id_verify = ed25519.Ed25519PublicKey.from_public_bytes(sender_signing_pub or sender_identity_pub)
-        if not verify_signature(sender_signed_prekey, prekey_signature, id_verify):
-            raise SignatureVerificationError("Invalid signed_prekey signature")
+        id_verify = ed25519.Ed25519PublicKey.from_public_bytes(
+            sender_signing_pub or sender_identity_pub
+        )
+        verify_signed_prekey(sender_signed_prekey, prekey_signature, id_verify)
 
         sid_pub = x25519.X25519PublicKey.from_public_bytes(sender_identity_pub)
         seph_pub = x25519.X25519PublicKey.from_public_bytes(sender_eph_pub)
