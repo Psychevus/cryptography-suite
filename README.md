@@ -3,7 +3,7 @@
 [![Python Version](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-macOS%20|%20Linux%20|%20Windows-informational)]()
-[![Version](https://img.shields.io/badge/version-2.0.1-blue)](https://github.com/Psychevus/cryptography-suite/releases/tag/v2.0.1)
+[![Version](https://img.shields.io/badge/version-3.0.0-blue)](https://github.com/Psychevus/cryptography-suite/releases/tag/v3.0.0)
 [![PyPI Version](https://img.shields.io/pypi/v/cryptography-suite)](https://pypi.org/project/cryptography-suite/)
 [![PyPI Downloads](https://img.shields.io/pypi/dm/cryptography-suite)](https://pypi.org/project/cryptography-suite/)
 [![Build Status](https://github.com/Psychevus/cryptography-suite/actions/workflows/python-app.yml/badge.svg)](https://github.com/Psychevus/cryptography-suite/actions)
@@ -31,6 +31,55 @@
 - **Rigorous Testing**: Achieves **99% code coverage** with a comprehensive test suite, guaranteeing reliability and robustness.
 
 ---
+
+## ✨ Version 3.0.0 Highlights
+
+Version 3.0.0 ushers in a modular design centered on formal verification and
+pipeline-driven workflows. Major enhancements include:
+
+- **Backend-Agnostic Core** – switch effortlessly between cryptographic
+  libraries or hardware modules.
+- **Declarative Pipeline DSL** for composing verifiable workflows.
+- **Misuse-Resistant Type System** via a dedicated mypy plugin.
+- **Automatic Zeroization & Constant-Time Operations** to protect secrets in
+  memory.
+- **Formal Verification Export** to ProVerif and Tamarin for rigorous analysis.
+- **Stub Generator** to scaffold new applications and services.
+- **Rich Logging, Progress Bars & Interactive Widgets** for real-time insight.
+- **Extensible Plugin Architecture** for HSM and cloud KMS providers.
+- **Integrated Fuzzing Harness** with deterministic seeds.
+- **Supply-Chain Attestation** delivering SLSA-compliant releases.
+- **Pipeline Visualizer** for quick ASCII diagrams of your workflow.
+
+Example pipeline configuration:
+
+```python
+from cryptography_suite import select_backend
+from cryptography_suite.crypto_backends import cryptography_backend
+from cryptography_suite.pipeline import Pipeline, AESGCMEncrypt, AESGCMDecrypt
+
+select_backend(cryptography_backend())
+
+p = Pipeline() >> AESGCMEncrypt(password="pass") >> AESGCMDecrypt(password="pass")
+assert p.run(b"data") == b"data"
+```
+
+Visualize and export the pipeline:
+
+```python
+from cryptography_suite.pipeline import PipelineVisualizer
+
+viz = PipelineVisualizer(p)
+print(viz.render_ascii())  # AESGCMEncrypt -> AESGCMDecrypt
+print(p.to_proverif())    # formal model output
+```
+
+## ✨ Version 2.0.2 Highlights
+
+- **Signed Prekey Verification** ensures X3DH session setup fails when the
+  sender's prekey signature is invalid.
+- **Optional One-Time Prekeys** can be mixed into the shared secret for extra
+  forward secrecy.
 
 ## ✨ Version 2.0.1 Highlights
 
@@ -643,6 +692,16 @@ cryptography-suite/
   The standalone ``generate_rsa_keypair_and_save`` helper is deprecated.
 - **KDF Naming**: ``derive_pbkdf2`` has been renamed to ``kdf_pbkdf2`` and the old
   name is deprecated.
+
+## 🛤 Migration Guide from v2.x to v3.0.0
+
+Version 3.0.0 introduces several breaking changes. To upgrade from 2.x:
+
+- **Backend Selection Required** via ``select_backend``.
+- **Pipeline API** replaces chained helper calls.
+- **KeyManager Interfaces Updated** for persistent key handling.
+- **Deprecated Helpers Removed** in favor of pipeline stages.
+- See [migration_3.0.md](docs/migration_3.0.md) for full details.
 
 ---
 
