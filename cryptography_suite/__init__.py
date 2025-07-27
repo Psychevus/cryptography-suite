@@ -63,7 +63,7 @@ from .asymmetric.signatures import (
 
 # Backend registry -----------------------------------------------------------------
 from .crypto_backends import pyca_backend  # noqa: F401  - registers default backend
-from .crypto_backends import available_backends, use_backend  # noqa: E402
+from .crypto_backends import available_backends, use_backend, select_backend  # noqa: E402
 from .hybrid import HybridEncryptor, hybrid_decrypt, hybrid_encrypt
 
 # Symmetric primitives -------------------------------------------------------
@@ -342,6 +342,7 @@ __all__ = [
     "ProtocolError",
     "available_backends",
     "use_backend",
+    "select_backend",
 ]
 
 # Conditional exports -------------------------------------------------------

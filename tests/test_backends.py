@@ -1,4 +1,5 @@
 import importlib
+import pytest
 
 import cryptography_suite.crypto_backends as backends
 import cryptography_suite.crypto_backends.pyca_backend as pyca_backend
@@ -18,4 +19,15 @@ def test_use_backend_runtime_switch():
     b = backends.get_backend()
     assert isinstance(b, Dummy)
     assert b.value == 1
+    backends.use_backend("pyca")
+
+
+def test_select_backend_alias():
+    class Dummy2:
+        pass
+
+    backends.register_backend("dummy2")(Dummy2)
+    with pytest.deprecated_call():
+        backends.select_backend("dummy2")
+    assert isinstance(backends.get_backend(), Dummy2)
     backends.use_backend("pyca")

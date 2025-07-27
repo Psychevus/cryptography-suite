@@ -54,11 +54,10 @@ pipeline-driven workflows. Major enhancements include:
 Example pipeline configuration:
 
 ```python
-from cryptography_suite import select_backend
-from cryptography_suite.crypto_backends import cryptography_backend
+from cryptography_suite import use_backend
 from cryptography_suite.pipeline import Pipeline, AESGCMEncrypt, AESGCMDecrypt
 
-select_backend(cryptography_backend())
+use_backend("pyca")
 
 p = Pipeline() >> AESGCMEncrypt(password="pass") >> AESGCMDecrypt(password="pass")
 assert p.run(b"data") == b"data"
@@ -697,7 +696,7 @@ cryptography-suite/
 
 Version 3.0.0 introduces several breaking changes. To upgrade from 2.x:
 
-- **Backend Selection Required** via ``select_backend``.
+- **Backend Selection Required** via ``use_backend``.
 - **Pipeline API** replaces chained helper calls.
 - **KeyManager Interfaces Updated** for persistent key handling.
 - **Deprecated Helpers Removed** in favor of pipeline stages.
