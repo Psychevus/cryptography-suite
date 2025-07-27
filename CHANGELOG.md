@@ -6,6 +6,44 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 ## [Unreleased]
 
+## [3.0.0] - 2025-08-30
+### Major Changes
+- Backend-Agnostic Core (Crypto Abstraction Layer)
+- Pipeline DSL for Crypto Workflows
+- Misuse-Resistant API (mypy plugin)
+- Zeroization & Constant-Time Guarantees
+- Formal Verification Export (ProVerif/Tamarin)
+- Auto-Stub Generator for App Skeletons
+- Rich Logging & Jupyter Widgets for Visualization
+- HSM, YubiKey, PKCS#11, Cloud KMS Plugin Architecture
+- Fuzzing Harness & Property-Based Testing
+- Supply-Chain Attestation, SLSA, and Reproducible Builds
+
+### Breaking Changes
+- Old helper modules removed in favor of the Pipeline API.
+- Explicit backend selection required.
+
+### Added
+- New plugin system for hardware and cloud key managers.
+- Stubs generator for application scaffolding.
+
+### Changed
+- Documentation reorganized; see [Migration Guide](docs/migration_3.0.md).
+
+### Deprecated
+- Direct calls to legacy encrypt/decrypt helpers.
+
+### Removed
+- Deprecated functions from the 2.x series.
+
+### Security
+- Strengthened zeroization and constant-time operations.
+
+### Fixed
+- Miscellaneous bugs resolved during refactor.
+
+[Full changelog](https://github.com/Psychevus/cryptography-suite/releases/tag/v3.0.0).
+
 ## [2.0.2] - 2025-07-26
 ### Fixed
 - Verified `signed_prekey` during X3DH session initiation for receiver-side validation.
