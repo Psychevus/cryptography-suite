@@ -1,3 +1,23 @@
+# Release Notes - Cryptography Suite 3.0.0
+
+Cryptography Suite 3.0.0 introduces a backend-agnostic core and a new pipeline
+framework.
+
+## Highlights
+
+- Backend-agnostic Crypto Abstraction Layer
+- Pipeline DSL for building workflows
+- Misuse-resistant API with a mypy plugin
+- Zeroization and constant-time safety guarantees
+- Formal verification export tools
+- Automatic stub generator for new applications
+- Rich logging and interactive widgets
+- Plugin architecture for HSM and cloud KMS
+- Integrated fuzzing harness
+- Supply-chain attestation and reproducible builds
+
+---
+
 # Release Notes - Cryptography Suite 2.0.2
 
 Cryptography Suite 2.0.2 introduces improvements to the X3DH key agreement.
