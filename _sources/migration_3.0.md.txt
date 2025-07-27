@@ -6,8 +6,8 @@ accordingly.
 
 ## Breaking Changes
 
-- **Backend Selection** is now mandatory via `select_backend`. The default
-  `cryptography` backend can be enabled with `select_backend(cryptography_backend())`.
+- **Backend Selection** is now mandatory via `use_backend`. The default
+  `cryptography` backend can be enabled with `use_backend("pyca")`.
 - **Pipeline API** replaces ad-hoc helper chains. Compose operations using the
   `Pipeline` class.
 - **Key Management Interfaces** have changed. Use `KeyManager` for all
@@ -25,11 +25,10 @@ accordingly.
 ## Example
 
 ```python
-from cryptography_suite import Pipeline, select_backend
-from cryptography_suite.crypto_backends import cryptography_backend
+from cryptography_suite import Pipeline, use_backend
 from cryptography_suite.pipeline import AESGCMEncrypt, AESGCMDecrypt
 
-select_backend(cryptography_backend())
+use_backend("pyca")
 
 encrypt = AESGCMEncrypt(password="pass")
 decrypt = AESGCMDecrypt(password="pass")

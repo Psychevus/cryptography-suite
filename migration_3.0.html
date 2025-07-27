@@ -260,8 +260,8 @@ accordingly.</p>
 <section id="breaking-changes">
 <h2>Breaking Changes<a class="headerlink" href="#breaking-changes" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p><strong>Backend Selection</strong> is now mandatory via <code class="docutils literal notranslate"><span class="pre">select_backend</span></code>. The default
-<code class="docutils literal notranslate"><span class="pre">cryptography</span></code> backend can be enabled with <code class="docutils literal notranslate"><span class="pre">select_backend(cryptography_backend())</span></code>.</p></li>
+<li><p><strong>Backend Selection</strong> is now mandatory via <code class="docutils literal notranslate"><span class="pre">use_backend</span></code>. The default
+<code class="docutils literal notranslate"><span class="pre">cryptography</span></code> backend can be enabled with <code class="docutils literal notranslate"><span class="pre">use_backend(&quot;pyca&quot;)</span></code>.</p></li>
 <li><p><strong>Pipeline API</strong> replaces ad-hoc helper chains. Compose operations using the
 <code class="docutils literal notranslate"><span class="pre">Pipeline</span></code> class.</p></li>
 <li><p><strong>Key Management Interfaces</strong> have changed. Use <code class="docutils literal notranslate"><span class="pre">KeyManager</span></code> for all
@@ -281,11 +281,10 @@ been deleted.</p></li>
 </section>
 <section id="example">
 <h2>Example<a class="headerlink" href="#example" title="Link to this heading">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cryptography_suite</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span><span class="p">,</span> <span class="n">select_backend</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">cryptography_suite.crypto_backends</span><span class="w"> </span><span class="kn">import</span> <span class="n">cryptography_backend</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cryptography_suite</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span><span class="p">,</span> <span class="n">use_backend</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cryptography_suite.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">AESGCMEncrypt</span><span class="p">,</span> <span class="n">AESGCMDecrypt</span>
 
-<span class="n">select_backend</span><span class="p">(</span><span class="n">cryptography_backend</span><span class="p">())</span>
+<span class="n">use_backend</span><span class="p">(</span><span class="s2">&quot;pyca&quot;</span><span class="p">)</span>
 
 <span class="n">encrypt</span> <span class="o">=</span> <span class="n">AESGCMEncrypt</span><span class="p">(</span><span class="n">password</span><span class="o">=</span><span class="s2">&quot;pass&quot;</span><span class="p">)</span>
 <span class="n">decrypt</span> <span class="o">=</span> <span class="n">AESGCMDecrypt</span><span class="p">(</span><span class="n">password</span><span class="o">=</span><span class="s2">&quot;pass&quot;</span><span class="p">)</span>

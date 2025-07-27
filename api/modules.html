@@ -1192,6 +1192,12 @@ sequence instead.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="cryptography_suite.select_backend">
+<span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">select_backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cryptography_suite.select_backend" title="Link to this definition">¶</a></dt>
+<dd><p>Deprecated alias for <a class="reference internal" href="#cryptography_suite.use_backend" title="cryptography_suite.use_backend"><code class="xref py py-func docutils literal notranslate"><span class="pre">use_backend()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="cryptography_suite.self_sign_certificate">
 <span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">self_sign_certificate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">common_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">private_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">RSAPrivateKey</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">EllipticCurvePrivateKey</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">days_valid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">365</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="headerlink" href="#cryptography_suite.self_sign_certificate" title="Link to this definition">¶</a></dt>
 <dd><p>Generate a self-signed X.509 certificate.</p>
@@ -1315,6 +1321,13 @@ and <code class="docutils literal notranslate"><span class="pre">key</span></cod
 <dt class="sig sig-object py" id="cryptography_suite.use_backend">
 <span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">use_backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cryptography_suite.use_backend" title="Link to this definition">¶</a></dt>
 <dd><p>Select the backend to use at runtime.</p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cryptography_suite.crypto_backends</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_backend</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">use_backend</span><span class="p">(</span><span class="s2">&quot;pyca&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">use_backend</span><span class="p">(</span><span class="s2">&quot;sodium&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">use_backend</span><span class="p">(</span><span class="s2">&quot;rust&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py function">
@@ -1371,6 +1384,15 @@ and <code class="docutils literal notranslate"><span class="pre">key</span></cod
 <dd><p>Encrypt <code class="docutils literal notranslate"><span class="pre">message</span></code> using XChaCha20-Poly1305.</p>
 </dd></dl>
 
+<section id="selecting-a-backend">
+<h2>Selecting a backend<a class="headerlink" href="#selecting-a-backend" title="Link to this heading">¶</a></h2>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cryptography_suite.crypto_backends</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_backend</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">use_backend</span><span class="p">(</span><span class="s2">&quot;pyca&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">use_backend</span><span class="p">(</span><span class="s2">&quot;sodium&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">use_backend</span><span class="p">(</span><span class="s2">&quot;rust&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
 </section>
 
         </article>
@@ -1576,6 +1598,7 @@ and <code class="docutils literal notranslate"><span class="pre">key</span></cod
 <li><a class="reference internal" href="#cryptography_suite.scrypt_encrypt"><code class="docutils literal notranslate"><span class="pre">scrypt_encrypt()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.secure_save_key_to_file"><code class="docutils literal notranslate"><span class="pre">secure_save_key_to_file()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.secure_zero"><code class="docutils literal notranslate"><span class="pre">secure_zero()</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.select_backend"><code class="docutils literal notranslate"><span class="pre">select_backend()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.self_sign_certificate"><code class="docutils literal notranslate"><span class="pre">self_sign_certificate()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.serialize_ecdsa_private_key"><code class="docutils literal notranslate"><span class="pre">serialize_ecdsa_private_key()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.serialize_ecdsa_public_key"><code class="docutils literal notranslate"><span class="pre">serialize_ecdsa_public_key()</span></code></a></li>
@@ -1603,6 +1626,7 @@ and <code class="docutils literal notranslate"><span class="pre">key</span></cod
 <li><a class="reference internal" href="#cryptography_suite.verify_totp"><code class="docutils literal notranslate"><span class="pre">verify_totp()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.xchacha_decrypt"><code class="docutils literal notranslate"><span class="pre">xchacha_decrypt()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.xchacha_encrypt"><code class="docutils literal notranslate"><span class="pre">xchacha_encrypt()</span></code></a></li>
+<li><a class="reference internal" href="#selecting-a-backend">Selecting a backend</a></li>
 </ul>
 </li>
 </ul>
