@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Pipeline API" href="pipeline.html" /><link rel="prev" title="Package Architecture" href="architecture.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Supply Chain Threat Model" href="threat_model.html" /><link rel="prev" title="Misuse-Resistant Checking" href="mypy_plugin.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
-        <title>Protocol Notes - cryptography-suite 2.0.2 documentation</title>
+        <title>Release Process - cryptography-suite 2.0.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -178,7 +178,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -200,12 +200,12 @@
   <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="architecture.html">Package Architecture</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Protocol Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="protocols.html">Protocol Notes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline.html">Pipeline API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="formal.html">Formal Verification Support</a></li>
 <li class="toctree-l1"><a class="reference internal" href="fuzzing.html">Fuzzing and Property Testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mypy_plugin.html">Misuse-Resistant Checking</a></li>
-<li class="toctree-l1"><a class="reference internal" href="release_process.html">Release Process</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Release Process</a></li>
 <li class="toctree-l1"><a class="reference internal" href="threat_model.html">Supply Chain Threat Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="security.html">Security Notes</a></li>
@@ -230,7 +230,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="_sources/protocols.md.txt" title="View this page">
+  <a class="muted-link" href="_sources/release_process.md.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -244,21 +244,30 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="protocol-notes">
-<h1>Protocol Notes<a class="headerlink" href="#protocol-notes" title="Link to this heading">¶</a></h1>
-<p>The suite provides a light-weight X3DH implementation used for Signal-like sessions.
-During session setup the receiver verifies that the sender’s signed prekey is
-signed with the sender’s identity key. A failed verification raises
-<code class="docutils literal notranslate"><span class="pre">SignatureVerificationError</span></code>.</p>
-<p>One-time prekeys are optional. When present they are mixed into the Diffie–Hellman
-chain as <code class="docutils literal notranslate"><span class="pre">dh4</span> <span class="pre">=</span> <span class="pre">DH(IK_B,</span> <span class="pre">OPK_A)</span></code>. Each step of the chain (<code class="docutils literal notranslate"><span class="pre">dh1</span></code>, <code class="docutils literal notranslate"><span class="pre">dh2</span></code>, <code class="docutils literal notranslate"><span class="pre">dh3</span></code>, <code class="docutils literal notranslate"><span class="pre">dh4</span></code>)
-is logged with <code class="docutils literal notranslate"><span class="pre">verbose_print</span></code> when <code class="docutils literal notranslate"><span class="pre">VERBOSE_MODE</span></code> is enabled.</p>
+          <section id="release-process">
+<h1>Release Process<a class="headerlink" href="#release-process" title="Link to this heading">¶</a></h1>
+<p>This project aims for fully reproducible builds and signed artifacts. Releases are created via GitHub Actions.</p>
+<section id="steps">
+<h2>Steps<a class="headerlink" href="#steps" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>CI runs <code class="docutils literal notranslate"><span class="pre">tools/reproducible_build.py</span></code> to build the wheel and sdist with <code class="docutils literal notranslate"><span class="pre">SOURCE_DATE_EPOCH</span></code> set.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">reproducibility.yml</span></code> verifies that two independent builds produce identical hashes.</p></li>
+<li><p>After tests pass, <code class="docutils literal notranslate"><span class="pre">release.yml</span></code> signs the artifacts using GitHub OIDC and <code class="docutils literal notranslate"><span class="pre">cosign</span></code>.</p></li>
+<li><p>A CycloneDX SBOM is generated and attached to the GitHub Release.</p></li>
+<li><p>Release notes are extracted from <code class="docutils literal notranslate"><span class="pre">CHANGELOG.md</span></code> and published to PyPI.</p></li>
+</ol>
+<p>Users can verify a downloaded artifact with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>tools/verify_artifact.py<span class="w"> </span>dist/cryptography_suite-&lt;version&gt;-py3-none-any.whl<span class="w"> </span>&lt;sha256&gt;
+</pre></div>
+</div>
+<p>The expected hashes are published alongside each release.</p>
+</section>
 </section>
 
         </article>
@@ -266,23 +275,23 @@ is logged with <code class="docutils literal notranslate"><span class="pre">verb
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="pipeline.html">
+          <a class="next-page" href="threat_model.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Pipeline API</div>
+                <div class="title">Supply Chain Threat Model</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="architecture.html">
+          <a class="prev-page" href="mypy_plugin.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Package Architecture</div>
+                <div class="title">Misuse-Resistant Checking</div>
                 
               </div>
             </a>
@@ -304,8 +313,27 @@ is logged with <code class="docutils literal notranslate"><span class="pre">verb
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Release Process</a><ul>
+<li><a class="reference internal" href="#steps">Steps</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
