@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Package Architecture" href="architecture.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
-        <title>cryptography-suite 2.0.2 documentation</title>
+        <title>cryptography-suite 3.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -166,7 +166,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="#"><div class="brand">cryptography-suite 2.0.2 documentation</div></a>
+      <a href="#"><div class="brand">cryptography-suite 3.0.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -178,7 +178,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -189,7 +189,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="#">
   
-  <span class="sidebar-brand-text">cryptography-suite 2.0.2 documentation</span>
+  <span class="sidebar-brand-text">cryptography-suite 3.0.0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -206,6 +206,7 @@
 <li class="toctree-l1"><a class="reference internal" href="fuzzing.html">Fuzzing and Property Testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mypy_plugin.html">Misuse-Resistant Checking</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release_process.html">Release Process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="migration_3.0.html">Migrating to Cryptography Suite 3.0.0</a></li>
 <li class="toctree-l1"><a class="reference internal" href="threat_model.html">Supply Chain Threat Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="security.html">Security Notes</a></li>
@@ -244,7 +245,7 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
@@ -256,6 +257,22 @@
 generated from the package’s docstrings.
 See the <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html">reStructuredText</a>
 documentation for details.</p>
+<section id="what-s-new-in-3-0-0">
+<h2>What’s new in 3.0.0<a class="headerlink" href="#what-s-new-in-3-0-0" title="Link to this heading">¶</a></h2>
+<p>Cryptography Suite 3.0.0 introduces a fully modular design and a focus on
+formally verified, misuse-resistant workflows.</p>
+<ul class="simple">
+<li><p>Backend-Agnostic Core (Crypto Abstraction Layer)</p></li>
+<li><p>Pipeline DSL for Crypto Workflows</p></li>
+<li><p>Misuse-Resistant API (mypy plugin)</p></li>
+<li><p>Zeroization &amp; Constant-Time Guarantees</p></li>
+<li><p>Formal Verification Export (ProVerif/Tamarin)</p></li>
+<li><p>Auto-Stub Generator for App Skeletons</p></li>
+<li><p>Rich Logging &amp; Jupyter Widgets for Visualization</p></li>
+<li><p>HSM, YubiKey, PKCS#11, Cloud KMS Plugin Architecture</p></li>
+<li><p>Fuzzing Harness &amp; Property-Based Testing</p></li>
+<li><p>Supply-Chain Attestation, SLSA, and Reproducible Builds</p></li>
+</ul>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
@@ -272,6 +289,12 @@ documentation for details.</p>
 <li class="toctree-l1"><a class="reference internal" href="mypy_plugin.html">Misuse-Resistant Checking</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release_process.html">Release Process</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="release_process.html#steps">Steps</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="migration_3.0.html">Migrating to Cryptography Suite 3.0.0</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="migration_3.0.html#breaking-changes">Breaking Changes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration_3.0.html#typical-upgrade-steps">Typical Upgrade Steps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration_3.0.html#example">Example</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="threat_model.html">Supply Chain Threat Model</a><ul>
@@ -414,6 +437,7 @@ documentation for details.</p>
 </ul>
 </div>
 </section>
+</section>
 
         </article>
       </div>
@@ -448,13 +472,32 @@ documentation for details.</p>
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">cryptography-suite documentation</a><ul>
+<li><a class="reference internal" href="#what-s-new-in-3-0-0">What’s new in 3.0.0</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=c2377ec0"></script>
+</div><script src="_static/documentation_options.js?v=acc74ff5"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=46bd48cc"></script>
