@@ -134,10 +134,10 @@ pip install -e ".[dev,pqc]"
 pip install cryptography-suite
 
 # Encrypt a file
-cryptography-suite encrypt --file input.txt --out encrypted.bin
+cryptography-suite file encrypt --in input.txt --out encrypted.bin --password mypass
 
 # Decrypt it back
-cryptography-suite decrypt --file encrypted.bin --out output.txt
+cryptography-suite file decrypt --in encrypted.bin --out output.txt --password mypass
 
 # Export a pipeline for formal verification
 cryptography-suite export examples/formal/pipeline.yaml --format proverif
@@ -576,8 +576,8 @@ Run each command with `-h` for detailed help.
 File encryption and decryption are available via the main CLI:
 
 ```bash
-cryptography-suite encrypt --file secret.txt --out secret.enc
-cryptography-suite decrypt --file secret.enc --out decrypted.txt
+cryptography-suite file encrypt --in secret.txt --out secret.enc --password mypass
+cryptography-suite file decrypt --in secret.enc --out decrypted.txt --password mypass
 ```
 
 ---

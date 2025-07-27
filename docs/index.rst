@@ -36,6 +36,7 @@ formally verified, misuse-resistant workflows.
    architecture.md
    protocols.md
    pipeline.md
+   cli.md
    formal.md
    fuzzing.md
    mypy_plugin.md
