@@ -252,9 +252,10 @@
         <article role="main" id="furo-main-content">
           <section id="protocol-notes">
 <h1>Protocol Notes<a class="headerlink" href="#protocol-notes" title="Link to this heading">¶</a></h1>
-<p>The suite provides a light-weight X3DH implementation used for Signal-like sessions.
-During session setup the receiver verifies that the sender’s signed prekey is
-signed with the sender’s identity key. A failed verification raises
+<p>The suite provides a light-weight X3DH implementation used for Signal-like
+sessions. During session setup the receiver verifies that the sender’s
+<code class="docutils literal notranslate"><span class="pre">signed_prekey</span></code> is signed with the sender’s identity key using the helper
+<code class="docutils literal notranslate"><span class="pre">verify_signed_prekey</span></code>. A failed verification raises
 <code class="docutils literal notranslate"><span class="pre">SignatureVerificationError</span></code>.</p>
 <p>One-time prekeys are optional. When present they are mixed into the Diffie–Hellman
 chain as <code class="docutils literal notranslate"><span class="pre">dh4</span> <span class="pre">=</span> <span class="pre">DH(IK_B,</span> <span class="pre">OPK_A)</span></code>. Each step of the chain (<code class="docutils literal notranslate"><span class="pre">dh1</span></code>, <code class="docutils literal notranslate"><span class="pre">dh2</span></code>, <code class="docutils literal notranslate"><span class="pre">dh3</span></code>, <code class="docutils literal notranslate"><span class="pre">dh4</span></code>)
