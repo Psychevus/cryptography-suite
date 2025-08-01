@@ -35,6 +35,8 @@ jobs:
         run: bandit -r cryptography_suite --exit-zero || true
       - name: Run vulture
         run: vulture cryptography_suite tests || true
+      - name: Check deprecated exports
+        run: python tools/check_deprecated_exports.py
 
   doctest:
     name: README Doctest

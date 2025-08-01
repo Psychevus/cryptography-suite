@@ -138,9 +138,7 @@ from .protocols import (
     SPAKE2Server,
     create_shares,
     generate_aes_key,
-    generate_ec_keypair_and_save,
     generate_hotp,
-    generate_rsa_keypair_and_save,
     generate_totp,
     initialize_signal_session,
     key_exists,
@@ -291,8 +289,6 @@ __all__ = [
     "load_private_key_from_file",
     "load_public_key_from_file",
     "key_exists",
-    "generate_rsa_keypair_and_save",
-    "generate_ec_keypair_and_save",
     # Secret Sharing
     "create_shares",
     "reconstruct_secret",

@@ -87,8 +87,8 @@ def generate_rsa_keypair_and_save(
 ):
     """Legacy wrapper for :class:`KeyManager` RSA key generation.
 
-    .. deprecated:: 2.0.0
-       Use :class:`KeyManager.generate_rsa_keypair_and_save` instead.
+    Deprecated: will be removed in v4.0.0. Use
+    :class:`KeyManager.generate_rsa_keypair_and_save` instead.
     """
 
     km = KeyManager()
@@ -107,7 +107,11 @@ def generate_ec_keypair_and_save(
     password: str,
     curve: ec.EllipticCurve = ec.SECP256R1(),
 ):
-    """Legacy wrapper for :class:`KeyManager` EC key generation."""
+    """Legacy wrapper for :class:`KeyManager` EC key generation.
+
+    Deprecated: will be removed in v4.0.0. Use
+    :class:`KeyManager.generate_ec_keypair_and_save` instead.
+    """
 
     km = KeyManager()
     return km.generate_ec_keypair_and_save(

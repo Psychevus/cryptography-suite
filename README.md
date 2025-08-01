@@ -164,7 +164,7 @@ cryptosuite-fuzz --runs 1000
 - **Hybrid Encryption**: Combine RSA/ECIES with AES-GCM for performance and security.
 - **Post-Quantum Cryptography**: Kyber key encapsulation and Dilithium signatures for quantum-safe workflows.
 - **XChaCha20-Poly1305**: Modern stream cipher support when ``cryptography`` exposes ``XChaCha20Poly1305``.
-- **Salsa20 and Ascon**: Provided for reference only. **Not recommended for production** and no longer exported via ``__all__``.
+- **Salsa20 and Ascon**: Deprecated and provided for reference only. **Not recommended for production**, removed from public imports, and scheduled for removal in v4.0.0. Use ``chacha20_stream_encrypt`` or authenticated ciphers like ``aes_encrypt`` instead.
 - **Audit Logging**: Decorators and helpers for encrypted audit trails.
 - **KeyVault Management**: Context manager to safely handle in-memory keys.
 - **Password-Authenticated Key Exchange (PAKE)**: SPAKE2 protocol implementation for secure password-based key exchange.
@@ -178,8 +178,9 @@ cryptosuite-fuzz --runs 1000
 
 ## ⚠️ Security Considerations
 
-- **Insecure Ciphers**: Functions such as `salsa20_encrypt` and `chacha20_stream_encrypt`
+- **Insecure Ciphers**: Functions such as `chacha20_stream_encrypt`
   do not provide authentication and should only be used for educational purposes.
+  The deprecated `salsa20_encrypt` will be removed in v4.0.0.
 - **Verbose Mode**: Enabling `VERBOSE_MODE` leaks sensitive information to stdout; never
   enable it in production.
 - **Private Key Protection**: Always supply a password when saving private keys to PEM
@@ -689,9 +690,10 @@ cryptography-suite/
   ``level`` parameter (512/768/1024). ``kyber_decrypt`` now computes the shared
   secret automatically when omitted.
 - **Key Management**: ``KeyManager`` now provides ``generate_rsa_keypair_and_save``.
-  The standalone ``generate_rsa_keypair_and_save`` helper is deprecated.
-- **KDF Naming**: ``derive_pbkdf2`` has been renamed to ``kdf_pbkdf2`` and the old
-  name is deprecated.
+  The standalone ``generate_rsa_keypair_and_save`` helper is deprecated and will
+  be removed in v4.0.0.
+- **KDF Naming**: ``derive_pbkdf2`` is deprecated and will be removed in v4.0.0.
+  Use ``kdf_pbkdf2`` instead.
 
 ## 🛤 Migration Guide from v2.x to v3.0.0
 

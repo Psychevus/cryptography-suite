@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from cryptography_suite.symmetric import (
+from cryptography_suite.symmetric.stream import (
     salsa20_encrypt,
     salsa20_decrypt,
     chacha20_stream_encrypt,
