@@ -7,7 +7,7 @@ from . import register_keystore
 from ..audit import audit_log
 
 if TYPE_CHECKING:  # pragma: no cover - used only for typing
-    import boto3  # type: ignore[import]
+    import boto3  # type: ignore[import]  # noqa: F401
 
 
 @register_keystore("aws-kms")
@@ -23,10 +23,10 @@ class AWSKMSKeyStore:
 
     def __init__(self, region_name: str | None = None):
         try:
-            boto3 = import_module("boto3")  # type: ignore[import]
+            boto3_mod = import_module("boto3")  # type: ignore[import]
         except Exception as exc:
             raise RuntimeError("boto3 is required for AWSKMSKeyStore") from exc
-        self.client = boto3.client("kms", region_name=region_name)
+        self.client = boto3_mod.client("kms", region_name=region_name)
 
     def list_keys(self) -> List[str]:
         keys: List[str] = []
