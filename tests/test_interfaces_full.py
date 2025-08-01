@@ -17,6 +17,8 @@ from cryptography_suite.asymmetric import (
 from cryptography_suite.protocols import (
     SPAKE2Client,
     SPAKE2Server,
+)
+from cryptography_suite.experimental.signal import (
     initialize_signal_session,
     SignalReceiver,
     SignalSender,

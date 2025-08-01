@@ -44,6 +44,9 @@ def test_homomorphic_ckks_and_bfv(monkeypatch):
     assert h.decrypt(he, ct) == 1.5
     assert h.add(he, ct, ct).value == 3.0
     assert h.multiply(he, ct, ct).value == 2.25
+    ser = h.serialize_context(he)
+    he2 = h.load_context(ser)
+    assert he2.scheme == "CKKS"
     he_bfv = h.keygen("BFV")
     ct2 = h.encrypt(he_bfv, 2)
     assert h.decrypt(he_bfv, ct2) == 2

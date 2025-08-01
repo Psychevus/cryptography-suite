@@ -3,12 +3,6 @@
 from .otp import generate_totp, verify_totp, generate_hotp, verify_hotp
 from .secret_sharing import create_shares, reconstruct_secret
 from .pake import SPAKE2Client, SPAKE2Server
-from .signal import (
-    SignalSender,
-    SignalReceiver,
-    initialize_signal_session,
-)
-from .signal.init_session import verify_signed_prekey
 from .key_management import (
     generate_aes_key,
     rotate_aes_key,
@@ -28,10 +22,6 @@ __all__ = [
     "reconstruct_secret",
     "SPAKE2Client",
     "SPAKE2Server",
-    "SignalSender",
-    "SignalReceiver",
-    "initialize_signal_session",
-    "verify_signed_prekey",
     "generate_aes_key",
     "rotate_aes_key",
     "secure_save_key_to_file",

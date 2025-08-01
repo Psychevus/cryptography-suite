@@ -94,15 +94,12 @@ from .hashing import (
 
 from .protocols import (
     KeyManager,
-    SignalReceiver,
-    SignalSender,
     SPAKE2Client,
     SPAKE2Server,
     create_shares,
     generate_aes_key,
     generate_hotp,
     generate_totp,
-    initialize_signal_session,
     key_exists,
     load_private_key_from_file,
     load_public_key_from_file,
@@ -234,10 +231,6 @@ __all__ = [
     # Audit
     "audit_log",
     "set_audit_logger",
-    # Signal Protocol
-    "SignalSender",
-    "SignalReceiver",
-    "initialize_signal_session",
     # Exceptions
     "CryptographySuiteError",
     "EncryptionError",

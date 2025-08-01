@@ -26,7 +26,9 @@
 
 - **Comprehensive Functionality**: Symmetric and asymmetric encryption, digital signatures, key management, secret sharing, password-authenticated key exchange (PAKE), and one-time passwords (OTP).
 - **Post-Quantum Primitives**: Kyber KEM, Dilithium signatures, and **experimental SPHINCS+** support (enable via `pip install "cryptography-suite[pqc]"` – demo-only, not production-grade). These are available under ``cryptography_suite.experimental``.
-- **Signal Protocol Demo**: Minimal X3DH + Double Ratchet implementation for demonstration purposes (**experimental, not production-ready**).
+- **Signal Protocol Demo**: Minimal X3DH + Double Ratchet implementation located in ``cryptography_suite.experimental.signal`` (**experimental, not production-ready**).
+- **Homomorphic Encryption**: Pyfhel-based helpers exposed via ``cryptography_suite.experimental`` (**experimental, demo-only**).
+- **Zero-Knowledge Proof Helpers**: Bulletproof range proofs and zk-SNARK examples under ``cryptography_suite.experimental`` (**experimental**).
 - **Developer-Friendly API**: Intuitive, well-documented interfaces that simplify integration and accelerate development.
 - **Cross-Platform Compatibility**: Fully compatible with macOS, Linux, and Windows environments.
 - **Rigorous Testing**: ~**99%** test coverage as of v3.0.0, ensuring reliability and robustness.
@@ -189,8 +191,8 @@ cryptosuite-fuzz --runs 1000
  - **One-Time Passwords (OTP)**: HOTP and TOTP algorithms for generating and verifying one-time passwords.
    > ⚠️ Secrets used for OTP (TOTP/HOTP) will now be auto-padded to prevent base32 decoding issues. No manual padding is required.
 - **Utility Functions**: Includes Base62 encoding/decoding, secure random string generation, and memory zeroing.
-- **Homomorphic Encryption**: Wrapper around Pyfhel supporting CKKS and BFV schemes.
-- **Zero-Knowledge Proofs**: Bulletproof range proofs and zk-SNARK preimage proofs (optional dependencies).
+- **Homomorphic Encryption**: Wrapper around Pyfhel supporting CKKS and BFV schemes. *(experimental)*
+- **Zero-Knowledge Proofs**: Bulletproof range proofs and zk-SNARK preimage proofs (optional dependencies, experimental).
 
 ---
 
@@ -413,10 +415,11 @@ print(f"Recovered secret: {recovered_secret}")
 
 ### Homomorphic Encryption
 
-Perform arithmetic over encrypted values using Pyfhel.
+Perform arithmetic over encrypted values using Pyfhel. These helpers are
+experimental.
 
 ```python
-from cryptography_suite.homomorphic import (
+from cryptography_suite.experimental import (
     fhe_keygen,
     fhe_encrypt,
     fhe_decrypt,
@@ -442,8 +445,9 @@ Prove knowledge of a SHA-256 preimage without revealing it. These
 functions require the optional `PySNARK` dependency.
 
 ```python
-from cryptography_suite.zk import zksnark
+from cryptography_suite.experimental import zksnark
 
+# Zero-knowledge helpers are experimental and require PySNARK.
 zksnark.setup()
 hash_hex: str
 proof_file: str
@@ -567,7 +571,7 @@ print(ec_decrypt(cipher, priv))
 > **Note**: The Signal Protocol helpers are experimental and intended for demonstrations only.
 
 ```python
-from cryptography_suite.protocols import initialize_signal_session
+from cryptography_suite.experimental.signal import initialize_signal_session
 
 sender, receiver = initialize_signal_session()
 msg: bytes = sender.encrypt(b"hi")

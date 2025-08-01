@@ -9,6 +9,8 @@ from __future__ import annotations
 
 from typing import Tuple
 
+from ..errors import MissingDependencyError
+
 try:  # pragma: no cover - optional dependency
     from pysnark.runtime import PrivVal, snark, run
     from pysnark.hash import sha256 as snark_sha256
@@ -29,11 +31,11 @@ def setup() -> None:
 
     Raises
     ------
-    ImportError
+    MissingDependencyError
         If PySNARK is not installed.
     """
     if not ZKSNARK_AVAILABLE:
-        raise ImportError("PySNARK is required for zk-SNARK proofs")
+        raise MissingDependencyError("PySNARK is required for zk-SNARK proofs")
     snarksetup("groth16")
 
 
@@ -52,7 +54,7 @@ def prove(preimage: bytes) -> Tuple[str, str]:
         of ``preimage`` and the path to the generated proof file.
     """
     if not ZKSNARK_AVAILABLE:
-        raise ImportError("PySNARK is required for zk-SNARK proofs")
+        raise MissingDependencyError("PySNARK is required for zk-SNARK proofs")
 
     secret = PrivVal(int.from_bytes(preimage, "big"))
     digest_bits = snark_sha256(secret)
@@ -78,5 +80,5 @@ def verify(hash_hex: str, proof_path: str) -> bool:
         ``True`` if the proof is valid, ``False`` otherwise.
     """
     if not ZKSNARK_AVAILABLE:
-        raise ImportError("PySNARK is required for zk-SNARK proofs")
+        raise MissingDependencyError("PySNARK is required for zk-SNARK proofs")
     return run.verify(hash_hex, proof_path)
