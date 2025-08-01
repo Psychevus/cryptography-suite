@@ -22,13 +22,14 @@
 
 ---
 
-## 🚀 Why Choose Cryptography Suite?
+## 🔑 Key Features
 
-- **Comprehensive Functionality**: Access a wide array of cryptographic algorithms and protocols, including symmetric and asymmetric encryption, digital signatures, key management, secret sharing, password-authenticated key exchange (PAKE), and one-time passwords (OTP).
-- **High Security Standards**: Implements industry-leading algorithms with best practices, ensuring your data is safeguarded with the highest level of security.
-- **Developer-Friendly API**: Offers intuitive and well-documented APIs that simplify integration and accelerate development.
+- **Comprehensive Functionality**: Symmetric and asymmetric encryption, digital signatures, key management, secret sharing, password-authenticated key exchange (PAKE), and one-time passwords (OTP).
+- **Post-Quantum Primitives**: Kyber KEM, Dilithium signatures, and **experimental SPHINCS+** support (enable via `pip install "cryptography-suite[pqc]"` – demo-only, not production-grade).
+- **Signal Protocol Demo**: Minimal X3DH + Double Ratchet implementation for demonstration purposes (**experimental, not production-ready**).
+- **Developer-Friendly API**: Intuitive, well-documented interfaces that simplify integration and accelerate development.
 - **Cross-Platform Compatibility**: Fully compatible with macOS, Linux, and Windows environments.
-- **Rigorous Testing**: Achieves **99% code coverage** with a comprehensive test suite, guaranteeing reliability and robustness.
+- **Rigorous Testing**: ~**99%** test coverage as of v3.0.0, ensuring reliability and robustness.
 
 ---
 
@@ -112,6 +113,8 @@ For optional functionality install extras:
 ```bash
 pip install "cryptography-suite[pqc,fhe,zk]"
 ```
+
+The **SPHINCS+** signature helpers are included in the `pqc` extra and are experimental/demo-only.
 
 > **Note**: Requires Python 3.10 or higher. Homomorphic encryption features need `Pyfhel` installed separately if the `fhe` extra is not used.
 
@@ -512,6 +515,8 @@ print(ec_decrypt(cipher, priv))
 ```
 
 ### Signal Protocol Messaging
+
+> **Note**: The Signal Protocol helpers are experimental and intended for demonstrations only.
 
 ```python
 from cryptography_suite.protocols import initialize_signal_session

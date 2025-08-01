@@ -1,7 +1,8 @@
 # Protocol Notes
 
 The suite provides a light-weight X3DH implementation used for Signal-like
-sessions. During session setup the receiver verifies that the sender's
+sessions. **This Signal Protocol support is experimental and intended for
+demonstrations only; it is not production-ready.** During session setup the receiver verifies that the sender's
 ``signed_prekey`` is signed with the sender's identity key using the helper
 ``verify_signed_prekey``. A failed verification raises
 ``SignatureVerificationError``.
