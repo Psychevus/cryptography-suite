@@ -50,6 +50,7 @@ formally verified, misuse-resistant workflows.
    migration_pipeline_api.md
    threat_model.md
    visualization.md
+   backend_consistency.md
    security.rst
    api/modules
    api/pipeline

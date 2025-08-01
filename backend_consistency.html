@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Supply Chain Threat Model" href="threat_model.html" /><link rel="prev" title="Migration Guide to Cryptography Suite 4.0.0" href="migration_4.0.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Security Notes" href="security.html" /><link rel="prev" title="Visualization Tools" href="visualization.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
-        <title>Migration to Pipeline API - cryptography-suite 3.0.0 documentation</title>
+        <title>Backend Consistency - cryptography-suite 3.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -211,10 +211,10 @@
 <li class="toctree-l1"><a class="reference internal" href="release_process.html">Release Process</a></li>
 <li class="toctree-l1"><a class="reference internal" href="migration_3.0.html">Migrating to Cryptography Suite 3.0.0</a></li>
 <li class="toctree-l1"><a class="reference internal" href="migration_4.0.html">Migration Guide to Cryptography Suite 4.0.0</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Migration to Pipeline API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="migration_pipeline_api.html">Migration to Pipeline API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="threat_model.html">Supply Chain Threat Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="backend_consistency.html">Backend Consistency</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Backend Consistency</a></li>
 <li class="toctree-l1"><a class="reference internal" href="security.html">Security Notes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/modules.html">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/pipeline.html">Pipeline DSL</a></li>
@@ -238,7 +238,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="_sources/migration_pipeline_api.md.txt" title="View this page">
+  <a class="muted-link" href="_sources/backend_consistency.md.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -258,31 +258,88 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="migration-to-pipeline-api">
-<h1>Migration to Pipeline API<a class="headerlink" href="#migration-to-pipeline-api" title="Link to this heading">¶</a></h1>
-<p>Legacy one-shot helpers such as <code class="docutils literal notranslate"><span class="pre">aes_encrypt</span></code> and <code class="docutils literal notranslate"><span class="pre">rsa_encrypt</span></code> are deprecated in
-favor of the composable Pipeline DSL.</p>
-<section id="replacing-aes-helpers">
-<h2>Replacing AES helpers<a class="headerlink" href="#replacing-aes-helpers" title="Link to this heading">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cryptography_suite.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">AESGCMEncrypt</span><span class="p">,</span> <span class="n">AESGCMDecrypt</span>
-
-<span class="n">ciphertext</span> <span class="o">=</span> <span class="n">AESGCMEncrypt</span><span class="p">(</span><span class="n">password</span><span class="o">=</span><span class="s2">&quot;pw&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;secret&quot;</span><span class="p">)</span>
-<span class="n">plaintext</span> <span class="o">=</span> <span class="n">AESGCMDecrypt</span><span class="p">(</span><span class="n">password</span><span class="o">=</span><span class="s2">&quot;pw&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">ciphertext</span><span class="p">)</span>
-</pre></div>
-</div>
+          <section id="backend-consistency">
+<h1>Backend Consistency<a class="headerlink" href="#backend-consistency" title="Link to this heading">¶</a></h1>
+<p>Cryptography Suite standardizes on well audited backends for each primitive to
+avoid accidental mixing of incompatible libraries.</p>
+<section id="philosophy">
+<h2>Philosophy<a class="headerlink" href="#philosophy" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>pyca/cryptography</strong> is the authoritative backend for all symmetric and
+asymmetric primitives such as AES, ChaCha20-Poly1305, RSA, ECDSA, and EdDSA.</p></li>
+<li><p>Third-party libraries are only used when a primitive is unavailable in
+<code class="docutils literal notranslate"><span class="pre">cryptography</span></code>. Such usage is isolated in optional modules and marked as
+deprecated.</p></li>
+<li><p>Contributions should not introduce new dependencies for primitives already
+supported by <code class="docutils literal notranslate"><span class="pre">cryptography</span></code>.</p></li>
+</ul>
 </section>
-<section id="replacing-rsa-helpers">
-<h2>Replacing RSA helpers<a class="headerlink" href="#replacing-rsa-helpers" title="Link to this heading">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cryptography_suite.asymmetric</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_rsa_keypair</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">cryptography_suite.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">RSAEncrypt</span><span class="p">,</span> <span class="n">RSADecrypt</span>
-
-<span class="n">priv</span><span class="p">,</span> <span class="n">pub</span> <span class="o">=</span> <span class="n">generate_rsa_keypair</span><span class="p">()</span>
-<span class="n">ct</span> <span class="o">=</span> <span class="n">RSAEncrypt</span><span class="p">(</span><span class="n">public_key</span><span class="o">=</span><span class="n">pub</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
-<span class="n">pt</span> <span class="o">=</span> <span class="n">RSADecrypt</span><span class="p">(</span><span class="n">private_key</span><span class="o">=</span><span class="n">priv</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">ct</span><span class="p">)</span>
-</pre></div>
+<section id="backend-matrix">
+<h2>Backend Matrix<a class="headerlink" href="#backend-matrix" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Primitive</p></th>
+<th class="head"><p>Backend</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>AES-GCM</p></td>
+<td><p>pyca/cryptography</p></td>
+<td><p>Authoritative</p></td>
+</tr>
+<tr class="row-odd"><td><p>ChaCha20-Poly1305 / XChaCha20-Poly1305</p></td>
+<td><p>pyca/cryptography</p></td>
+<td><p>Authoritative</p></td>
+</tr>
+<tr class="row-even"><td><p>Salsa20</p></td>
+<td><p>PyCryptodome (optional)</p></td>
+<td><p>Deprecated; reference only</p></td>
+</tr>
+<tr class="row-odd"><td><p>Ascon-128a</p></td>
+<td><p>Pure Python</p></td>
+<td><p>Experimental</p></td>
+</tr>
+<tr class="row-even"><td><p>RSA, ECDSA, Ed25519, Ed448</p></td>
+<td><p>pyca/cryptography</p></td>
+<td><p>Authoritative</p></td>
+</tr>
+<tr class="row-odd"><td><p>BLS12-381</p></td>
+<td><p>py_ecc</p></td>
+<td><p>Optional</p></td>
+</tr>
+<tr class="row-even"><td><p>SHA-2, SHA-3, BLAKE2b</p></td>
+<td><p>pyca/cryptography</p></td>
+<td><p>Authoritative</p></td>
+</tr>
+<tr class="row-odd"><td><p>BLAKE3</p></td>
+<td><p>blake3</p></td>
+<td><p>Authoritative</p></td>
+</tr>
+<tr class="row-even"><td><p>Argon2id, Scrypt, PBKDF2, HKDF</p></td>
+<td><p>pyca/cryptography</p></td>
+<td><p>Authoritative</p></td>
+</tr>
+<tr class="row-odd"><td><p>Kyber, Dilithium (PQC)</p></td>
+<td><p>pqcrypto (optional)</p></td>
+<td><p>Optional</p></td>
+</tr>
+</tbody>
+</table>
 </div>
-<p>After one major version, these legacy helpers will be removed. Always prefer
-adding new functionality as Pipeline modules.</p>
+<section id="future-migration">
+<h3>Future Migration<a class="headerlink" href="#future-migration" title="Link to this heading">¶</a></h3>
+<p>When <code class="docutils literal notranslate"><span class="pre">pyca/cryptography</span></code> adds support for primitives currently provided by
+optional modules (e.g. Salsa20), those modules and their dependencies will be
+removed.</p>
+</section>
+<section id="consistency-check">
+<h3>Consistency Check<a class="headerlink" href="#consistency-check" title="Link to this heading">¶</a></h3>
+<p>A lightweight test ensures that PyCryptodome is only imported from the optional
+Salsa20 module. Running <code class="docutils literal notranslate"><span class="pre">pytest</span></code> will fail if any other package imports
+<code class="docutils literal notranslate"><span class="pre">Crypto.*</span></code>.</p>
+</section>
 </section>
 </section>
 
@@ -291,23 +348,23 @@ adding new functionality as Pipeline modules.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="threat_model.html">
+          <a class="next-page" href="security.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Supply Chain Threat Model</div>
+                <div class="title">Security Notes</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="migration_4.0.html">
+          <a class="prev-page" href="visualization.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Migration Guide to Cryptography Suite 4.0.0</div>
+                <div class="title">Visualization Tools</div>
                 
               </div>
             </a>
@@ -341,9 +398,13 @@ adding new functionality as Pipeline modules.</p>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Migration to Pipeline API</a><ul>
-<li><a class="reference internal" href="#replacing-aes-helpers">Replacing AES helpers</a></li>
-<li><a class="reference internal" href="#replacing-rsa-helpers">Replacing RSA helpers</a></li>
+<li><a class="reference internal" href="#">Backend Consistency</a><ul>
+<li><a class="reference internal" href="#philosophy">Philosophy</a></li>
+<li><a class="reference internal" href="#backend-matrix">Backend Matrix</a><ul>
+<li><a class="reference internal" href="#future-migration">Future Migration</a></li>
+<li><a class="reference internal" href="#consistency-check">Consistency Check</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

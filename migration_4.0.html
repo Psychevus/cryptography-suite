@@ -214,6 +214,7 @@
 <li class="toctree-l1"><a class="reference internal" href="migration_pipeline_api.html">Migration to Pipeline API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="threat_model.html">Supply Chain Threat Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backend_consistency.html">Backend Consistency</a></li>
 <li class="toctree-l1"><a class="reference internal" href="security.html">Security Notes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/modules.html">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/pipeline.html">Pipeline DSL</a></li>
@@ -279,7 +280,7 @@ existing code to use the recommended replacements.</p>
 <td><p><code class="docutils literal notranslate"><span class="pre">KeyManager.generate_ec_keypair_and_save</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">salsa20_encrypt</span></code> / <code class="docutils literal notranslate"><span class="pre">salsa20_decrypt</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">chacha20_stream_encrypt</span></code> / <code class="docutils literal notranslate"><span class="pre">chacha20_stream_decrypt</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">chacha20_encrypt</span></code> / <code class="docutils literal notranslate"><span class="pre">chacha20_decrypt</span></code> or <code class="docutils literal notranslate"><span class="pre">aead.chacha20_encrypt_aead</span></code></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ascon.encrypt</span></code> / <code class="docutils literal notranslate"><span class="pre">ascon.decrypt</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">aead.chacha20_encrypt_aead</span></code> / <code class="docutils literal notranslate"><span class="pre">aead.chacha20_decrypt_aead</span></code> or <code class="docutils literal notranslate"><span class="pre">symmetric.aes_encrypt</span></code> / <code class="docutils literal notranslate"><span class="pre">symmetric.aes_decrypt</span></code></p></td>
