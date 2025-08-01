@@ -202,6 +202,7 @@
 <li class="toctree-l1"><a class="reference internal" href="architecture.html">Package Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="protocols.html">Protocol Notes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline.html">Pipeline API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pipeline_coverage.html">Pipeline API Coverage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="formal.html">Formal Verification Support</a></li>
 <li class="toctree-l1"><a class="reference internal" href="fuzzing.html">Fuzzing and Property Testing</a></li>
@@ -209,6 +210,7 @@
 <li class="toctree-l1"><a class="reference internal" href="release_process.html">Release Process</a></li>
 <li class="toctree-l1"><a class="reference internal" href="migration_3.0.html">Migrating to Cryptography Suite 3.0.0</a></li>
 <li class="toctree-l1"><a class="reference internal" href="migration_4.0.html">Migration Guide to Cryptography Suite 4.0.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="migration_pipeline_api.html">Migration to Pipeline API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="threat_model.html">Supply Chain Threat Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="security.html">Security Notes</a></li>
@@ -288,6 +290,7 @@ formally verified, misuse-resistant workflows.</p>
 <li class="toctree-l2"><a class="reference internal" href="pipeline.html#extending-the-pipeline-dsl">Extending the Pipeline DSL</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="pipeline_coverage.html">Pipeline API Coverage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="cli.html#file-encryption">File Encryption</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cli.html#other-commands">Other Commands</a></li>
@@ -312,6 +315,11 @@ formally verified, misuse-resistant workflows.</p>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="migration_4.0.html">Migration Guide to Cryptography Suite 4.0.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="migration_pipeline_api.html">Migration to Pipeline API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="migration_pipeline_api.html#replacing-aes-helpers">Replacing AES helpers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration_pipeline_api.html#replacing-rsa-helpers">Replacing RSA helpers</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="threat_model.html">Supply Chain Threat Model</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="threat_model.html#mitigations">Mitigations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="threat_model.html#attack-vectors">Attack Vectors</a></li>
@@ -339,8 +347,6 @@ formally verified, misuse-resistant workflows.</p>
 <li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.SignalReceiver"><code class="docutils literal notranslate"><span class="pre">SignalReceiver</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.SignalSender"><code class="docutils literal notranslate"><span class="pre">SignalSender</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.SignatureVerificationError"><code class="docutils literal notranslate"><span class="pre">SignatureVerificationError</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.aes_decrypt"><code class="docutils literal notranslate"><span class="pre">aes_decrypt()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.aes_encrypt"><code class="docutils literal notranslate"><span class="pre">aes_encrypt()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.argon2_decrypt"><code class="docutils literal notranslate"><span class="pre">argon2_decrypt()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.argon2_encrypt"><code class="docutils literal notranslate"><span class="pre">argon2_encrypt()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.audit_log"><code class="docutils literal notranslate"><span class="pre">audit_log()</span></code></a></li>
@@ -412,8 +418,6 @@ formally verified, misuse-resistant workflows.</p>
 <li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.pem_to_json"><code class="docutils literal notranslate"><span class="pre">pem_to_json()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.reconstruct_secret"><code class="docutils literal notranslate"><span class="pre">reconstruct_secret()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.rotate_aes_key"><code class="docutils literal notranslate"><span class="pre">rotate_aes_key()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.rsa_decrypt"><code class="docutils literal notranslate"><span class="pre">rsa_decrypt()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.rsa_encrypt"><code class="docutils literal notranslate"><span class="pre">rsa_encrypt()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.scrypt_decrypt"><code class="docutils literal notranslate"><span class="pre">scrypt_decrypt()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.scrypt_encrypt"><code class="docutils literal notranslate"><span class="pre">scrypt_encrypt()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.secure_save_key_to_file"><code class="docutils literal notranslate"><span class="pre">secure_save_key_to_file()</span></code></a></li>
@@ -455,6 +459,8 @@ formally verified, misuse-resistant workflows.</p>
 <li class="toctree-l2"><a class="reference internal" href="api/pipeline.html#cryptography_suite.pipeline.CryptoModule"><code class="docutils literal notranslate"><span class="pre">CryptoModule</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/pipeline.html#cryptography_suite.pipeline.Pipeline"><code class="docutils literal notranslate"><span class="pre">Pipeline</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/pipeline.html#cryptography_suite.pipeline.PipelineVisualizer"><code class="docutils literal notranslate"><span class="pre">PipelineVisualizer</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/pipeline.html#cryptography_suite.pipeline.RSADecrypt"><code class="docutils literal notranslate"><span class="pre">RSADecrypt</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/pipeline.html#cryptography_suite.pipeline.RSAEncrypt"><code class="docutils literal notranslate"><span class="pre">RSAEncrypt</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/pipeline.html#cryptography_suite.pipeline.list_modules"><code class="docutils literal notranslate"><span class="pre">list_modules()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/pipeline.html#cryptography_suite.pipeline.register_module"><code class="docutils literal notranslate"><span class="pre">register_module()</span></code></a></li>
 </ul>

@@ -202,6 +202,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../architecture.html">Package Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../protocols.html">Protocol Notes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pipeline.html">Pipeline API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pipeline_coverage.html">Pipeline API Coverage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cli.html">Command Line Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../formal.html">Formal Verification Support</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../fuzzing.html">Fuzzing and Property Testing</a></li>
@@ -209,6 +210,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../release_process.html">Release Process</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../migration_3.0.html">Migrating to Cryptography Suite 3.0.0</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../migration_4.0.html">Migration Guide to Cryptography Suite 4.0.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../migration_pipeline_api.html">Migration to Pipeline API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../threat_model.html">Supply Chain Threat Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../visualization.html">Visualization Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../security.html">Security Notes</a></li>
@@ -475,6 +477,86 @@ pipeline steps.</p>
 
 </dd></dl>
 
+<dl class="py class">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.RSADecrypt">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cryptography_suite.pipeline.</span></span><span class="sig-name descname"><span class="pre">RSADecrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">private_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cryptography_suite.pipeline.RSADecrypt" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cryptography_suite.pipeline.CryptoModule" title="cryptography_suite.pipeline.CryptoModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">CryptoModule</span></code></a>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code>]</p>
+<p>Decrypt RSA-OAEP ciphertext.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>private_key</strong> (<em>Any</em>) – The <code class="xref py py-class docutils literal notranslate"><span class="pre">RSAPrivateKey</span></code>
+used for decryption.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.RSADecrypt.private_key">
+<span class="sig-name descname"><span class="pre">private_key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Any</span></em><a class="headerlink" href="#cryptography_suite.pipeline.RSADecrypt.private_key" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.RSADecrypt.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.RSADecrypt.run" title="Link to this definition">¶</a></dt>
+<dd><p>Run the module on the provided data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.RSADecrypt.to_proverif">
+<span class="sig-name descname"><span class="pre">to_proverif</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.RSADecrypt.to_proverif" title="Link to this definition">¶</a></dt>
+<dd><p>Return a ProVerif representation of the module.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.RSADecrypt.to_tamarin">
+<span class="sig-name descname"><span class="pre">to_tamarin</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.RSADecrypt.to_tamarin" title="Link to this definition">¶</a></dt>
+<dd><p>Return a Tamarin representation of the module.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.RSAEncrypt">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cryptography_suite.pipeline.</span></span><span class="sig-name descname"><span class="pre">RSAEncrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">public_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cryptography_suite.pipeline.RSAEncrypt" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cryptography_suite.pipeline.CryptoModule" title="cryptography_suite.pipeline.CryptoModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">CryptoModule</span></code></a>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code>]</p>
+<p>Encrypt data using RSA-OAEP.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>public_key</strong> (<em>Any</em>) – The <code class="xref py py-class docutils literal notranslate"><span class="pre">RSAPublicKey</span></code>
+used for encryption.</p></li>
+<li><p><strong>raw_output</strong> (<em>bool</em>) – When <code class="docutils literal notranslate"><span class="pre">True</span></code> return raw bytes instead of Base64 encoded text.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.RSAEncrypt.public_key">
+<span class="sig-name descname"><span class="pre">public_key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Any</span></em><a class="headerlink" href="#cryptography_suite.pipeline.RSAEncrypt.public_key" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.RSAEncrypt.raw_output">
+<span class="sig-name descname"><span class="pre">raw_output</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#cryptography_suite.pipeline.RSAEncrypt.raw_output" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.RSAEncrypt.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.RSAEncrypt.run" title="Link to this definition">¶</a></dt>
+<dd><p>Run the module on the provided data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.RSAEncrypt.to_proverif">
+<span class="sig-name descname"><span class="pre">to_proverif</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.RSAEncrypt.to_proverif" title="Link to this definition">¶</a></dt>
+<dd><p>Return a ProVerif representation of the module.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.RSAEncrypt.to_tamarin">
+<span class="sig-name descname"><span class="pre">to_tamarin</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.RSAEncrypt.to_tamarin" title="Link to this definition">¶</a></dt>
+<dd><p>Return a Tamarin representation of the module.</p>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="cryptography_suite.pipeline.list_modules">
 <span class="sig-prename descclassname"><span class="pre">cryptography_suite.pipeline.</span></span><span class="sig-name descname"><span class="pre">list_modules</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.list_modules" title="Link to this definition">¶</a></dt>
@@ -578,6 +660,21 @@ importable from <a class="reference internal" href="#module-cryptography_suite.p
 </li>
 <li><a class="reference internal" href="#cryptography_suite.pipeline.PipelineVisualizer"><code class="docutils literal notranslate"><span class="pre">PipelineVisualizer</span></code></a><ul>
 <li><a class="reference internal" href="#cryptography_suite.pipeline.PipelineVisualizer.render_ascii"><code class="docutils literal notranslate"><span class="pre">PipelineVisualizer.render_ascii()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.RSADecrypt"><code class="docutils literal notranslate"><span class="pre">RSADecrypt</span></code></a><ul>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.RSADecrypt.private_key"><code class="docutils literal notranslate"><span class="pre">RSADecrypt.private_key</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.RSADecrypt.run"><code class="docutils literal notranslate"><span class="pre">RSADecrypt.run()</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.RSADecrypt.to_proverif"><code class="docutils literal notranslate"><span class="pre">RSADecrypt.to_proverif()</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.RSADecrypt.to_tamarin"><code class="docutils literal notranslate"><span class="pre">RSADecrypt.to_tamarin()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.RSAEncrypt"><code class="docutils literal notranslate"><span class="pre">RSAEncrypt</span></code></a><ul>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.RSAEncrypt.public_key"><code class="docutils literal notranslate"><span class="pre">RSAEncrypt.public_key</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.RSAEncrypt.raw_output"><code class="docutils literal notranslate"><span class="pre">RSAEncrypt.raw_output</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.RSAEncrypt.run"><code class="docutils literal notranslate"><span class="pre">RSAEncrypt.run()</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.RSAEncrypt.to_proverif"><code class="docutils literal notranslate"><span class="pre">RSAEncrypt.to_proverif()</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.RSAEncrypt.to_tamarin"><code class="docutils literal notranslate"><span class="pre">RSAEncrypt.to_tamarin()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#cryptography_suite.pipeline.list_modules"><code class="docutils literal notranslate"><span class="pre">list_modules()</span></code></a></li>

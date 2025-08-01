@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Release Process" href="release_process.html" /><link rel="prev" title="Fuzzing and Property Testing" href="fuzzing.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Supply Chain Threat Model" href="threat_model.html" /><link rel="prev" title="Migration Guide to Cryptography Suite 4.0.0" href="migration_4.0.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
-        <title>Misuse-Resistant Checking - cryptography-suite 3.0.0 documentation</title>
+        <title>Migration to Pipeline API - cryptography-suite 3.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -178,7 +178,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -206,11 +206,11 @@
 <li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="formal.html">Formal Verification Support</a></li>
 <li class="toctree-l1"><a class="reference internal" href="fuzzing.html">Fuzzing and Property Testing</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Misuse-Resistant Checking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mypy_plugin.html">Misuse-Resistant Checking</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release_process.html">Release Process</a></li>
 <li class="toctree-l1"><a class="reference internal" href="migration_3.0.html">Migrating to Cryptography Suite 3.0.0</a></li>
 <li class="toctree-l1"><a class="reference internal" href="migration_4.0.html">Migration Guide to Cryptography Suite 4.0.0</a></li>
-<li class="toctree-l1"><a class="reference internal" href="migration_pipeline_api.html">Migration to Pipeline API</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Migration to Pipeline API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="threat_model.html">Supply Chain Threat Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="security.html">Security Notes</a></li>
@@ -236,7 +236,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="_sources/mypy_plugin.md.txt" title="View this page">
+  <a class="muted-link" href="_sources/migration_pipeline_api.md.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -250,38 +250,38 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="misuse-resistant-checking">
-<h1>Misuse-Resistant Checking<a class="headerlink" href="#misuse-resistant-checking" title="Link to this heading">¶</a></h1>
-<p>The project ships with a custom <strong>mypy</strong> plugin that performs static
-analysis to detect insecure cryptographic API usage. The plugin runs as
-part of the type checking stage and will fail the build if dangerous
-patterns are found.</p>
-<p>Detected issues include:</p>
-<ul class="simple">
-<li><p>Use of weak hash functions like <code class="docutils literal notranslate"><span class="pre">md5</span></code> or <code class="docutils literal notranslate"><span class="pre">sha1</span></code>.</p></li>
-<li><p>Creating AES ciphers in <code class="docutils literal notranslate"><span class="pre">ECB</span></code> mode.</p></li>
-</ul>
-<p>To enable the plugin manually add <code class="docutils literal notranslate"><span class="pre">tools.mypy_crypto_checker</span></code> to the
-<code class="docutils literal notranslate"><span class="pre">plugins</span></code> option in your <code class="docutils literal notranslate"><span class="pre">mypy</span></code> configuration. The repository has this
-enabled by default via <code class="docutils literal notranslate"><span class="pre">setup.cfg</span></code>.</p>
-<p>Code snippets that trigger the plugin can be found in
-<code class="docutils literal notranslate"><span class="pre">examples/vulnerable.py</span></code>.</p>
-<p>You can run the check locally with:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mypy<span class="w"> </span>examples/vulnerable.py
+          <section id="migration-to-pipeline-api">
+<h1>Migration to Pipeline API<a class="headerlink" href="#migration-to-pipeline-api" title="Link to this heading">¶</a></h1>
+<p>Legacy one-shot helpers such as <code class="docutils literal notranslate"><span class="pre">aes_encrypt</span></code> and <code class="docutils literal notranslate"><span class="pre">rsa_encrypt</span></code> are deprecated in
+favor of the composable Pipeline DSL.</p>
+<section id="replacing-aes-helpers">
+<h2>Replacing AES helpers<a class="headerlink" href="#replacing-aes-helpers" title="Link to this heading">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cryptography_suite.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">AESGCMEncrypt</span><span class="p">,</span> <span class="n">AESGCMDecrypt</span>
+
+<span class="n">ciphertext</span> <span class="o">=</span> <span class="n">AESGCMEncrypt</span><span class="p">(</span><span class="n">password</span><span class="o">=</span><span class="s2">&quot;pw&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;secret&quot;</span><span class="p">)</span>
+<span class="n">plaintext</span> <span class="o">=</span> <span class="n">AESGCMDecrypt</span><span class="p">(</span><span class="n">password</span><span class="o">=</span><span class="s2">&quot;pw&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">ciphertext</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Install the development extras to get <code class="docutils literal notranslate"><span class="pre">mypy</span></code>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[dev]&quot;</span>
+</section>
+<section id="replacing-rsa-helpers">
+<h2>Replacing RSA helpers<a class="headerlink" href="#replacing-rsa-helpers" title="Link to this heading">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cryptography_suite.asymmetric</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_rsa_keypair</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cryptography_suite.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">RSAEncrypt</span><span class="p">,</span> <span class="n">RSADecrypt</span>
+
+<span class="n">priv</span><span class="p">,</span> <span class="n">pub</span> <span class="o">=</span> <span class="n">generate_rsa_keypair</span><span class="p">()</span>
+<span class="n">ct</span> <span class="o">=</span> <span class="n">RSAEncrypt</span><span class="p">(</span><span class="n">public_key</span><span class="o">=</span><span class="n">pub</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
+<span class="n">pt</span> <span class="o">=</span> <span class="n">RSADecrypt</span><span class="p">(</span><span class="n">private_key</span><span class="o">=</span><span class="n">priv</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">ct</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>IDE integration works out of the box in PyCharm and VSCode when using the
-project’s <code class="docutils literal notranslate"><span class="pre">setup.cfg</span></code>.</p>
+<p>After one major version, these legacy helpers will be removed. Always prefer
+adding new functionality as Pipeline modules.</p>
+</section>
 </section>
 
         </article>
@@ -289,23 +289,23 @@ project’s <code class="docutils literal notranslate"><span class="pre">setup.c
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="release_process.html">
+          <a class="next-page" href="threat_model.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Release Process</div>
+                <div class="title">Supply Chain Threat Model</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="fuzzing.html">
+          <a class="prev-page" href="migration_4.0.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Fuzzing and Property Testing</div>
+                <div class="title">Migration Guide to Cryptography Suite 4.0.0</div>
                 
               </div>
             </a>
@@ -327,8 +327,28 @@ project’s <code class="docutils literal notranslate"><span class="pre">setup.c
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Migration to Pipeline API</a><ul>
+<li><a class="reference internal" href="#replacing-aes-helpers">Replacing AES helpers</a></li>
+<li><a class="reference internal" href="#replacing-rsa-helpers">Replacing RSA helpers</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
