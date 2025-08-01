@@ -5,4 +5,4 @@ provided for reference or legacy compatibility only. They are
 **not** recommended for production use.
 """
 
-__all__ = []
+__all__: list[str] = []
