@@ -1,6 +1,6 @@
 import pytest
 
-from cryptography_suite import bulletproof
+from cryptography_suite.experimental import bulletproof
 
 
 pytestmark = pytest.mark.skipif(

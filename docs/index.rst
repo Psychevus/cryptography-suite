@@ -54,4 +54,5 @@ formally verified, misuse-resistant workflows.
    security.rst
    api/modules
    api/pipeline
+   api/public_api_table
 

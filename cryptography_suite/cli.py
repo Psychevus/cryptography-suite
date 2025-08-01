@@ -33,7 +33,7 @@ from .zk.bulletproof import (
 from .crypto_backends import available_backends
 
 try:
-    from . import zksnark
+    from .experimental import zksnark
 
     ZKSNARK_AVAILABLE = getattr(zksnark, "ZKSNARK_AVAILABLE", False)
 except Exception:

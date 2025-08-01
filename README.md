@@ -25,7 +25,7 @@
 ## 🔑 Key Features
 
 - **Comprehensive Functionality**: Symmetric and asymmetric encryption, digital signatures, key management, secret sharing, password-authenticated key exchange (PAKE), and one-time passwords (OTP).
-- **Post-Quantum Primitives**: Kyber KEM, Dilithium signatures, and **experimental SPHINCS+** support (enable via `pip install "cryptography-suite[pqc]"` – demo-only, not production-grade).
+- **Post-Quantum Primitives**: Kyber KEM, Dilithium signatures, and **experimental SPHINCS+** support (enable via `pip install "cryptography-suite[pqc]"` – demo-only, not production-grade). These are available under ``cryptography_suite.experimental``.
 - **Signal Protocol Demo**: Minimal X3DH + Double Ratchet implementation for demonstration purposes (**experimental, not production-ready**).
 - **Developer-Friendly API**: Intuitive, well-documented interfaces that simplify integration and accelerate development.
 - **Cross-Platform Compatibility**: Fully compatible with macOS, Linux, and Windows environments.
