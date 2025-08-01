@@ -8,6 +8,10 @@ removed without notice. Import them explicitly, e.g.::
 
 from typing import Any
 
+DEPRECATED_MSG = (
+    "This function is deprecated and will be removed in v4.0.0. For reference/education only. DO NOT USE IN PRODUCTION."
+)
+
 # Signal protocol ------------------------------------------------------------
 try:  # pragma: no cover - pure Python experimental feature
     from .signal import (
@@ -152,3 +156,9 @@ __all__ = [
     "KeyGraphWidget",
     "SessionTimelineWidget",
 ]
+
+
+def __getattr__(name: str) -> Any:
+    if name in {"salsa20_encrypt", "salsa20_decrypt", "ascon_encrypt", "ascon_decrypt"}:
+        raise RuntimeError(DEPRECATED_MSG)
+    raise AttributeError(name)
