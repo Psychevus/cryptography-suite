@@ -63,12 +63,18 @@ from cryptography_suite.pipeline import (
     list_modules,
 )
 
-use_backend("pyca")
-
-p = Pipeline() >> AESGCMEncrypt(password="pass") >> AESGCMDecrypt(password="pass")
-assert p.run("data") == "data"
-print(list_modules())  # ['AESGCMDecrypt', 'AESGCMEncrypt']
+with use_backend("pyca"):
+    p = (
+        Pipeline()
+        >> AESGCMEncrypt(password="pass")
+        >> AESGCMDecrypt(password="pass")
+    )
+    assert p.run("data") == "data"
+    print(list_modules())  # ['AESGCMDecrypt', 'AESGCMEncrypt']
 ```
+
+Backend selection is context-local: each thread or async task maintains its
+own active backend when using :func:`use_backend` as a context manager.
 
 *Contributors*: new pipeline modules can be exposed with the
 `@register_module` decorator in ``cryptography_suite.pipeline``.
@@ -728,7 +734,8 @@ cryptography-suite/
 
 Version 3.0.0 introduces several breaking changes. To upgrade from 2.x:
 
-- **Backend Selection Required** via ``use_backend``.
+- **Backend Selection Required** via ``use_backend``; the library emits a
+  runtime warning if no backend is explicitly selected.
 - **Pipeline API** replaces chained helper calls.
 - **KeyManager Interfaces Updated** for persistent key handling.
 - **Deprecated Helpers Removed** in favor of pipeline stages.
