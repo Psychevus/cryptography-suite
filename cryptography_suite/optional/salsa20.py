@@ -51,4 +51,4 @@ def salsa20_decrypt(ciphertext: bytes, key: bytes, nonce: bytes) -> bytes:
     return cipher.decrypt(ciphertext)
 
 
-__all__ = ["salsa20_encrypt", "salsa20_decrypt"]
+__all__: list[str] = []
