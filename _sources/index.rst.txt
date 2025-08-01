@@ -42,6 +42,7 @@ formally verified, misuse-resistant workflows.
    mypy_plugin.md
    release_process.md
    migration_3.0.md
+   migration_4.0.md
    threat_model.md
    visualization.md
    security.rst

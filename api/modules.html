@@ -208,6 +208,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../mypy_plugin.html">Misuse-Resistant Checking</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../release_process.html">Release Process</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../migration_3.0.html">Migrating to Cryptography Suite 3.0.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../migration_4.0.html">Migration Guide to Cryptography Suite 4.0.0</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../threat_model.html">Supply Chain Threat Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../visualization.html">Visualization Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../security.html">Security Notes</a></li>
@@ -956,12 +957,6 @@ a byte string.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="cryptography_suite.generate_ec_keypair_and_save">
-<span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">generate_ec_keypair_and_save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">private_key_path:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">public_key_path:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">curve:</span> <span class="pre">~cryptography.hazmat.primitives.asymmetric.ec.EllipticCurve</span> <span class="pre">=</span> <span class="pre">&lt;cryptography.hazmat.primitives.asymmetric.ec.SECP256R1</span> <span class="pre">object&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cryptography_suite.generate_ec_keypair_and_save" title="Link to this definition">¶</a></dt>
-<dd><p>Legacy wrapper for <a class="reference internal" href="#cryptography_suite.KeyManager" title="cryptography_suite.KeyManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">KeyManager</span></code></a> EC key generation.</p>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="cryptography_suite.generate_ecdsa_keypair">
 <span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">generate_ecdsa_keypair</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">curve:</span> <span class="pre">~cryptography.hazmat.primitives.asymmetric.ec.EllipticCurve</span> <span class="pre">=</span> <span class="pre">&lt;cryptography.hazmat.primitives.asymmetric.ec.SECP256R1</span> <span class="pre">object&gt;</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">EllipticCurvePrivateKey</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">EllipticCurvePublicKey</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#cryptography_suite.generate_ecdsa_keypair" title="Link to this definition">¶</a></dt>
 <dd><p>Generates an ECDSA private and public key pair.</p>
@@ -989,15 +984,6 @@ a byte string.</p>
 <dt class="sig sig-object py" id="cryptography_suite.generate_rsa_keypair">
 <span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">generate_rsa_keypair</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">4096</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">RSAPrivateKey</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">RSAPublicKey</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#cryptography_suite.generate_rsa_keypair" title="Link to this definition">¶</a></dt>
 <dd><p>Generates an RSA private and public key pair.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="cryptography_suite.generate_rsa_keypair_and_save">
-<span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">generate_rsa_keypair_and_save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">private_key_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">public_key_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">4096</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cryptography_suite.generate_rsa_keypair_and_save" title="Link to this definition">¶</a></dt>
-<dd><p>Legacy wrapper for <a class="reference internal" href="#cryptography_suite.KeyManager" title="cryptography_suite.KeyManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">KeyManager</span></code></a> RSA key generation.</p>
-<div class="deprecated">
-<p><span class="versionmodified deprecated">Deprecated since version 2.0.0: </span>Use <a class="reference internal" href="#cryptography_suite.KeyManager.generate_rsa_keypair_and_save" title="cryptography_suite.KeyManager.generate_rsa_keypair_and_save"><code class="xref py py-class docutils literal notranslate"><span class="pre">KeyManager.generate_rsa_keypair_and_save</span></code></a> instead.</p>
-</div>
 </dd></dl>
 
 <dl class="py function">
@@ -1580,13 +1566,11 @@ and <code class="docutils literal notranslate"><span class="pre">key</span></cod
 <li><a class="reference internal" href="#cryptography_suite.generate_bls_keypair"><code class="docutils literal notranslate"><span class="pre">generate_bls_keypair()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.generate_csr"><code class="docutils literal notranslate"><span class="pre">generate_csr()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.generate_ec_keypair"><code class="docutils literal notranslate"><span class="pre">generate_ec_keypair()</span></code></a></li>
-<li><a class="reference internal" href="#cryptography_suite.generate_ec_keypair_and_save"><code class="docutils literal notranslate"><span class="pre">generate_ec_keypair_and_save()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.generate_ecdsa_keypair"><code class="docutils literal notranslate"><span class="pre">generate_ecdsa_keypair()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.generate_ed25519_keypair"><code class="docutils literal notranslate"><span class="pre">generate_ed25519_keypair()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.generate_ed448_keypair"><code class="docutils literal notranslate"><span class="pre">generate_ed448_keypair()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.generate_hotp"><code class="docutils literal notranslate"><span class="pre">generate_hotp()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.generate_rsa_keypair"><code class="docutils literal notranslate"><span class="pre">generate_rsa_keypair()</span></code></a></li>
-<li><a class="reference internal" href="#cryptography_suite.generate_rsa_keypair_and_save"><code class="docutils literal notranslate"><span class="pre">generate_rsa_keypair_and_save()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.generate_rsa_keypair_async"><code class="docutils literal notranslate"><span class="pre">generate_rsa_keypair_async()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.generate_salt"><code class="docutils literal notranslate"><span class="pre">generate_salt()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.generate_secure_random_string"><code class="docutils literal notranslate"><span class="pre">generate_secure_random_string()</span></code></a></li>

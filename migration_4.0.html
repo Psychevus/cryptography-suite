@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Migration Guide to Cryptography Suite 4.0.0" href="migration_4.0.html" /><link rel="prev" title="Release Process" href="release_process.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Supply Chain Threat Model" href="threat_model.html" /><link rel="prev" title="Migrating to Cryptography Suite 3.0.0" href="migration_3.0.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
-        <title>Migrating to Cryptography Suite 3.0.0 - cryptography-suite 3.0.0 documentation</title>
+        <title>Migration Guide to Cryptography Suite 4.0.0 - cryptography-suite 3.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -178,7 +178,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -207,8 +207,8 @@
 <li class="toctree-l1"><a class="reference internal" href="fuzzing.html">Fuzzing and Property Testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mypy_plugin.html">Misuse-Resistant Checking</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release_process.html">Release Process</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Migrating to Cryptography Suite 3.0.0</a></li>
-<li class="toctree-l1"><a class="reference internal" href="migration_4.0.html">Migration Guide to Cryptography Suite 4.0.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="migration_3.0.html">Migrating to Cryptography Suite 3.0.0</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Migration Guide to Cryptography Suite 4.0.0</a></li>
 <li class="toctree-l1"><a class="reference internal" href="threat_model.html">Supply Chain Threat Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="security.html">Security Notes</a></li>
@@ -233,7 +233,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="_sources/migration_3.0.md.txt" title="View this page">
+  <a class="muted-link" href="_sources/migration_4.0.md.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -247,68 +247,44 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="migrating-to-cryptography-suite-3-0-0">
-<h1>Migrating to Cryptography Suite 3.0.0<a class="headerlink" href="#migrating-to-cryptography-suite-3-0-0" title="Link to this heading">¶</a></h1>
-<p>Version 3.0.0 introduces a redesigned, backend-agnostic architecture. Users of
-2.x should review the following breaking changes and update their code
-accordingly.</p>
-<section id="breaking-changes">
-<h2>Breaking Changes<a class="headerlink" href="#breaking-changes" title="Link to this heading">¶</a></h2>
-<ul>
-<li><p><strong>Backend Selection</strong> is now mandatory via <code class="docutils literal notranslate"><span class="pre">use_backend</span></code>. The default
-<code class="docutils literal notranslate"><span class="pre">cryptography</span></code> backend can be enabled with <code class="docutils literal notranslate"><span class="pre">use_backend(&quot;pyca&quot;)</span></code>.</p></li>
-<li><p><strong>Pipeline API</strong> replaces ad-hoc helper chains. Compose operations using the
-<code class="docutils literal notranslate"><span class="pre">Pipeline</span></code> class.</p></li>
-<li><p><strong>Key Management Interfaces</strong> have changed. Use <code class="docutils literal notranslate"><span class="pre">KeyManager</span></code> for all
-persistent key operations.</p>
-<p>Old helpers like <code class="docutils literal notranslate"><span class="pre">generate_rsa_keypair_and_save</span></code> and
-<code class="docutils literal notranslate"><span class="pre">generate_ec_keypair_and_save</span></code> are deprecated and will be removed in
-v4.0.0. Convert code such as::</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>generate_ec_keypair_and_save(&quot;priv.pem&quot;, &quot;pub.pem&quot;, &quot;pw&quot;)
-</pre></div>
+          <section id="migration-guide-to-cryptography-suite-4-0-0">
+<h1>Migration Guide to Cryptography Suite 4.0.0<a class="headerlink" href="#migration-guide-to-cryptography-suite-4-0-0" title="Link to this heading">¶</a></h1>
+<p>The following functions are deprecated and scheduled for removal in v4.0.0. Update
+existing code to use the recommended replacements.</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Deprecated Function</p></th>
+<th class="head"><p>Replacement</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">derive_pbkdf2</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">kdf_pbkdf2</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">generate_rsa_keypair_and_save</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">KeyManager.generate_rsa_keypair_and_save</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">generate_ec_keypair_and_save</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">KeyManager.generate_ec_keypair_and_save</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">salsa20_encrypt</span></code> / <code class="docutils literal notranslate"><span class="pre">salsa20_decrypt</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">chacha20_stream_encrypt</span></code> / <code class="docutils literal notranslate"><span class="pre">chacha20_stream_decrypt</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ascon.encrypt</span></code> / <code class="docutils literal notranslate"><span class="pre">ascon.decrypt</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">aead.chacha20_encrypt_aead</span></code> / <code class="docutils literal notranslate"><span class="pre">aead.chacha20_decrypt_aead</span></code> or <code class="docutils literal notranslate"><span class="pre">symmetric.aes_encrypt</span></code> / <code class="docutils literal notranslate"><span class="pre">symmetric.aes_decrypt</span></code></p></td>
+</tr>
+</tbody>
+</table>
 </div>
-<p>to::</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>km = KeyManager()
-km.generate_ec_keypair_and_save(&quot;priv.pem&quot;, &quot;pub.pem&quot;, &quot;pw&quot;)
-</pre></div>
-</div>
-</li>
-<li><p><strong>Deprecated Functions Removed.</strong> Legacy helpers marked deprecated in 2.x have
-been deleted.</p></li>
-</ul>
-</section>
-<section id="typical-upgrade-steps">
-<h2>Typical Upgrade Steps<a class="headerlink" href="#typical-upgrade-steps" title="Link to this heading">¶</a></h2>
-<ol class="arabic simple">
-<li><p>Install version 3.0.0 and required extras.</p></li>
-<li><p>Replace direct calls to helper functions with pipeline stages.</p></li>
-<li><p>Configure a backend at application start-up.</p></li>
-<li><p>Review new exceptions for misuse protection and update error handling.</p></li>
-</ol>
-</section>
-<section id="example">
-<h2>Example<a class="headerlink" href="#example" title="Link to this heading">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cryptography_suite</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span><span class="p">,</span> <span class="n">use_backend</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">cryptography_suite.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">AESGCMEncrypt</span><span class="p">,</span> <span class="n">AESGCMDecrypt</span>
-
-<span class="n">use_backend</span><span class="p">(</span><span class="s2">&quot;pyca&quot;</span><span class="p">)</span>
-
-<span class="n">encrypt</span> <span class="o">=</span> <span class="n">AESGCMEncrypt</span><span class="p">(</span><span class="n">password</span><span class="o">=</span><span class="s2">&quot;pass&quot;</span><span class="p">)</span>
-<span class="n">decrypt</span> <span class="o">=</span> <span class="n">AESGCMDecrypt</span><span class="p">(</span><span class="n">password</span><span class="o">=</span><span class="s2">&quot;pass&quot;</span><span class="p">)</span>
-
-<span class="n">p</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">()</span> <span class="o">&gt;&gt;</span> <span class="n">encrypt</span> <span class="o">&gt;&gt;</span> <span class="n">decrypt</span>
-<span class="k">assert</span> <span class="n">p</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;msg&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;msg&quot;</span>
-</pre></div>
-</div>
-<p>See the <a class="reference internal" href="#index.html"><span class="xref myst">full documentation</span></a> for details on the new architecture and
-plugin interfaces.</p>
-</section>
+<p>All deprecated helpers emit <code class="docutils literal notranslate"><span class="pre">DeprecationWarning</span></code> when used. Remove any remaining
+references before upgrading to v4.0.0.</p>
 </section>
 
         </article>
@@ -316,23 +292,23 @@ plugin interfaces.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="migration_4.0.html">
+          <a class="next-page" href="threat_model.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Migration Guide to Cryptography Suite 4.0.0</div>
+                <div class="title">Supply Chain Threat Model</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="release_process.html">
+          <a class="prev-page" href="migration_3.0.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Release Process</div>
+                <div class="title">Migrating to Cryptography Suite 3.0.0</div>
                 
               </div>
             </a>
@@ -354,29 +330,8 @@ plugin interfaces.</p>
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">Migrating to Cryptography Suite 3.0.0</a><ul>
-<li><a class="reference internal" href="#breaking-changes">Breaking Changes</a></li>
-<li><a class="reference internal" href="#typical-upgrade-steps">Typical Upgrade Steps</a></li>
-<li><a class="reference internal" href="#example">Example</a></li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>

@@ -14,7 +14,8 @@ accordingly.
   persistent key operations.
 
   Old helpers like ``generate_rsa_keypair_and_save`` and
-  ``generate_ec_keypair_and_save`` are deprecated. Convert code such as::
+  ``generate_ec_keypair_and_save`` are deprecated and will be removed in
+  v4.0.0. Convert code such as::
 
       generate_ec_keypair_and_save("priv.pem", "pub.pem", "pw")
 
