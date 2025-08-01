@@ -32,4 +32,3 @@ __all__ = [
     "verify_signature_ed448",
     "blake3_hash_v2",
 ]
-

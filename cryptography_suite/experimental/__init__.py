@@ -105,4 +105,3 @@ __all__ = [
     "KeyGraphWidget",
     "SessionTimelineWidget",
 ]
-
