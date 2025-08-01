@@ -213,6 +213,7 @@
 <li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="security.html">Security Notes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/modules.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/pipeline.html">Pipeline DSL</a></li>
 </ul>
 
 </div>
@@ -282,7 +283,11 @@ formally verified, misuse-resistant workflows.</p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="architecture.html">Package Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="protocols.html">Protocol Notes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pipeline.html">Pipeline API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pipeline.html">Pipeline API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pipeline.html#pipeline-dsl">Pipeline DSL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline.html#extending-the-pipeline-dsl">Extending the Pipeline DSL</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="cli.html#file-encryption">File Encryption</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cli.html#other-commands">Other Commands</a></li>
@@ -442,6 +447,16 @@ formally verified, misuse-resistant workflows.</p>
 <li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.xchacha_decrypt"><code class="docutils literal notranslate"><span class="pre">xchacha_decrypt()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.xchacha_encrypt"><code class="docutils literal notranslate"><span class="pre">xchacha_encrypt()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/modules.html#selecting-a-backend">Selecting a backend</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/pipeline.html">Pipeline DSL</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/pipeline.html#cryptography_suite.pipeline.AESGCMDecrypt"><code class="docutils literal notranslate"><span class="pre">AESGCMDecrypt</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/pipeline.html#cryptography_suite.pipeline.AESGCMEncrypt"><code class="docutils literal notranslate"><span class="pre">AESGCMEncrypt</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/pipeline.html#cryptography_suite.pipeline.CryptoModule"><code class="docutils literal notranslate"><span class="pre">CryptoModule</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/pipeline.html#cryptography_suite.pipeline.Pipeline"><code class="docutils literal notranslate"><span class="pre">Pipeline</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/pipeline.html#cryptography_suite.pipeline.PipelineVisualizer"><code class="docutils literal notranslate"><span class="pre">PipelineVisualizer</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/pipeline.html#cryptography_suite.pipeline.list_modules"><code class="docutils literal notranslate"><span class="pre">list_modules()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/pipeline.html#cryptography_suite.pipeline.register_module"><code class="docutils literal notranslate"><span class="pre">register_module()</span></code></a></li>
 </ul>
 </li>
 </ul>

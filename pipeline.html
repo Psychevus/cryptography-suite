@@ -178,7 +178,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -213,6 +213,7 @@
 <li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="security.html">Security Notes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/modules.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/pipeline.html">Pipeline DSL</a></li>
 </ul>
 
 </div>
@@ -247,7 +248,7 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
@@ -258,17 +259,45 @@
 <p>The <code class="docutils literal notranslate"><span class="pre">Pipeline</span></code> class allows sequential composition of cryptographic modules. Each
 module implements a simple <code class="docutils literal notranslate"><span class="pre">run</span></code> method. Pipelines can be built using the <code class="docutils literal notranslate"><span class="pre">&gt;&gt;</span></code>
 operator and inspected as JSON.</p>
-<p>Example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cryptography_suite.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span>
+<section id="pipeline-dsl">
+<h2>Pipeline DSL<a class="headerlink" href="#pipeline-dsl" title="Link to this heading">¶</a></h2>
+<p>The package ships with a small DSL for common cryptographic operations such as
+AES-GCM encryption. Modules are importable from
+<code class="docutils literal notranslate"><span class="pre">cryptography_suite.pipeline</span></code> and can be composed declaratively:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cryptography_suite.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Pipeline</span><span class="p">,</span>
+    <span class="n">AESGCMEncrypt</span><span class="p">,</span>
+    <span class="n">AESGCMDecrypt</span><span class="p">,</span>
+    <span class="n">list_modules</span><span class="p">,</span>
+<span class="p">)</span>
 
-<span class="k">class</span><span class="w"> </span><span class="nc">UpperCase</span><span class="p">:</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
-
-<span class="n">p</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">()</span> <span class="o">&gt;&gt;</span> <span class="n">UpperCase</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;abc&quot;</span><span class="p">))</span>  <span class="c1"># b&#39;ABC&#39;</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">()</span> <span class="o">&gt;&gt;</span> <span class="n">AESGCMEncrypt</span><span class="p">(</span><span class="n">password</span><span class="o">=</span><span class="s2">&quot;pw&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">AESGCMDecrypt</span><span class="p">(</span><span class="n">password</span><span class="o">=</span><span class="s2">&quot;pw&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;hi&quot;</span><span class="p">))</span>        <span class="c1"># &#39;hi&#39;</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">list_modules</span><span class="p">())</span>      <span class="c1"># [&#39;AESGCMDecrypt&#39;, &#39;AESGCMEncrypt&#39;]</span>
 </pre></div>
 </div>
+</section>
+<section id="extending-the-pipeline-dsl">
+<h2>Extending the Pipeline DSL<a class="headerlink" href="#extending-the-pipeline-dsl" title="Link to this heading">¶</a></h2>
+<p>Backends or applications can expose custom modules using the
+<code class="docutils literal notranslate"><span class="pre">&#64;register_module</span></code> decorator. Registered classes automatically appear in
+<code class="docutils literal notranslate"><span class="pre">list_modules</span></code> and are importable from the pipeline namespace:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cryptography_suite.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">CryptoModule</span><span class="p">,</span> <span class="n">register_module</span>
+
+<span class="nd">@register_module</span>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ROT13</span><span class="p">(</span><span class="n">CryptoModule</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">codecs</span>
+        <span class="k">return</span> <span class="n">codecs</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">&quot;rot13&quot;</span><span class="p">)</span>
+
+<span class="n">Pipeline</span><span class="p">()</span> <span class="o">&gt;&gt;</span> <span class="n">ROT13</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Use :func:<code class="docutils literal notranslate"><span class="pre">cryptography_suite.crypto_backends.use_backend</span></code> to switch the
+backend providing primitive implementations.</p>
+</section>
 </section>
 
         </article>
@@ -314,8 +343,28 @@ operator and inspected as JSON.</p>
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Pipeline API</a><ul>
+<li><a class="reference internal" href="#pipeline-dsl">Pipeline DSL</a></li>
+<li><a class="reference internal" href="#extending-the-pipeline-dsl">Extending the Pipeline DSL</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

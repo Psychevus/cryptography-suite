@@ -211,6 +211,7 @@
 <li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="security.html">Security Notes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/modules.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/pipeline.html">Pipeline DSL</a></li>
 </ul>
 
 </div>
@@ -262,8 +263,12 @@
 </li>
         <li><a href="api/modules.html#cryptography_suite.aes_encrypt">aes_encrypt() (in module cryptography_suite)</a>
 </li>
+        <li><a href="api/pipeline.html#cryptography_suite.pipeline.AESGCMDecrypt">AESGCMDecrypt (class in cryptography_suite.pipeline)</a>
+</li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/pipeline.html#cryptography_suite.pipeline.AESGCMEncrypt">AESGCMEncrypt (class in cryptography_suite.pipeline)</a>
+</li>
         <li><a href="api/modules.html#cryptography_suite.argon2_decrypt">argon2_decrypt() (in module cryptography_suite)</a>
 </li>
         <li><a href="api/modules.html#cryptography_suite.argon2_encrypt">argon2_encrypt() (in module cryptography_suite)</a>
@@ -320,14 +325,14 @@
 </li>
         <li><a href="api/modules.html#cryptography_suite.chacha20_stream_encrypt">chacha20_stream_encrypt() (in module cryptography_suite)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/modules.html#cryptography_suite.SPAKE2Client.compute_shared_key">compute_shared_key() (cryptography_suite.SPAKE2Client method)</a>
 
         <ul>
           <li><a href="api/modules.html#cryptography_suite.SPAKE2Server.compute_shared_key">(cryptography_suite.SPAKE2Server method)</a>
 </li>
         </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/modules.html#cryptography_suite.constant_time_compare">constant_time_compare() (in module cryptography_suite)</a>
 </li>
         <li><a href="api/modules.html#cryptography_suite.create_shares">create_shares() (in module cryptography_suite)</a>
@@ -339,7 +344,16 @@
           <li><a href="api/modules.html#module-cryptography_suite">module</a>
 </li>
         </ul></li>
+        <li>
+    cryptography_suite.pipeline
+
+        <ul>
+          <li><a href="api/pipeline.html#module-cryptography_suite.pipeline">module</a>
+</li>
+        </ul></li>
         <li><a href="api/modules.html#cryptography_suite.CryptographySuiteError">CryptographySuiteError</a>
+</li>
+        <li><a href="api/pipeline.html#cryptography_suite.pipeline.CryptoModule">CryptoModule (class in cryptography_suite.pipeline)</a>
 </li>
     </ul></td>
   </tr></table>
@@ -365,10 +379,10 @@
 </li>
         <li><a href="api/modules.html#cryptography_suite.DecryptionError">DecryptionError</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/modules.html#cryptography_suite.derive_hkdf">derive_hkdf() (in module cryptography_suite)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/modules.html#cryptography_suite.derive_key_argon2">derive_key_argon2() (in module cryptography_suite)</a>
 </li>
         <li><a href="api/modules.html#cryptography_suite.derive_key_pbkdf2">derive_key_pbkdf2() (in module cryptography_suite)</a>
@@ -380,9 +394,17 @@
         <li><a href="api/modules.html#cryptography_suite.derive_x448_shared_key">derive_x448_shared_key() (in module cryptography_suite)</a>
 </li>
         <li><a href="api/modules.html#cryptography_suite.Pipeline.describe">describe() (cryptography_suite.Pipeline method)</a>
+
+        <ul>
+          <li><a href="api/pipeline.html#cryptography_suite.pipeline.Pipeline.describe">(cryptography_suite.pipeline.Pipeline method)</a>
 </li>
+        </ul></li>
         <li><a href="api/modules.html#cryptography_suite.Pipeline.dry_run">dry_run() (cryptography_suite.Pipeline method)</a>
+
+        <ul>
+          <li><a href="api/pipeline.html#cryptography_suite.pipeline.Pipeline.dry_run">(cryptography_suite.pipeline.Pipeline method)</a>
 </li>
+        </ul></li>
     </ul></td>
   </tr></table>
 </section>
@@ -422,7 +444,11 @@
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/modules.html#cryptography_suite.Pipeline.from_config">from_config() (cryptography_suite.Pipeline class method)</a>
+
+        <ul>
+          <li><a href="api/pipeline.html#cryptography_suite.pipeline.Pipeline.from_config">(cryptography_suite.pipeline.Pipeline class method)</a>
 </li>
+        </ul></li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/modules.html#cryptography_suite.from_pem">from_pem() (in module cryptography_suite)</a>
@@ -527,14 +553,20 @@
   <h2>K</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/pipeline.html#cryptography_suite.pipeline.AESGCMDecrypt.kdf">kdf (cryptography_suite.pipeline.AESGCMDecrypt attribute)</a>
+
+        <ul>
+          <li><a href="api/pipeline.html#cryptography_suite.pipeline.AESGCMEncrypt.kdf">(cryptography_suite.pipeline.AESGCMEncrypt attribute)</a>
+</li>
+        </ul></li>
         <li><a href="api/modules.html#cryptography_suite.kdf_pbkdf2">kdf_pbkdf2() (in module cryptography_suite)</a>
 </li>
         <li><a href="api/modules.html#cryptography_suite.key_exists">key_exists() (in module cryptography_suite)</a>
 </li>
-        <li><a href="api/modules.html#cryptography_suite.KeyDerivationError">KeyDerivationError</a>
-</li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.KeyDerivationError">KeyDerivationError</a>
+</li>
         <li><a href="api/modules.html#cryptography_suite.KeyGraphWidget">KeyGraphWidget (class in cryptography_suite)</a>
 </li>
         <li><a href="api/modules.html#cryptography_suite.KeyManager">KeyManager (class in cryptography_suite)</a>
@@ -549,6 +581,8 @@
   <h2>L</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/pipeline.html#cryptography_suite.pipeline.list_modules">list_modules() (in module cryptography_suite.pipeline)</a>
+</li>
         <li><a href="api/modules.html#cryptography_suite.load_certificate">load_certificate() (in module cryptography_suite)</a>
 </li>
         <li><a href="api/modules.html#cryptography_suite.load_ecdsa_private_key">load_ecdsa_private_key() (in module cryptography_suite)</a>
@@ -557,10 +591,10 @@
 </li>
         <li><a href="api/modules.html#cryptography_suite.load_ed25519_private_key">load_ed25519_private_key() (in module cryptography_suite)</a>
 </li>
-        <li><a href="api/modules.html#cryptography_suite.load_ed25519_public_key">load_ed25519_public_key() (in module cryptography_suite)</a>
-</li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.load_ed25519_public_key">load_ed25519_public_key() (in module cryptography_suite)</a>
+</li>
         <li><a href="api/modules.html#cryptography_suite.KeyManager.load_private_key">load_private_key() (cryptography_suite.KeyManager method)</a>
 
         <ul>
@@ -589,11 +623,17 @@
         <ul>
           <li><a href="api/modules.html#module-cryptography_suite">cryptography_suite</a>
 </li>
+          <li><a href="api/pipeline.html#module-cryptography_suite.pipeline">cryptography_suite.pipeline</a>
+</li>
         </ul></li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/modules.html#cryptography_suite.Pipeline.modules">modules (cryptography_suite.Pipeline attribute)</a>
+
+        <ul>
+          <li><a href="api/pipeline.html#cryptography_suite.pipeline.Pipeline.modules">(cryptography_suite.pipeline.Pipeline attribute)</a>
 </li>
+        </ul></li>
     </ul></td>
   </tr></table>
 </section>
@@ -612,6 +652,12 @@
   <h2>P</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/pipeline.html#cryptography_suite.pipeline.AESGCMDecrypt.password">password (cryptography_suite.pipeline.AESGCMDecrypt attribute)</a>
+
+        <ul>
+          <li><a href="api/pipeline.html#cryptography_suite.pipeline.AESGCMEncrypt.password">(cryptography_suite.pipeline.AESGCMEncrypt attribute)</a>
+</li>
+        </ul></li>
         <li><a href="api/modules.html#cryptography_suite.pbkdf2_decrypt">pbkdf2_decrypt() (in module cryptography_suite)</a>
 </li>
         <li><a href="api/modules.html#cryptography_suite.pbkdf2_encrypt">pbkdf2_encrypt() (in module cryptography_suite)</a>
@@ -621,9 +667,17 @@
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/modules.html#cryptography_suite.Pipeline">Pipeline (class in cryptography_suite)</a>
+
+        <ul>
+          <li><a href="api/pipeline.html#cryptography_suite.pipeline.Pipeline">(class in cryptography_suite.pipeline)</a>
 </li>
+        </ul></li>
         <li><a href="api/modules.html#cryptography_suite.PipelineVisualizer">PipelineVisualizer (class in cryptography_suite)</a>
+
+        <ul>
+          <li><a href="api/pipeline.html#cryptography_suite.pipeline.PipelineVisualizer">(class in cryptography_suite.pipeline)</a>
 </li>
+        </ul></li>
         <li><a href="api/modules.html#cryptography_suite.ProtocolError">ProtocolError</a>
 </li>
         <li><a href="api/modules.html#cryptography_suite.SignalReceiver.public_bundle">public_bundle (cryptography_suite.SignalReceiver property)</a>
@@ -638,22 +692,42 @@
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/modules.html#cryptography_suite.reconstruct_secret">reconstruct_secret() (in module cryptography_suite)</a>
 </li>
-        <li><a href="api/modules.html#cryptography_suite.PipelineVisualizer.render_ascii">render_ascii() (cryptography_suite.PipelineVisualizer method)</a>
+        <li><a href="api/pipeline.html#cryptography_suite.pipeline.register_module">register_module() (in module cryptography_suite.pipeline)</a>
 </li>
+        <li><a href="api/pipeline.html#cryptography_suite.pipeline.PipelineVisualizer.render_ascii">render_ascii() (cryptography_suite.pipeline.PipelineVisualizer method)</a>
+
+        <ul>
+          <li><a href="api/modules.html#cryptography_suite.PipelineVisualizer.render_ascii">(cryptography_suite.PipelineVisualizer method)</a>
+</li>
+        </ul></li>
         <li><a href="api/modules.html#cryptography_suite.rotate_aes_key">rotate_aes_key() (in module cryptography_suite)</a>
 </li>
         <li><a href="api/modules.html#cryptography_suite.KeyManager.rotate_keys">rotate_keys() (cryptography_suite.KeyManager method)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/modules.html#cryptography_suite.rsa_decrypt">rsa_decrypt() (in module cryptography_suite)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/modules.html#cryptography_suite.rsa_encrypt">rsa_encrypt() (in module cryptography_suite)</a>
 </li>
         <li><a href="api/modules.html#cryptography_suite.Pipeline.run">run() (cryptography_suite.Pipeline method)</a>
+
+        <ul>
+          <li><a href="api/pipeline.html#cryptography_suite.pipeline.AESGCMDecrypt.run">(cryptography_suite.pipeline.AESGCMDecrypt method)</a>
 </li>
+          <li><a href="api/pipeline.html#cryptography_suite.pipeline.AESGCMEncrypt.run">(cryptography_suite.pipeline.AESGCMEncrypt method)</a>
+</li>
+          <li><a href="api/pipeline.html#cryptography_suite.pipeline.CryptoModule.run">(cryptography_suite.pipeline.CryptoModule method)</a>
+</li>
+          <li><a href="api/pipeline.html#cryptography_suite.pipeline.Pipeline.run">(cryptography_suite.pipeline.Pipeline method)</a>
+</li>
+        </ul></li>
         <li><a href="api/modules.html#cryptography_suite.Pipeline.run_with_logging">run_with_logging() (cryptography_suite.Pipeline method)</a>
+
+        <ul>
+          <li><a href="api/pipeline.html#cryptography_suite.pipeline.Pipeline.run_with_logging">(cryptography_suite.pipeline.Pipeline method)</a>
 </li>
+        </ul></li>
     </ul></td>
   </tr></table>
 </section>
@@ -729,19 +803,51 @@
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/modules.html#cryptography_suite.Pipeline.to_json">to_json() (cryptography_suite.Pipeline method)</a>
+
+        <ul>
+          <li><a href="api/pipeline.html#cryptography_suite.pipeline.Pipeline.to_json">(cryptography_suite.pipeline.Pipeline method)</a>
 </li>
+        </ul></li>
         <li><a href="api/modules.html#cryptography_suite.to_pem">to_pem() (in module cryptography_suite)</a>
 </li>
         <li><a href="api/modules.html#cryptography_suite.Pipeline.to_proverif">to_proverif() (cryptography_suite.Pipeline method)</a>
+
+        <ul>
+          <li><a href="api/pipeline.html#cryptography_suite.pipeline.AESGCMDecrypt.to_proverif">(cryptography_suite.pipeline.AESGCMDecrypt method)</a>
 </li>
+          <li><a href="api/pipeline.html#cryptography_suite.pipeline.AESGCMEncrypt.to_proverif">(cryptography_suite.pipeline.AESGCMEncrypt method)</a>
+</li>
+          <li><a href="api/pipeline.html#cryptography_suite.pipeline.CryptoModule.to_proverif">(cryptography_suite.pipeline.CryptoModule method)</a>
+</li>
+          <li><a href="api/pipeline.html#cryptography_suite.pipeline.Pipeline.to_proverif">(cryptography_suite.pipeline.Pipeline method)</a>
+</li>
+        </ul></li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/modules.html#cryptography_suite.Pipeline.to_tamarin">to_tamarin() (cryptography_suite.Pipeline method)</a>
+
+        <ul>
+          <li><a href="api/pipeline.html#cryptography_suite.pipeline.AESGCMDecrypt.to_tamarin">(cryptography_suite.pipeline.AESGCMDecrypt method)</a>
 </li>
+          <li><a href="api/pipeline.html#cryptography_suite.pipeline.AESGCMEncrypt.to_tamarin">(cryptography_suite.pipeline.AESGCMEncrypt method)</a>
+</li>
+          <li><a href="api/pipeline.html#cryptography_suite.pipeline.CryptoModule.to_tamarin">(cryptography_suite.pipeline.CryptoModule method)</a>
+</li>
+          <li><a href="api/pipeline.html#cryptography_suite.pipeline.Pipeline.to_tamarin">(cryptography_suite.pipeline.Pipeline method)</a>
+</li>
+        </ul></li>
         <li><a href="api/modules.html#cryptography_suite.Pipeline.track_secret">track_secret() (cryptography_suite.Pipeline method)</a>
+
+        <ul>
+          <li><a href="api/pipeline.html#cryptography_suite.pipeline.Pipeline.track_secret">(cryptography_suite.pipeline.Pipeline method)</a>
 </li>
+        </ul></li>
         <li><a href="api/modules.html#cryptography_suite.Pipeline.tracked_secrets">tracked_secrets (cryptography_suite.Pipeline attribute)</a>
+
+        <ul>
+          <li><a href="api/pipeline.html#cryptography_suite.pipeline.Pipeline.tracked_secrets">(cryptography_suite.pipeline.Pipeline attribute)</a>
 </li>
+        </ul></li>
     </ul></td>
   </tr></table>
 </section>
