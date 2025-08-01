@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Formal Verification Support" href="formal.html" /><link rel="prev" title="Pipeline API Coverage" href="pipeline_coverage.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="KeyStore Plugin Development" href="keystore_plugins.html" /><link rel="prev" title="Pipeline API Coverage" href="pipeline_coverage.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
         <title>Command Line Interface - cryptography-suite 3.0.0 documentation</title>
@@ -204,6 +204,7 @@
 <li class="toctree-l1"><a class="reference internal" href="pipeline.html">Pipeline API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline_coverage.html">Pipeline API Coverage</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="keystore_plugins.html">KeyStore Plugin Development</a></li>
 <li class="toctree-l1"><a class="reference internal" href="formal.html">Formal Verification Support</a></li>
 <li class="toctree-l1"><a class="reference internal" href="fuzzing.html">Fuzzing and Property Testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mypy_plugin.html">Misuse-Resistant Checking</a></li>
@@ -290,6 +291,17 @@ as hidden aliases for backward compatibility.</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">fuzz</span></code> – run fuzzing harnesses (also exposed via <code class="docutils literal notranslate"><span class="pre">cryptosuite-fuzz</span></code>)</p></li>
 </ul>
 </section>
+<section id="keystore-command">
+<h2>Keystore Command<a class="headerlink" href="#keystore-command" title="Link to this heading">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">keystore</span></code> group exposes pluggable key storage backends.  Available
+backends are classified by stability:</p>
+<p><code class="docutils literal notranslate"><span class="pre">local</span></code> (testing), <code class="docutils literal notranslate"><span class="pre">mock_hsm</span></code> (testing), <code class="docutils literal notranslate"><span class="pre">aws-kms</span></code> (production,
+requires <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">cryptography-suite[aws]</span></code>)</p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">cryptography-suite</span> <span class="pre">keystore</span> <span class="pre">list</span></code> to display the available backends
+with their status and <code class="docutils literal notranslate"><span class="pre">cryptography-suite</span> <span class="pre">keystore</span> <span class="pre">test</span></code> to verify
+connectivity.  The <code class="docutils literal notranslate"><span class="pre">migrate</span></code> subcommand is reserved for future use and
+currently prints <code class="docutils literal notranslate"><span class="pre">Not</span> <span class="pre">Implemented</span></code>.</p>
+</section>
 </section>
 
         </article>
@@ -297,12 +309,12 @@ as hidden aliases for backward compatibility.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="formal.html">
+          <a class="next-page" href="keystore_plugins.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Formal Verification Support</div>
+                <div class="title">KeyStore Plugin Development</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -350,6 +362,7 @@ as hidden aliases for backward compatibility.</p>
 <li><a class="reference internal" href="#">Command Line Interface</a><ul>
 <li><a class="reference internal" href="#file-encryption">File Encryption</a></li>
 <li><a class="reference internal" href="#other-commands">Other Commands</a></li>
+<li><a class="reference internal" href="#keystore-command">Keystore Command</a></li>
 </ul>
 </li>
 </ul>
