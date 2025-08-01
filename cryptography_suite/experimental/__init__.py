@@ -50,6 +50,13 @@ except Exception:  # pragma: no cover - fallback when pqcrypto is missing
     sphincs_sign = sphincs_verify = None  # type: ignore
 
 # Homomorphic encryption -----------------------------------------------------
+fhe_add: Any
+fhe_decrypt: Any
+fhe_encrypt: Any
+fhe_keygen: Any
+fhe_load_context: Any
+fhe_multiply: Any
+fhe_serialize_context: Any
 try:  # pragma: no cover - optional dependency
     from ..homomorphic import (
         add as fhe_add,
@@ -76,7 +83,7 @@ except Exception:  # pragma: no cover - handle missing Pyfhel
         fhe_multiply
     ) = (
         fhe_serialize_context
-    ) = None  # type: ignore
+    ) = None  # type: ignore[assignment]
     FHE_AVAILABLE = False
 
 # Zero-knowledge proofs ------------------------------------------------------

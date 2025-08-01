@@ -60,8 +60,12 @@ class PyfhelBackend(HEBackend):
                 "Pyfhel is required for homomorphic encryption features"
             )
 
-    _CKKS_DEFAULTS = {"n": 2**14, "scale": 2**30, "qi_sizes": [60, 30, 30, 60]}
-    _BFV_DEFAULTS = {"n": 2**14, "t_bits": 20}
+    _CKKS_DEFAULTS: dict[str, Any] = {
+        "n": 2**14,
+        "scale": 2**30,
+        "qi_sizes": [60, 30, 30, 60],
+    }
+    _BFV_DEFAULTS: dict[str, Any] = {"n": 2**14, "t_bits": 20}
 
     def keygen(self, params: HEParams) -> Pyfhel:
         scheme = params.scheme.upper()
