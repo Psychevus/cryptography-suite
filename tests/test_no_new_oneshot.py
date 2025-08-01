@@ -7,8 +7,6 @@ EXPECTED_ONE_SHOTS = {
     "argon2_encrypt",
     "chacha20_decrypt",
     "chacha20_encrypt",
-    "chacha20_stream_decrypt",
-    "chacha20_stream_encrypt",
     "ec_decrypt",
     "ec_encrypt",
     "hybrid_decrypt",

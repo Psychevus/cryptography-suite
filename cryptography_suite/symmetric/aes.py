@@ -1,5 +1,12 @@
 from __future__ import annotations
 
+"""AES helpers built on :mod:`pyca/cryptography`.
+
+``AESGCM`` from ``pyca/cryptography`` is the authoritative backend for AES
+operations in this project. Other AES libraries (e.g. PyCryptodome) should not
+be used in production code.
+"""
+
 import base64
 import os
 from os import urandom

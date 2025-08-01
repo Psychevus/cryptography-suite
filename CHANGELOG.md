@@ -11,7 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 - Legacy helpers `generate_rsa_keypair_and_save` and `generate_ec_keypair_and_save`
   (use `KeyManager` methods; will be removed in v4.0.0).
 - Insecure ciphers `salsa20_encrypt`/`salsa20_decrypt` and experimental `ascon.encrypt`/`ascon.decrypt`
-  (use `chacha20_stream_encrypt` or authenticated ciphers like `aes_encrypt`).
+  (use `chacha20_encrypt`/`xchacha_encrypt` or authenticated ciphers like `aes_encrypt`).
 
 These functions remain temporarily for backward compatibility but emit
 `DeprecationWarning` on use.

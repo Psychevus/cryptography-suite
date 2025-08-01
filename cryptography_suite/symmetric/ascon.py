@@ -1,6 +1,7 @@
 """Ascon-128a authenticated encryption based on the NIST specification.
 
-This implementation is experimental and **not recommended for production use**.
+This pure-Python implementation is experimental and **not recommended for
+production use**.
 """
 
 from __future__ import annotations

@@ -1,3 +1,10 @@
+"""Hashing utilities.
+
+SHA and BLAKE2b use :mod:`pyca/cryptography`. BLAKE3 relies on the standalone
+``blake3`` library. These are the authoritative backends for hashing within the
+project.
+"""
+
 from cryptography.hazmat.primitives import hashes
 from blake3 import blake3
 

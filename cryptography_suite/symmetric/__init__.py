@@ -18,10 +18,6 @@ from .chacha import (
     xchacha_encrypt,
     xchacha_decrypt,
 )
-from .stream import (
-    chacha20_stream_encrypt,
-    chacha20_stream_decrypt,
-)
 from .kdf import (
     derive_key_scrypt,
     verify_derived_key_scrypt,
@@ -48,8 +44,6 @@ __all__ = [
     "chacha20_decrypt",
     "xchacha_encrypt",
     "xchacha_decrypt",
-    "chacha20_stream_encrypt",
-    "chacha20_stream_decrypt",
     "derive_key_scrypt",
     "verify_derived_key_scrypt",
     "derive_key_pbkdf2",
