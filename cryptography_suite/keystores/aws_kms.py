@@ -1,9 +1,13 @@
 from __future__ import annotations
 
-from typing import List
+from typing import TYPE_CHECKING, List
+from importlib import import_module
 
 from . import register_keystore
 from ..audit import audit_log
+
+if TYPE_CHECKING:  # pragma: no cover - used only for typing
+    import boto3  # type: ignore[import]
 
 
 @register_keystore("aws-kms")
@@ -18,8 +22,10 @@ class AWSKMSKeyStore:
     status = "production"
 
     def __init__(self, region_name: str | None = None):
-        import boto3  # imported lazily
-
+        try:
+            boto3 = import_module("boto3")  # type: ignore[import]
+        except Exception as exc:
+            raise RuntimeError("boto3 is required for AWSKMSKeyStore") from exc
         self.client = boto3.client("kms", region_name=region_name)
 
     def list_keys(self) -> List[str]:
