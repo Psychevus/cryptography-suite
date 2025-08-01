@@ -283,15 +283,6 @@ Public API Inventory
    * - ``set_audit_logger``
      - Configure the audit logger.
      - Core
-   * - ``SignalSender``
-     - Sender that initiates a Signal session.
-     - Core
-   * - ``SignalReceiver``
-     - Receiver that responds to a Signal session.
-     - Core
-   * - ``initialize_signal_session``
-     - Convenience function to create two parties with a shared session.
-     - Core
    * - ``CryptographySuiteError``
      - Base exception for the cryptography suite.
      - Core
@@ -355,6 +346,24 @@ Public API Inventory
    * - ``sphincs_verify``
      - Verify a SPHINCS+ signature.
      - Experimental
+   * - ``SIGNAL_AVAILABLE``
+     - bool(x) -> bool
+     - Experimental
+   * - ``SignalSender``
+     - Sender that initiates a Signal session.
+     - Experimental
+   * - ``SignalReceiver``
+     - Receiver that responds to a Signal session.
+     - Experimental
+   * - ``initialize_signal_session``
+     - Convenience function to create two parties with a shared session.
+     - Experimental
+   * - ``x3dh_initiator``
+     - Perform the initiator side of the X3DH key agreement.
+     - Experimental
+   * - ``x3dh_responder``
+     - Perform the responder side of the X3DH key agreement.
+     - Experimental
    * - ``FHE_AVAILABLE``
      - bool(x) -> bool
      - Experimental
@@ -371,7 +380,13 @@ Public API Inventory
      - 
      - Experimental
    * - ``fhe_multiply``
-     - 
+     -
+     - Experimental
+   * - ``fhe_serialize_context``
+     -
+     - Experimental
+   * - ``fhe_load_context``
+     -
      - Experimental
    * - ``BULLETPROOF_AVAILABLE``
      - bool(x) -> bool

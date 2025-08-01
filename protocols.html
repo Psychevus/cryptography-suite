@@ -215,6 +215,8 @@
 <li class="toctree-l1"><a class="reference internal" href="threat_model.html">Supply Chain Threat Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="backend_consistency.html">Backend Consistency</a></li>
+<li class="toctree-l1"><a class="reference internal" href="feature_maturity.html">Feature Maturity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roadmap.html">Experimental Feature Roadmap</a></li>
 <li class="toctree-l1"><a class="reference internal" href="security.html">Security Notes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/modules.html">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/pipeline.html">Pipeline DSL</a></li>
@@ -262,10 +264,11 @@
           <section id="protocol-notes">
 <h1>Protocol Notes<a class="headerlink" href="#protocol-notes" title="Link to this heading">¶</a></h1>
 <p>The suite provides a light-weight X3DH implementation used for Signal-like
-sessions. <strong>This Signal Protocol support is experimental and intended for
-demonstrations only; it is not production-ready.</strong> During session setup the receiver verifies that the sender’s
-<code class="docutils literal notranslate"><span class="pre">signed_prekey</span></code> is signed with the sender’s identity key using the helper
-<code class="docutils literal notranslate"><span class="pre">verify_signed_prekey</span></code>. A failed verification raises
+sessions. This code now lives under
+<code class="docutils literal notranslate"><span class="pre">cryptography_suite.experimental.signal</span></code> and <strong>is strictly experimental</strong>.
+Use it only for demos or research. During session setup the receiver verifies
+that the sender’s <code class="docutils literal notranslate"><span class="pre">signed_prekey</span></code> is signed with the sender’s identity key
+using the helper <code class="docutils literal notranslate"><span class="pre">verify_signed_prekey</span></code>. A failed verification raises
 <code class="docutils literal notranslate"><span class="pre">SignatureVerificationError</span></code>.</p>
 <p>One-time prekeys are optional. When present they are mixed into the Diffie–Hellman
 chain as <code class="docutils literal notranslate"><span class="pre">dh4</span> <span class="pre">=</span> <span class="pre">DH(IK_B,</span> <span class="pre">OPK_A)</span></code>. Each step of the chain (<code class="docutils literal notranslate"><span class="pre">dh1</span></code>, <code class="docutils literal notranslate"><span class="pre">dh2</span></code>, <code class="docutils literal notranslate"><span class="pre">dh3</span></code>, <code class="docutils literal notranslate"><span class="pre">dh4</span></code>)

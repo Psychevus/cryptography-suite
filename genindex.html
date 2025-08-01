@@ -213,6 +213,8 @@
 <li class="toctree-l1"><a class="reference internal" href="threat_model.html">Supply Chain Threat Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="backend_consistency.html">Backend Consistency</a></li>
+<li class="toctree-l1"><a class="reference internal" href="feature_maturity.html">Feature Maturity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roadmap.html">Experimental Feature Roadmap</a></li>
 <li class="toctree-l1"><a class="reference internal" href="security.html">Security Notes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/modules.html">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/pipeline.html">Pipeline DSL</a></li>
@@ -382,12 +384,12 @@
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/modules.html#cryptography_suite.decode_encrypted_message">decode_encrypted_message() (in module cryptography_suite)</a>
 </li>
-        <li><a href="api/modules.html#cryptography_suite.HybridEncryptor.decrypt">decrypt() (cryptography_suite.HybridEncryptor method)</a>
+        <li><a href="api/modules.html#cryptography_suite.experimental.SignalReceiver.decrypt">decrypt() (cryptography_suite.experimental.SignalReceiver method)</a>
 
         <ul>
-          <li><a href="api/modules.html#cryptography_suite.SignalReceiver.decrypt">(cryptography_suite.SignalReceiver method)</a>
+          <li><a href="api/modules.html#cryptography_suite.experimental.SignalSender.decrypt">(cryptography_suite.experimental.SignalSender method)</a>
 </li>
-          <li><a href="api/modules.html#cryptography_suite.SignalSender.decrypt">(cryptography_suite.SignalSender method)</a>
+          <li><a href="api/modules.html#cryptography_suite.HybridEncryptor.decrypt">(cryptography_suite.HybridEncryptor method)</a>
 </li>
         </ul></li>
         <li><a href="api/modules.html#cryptography_suite.decrypt_file">decrypt_file() (in module cryptography_suite)</a>
@@ -396,10 +398,10 @@
 </li>
         <li><a href="api/modules.html#cryptography_suite.DecryptionError">DecryptionError</a>
 </li>
-        <li><a href="api/modules.html#cryptography_suite.derive_hkdf">derive_hkdf() (in module cryptography_suite)</a>
-</li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.derive_hkdf">derive_hkdf() (in module cryptography_suite)</a>
+</li>
         <li><a href="api/modules.html#cryptography_suite.derive_key_argon2">derive_key_argon2() (in module cryptography_suite)</a>
 </li>
         <li><a href="api/modules.html#cryptography_suite.derive_key_pbkdf2">derive_key_pbkdf2() (in module cryptography_suite)</a>
@@ -411,10 +413,6 @@
         <li><a href="api/modules.html#cryptography_suite.derive_x448_shared_key">derive_x448_shared_key() (in module cryptography_suite)</a>
 </li>
         <li><a href="api/pipeline.html#cryptography_suite.pipeline.Pipeline.describe">describe() (cryptography_suite.pipeline.Pipeline method)</a>
-</li>
-        <li><a href="api/modules.html#cryptography_suite.experimental.dilithium_sign">dilithium_sign() (in module cryptography_suite.experimental)</a>
-</li>
-        <li><a href="api/modules.html#cryptography_suite.experimental.dilithium_verify">dilithium_verify() (in module cryptography_suite.experimental)</a>
 </li>
         <li><a href="api/pipeline.html#cryptography_suite.pipeline.Pipeline.dry_run">dry_run() (cryptography_suite.pipeline.Pipeline method)</a>
 </li>
@@ -432,12 +430,12 @@
 </li>
         <li><a href="api/modules.html#cryptography_suite.encode_encrypted_message">encode_encrypted_message() (in module cryptography_suite)</a>
 </li>
-        <li><a href="api/modules.html#cryptography_suite.HybridEncryptor.encrypt">encrypt() (cryptography_suite.HybridEncryptor method)</a>
+        <li><a href="api/modules.html#cryptography_suite.experimental.SignalReceiver.encrypt">encrypt() (cryptography_suite.experimental.SignalReceiver method)</a>
 
         <ul>
-          <li><a href="api/modules.html#cryptography_suite.SignalReceiver.encrypt">(cryptography_suite.SignalReceiver method)</a>
+          <li><a href="api/modules.html#cryptography_suite.experimental.SignalSender.encrypt">(cryptography_suite.experimental.SignalSender method)</a>
 </li>
-          <li><a href="api/modules.html#cryptography_suite.SignalSender.encrypt">(cryptography_suite.SignalSender method)</a>
+          <li><a href="api/modules.html#cryptography_suite.HybridEncryptor.encrypt">(cryptography_suite.HybridEncryptor method)</a>
 </li>
         </ul></li>
     </ul></td>
@@ -456,10 +454,24 @@
   <h2>F</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="api/pipeline.html#cryptography_suite.pipeline.Pipeline.from_config">from_config() (cryptography_suite.pipeline.Pipeline class method)</a>
+        <li><a href="api/modules.html#cryptography_suite.experimental.fhe_add">fhe_add() (in module cryptography_suite.experimental)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.experimental.fhe_decrypt">fhe_decrypt() (in module cryptography_suite.experimental)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.experimental.fhe_encrypt">fhe_encrypt() (in module cryptography_suite.experimental)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.experimental.fhe_keygen">fhe_keygen() (in module cryptography_suite.experimental)</a>
 </li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.experimental.fhe_load_context">fhe_load_context() (in module cryptography_suite.experimental)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.experimental.fhe_multiply">fhe_multiply() (in module cryptography_suite.experimental)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.experimental.fhe_serialize_context">fhe_serialize_context() (in module cryptography_suite.experimental)</a>
+</li>
+        <li><a href="api/pipeline.html#cryptography_suite.pipeline.Pipeline.from_config">from_config() (cryptography_suite.pipeline.Pipeline class method)</a>
+</li>
         <li><a href="api/modules.html#cryptography_suite.from_pem">from_pem() (in module cryptography_suite)</a>
 </li>
     </ul></td>
@@ -476,8 +488,6 @@
 </li>
         <li><a href="api/modules.html#cryptography_suite.generate_csr">generate_csr() (in module cryptography_suite)</a>
 </li>
-        <li><a href="api/modules.html#cryptography_suite.experimental.generate_dilithium_keypair">generate_dilithium_keypair() (in module cryptography_suite.experimental)</a>
-</li>
         <li><a href="api/modules.html#cryptography_suite.generate_ec_keypair">generate_ec_keypair() (in module cryptography_suite)</a>
 </li>
         <li><a href="api/modules.html#cryptography_suite.KeyManager.generate_ec_keypair_and_save">generate_ec_keypair_and_save() (cryptography_suite.KeyManager method)</a>
@@ -492,11 +502,9 @@
 </li>
         <li><a href="api/modules.html#cryptography_suite.KeyManager.generate_ed448_keypair_and_save">generate_ed448_keypair_and_save() (cryptography_suite.KeyManager method)</a>
 </li>
-        <li><a href="api/modules.html#cryptography_suite.generate_hotp">generate_hotp() (in module cryptography_suite)</a>
-</li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="api/modules.html#cryptography_suite.experimental.generate_kyber_keypair">generate_kyber_keypair() (in module cryptography_suite.experimental)</a>
+        <li><a href="api/modules.html#cryptography_suite.generate_hotp">generate_hotp() (in module cryptography_suite)</a>
 </li>
         <li><a href="api/modules.html#cryptography_suite.SPAKE2Client.generate_message">generate_message() (cryptography_suite.SPAKE2Client method)</a>
 
@@ -514,8 +522,6 @@
 </li>
         <li><a href="api/modules.html#cryptography_suite.generate_secure_random_string">generate_secure_random_string() (in module cryptography_suite)</a>
 </li>
-        <li><a href="api/modules.html#cryptography_suite.experimental.generate_sphincs_keypair">generate_sphincs_keypair() (in module cryptography_suite.experimental)</a>
-</li>
         <li><a href="api/modules.html#cryptography_suite.generate_totp">generate_totp() (in module cryptography_suite)</a>
 </li>
         <li><a href="api/modules.html#cryptography_suite.generate_x25519_keypair">generate_x25519_keypair() (in module cryptography_suite)</a>
@@ -530,9 +536,9 @@
   <h2>H</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="api/modules.html#cryptography_suite.SignalSender.handshake_bundle">handshake_bundle (cryptography_suite.SignalSender property)</a>
+        <li><a href="api/modules.html#cryptography_suite.experimental.SignalSender.handshake_bundle">handshake_bundle (cryptography_suite.experimental.SignalSender property)</a>
 </li>
-        <li><a href="api/modules.html#cryptography_suite.SignalSender.handshake_public">handshake_public (cryptography_suite.SignalSender property)</a>
+        <li><a href="api/modules.html#cryptography_suite.experimental.SignalSender.handshake_public">handshake_public (cryptography_suite.experimental.SignalSender property)</a>
 </li>
         <li><a href="api/modules.html#cryptography_suite.experimental.HandshakeFlowWidget">HandshakeFlowWidget (class in cryptography_suite.experimental)</a>
 </li>
@@ -552,11 +558,11 @@
   <h2>I</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="api/modules.html#cryptography_suite.SignalReceiver.initialize_session">initialize_session() (cryptography_suite.SignalReceiver method)</a>
+        <li><a href="api/modules.html#cryptography_suite.experimental.SignalReceiver.initialize_session">initialize_session() (cryptography_suite.experimental.SignalReceiver method)</a>
 </li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="api/modules.html#cryptography_suite.initialize_signal_session">initialize_signal_session() (in module cryptography_suite)</a>
+        <li><a href="api/modules.html#cryptography_suite.experimental.initialize_signal_session">initialize_signal_session() (in module cryptography_suite.experimental)</a>
 </li>
     </ul></td>
   </tr></table>
@@ -576,19 +582,15 @@
 </li>
         <li><a href="api/modules.html#cryptography_suite.key_exists">key_exists() (in module cryptography_suite)</a>
 </li>
-        <li><a href="api/modules.html#cryptography_suite.KeyDerivationError">KeyDerivationError</a>
-</li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.KeyDerivationError">KeyDerivationError</a>
+</li>
         <li><a href="api/modules.html#cryptography_suite.experimental.KeyGraphWidget">KeyGraphWidget (class in cryptography_suite.experimental)</a>
 </li>
         <li><a href="api/modules.html#cryptography_suite.KeyManager">KeyManager (class in cryptography_suite)</a>
 </li>
         <li><a href="api/modules.html#cryptography_suite.KeyVault">KeyVault (class in cryptography_suite)</a>
-</li>
-        <li><a href="api/modules.html#cryptography_suite.experimental.kyber_decrypt">kyber_decrypt() (in module cryptography_suite.experimental)</a>
-</li>
-        <li><a href="api/modules.html#cryptography_suite.experimental.kyber_encrypt">kyber_encrypt() (in module cryptography_suite.experimental)</a>
 </li>
     </ul></td>
   </tr></table>
@@ -691,7 +693,7 @@
 </li>
         <li><a href="api/modules.html#cryptography_suite.ProtocolError">ProtocolError</a>
 </li>
-        <li><a href="api/modules.html#cryptography_suite.SignalReceiver.public_bundle">public_bundle (cryptography_suite.SignalReceiver property)</a>
+        <li><a href="api/modules.html#cryptography_suite.experimental.SignalReceiver.public_bundle">public_bundle (cryptography_suite.experimental.SignalReceiver property)</a>
 </li>
         <li><a href="api/pipeline.html#cryptography_suite.pipeline.RSAEncrypt.public_key">public_key (cryptography_suite.pipeline.RSAEncrypt attribute)</a>
 </li>
@@ -773,10 +775,10 @@
 </li>
         <li><a href="api/modules.html#cryptography_suite.experimental.SessionTimelineWidget">SessionTimelineWidget (class in cryptography_suite.experimental)</a>
 </li>
-        <li><a href="api/modules.html#cryptography_suite.set_audit_logger">set_audit_logger() (in module cryptography_suite)</a>
-</li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.set_audit_logger">set_audit_logger() (in module cryptography_suite)</a>
+</li>
         <li><a href="api/modules.html#cryptography_suite.sha256_hash">sha256_hash() (in module cryptography_suite)</a>
 </li>
         <li><a href="api/modules.html#cryptography_suite.sha384_hash">sha384_hash() (in module cryptography_suite)</a>
@@ -793,19 +795,15 @@
 </li>
         <li><a href="api/modules.html#cryptography_suite.legacy.sign_message_ed448">sign_message_ed448() (in module cryptography_suite.legacy)</a>
 </li>
-        <li><a href="api/modules.html#cryptography_suite.SignalReceiver">SignalReceiver (class in cryptography_suite)</a>
+        <li><a href="api/modules.html#cryptography_suite.experimental.SignalReceiver">SignalReceiver (class in cryptography_suite.experimental)</a>
 </li>
-        <li><a href="api/modules.html#cryptography_suite.SignalSender">SignalSender (class in cryptography_suite)</a>
+        <li><a href="api/modules.html#cryptography_suite.experimental.SignalSender">SignalSender (class in cryptography_suite.experimental)</a>
 </li>
         <li><a href="api/modules.html#cryptography_suite.SignatureVerificationError">SignatureVerificationError</a>
 </li>
         <li><a href="api/modules.html#cryptography_suite.SPAKE2Client">SPAKE2Client (class in cryptography_suite)</a>
 </li>
         <li><a href="api/modules.html#cryptography_suite.SPAKE2Server">SPAKE2Server (class in cryptography_suite)</a>
-</li>
-        <li><a href="api/modules.html#cryptography_suite.experimental.sphincs_sign">sphincs_sign() (in module cryptography_suite.experimental)</a>
-</li>
-        <li><a href="api/modules.html#cryptography_suite.experimental.sphincs_verify">sphincs_verify() (in module cryptography_suite.experimental)</a>
 </li>
     </ul></td>
   </tr></table>
@@ -895,10 +893,14 @@
   <h2>X</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="api/modules.html#cryptography_suite.xchacha_decrypt">xchacha_decrypt() (in module cryptography_suite)</a>
+        <li><a href="api/modules.html#cryptography_suite.experimental.x3dh_initiator">x3dh_initiator() (in module cryptography_suite.experimental)</a>
+</li>
+        <li><a href="api/modules.html#cryptography_suite.experimental.x3dh_responder">x3dh_responder() (in module cryptography_suite.experimental)</a>
 </li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/modules.html#cryptography_suite.xchacha_decrypt">xchacha_decrypt() (in module cryptography_suite)</a>
+</li>
         <li><a href="api/modules.html#cryptography_suite.xchacha_encrypt">xchacha_encrypt() (in module cryptography_suite)</a>
 </li>
     </ul></td>

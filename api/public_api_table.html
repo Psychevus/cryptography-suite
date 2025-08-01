@@ -215,6 +215,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../threat_model.html">Supply Chain Threat Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../visualization.html">Visualization Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../backend_consistency.html">Backend Consistency</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../feature_maturity.html">Feature Maturity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../roadmap.html">Experimental Feature Roadmap</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../security.html">Security Notes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline.html">Pipeline DSL</a></li>
@@ -639,187 +641,207 @@
 <td><p>Configure the audit logger.</p></td>
 <td><p>Core</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">SignalSender</span></code></p></td>
-<td><p>Sender that initiates a Signal session.</p></td>
-<td><p>Core</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">SignalReceiver</span></code></p></td>
-<td><p>Receiver that responds to a Signal session.</p></td>
-<td><p>Core</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">initialize_signal_session</span></code></p></td>
-<td><p>Convenience function to create two parties with a shared session.</p></td>
-<td><p>Core</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">CryptographySuiteError</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">CryptographySuiteError</span></code></p></td>
 <td><p>Base exception for the cryptography suite.</p></td>
 <td><p>Core</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">EncryptionError</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">EncryptionError</span></code></p></td>
 <td><p>Raised when encryption fails or invalid parameters are provided.</p></td>
 <td><p>Core</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">DecryptionError</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">DecryptionError</span></code></p></td>
 <td><p>Raised when decryption fails or invalid data is provided.</p></td>
 <td><p>Core</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">KeyDerivationError</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">KeyDerivationError</span></code></p></td>
 <td><p>Raised when a key derivation operation fails.</p></td>
 <td><p>Core</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">SignatureVerificationError</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">SignatureVerificationError</span></code></p></td>
 <td><p>Raised when signature verification fails.</p></td>
 <td><p>Core</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MissingDependencyError</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MissingDependencyError</span></code></p></td>
 <td><p>Raised when an optional dependency is missing.</p></td>
 <td><p>Core</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ProtocolError</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ProtocolError</span></code></p></td>
 <td><p>Raised when a protocol implementation encounters an error.</p></td>
 <td><p>Core</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">available_backends</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">available_backends</span></code></p></td>
 <td></td>
 <td><p>Core</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">use_backend</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">use_backend</span></code></p></td>
 <td><p>Select the backend to use.</p></td>
 <td><p>Core</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">select_backend</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">select_backend</span></code></p></td>
 <td><p>Register and select a backend.</p></td>
 <td><p>Core</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">PQCRYPTO_AVAILABLE</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">PQCRYPTO_AVAILABLE</span></code></p></td>
 <td><p>bool(x) -&gt; bool</p></td>
 <td><p>Experimental</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">SPHINCS_AVAILABLE</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">SPHINCS_AVAILABLE</span></code></p></td>
 <td><p>bool(x) -&gt; bool</p></td>
 <td><p>Experimental</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">dilithium_sign</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dilithium_sign</span></code></p></td>
 <td><p>Sign a message using Dilithium level 2.</p></td>
 <td><p>Experimental</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dilithium_verify</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">dilithium_verify</span></code></p></td>
 <td><p>Verify a Dilithium signature using level 2.</p></td>
 <td><p>Experimental</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">generate_dilithium_keypair</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">generate_dilithium_keypair</span></code></p></td>
 <td><p>Generate a Dilithium key pair using level 2 parameters.</p></td>
 <td><p>Experimental</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">generate_kyber_keypair</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">generate_kyber_keypair</span></code></p></td>
 <td><p>Generate a Kyber key pair for the given <code class="docutils literal notranslate"><span class="pre">level</span></code>.</p></td>
 <td><p>Experimental</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">generate_sphincs_keypair</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">generate_sphincs_keypair</span></code></p></td>
 <td><p>Generate a SPHINCS+ key pair using a 128-bit security level.</p></td>
 <td><p>Experimental</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">kyber_decrypt</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">kyber_decrypt</span></code></p></td>
 <td><p>Decrypt data encrypted by <code class="xref py py-func docutils literal notranslate"><span class="pre">kyber_encrypt()</span></code>.</p></td>
 <td><p>Experimental</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">kyber_encrypt</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">kyber_encrypt</span></code></p></td>
 <td><p>Encrypt <code class="docutils literal notranslate"><span class="pre">plaintext</span></code> using Kyber and AES-GCM.</p></td>
 <td><p>Experimental</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">sphincs_sign</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">sphincs_sign</span></code></p></td>
 <td><p>Sign <code class="docutils literal notranslate"><span class="pre">message</span></code> with SPHINCS+ returning Base64 by default.</p></td>
 <td><p>Experimental</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">sphincs_verify</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">sphincs_verify</span></code></p></td>
 <td><p>Verify a SPHINCS+ signature.</p></td>
 <td><p>Experimental</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">FHE_AVAILABLE</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">SIGNAL_AVAILABLE</span></code></p></td>
 <td><p>bool(x) -&gt; bool</p></td>
 <td><p>Experimental</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">fhe_keygen</span></code></p></td>
-<td></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">SignalSender</span></code></p></td>
+<td><p>Sender that initiates a Signal session.</p></td>
 <td><p>Experimental</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">fhe_encrypt</span></code></p></td>
-<td></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">SignalReceiver</span></code></p></td>
+<td><p>Receiver that responds to a Signal session.</p></td>
 <td><p>Experimental</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">fhe_decrypt</span></code></p></td>
-<td></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">initialize_signal_session</span></code></p></td>
+<td><p>Convenience function to create two parties with a shared session.</p></td>
 <td><p>Experimental</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">fhe_add</span></code></p></td>
-<td></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">x3dh_initiator</span></code></p></td>
+<td><p>Perform the initiator side of the X3DH key agreement.</p></td>
 <td><p>Experimental</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">fhe_multiply</span></code></p></td>
-<td></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">x3dh_responder</span></code></p></td>
+<td><p>Perform the responder side of the X3DH key agreement.</p></td>
 <td><p>Experimental</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">BULLETPROOF_AVAILABLE</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">FHE_AVAILABLE</span></code></p></td>
 <td><p>bool(x) -&gt; bool</p></td>
 <td><p>Experimental</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">bulletproof</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">fhe_keygen</span></code></p></td>
+<td></td>
+<td><p>Experimental</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">fhe_encrypt</span></code></p></td>
+<td></td>
+<td><p>Experimental</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">fhe_decrypt</span></code></p></td>
+<td></td>
+<td><p>Experimental</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">fhe_add</span></code></p></td>
+<td></td>
+<td><p>Experimental</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">fhe_multiply</span></code></p></td>
+<td></td>
+<td><p>Experimental</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">fhe_serialize_context</span></code></p></td>
+<td></td>
+<td><p>Experimental</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">fhe_load_context</span></code></p></td>
+<td></td>
+<td><p>Experimental</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">BULLETPROOF_AVAILABLE</span></code></p></td>
+<td><p>bool(x) -&gt; bool</p></td>
+<td><p>Experimental</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">bulletproof</span></code></p></td>
 <td><p>Bulletproof range proof utilities using pybulletproofs.</p></td>
 <td><p>Experimental</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ZKSNARK_AVAILABLE</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ZKSNARK_AVAILABLE</span></code></p></td>
 <td><p>bool(x) -&gt; bool</p></td>
 <td><p>Experimental</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">zksnark</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">zksnark</span></code></p></td>
 <td><p>ZK-SNARK utilities using PySNARK.</p></td>
 <td><p>Experimental</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">HandshakeFlowWidget</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">HandshakeFlowWidget</span></code></p></td>
 <td><p>Animated visualization of a handshake protocol.</p></td>
 <td><p>Experimental</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">KeyGraphWidget</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">KeyGraphWidget</span></code></p></td>
 <td><p>Display key relationships as a graph.</p></td>
 <td><p>Experimental</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">SessionTimelineWidget</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">SessionTimelineWidget</span></code></p></td>
 <td><p>Visualize message and key events over time.</p></td>
 <td><p>Experimental</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">generate_bls_keypair</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">generate_bls_keypair</span></code></p></td>
 <td><p>Generate a BLS12-381 key pair.</p></td>
 <td><p>Legacy</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">bls_sign</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">bls_sign</span></code></p></td>
 <td><p>Sign a message using the BLS signature scheme.</p></td>
 <td><p>Legacy</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">bls_verify</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">bls_verify</span></code></p></td>
 <td><p>Verify a BLS signature.</p></td>
 <td><p>Legacy</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">bls_aggregate</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">bls_aggregate</span></code></p></td>
 <td><p>Aggregate multiple BLS signatures into one.</p></td>
 <td><p>Legacy</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">bls_aggregate_verify</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">bls_aggregate_verify</span></code></p></td>
 <td><p>Verify an aggregated BLS signature against multiple messages.</p></td>
 <td><p>Legacy</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">generate_ed448_keypair</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">generate_ed448_keypair</span></code></p></td>
 <td><p>Generates an Ed448 private and public key pair.</p></td>
 <td><p>Legacy</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">sign_message_ed448</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">sign_message_ed448</span></code></p></td>
 <td><p>Sign a message using Ed448 and return Base64 by default.</p></td>
 <td><p>Legacy</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">verify_signature_ed448</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">verify_signature_ed448</span></code></p></td>
 <td><p>Verifies an Ed448 signature.</p></td>
 <td><p>Legacy</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">blake3_hash_v2</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">blake3_hash_v2</span></code></p></td>
 <td><p>Another BLAKE3 hash helper used for testing.</p></td>
 <td><p>Legacy</p></td>
 </tr>
