@@ -260,6 +260,10 @@
 <h1>Command Line Interface<a class="headerlink" href="#command-line-interface" title="Link to this heading">¶</a></h1>
 <p>The <code class="docutils literal notranslate"><span class="pre">cryptography-suite</span></code> executable exposes several subcommands. Run
 <code class="docutils literal notranslate"><span class="pre">cryptography-suite</span> <span class="pre">--help</span></code> to see the list.</p>
+<p>.. note::
+The CLI uses the default registered backend. When writing scripts or
+libraries, call :func:<code class="docutils literal notranslate"><span class="pre">cryptography_suite.crypto_backends.use_backend</span></code>
+explicitly.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cryptography-suite<span class="w"> </span>--help
 </pre></div>
 </div>

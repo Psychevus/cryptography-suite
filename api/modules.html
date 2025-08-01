@@ -1169,8 +1169,15 @@ public key. The message itself is encrypted with AES-GCM.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cryptography_suite.select_backend">
-<span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">select_backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cryptography_suite.select_backend" title="Link to this definition">¶</a></dt>
-<dd><p>Deprecated alias for <a class="reference internal" href="#cryptography_suite.use_backend" title="cryptography_suite.use_backend"><code class="xref py py-func docutils literal notranslate"><span class="pre">use_backend()</span></code></a>.</p>
+<span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">select_backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cryptography_suite.select_backend" title="Link to this definition">¶</a></dt>
+<dd><p>Register and select a backend.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>obj</strong> – Either the name of a registered backend or a backend instance. When an
+instance is provided it will be registered under <code class="docutils literal notranslate"><span class="pre">obj.name</span></code> if the
+attribute exists, otherwise the lower-cased class name.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -1295,15 +1302,17 @@ and <code class="docutils literal notranslate"><span class="pre">key</span></cod
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cryptography_suite.use_backend">
-<span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">use_backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cryptography_suite.use_backend" title="Link to this definition">¶</a></dt>
-<dd><p>Select the backend to use at runtime.</p>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cryptography_suite.crypto_backends</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_backend</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">use_backend</span><span class="p">(</span><span class="s2">&quot;pyca&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">use_backend</span><span class="p">(</span><span class="s2">&quot;sodium&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">use_backend</span><span class="p">(</span><span class="s2">&quot;rust&quot;</span><span class="p">)</span>
+<span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">use_backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">_BackendContext</span></span></span><a class="headerlink" href="#cryptography_suite.use_backend" title="Link to this definition">¶</a></dt>
+<dd><p>Select the backend to use.</p>
+<p>Backend selection is stored in a <code class="xref py py-class docutils literal notranslate"><span class="pre">contextvars.ContextVar</span></code>, making it
+safe for threads and asynchronous tasks. The function returns a context
+manager so it can be used in <code class="docutils literal notranslate"><span class="pre">with</span></code> blocks:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">use_backend</span><span class="p">(</span><span class="s2">&quot;pyca&quot;</span><span class="p">):</span>
+    <span class="o">...</span>
 </pre></div>
 </div>
+<p>Calling it without <code class="docutils literal notranslate"><span class="pre">with</span></code> permanently switches the backend for the
+current thread or task.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -1363,9 +1372,12 @@ and <code class="docutils literal notranslate"><span class="pre">key</span></cod
 <section id="selecting-a-backend">
 <h2>Selecting a backend<a class="headerlink" href="#selecting-a-backend" title="Link to this heading">¶</a></h2>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cryptography_suite.crypto_backends</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_backend</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">use_backend</span><span class="p">(</span><span class="s2">&quot;pyca&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">use_backend</span><span class="p">(</span><span class="s2">&quot;sodium&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">use_backend</span><span class="p">(</span><span class="s2">&quot;rust&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">use_backend</span><span class="p">(</span><span class="s2">&quot;pyca&quot;</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">pass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">use_backend</span><span class="p">(</span><span class="s2">&quot;sodium&quot;</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">pass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">use_backend</span><span class="p">(</span><span class="s2">&quot;rust&quot;</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">pass</span>
 </pre></div>
 </div>
 </section>

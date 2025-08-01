@@ -3,6 +3,11 @@
 The ``cryptography-suite`` executable exposes several subcommands. Run
 ``cryptography-suite --help`` to see the list.
 
+.. note::
+   The CLI uses the default registered backend. When writing scripts or
+   libraries, call :func:`cryptography_suite.crypto_backends.use_backend`
+   explicitly.
+
 ```bash
 cryptography-suite --help
 ```
