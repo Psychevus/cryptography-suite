@@ -157,6 +157,7 @@ __all__ = [
     "SessionTimelineWidget",
 ]
 
+
 def __getattr__(name: str) -> Any:
     if name in {"salsa20_encrypt", "salsa20_decrypt", "ascon_encrypt", "ascon_decrypt"}:
         raise RuntimeError(DEPRECATED_MSG)
