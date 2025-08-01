@@ -49,4 +49,5 @@ formally verified, misuse-resistant workflows.
    visualization.md
    security.rst
    api/modules
+   api/pipeline
 
