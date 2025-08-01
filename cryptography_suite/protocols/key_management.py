@@ -11,6 +11,10 @@ from ..asymmetric import (
     serialize_public_key,
     generate_ec_keypair,
 )
+from ..asymmetric.signatures import (
+    generate_ed25519_keypair,
+    generate_ed448_keypair,
+)
 from ..errors import DecryptionError
 
 # Constants
@@ -93,21 +97,22 @@ def generate_rsa_keypair_and_save(
     )
 
 
+@deprecated(
+    "generate_ec_keypair_and_save is deprecated; "
+    "use KeyManager.generate_ec_keypair_and_save"
+)
 def generate_ec_keypair_and_save(
     private_key_path: str,
     public_key_path: str,
     password: str,
     curve: ec.EllipticCurve = ec.SECP256R1(),
 ):
-    """
-    Generates an EC key pair and saves them to files.
-    """
-    private_key, public_key = generate_ec_keypair(curve=curve)
-    private_pem = serialize_private_key(private_key, password)
-    public_pem = serialize_public_key(public_key)
+    """Legacy wrapper for :class:`KeyManager` EC key generation."""
 
-    secure_save_key_to_file(private_pem, private_key_path)
-    secure_save_key_to_file(public_pem, public_key_path)
+    km = KeyManager()
+    return km.generate_ec_keypair_and_save(
+        private_key_path, public_key_path, password, curve
+    )
 
 
 class KeyManager:
@@ -183,6 +188,59 @@ class KeyManager:
         private_key, public_key = generate_rsa_keypair(key_size=key_size)
         private_pem = serialize_private_key(private_key, password)
         public_pem = serialize_public_key(public_key)
+        secure_save_key_to_file(private_pem, private_key_path)
+        secure_save_key_to_file(public_pem, public_key_path)
+        return private_key, public_key
+
+    def generate_ec_keypair_and_save(
+        self,
+        private_key_path: str,
+        public_key_path: str,
+        password: str,
+        curve: ec.EllipticCurve = ec.SECP256R1(),
+    ):
+        """Generate an EC key pair and save to ``private_key_path`` and ``public_key_path``."""
+
+        private_key, public_key = generate_ec_keypair(curve=curve)
+        private_pem = serialize_private_key(private_key, password)
+        public_pem = serialize_public_key(public_key)
+        secure_save_key_to_file(private_pem, private_key_path)
+        secure_save_key_to_file(public_pem, public_key_path)
+        return private_key, public_key
+
+    def generate_ed25519_keypair_and_save(
+        self,
+        private_key_path: str,
+        public_key_path: str,
+        password: str,
+    ):
+        """Generate an Ed25519 key pair and save to disk."""
+
+        private_key, public_key = generate_ed25519_keypair()
+        private_pem = serialize_private_key(private_key, password)
+        public_pem = serialize_public_key(public_key)
+        secure_save_key_to_file(private_pem, private_key_path)
+        secure_save_key_to_file(public_pem, public_key_path)
+        return private_key, public_key
+
+    def generate_ed448_keypair_and_save(
+        self,
+        private_key_path: str,
+        public_key_path: str,
+        password: str,
+    ):
+        """Generate an Ed448 key pair and save to disk."""
+
+        private_key, public_key = generate_ed448_keypair()
+        private_pem = private_key.private_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PrivateFormat.PKCS8,
+            encryption_algorithm=serialization.BestAvailableEncryption(password.encode()),
+        )
+        public_pem = public_key.public_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PublicFormat.SubjectPublicKeyInfo,
+        )
         secure_save_key_to_file(private_pem, private_key_path)
         secure_save_key_to_file(public_pem, public_key_path)
         return private_key, public_key

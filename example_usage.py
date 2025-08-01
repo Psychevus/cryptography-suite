@@ -208,9 +208,12 @@ def main():
     print("\n=== Key Management ===")
     private_key_path = "rsa_private.pem"
     public_key_path = "rsa_public.pem"
+    ec_private = "ec_private.pem"
+    ec_public = "ec_public.pem"
 
     km = KeyManager()
     km.generate_rsa_keypair_and_save(private_key_path, public_key_path, key_password)
+    km.generate_ec_keypair_and_save(ec_private, ec_public, key_password)
     loaded_private_key = load_private_key_from_file(private_key_path, key_password)
     loaded_public_key = load_public_key_from_file(public_key_path)
     print("RSA keys generated, saved, and loaded from files successfully.")
@@ -218,6 +221,8 @@ def main():
     # Clean up key files
     os.remove(private_key_path)
     os.remove(public_key_path)
+    os.remove(ec_private)
+    os.remove(ec_public)
 
     # Rotate AES Key
     aes_key = generate_aes_key()

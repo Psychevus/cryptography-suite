@@ -474,13 +474,14 @@ with KeyVault(key_material) as buf:
 
 ### KeyManager File Handling
 
-Persist RSA keys to disk with the high-level ``KeyManager`` helper.
+Persist key pairs to disk with the high-level ``KeyManager`` helper.
 
 ```python
 from cryptography_suite.protocols import KeyManager
 
 km = KeyManager()
-km.generate_rsa_keypair_and_save("priv.pem", "pub.pem", "password")
+km.generate_rsa_keypair_and_save("rsa_priv.pem", "rsa_pub.pem", "password")
+km.generate_ec_keypair_and_save("ec_priv.pem", "ec_pub.pem", "password")
 ```
 
 ## Advanced Protocols

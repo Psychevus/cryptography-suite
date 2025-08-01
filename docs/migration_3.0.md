@@ -12,6 +12,16 @@ accordingly.
   `Pipeline` class.
 - **Key Management Interfaces** have changed. Use `KeyManager` for all
   persistent key operations.
+
+  Old helpers like ``generate_rsa_keypair_and_save`` and
+  ``generate_ec_keypair_and_save`` are deprecated. Convert code such as::
+
+      generate_ec_keypair_and_save("priv.pem", "pub.pem", "pw")
+
+  to::
+
+      km = KeyManager()
+      km.generate_ec_keypair_and_save("priv.pem", "pub.pem", "pw")
 - **Deprecated Functions Removed.** Legacy helpers marked deprecated in 2.x have
   been deleted.
 
