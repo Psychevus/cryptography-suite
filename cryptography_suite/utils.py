@@ -20,7 +20,7 @@ from cryptography.hazmat.primitives.asymmetric import (
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from .hybrid import EncryptedHybridMessage
-    from .protocols.signal import EncryptedMessage
+from .experimental.signal import EncryptedMessage
 
 BASE62_ALPHABET = string.digits + string.ascii_letters
 
@@ -266,7 +266,7 @@ def decode_encrypted_message(
     }
 
     try:  # Return EncryptedMessage if fields match
-        from .protocols.signal import EncryptedMessage
+        from .experimental.signal import EncryptedMessage
 
         if set(out.keys()) == {"dh_public", "nonce", "ciphertext"}:
             return EncryptedMessage(**out)

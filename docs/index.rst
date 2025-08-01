@@ -29,6 +29,8 @@ formally verified, misuse-resistant workflows.
 - Supply-Chain Attestation, SLSA, and Reproducible Builds
 - Signal Protocol components (X3DH + Double Ratchet) for demo use (*experimental, not production-ready*)
 - Post-Quantum primitives: Kyber KEM, Dilithium signatures, and *experimental* SPHINCS+ (requires `pip install "cryptography-suite[pqc]"`)
+- Homomorphic encryption helpers via Pyfhel (*experimental*)
+- Zero-knowledge proof demos (Bulletproofs, zk-SNARK) (*experimental*)
 
 
 .. toctree::
@@ -51,6 +53,8 @@ formally verified, misuse-resistant workflows.
    threat_model.md
    visualization.md
    backend_consistency.md
+   feature_maturity.md
+   roadmap.md
    security.rst
    api/modules
    api/pipeline

@@ -1,6 +1,9 @@
 import unittest
-from cryptography_suite.protocols import initialize_signal_session
-from cryptography_suite.protocols.signal import x3dh_initiator, x3dh_responder
+from cryptography_suite.experimental.signal import (
+    initialize_signal_session,
+    x3dh_initiator,
+    x3dh_responder,
+)
 from cryptography_suite.asymmetric import generate_x25519_keypair
 from cryptography_suite.errors import SignatureVerificationError
 

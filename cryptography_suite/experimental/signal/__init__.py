@@ -1,4 +1,7 @@
-"""Simplified Signal protocol implementation."""
+"""Simplified Signal protocol implementation.
+
+.. warning:: This module is experimental and not ready for production use.
+"""
 
 from __future__ import annotations
 

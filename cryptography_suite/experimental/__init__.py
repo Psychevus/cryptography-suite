@@ -8,6 +8,22 @@ removed without notice. Import them explicitly, e.g.::
 
 from typing import Any
 
+# Signal protocol ------------------------------------------------------------
+try:  # pragma: no cover - pure Python experimental feature
+    from .signal import (
+        SignalSender,
+        SignalReceiver,
+        initialize_signal_session,
+        x3dh_initiator,
+        x3dh_responder,
+    )
+
+    SIGNAL_AVAILABLE = True
+except Exception:  # pragma: no cover - shouldn't happen but keep consistent
+    SignalSender = SignalReceiver = initialize_signal_session = None  # type: ignore
+    x3dh_initiator = x3dh_responder = None  # type: ignore
+    SIGNAL_AVAILABLE = False
+
 # Post-quantum cryptography --------------------------------------------------
 try:  # pragma: no cover - optional dependency
     from ..pqc import (
@@ -34,18 +50,40 @@ except Exception:  # pragma: no cover - fallback when pqcrypto is missing
     sphincs_sign = sphincs_verify = None  # type: ignore
 
 # Homomorphic encryption -----------------------------------------------------
+fhe_add: Any
+fhe_decrypt: Any
+fhe_encrypt: Any
+fhe_keygen: Any
+fhe_load_context: Any
+fhe_multiply: Any
+fhe_serialize_context: Any
 try:  # pragma: no cover - optional dependency
     from ..homomorphic import (
         add as fhe_add,
         decrypt as fhe_decrypt,
         encrypt as fhe_encrypt,
         keygen as fhe_keygen,
+        load_context as fhe_load_context,
         multiply as fhe_multiply,
+        serialize_context as fhe_serialize_context,
+        PYFHEL_AVAILABLE as _PYFHEL_AVAILABLE,
     )
 
-    FHE_AVAILABLE = True
+    FHE_AVAILABLE = _PYFHEL_AVAILABLE
 except Exception:  # pragma: no cover - handle missing Pyfhel
-    fhe_add = fhe_decrypt = fhe_encrypt = fhe_keygen = fhe_multiply = None  # type: ignore
+    fhe_add = (
+        fhe_decrypt
+    ) = (
+        fhe_encrypt
+    ) = (
+        fhe_keygen
+    ) = (
+        fhe_load_context
+    ) = (
+        fhe_multiply
+    ) = (
+        fhe_serialize_context
+    ) = None  # type: ignore[assignment]
     FHE_AVAILABLE = False
 
 # Zero-knowledge proofs ------------------------------------------------------
@@ -88,6 +126,13 @@ __all__ = [
     "kyber_encrypt",
     "sphincs_sign",
     "sphincs_verify",
+    # Signal
+    "SIGNAL_AVAILABLE",
+    "SignalSender",
+    "SignalReceiver",
+    "initialize_signal_session",
+    "x3dh_initiator",
+    "x3dh_responder",
     # Homomorphic
     "FHE_AVAILABLE",
     "fhe_keygen",
@@ -95,6 +140,8 @@ __all__ = [
     "fhe_decrypt",
     "fhe_add",
     "fhe_multiply",
+    "fhe_serialize_context",
+    "fhe_load_context",
     # ZK proofs
     "BULLETPROOF_AVAILABLE",
     "bulletproof",

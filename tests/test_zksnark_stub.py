@@ -2,6 +2,7 @@ import importlib
 import sys
 import types
 import pytest
+from cryptography_suite.errors import MissingDependencyError
 
 class DummyPrivVal:
     def __init__(self, val):
@@ -44,9 +45,9 @@ def test_zksnark_import_error(monkeypatch):
     monkeypatch.setitem(sys.modules, "pysnark", None)
     import cryptography_suite.zk.zksnark as zk
     importlib.reload(zk)
-    with pytest.raises(ImportError):
+    with pytest.raises(MissingDependencyError):
         zk.setup()
-    with pytest.raises(ImportError):
+    with pytest.raises(MissingDependencyError):
         zk.prove(b"x")
-    with pytest.raises(ImportError):
+    with pytest.raises(MissingDependencyError):
         zk.verify("h", "p")

@@ -2,7 +2,7 @@ import importlib
 import sys
 import types
 import pytest
-from cryptography_suite.errors import ProtocolError
+from cryptography_suite.errors import MissingDependencyError, ProtocolError
 
 
 def test_bulletproof_prove_verify(monkeypatch):
@@ -24,7 +24,7 @@ def test_bulletproof_import_error(monkeypatch):
     monkeypatch.setitem(sys.modules, "pybulletproofs", None)
     import cryptography_suite.zk.bulletproof as bp
     importlib.reload(bp)
-    with pytest.raises(ImportError):
+    with pytest.raises(MissingDependencyError):
         bp.prove(1)
-    with pytest.raises(ImportError):
+    with pytest.raises(MissingDependencyError):
         bp.verify(b"p", b"c")
