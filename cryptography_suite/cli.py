@@ -269,7 +269,7 @@ def keystore_cli(argv: list[str] | None = None) -> None:
                 ok = False
             print(f"{name}: {'ok' if ok else 'fail'}")
     elif args.action == "migrate":
-        print("Key migration is not implemented")
+        print("Keystore migration not implemented")
 
 
 def export_cli(argv: list[str] | None = None) -> None:
