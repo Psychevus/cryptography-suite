@@ -1,4 +1,10 @@
-from cryptography.hazmat.primitives.asymmetric import ed25519, ed448, ec
+from cryptography.hazmat.primitives.asymmetric import (
+    ed25519,
+    ed448,
+    ec,
+    rsa,
+    padding,
+)
 from cryptography.hazmat.primitives import serialization, hashes
 import base64
 from cryptography.exceptions import InvalidSignature
@@ -224,6 +230,65 @@ def verify_signature_ecdsa(
 
     try:
         public_key.verify(signature, message, ec.ECDSA(hashes.SHA256()))
+        return True
+    except InvalidSignature:
+        return False
+
+
+def sign_message_rsa(
+    message: bytes,
+    private_key: rsa.RSAPrivateKey,
+    *,
+    raw_output: bool = False,
+) -> str | bytes:
+    """Sign a message using RSA-PSS and return Base64 by default."""
+
+    if not message:
+        raise SignatureVerificationError("Message cannot be empty.")
+    if not isinstance(private_key, rsa.RSAPrivateKey):
+        raise SignatureVerificationError("Invalid RSA private key.")
+
+    sig = private_key.sign(
+        message,
+        padding.PSS(
+            mgf=padding.MGF1(hashes.SHA256()),
+            salt_length=padding.PSS.MAX_LENGTH,
+        ),
+        hashes.SHA256(),
+    )
+    if raw_output:
+        return sig
+    return base64.b64encode(sig).decode()
+
+
+def verify_signature_rsa(
+    message: bytes, signature: bytes | str, public_key: rsa.RSAPublicKey
+) -> bool:
+    """Verify an RSA-PSS signature."""
+
+    if not message:
+        raise SignatureVerificationError("Message cannot be empty.")
+    if not signature:
+        raise SignatureVerificationError("Signature cannot be empty.")
+    if not isinstance(public_key, rsa.RSAPublicKey):
+        raise SignatureVerificationError("Invalid RSA public key.")
+
+    if isinstance(signature, str):
+        try:
+            signature = base64.b64decode(signature)
+        except Exception:
+            return False
+
+    try:
+        public_key.verify(
+            signature,
+            message,
+            padding.PSS(
+                mgf=padding.MGF1(hashes.SHA256()),
+                salt_length=padding.PSS.MAX_LENGTH,
+            ),
+            hashes.SHA256(),
+        )
         return True
     except InvalidSignature:
         return False

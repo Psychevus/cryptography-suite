@@ -34,3 +34,16 @@ as hidden aliases for backward compatibility.
 - ``backends`` – manage crypto backends
 - ``keystore`` – manage key storage plugins
 - ``fuzz`` – run fuzzing harnesses (also exposed via ``cryptosuite-fuzz``)
+
+## Keystore Command
+
+The ``keystore`` group exposes pluggable key storage backends.  Available
+backends are classified by stability:
+
+``local`` (testing), ``mock_hsm`` (testing), ``aws-kms`` (production,
+requires ``pip install cryptography-suite[aws]``)
+
+Use ``cryptography-suite keystore list`` to display the available backends
+with their status and ``cryptography-suite keystore test`` to verify
+connectivity.  The ``migrate`` subcommand is reserved for future use and
+currently prints ``Not Implemented``.

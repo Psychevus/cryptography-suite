@@ -11,6 +11,7 @@ class MockHSMKeyStore:
     """In-memory keystore emulating an HSM for testing."""
 
     name = "mock_hsm"
+    status = "testing"
 
     def __init__(self) -> None:
         self._keys: dict[str, bytes] = {"test": b"secret"}
