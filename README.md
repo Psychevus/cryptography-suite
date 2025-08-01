@@ -56,13 +56,22 @@ Example pipeline configuration:
 
 ```python
 from cryptography_suite import use_backend
-from cryptography_suite.pipeline import Pipeline, AESGCMEncrypt, AESGCMDecrypt
+from cryptography_suite.pipeline import (
+    Pipeline,
+    AESGCMEncrypt,
+    AESGCMDecrypt,
+    list_modules,
+)
 
 use_backend("pyca")
 
 p = Pipeline() >> AESGCMEncrypt(password="pass") >> AESGCMDecrypt(password="pass")
-assert p.run(b"data") == b"data"
+assert p.run("data") == "data"
+print(list_modules())  # ['AESGCMDecrypt', 'AESGCMEncrypt']
 ```
+
+*Contributors*: new pipeline modules can be exposed with the
+`@register_module` decorator in ``cryptography_suite.pipeline``.
 
 Visualize and export the pipeline:
 

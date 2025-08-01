@@ -1,3 +1,10 @@
+"""Pipeline DSL and module registry.
+
+This module provides a small domain specific language for composing
+cryptographic workflows and a registry that allows backends to expose custom
+pipeline steps.
+"""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -139,3 +146,117 @@ class PipelineVisualizer:
     def render_ascii(self) -> str:
         parts = [mod.__class__.__name__ for mod in self.pipeline.modules]
         return " -> ".join(parts)
+
+
+# ---------------------------------------------------------------------------
+# Module registry and built-in DSL modules
+# ---------------------------------------------------------------------------
+
+MODULE_REGISTRY: dict[str, type[CryptoModule[Any, Any]]] = {}
+
+
+def register_module(cls: type[CryptoModule[Any, Any]]) -> type[CryptoModule[Any, Any]]:
+    """Register a pipeline DSL class.
+
+    Backends can decorate classes with ``@register_module`` to expose custom
+    pipeline steps. Registered classes appear in :func:`list_modules` and are
+    importable from :mod:`cryptography_suite.pipeline`.
+    """
+
+    MODULE_REGISTRY[cls.__name__] = cls
+    return cls
+
+
+def list_modules() -> list[str]:
+    """Return the names of all registered pipeline modules."""
+
+    return sorted(MODULE_REGISTRY)
+
+
+@register_module
+@dataclass
+class AESGCMEncrypt(CryptoModule[str, str]):
+    """Encrypt data using AES-GCM.
+
+    Parameters
+    ----------
+    password:
+        Password used to derive the encryption key.
+    kdf:
+        Key-derivation function name (``"argon2"`` by default).
+
+    Example
+    -------
+    >>> from cryptography_suite.pipeline import AESGCMEncrypt
+    >>> AESGCMEncrypt(password="pw").run("hi")  # doctest: +SKIP
+    '...'
+
+    See Also
+    --------
+    cryptography_suite.crypto_backends.use_backend
+        Selects the active backend providing the AES implementation.
+    """
+
+    password: str
+    kdf: str = "argon2"
+
+    def run(self, data: str) -> str:
+        from .symmetric import aes_encrypt
+
+        return aes_encrypt(data, self.password, kdf=self.kdf)
+
+    def to_proverif(self) -> str:  # pragma: no cover - simple serialization
+        return f"aesgcm_encrypt({self.kdf})"
+
+    def to_tamarin(self) -> str:  # pragma: no cover - simple serialization
+        return f"aesgcm_encrypt({self.kdf})"
+
+
+@register_module
+@dataclass
+class AESGCMDecrypt(CryptoModule[str, str]):
+    """Decrypt AES-GCM data.
+
+    Parameters
+    ----------
+    password:
+        Password used to derive the decryption key.
+    kdf:
+        Key-derivation function name (``"argon2"`` by default).
+
+    Example
+    -------
+    >>> from cryptography_suite.pipeline import AESGCMDecrypt
+    >>> AESGCMDecrypt(password="pw").run("...")  # doctest: +SKIP
+    'hi'
+
+    See Also
+    --------
+    cryptography_suite.crypto_backends.use_backend
+        Selects the active backend providing the AES implementation.
+    """
+
+    password: str
+    kdf: str = "argon2"
+
+    def run(self, data: str) -> str:
+        from .symmetric import aes_decrypt
+
+        return aes_decrypt(data, self.password, kdf=self.kdf)
+
+    def to_proverif(self) -> str:  # pragma: no cover - simple serialization
+        return f"aesgcm_decrypt({self.kdf})"
+
+    def to_tamarin(self) -> str:  # pragma: no cover - simple serialization
+        return f"aesgcm_decrypt({self.kdf})"
+
+
+__all__ = [
+    "CryptoModule",
+    "Pipeline",
+    "PipelineVisualizer",
+    "register_module",
+    "list_modules",
+    "AESGCMEncrypt",
+    "AESGCMDecrypt",
+]
