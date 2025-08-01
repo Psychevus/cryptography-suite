@@ -1,11 +1,16 @@
-"""Simplified Signal protocol implementation.
+"""Simplified Signal protocol demonstration (X3DH + Double Ratchet).
 
-.. warning:: This module is experimental and not ready for production use.
+This implementation is a simplified demonstration of the Signal protocol
+(X3DH + Double Ratchet) and is NOT production-grade. It omits important
+features (multi-session, message headers, robust identity binding, etc.)
+and is suitable only for research, prototyping, or education. Do not use
+for real secure messaging.
 """
 
 from __future__ import annotations
 
 import os
+import warnings
 from dataclasses import dataclass
 from typing import Tuple
 
@@ -19,6 +24,13 @@ from .init_session import verify_signed_prekey
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 
+
+WARNING_MSG = (
+    "Signal Protocol demo: This implementation is not production-grade and "
+    "omits critical features (multi-session, message headers, robust identity "
+    "binding, etc.). Use only for research, prototyping, or education. Do not "
+    "use for real secure messaging."
+)
 
 @dataclass
 class EncryptedMessage:
@@ -103,7 +115,12 @@ def x3dh_responder(
 
 
 class DoubleRatchet:
-    """Minimal Double Ratchet implementation."""
+    """Minimal Double Ratchet implementation.
+
+    This class backs the experimental Signal protocol demo and is **not**
+    production-grade. It omits features like skipped-message handling and
+    header encryption. Suitable only for research, prototyping, or education.
+    """
 
     def __init__(
         self,
@@ -183,7 +200,14 @@ class DoubleRatchet:
 
 
 class SignalSender:
-    """Sender that initiates a Signal session."""
+    """Sender that initiates a Signal session.
+
+    WARNING: This implementation is a simplified demonstration of the Signal
+    protocol (X3DH + Double Ratchet) and is NOT production-grade. It omits
+    important features (multi-session, message headers, robust identity
+    binding, etc.) and is suitable only for research, prototyping, or
+    education. Do not use for real secure messaging.
+    """
 
     def __init__(
         self,
@@ -193,6 +217,7 @@ class SignalSender:
         *,
         use_one_time_prekey: bool = False,
     ) -> None:
+        warnings.warn(WARNING_MSG, UserWarning, stacklevel=2)
         self.identity_priv = identity_priv
         self.identity_pub = identity_priv.public_key()
         self.ephemeral_priv = x25519.X25519PrivateKey.generate()
@@ -274,9 +299,17 @@ class SignalSender:
 
 
 class SignalReceiver:
-    """Receiver that responds to a Signal session."""
+    """Receiver that responds to a Signal session.
+
+    WARNING: This implementation is a simplified demonstration of the Signal
+    protocol (X3DH + Double Ratchet) and is NOT production-grade. It omits
+    important features (multi-session, message headers, robust identity
+    binding, etc.) and is suitable only for research, prototyping, or
+    education. Do not use for real secure messaging.
+    """
 
     def __init__(self, identity_priv: x25519.X25519PrivateKey) -> None:
+        warnings.warn(WARNING_MSG, UserWarning, stacklevel=2)
         self.identity_priv = identity_priv
         self.identity_pub = identity_priv.public_key()
         self.prekey_priv = x25519.X25519PrivateKey.generate()
@@ -346,10 +379,18 @@ class SignalReceiver:
 
 
 def initialize_signal_session(*, use_one_time_prekey: bool = False) -> Tuple[SignalSender, SignalReceiver]:
-    """Convenience function to create two parties with a shared session."""
+    """Convenience function to create two parties with a shared session.
+
+    WARNING: This implementation is a simplified demonstration of the Signal
+    protocol (X3DH + Double Ratchet) and is NOT production-grade. It omits
+    important features (multi-session, message headers, robust identity
+    binding, etc.) and is suitable only for research, prototyping, or
+    education. Do not use for real secure messaging.
+    """
 
     sender_id_priv = x25519.X25519PrivateKey.generate()
     receiver_id_priv = x25519.X25519PrivateKey.generate()
+    warnings.warn(WARNING_MSG, UserWarning, stacklevel=2)
     receiver = SignalReceiver(receiver_id_priv)
     sender = SignalSender(
         sender_id_priv,

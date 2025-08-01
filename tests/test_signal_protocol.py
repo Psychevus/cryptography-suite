@@ -1,11 +1,15 @@
 import unittest
+import warnings
 
 from cryptography_suite.experimental.signal import initialize_signal_session
 
 
 class TestSignalProtocol(unittest.TestCase):
     def test_message_exchange_and_ratchet(self):
-        sender, receiver = initialize_signal_session()
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            sender, receiver = initialize_signal_session()
+        self.assertTrue(any("Signal Protocol" in str(wi.message) for wi in w))
         first_root = sender.ratchet.root_key
 
         msg1 = b"Hello Bob"

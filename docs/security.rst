@@ -10,3 +10,10 @@ Security Considerations
 - When serializing private keys with :func:`cryptography_suite.serialize_private_key`
   or using :class:`cryptography_suite.protocols.key_management.KeyManager`, always
   supply a password so the key material is encrypted.
+
+Signal Protocol: Experimental Demo Only
+---------------------------------------
+
+The ``cryptography_suite.experimental.signal`` module is not a full Signal
+implementation. It lacks critical security properties and should never be
+used for production or high-assurance messaging.

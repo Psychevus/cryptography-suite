@@ -18,6 +18,8 @@ from cryptography_suite.protocols import (
     SPAKE2Client,
     SPAKE2Server,
 )
+import warnings
+
 from cryptography_suite.experimental.signal import (
     initialize_signal_session,
     SignalReceiver,
@@ -60,7 +62,10 @@ def test_spake2_invalid_peer_message():
 
 
 def test_signal_protocol_valid_flow():
-    sender, receiver = initialize_signal_session()
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        sender, receiver = initialize_signal_session()
+    assert any("Signal Protocol" in str(wi.message) for wi in w)
     msg = b"hi"
     enc = sender.encrypt(msg)
     dec = receiver.decrypt(enc)
@@ -71,7 +76,10 @@ def test_signal_protocol_valid_flow():
 
 
 def test_signal_protocol_tampered_ciphertext():
-    sender, receiver = initialize_signal_session()
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        sender, receiver = initialize_signal_session()
+    assert any("Signal Protocol" in str(wi.message) for wi in w)
     enc = sender.encrypt(b"hi")
     tampered = types.SimpleNamespace(
         dh_public=enc.dh_public,
@@ -83,8 +91,11 @@ def test_signal_protocol_tampered_ciphertext():
 
 
 def test_signal_protocol_wrong_receiver():
-    sender, receiver = initialize_signal_session()
-    other = SignalReceiver(x25519.X25519PrivateKey.generate())
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        sender, receiver = initialize_signal_session()
+        other = SignalReceiver(x25519.X25519PrivateKey.generate())
+    assert any("Signal Protocol" in str(wi.message) for wi in w)
     other.initialize_session(*sender.handshake_public)
     enc = sender.encrypt(b"hi")
     # other has different keys; decryption should fail
