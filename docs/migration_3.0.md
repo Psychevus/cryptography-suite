@@ -6,8 +6,9 @@ accordingly.
 
 ## Breaking Changes
 
-- **Backend Selection** is now mandatory via `use_backend`. The default
-  `cryptography` backend can be enabled with `use_backend("pyca")`.
+- **Backend Selection** is now mandatory via `use_backend` (typically as a
+  context manager). The default `cryptography` backend can be enabled with
+  `use_backend("pyca")`.
 - **Pipeline API** replaces ad-hoc helper chains. Compose operations using the
   `Pipeline` class.
 - **Key Management Interfaces** have changed. Use `KeyManager` for all
@@ -39,13 +40,12 @@ accordingly.
 from cryptography_suite import Pipeline, use_backend
 from cryptography_suite.pipeline import AESGCMEncrypt, AESGCMDecrypt
 
-use_backend("pyca")
+with use_backend("pyca"):
+    encrypt = AESGCMEncrypt(password="pass")
+    decrypt = AESGCMDecrypt(password="pass")
 
-encrypt = AESGCMEncrypt(password="pass")
-decrypt = AESGCMDecrypt(password="pass")
-
-p = Pipeline() >> encrypt >> decrypt
-assert p.run(b"msg") == b"msg"
+    p = Pipeline() >> encrypt >> decrypt
+    assert p.run(b"msg") == b"msg"
 ```
 
 See the [full documentation](index.html) for details on the new architecture and

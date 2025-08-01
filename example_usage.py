@@ -56,6 +56,7 @@ from cryptography_suite import (
     base62_encode,
     base62_decode,
     generate_secure_random_string,
+    use_backend,
 )
 from cryptography_suite.pipeline import (
     AESGCMEncrypt,
@@ -66,58 +67,59 @@ from cryptography_suite.pipeline import (
 
 
 def main():
-    # Symmetric Encryption Example
-    print("=== Symmetric Encryption ===")
-    plaintext = "Hello, Symmetric Encryption!"
-    symmetric_password = "strong_password"
+    with use_backend("pyca"):
+        # Symmetric Encryption Example
+        print("=== Symmetric Encryption ===")
+        plaintext = "Hello, Symmetric Encryption!"
+        symmetric_password = "strong_password"
 
-    # AES Encryption with Scrypt KDF
-    encrypted_aes = AESGCMEncrypt(password=symmetric_password, kdf="scrypt").run(
-        plaintext
-    )
-    decrypted_aes = AESGCMDecrypt(password=symmetric_password, kdf="scrypt").run(
-        encrypted_aes
-    )
-    print(f"AES Encrypted: {encrypted_aes}")
-    print(f"AES Decrypted: {decrypted_aes}")
+        # AES Encryption with Scrypt KDF
+        encrypted_aes = AESGCMEncrypt(password=symmetric_password, kdf="scrypt").run(
+            plaintext
+        )
+        decrypted_aes = AESGCMDecrypt(password=symmetric_password, kdf="scrypt").run(
+            encrypted_aes
+        )
+        print(f"AES Encrypted: {encrypted_aes}")
+        print(f"AES Decrypted: {decrypted_aes}")
 
-    # ChaCha20 Encryption
-    encrypted_chacha = chacha20_encrypt(plaintext, symmetric_password)
-    decrypted_chacha = chacha20_decrypt(encrypted_chacha, symmetric_password)
-    print(f"ChaCha20 Encrypted: {encrypted_chacha}")
-    print(f"ChaCha20 Decrypted: {decrypted_chacha}")
+        # ChaCha20 Encryption
+        encrypted_chacha = chacha20_encrypt(plaintext, symmetric_password)
+        decrypted_chacha = chacha20_decrypt(encrypted_chacha, symmetric_password)
+        print(f"ChaCha20 Encrypted: {encrypted_chacha}")
+        print(f"ChaCha20 Decrypted: {decrypted_chacha}")
 
-    # Symmetric File Encryption
-    print("\n=== File Encryption ===")
-    try:
-        with open("test.txt", "w") as f:
-            f.write("This is a test file for encryption.")
+        # Symmetric File Encryption
+        print("\n=== File Encryption ===")
+        try:
+            with open("test.txt", "w") as f:
+                f.write("This is a test file for encryption.")
 
-        encrypt_file("test.txt", "encrypted_test.enc", symmetric_password)
-        decrypt_file("encrypted_test.enc", "decrypted_test.txt", symmetric_password)
-        with open("decrypted_test.txt", "r") as f:
-            decrypted_content = f.read()
-        print(f"Decrypted File Content: {decrypted_content}")
-    finally:
-        # Clean up
-        os.remove("test.txt")
-        os.remove("encrypted_test.enc")
-        os.remove("decrypted_test.txt")
+            encrypt_file("test.txt", "encrypted_test.enc", symmetric_password)
+            decrypt_file("encrypted_test.enc", "decrypted_test.txt", symmetric_password)
+            with open("decrypted_test.txt", "r") as f:
+                decrypted_content = f.read()
+            print(f"Decrypted File Content: {decrypted_content}")
+        finally:
+            # Clean up
+            os.remove("test.txt")
+            os.remove("encrypted_test.enc")
+            os.remove("decrypted_test.txt")
 
-    # Asymmetric Encryption Example
-    print("\n=== Asymmetric Encryption ===")
-    rsa_private_key, rsa_public_key = generate_rsa_keypair()
-    message = b"Hello, Asymmetric Encryption!"
+        # Asymmetric Encryption Example
+        print("\n=== Asymmetric Encryption ===")
+        rsa_private_key, rsa_public_key = generate_rsa_keypair()
+        message = b"Hello, Asymmetric Encryption!"
 
-    rsa_ciphertext = RSAEncrypt(public_key=rsa_public_key).run(message)
-    rsa_plaintext = RSADecrypt(private_key=rsa_private_key).run(rsa_ciphertext)
-    print(f"RSA Decrypted Message: {rsa_plaintext.decode()}")
+        rsa_ciphertext = RSAEncrypt(public_key=rsa_public_key).run(message)
+        rsa_plaintext = RSADecrypt(private_key=rsa_private_key).run(rsa_ciphertext)
+        print(f"RSA Decrypted Message: {rsa_plaintext.decode()}")
 
-    # Key Serialization and Loading
-    key_password = "encryption_password"
-    private_pem = serialize_private_key(rsa_private_key, key_password)
-    public_pem = serialize_public_key(rsa_public_key)
-    loaded_private_key = load_private_key(private_pem, key_password)
+        # Key Serialization and Loading
+        key_password = "encryption_password"
+        private_pem = serialize_private_key(rsa_private_key, key_password)
+        public_pem = serialize_public_key(rsa_public_key)
+        loaded_private_key = load_private_key(private_pem, key_password)
     loaded_public_key = load_public_key(public_pem)
     print("RSA keys serialized and loaded successfully.")
 

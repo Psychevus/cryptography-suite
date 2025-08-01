@@ -44,4 +44,7 @@ Pipeline() >> ROT13()
 ```
 
 Use :func:`cryptography_suite.crypto_backends.use_backend` to switch the
-backend providing primitive implementations.
+backend providing primitive implementations::
+
+    with use_backend("pyca"):
+        ...

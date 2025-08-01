@@ -184,6 +184,8 @@ class AESGCMEncrypt(CryptoModule[str, str]):
         Password used to derive the encryption key.
     kdf:
         Key-derivation function name (``"argon2"`` by default).
+    backend:
+        Optional backend name to use for this operation only.
 
     Example
     -------
@@ -199,17 +201,24 @@ class AESGCMEncrypt(CryptoModule[str, str]):
 
     password: str
     kdf: str = "argon2"
+    backend: str | None = None
 
     def run(self, data: str) -> str:
         from .symmetric import aes as _aes_mod
         import warnings
+        import contextlib
+        from .crypto_backends import use_backend
 
-        # aes_encrypt returns ``str`` when ``raw_output`` is ``False`` (default)
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=DeprecationWarning)
-            return cast(
-                str, _aes_mod.aes_encrypt(data, self.password, kdf=self.kdf)
-            )
+        cm = (
+            use_backend(self.backend) if self.backend is not None else contextlib.nullcontext()
+        )
+        with cm:
+            # aes_encrypt returns ``str`` when ``raw_output`` is ``False`` (default)
+            with warnings.catch_warnings():
+                warnings.filterwarnings("ignore", category=DeprecationWarning)
+                return cast(
+                    str, _aes_mod.aes_encrypt(data, self.password, kdf=self.kdf)
+                )
 
     def to_proverif(self) -> str:  # pragma: no cover - simple serialization
         return f"aesgcm_encrypt({self.kdf})"
@@ -229,6 +238,8 @@ class AESGCMDecrypt(CryptoModule[str, str]):
         Password used to derive the decryption key.
     kdf:
         Key-derivation function name (``"argon2"`` by default).
+    backend:
+        Optional backend name to use for this operation only.
 
     Example
     -------
@@ -244,14 +255,21 @@ class AESGCMDecrypt(CryptoModule[str, str]):
 
     password: str
     kdf: str = "argon2"
+    backend: str | None = None
 
     def run(self, data: str) -> str:
         from .symmetric import aes as _aes_mod
         import warnings
+        import contextlib
+        from .crypto_backends import use_backend
 
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=DeprecationWarning)
-            return _aes_mod.aes_decrypt(data, self.password, kdf=self.kdf)
+        cm = (
+            use_backend(self.backend) if self.backend is not None else contextlib.nullcontext()
+        )
+        with cm:
+            with warnings.catch_warnings():
+                warnings.filterwarnings("ignore", category=DeprecationWarning)
+                return _aes_mod.aes_decrypt(data, self.password, kdf=self.kdf)
 
     def to_proverif(self) -> str:  # pragma: no cover - simple serialization
         return f"aesgcm_decrypt({self.kdf})"
