@@ -259,13 +259,24 @@
 accordingly.</p>
 <section id="breaking-changes">
 <h2>Breaking Changes<a class="headerlink" href="#breaking-changes" title="Link to this heading">¶</a></h2>
-<ul class="simple">
+<ul>
 <li><p><strong>Backend Selection</strong> is now mandatory via <code class="docutils literal notranslate"><span class="pre">use_backend</span></code>. The default
 <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> backend can be enabled with <code class="docutils literal notranslate"><span class="pre">use_backend(&quot;pyca&quot;)</span></code>.</p></li>
 <li><p><strong>Pipeline API</strong> replaces ad-hoc helper chains. Compose operations using the
 <code class="docutils literal notranslate"><span class="pre">Pipeline</span></code> class.</p></li>
 <li><p><strong>Key Management Interfaces</strong> have changed. Use <code class="docutils literal notranslate"><span class="pre">KeyManager</span></code> for all
-persistent key operations.</p></li>
+persistent key operations.</p>
+<p>Old helpers like <code class="docutils literal notranslate"><span class="pre">generate_rsa_keypair_and_save</span></code> and
+<code class="docutils literal notranslate"><span class="pre">generate_ec_keypair_and_save</span></code> are deprecated. Convert code such as::</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>generate_ec_keypair_and_save(&quot;priv.pem&quot;, &quot;pub.pem&quot;, &quot;pw&quot;)
+</pre></div>
+</div>
+<p>to::</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>km = KeyManager()
+km.generate_ec_keypair_and_save(&quot;priv.pem&quot;, &quot;pub.pem&quot;, &quot;pw&quot;)
+</pre></div>
+</div>
+</li>
 <li><p><strong>Deprecated Functions Removed.</strong> Legacy helpers marked deprecated in 2.x have
 been deleted.</p></li>
 </ul>
