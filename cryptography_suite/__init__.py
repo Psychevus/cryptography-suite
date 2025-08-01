@@ -1,7 +1,5 @@
 """Cryptography Suite Package Initialization."""
 
-from typing import Any
-
 from .errors import (
     CryptographySuiteError,
     DecryptionError,
@@ -32,16 +30,9 @@ from .asymmetric import (
     serialize_private_key,
     serialize_public_key,
 )
-from .asymmetric.bls import (
-    bls_aggregate,
-    bls_aggregate_verify,
-    bls_sign,
-    bls_verify,
-    generate_bls_keypair,
-)
+
 from .asymmetric.signatures import (
     generate_ecdsa_keypair,
-    generate_ed448_keypair,
     generate_ed25519_keypair,
     load_ecdsa_private_key,
     load_ecdsa_public_key,
@@ -53,15 +44,13 @@ from .asymmetric.signatures import (
     serialize_ed25519_public_key,
     sign_message,
     sign_message_ecdsa,
-    sign_message_ed448,
     verify_signature,
     verify_signature_ecdsa,
-    verify_signature_ed448,
 )
 
-# Backend registry -----------------------------------------------------------------
-from .crypto_backends import pyca_backend  # noqa: F401  - registers default backend
-from .crypto_backends import available_backends, use_backend, select_backend  # noqa: E402
+# Backend registry -----------------------------------------------------------
+from .crypto_backends import pyca_backend  # noqa: F401 - registers default backend
+from .crypto_backends import available_backends, use_backend, select_backend
 from .hybrid import HybridEncryptor, hybrid_decrypt, hybrid_encrypt
 
 # Symmetric primitives -------------------------------------------------------
@@ -90,40 +79,19 @@ from .symmetric import (
     xchacha_encrypt,
 )
 
-# Post-quantum cryptography --------------------------------------------------
-try:  # pragma: no cover - optional dependency
-    from .pqc import (  # noqa: F401
-        PQCRYPTO_AVAILABLE,
-        SPHINCS_AVAILABLE,
-        dilithium_sign,
-        dilithium_verify,
-        generate_dilithium_keypair,
-        generate_kyber_keypair,
-        generate_sphincs_keypair,
-        kyber_decrypt,
-        kyber_encrypt,
-        sphincs_sign,
-        sphincs_verify,
-    )
-except Exception:  # pragma: no cover - fallback when pqcrypto is missing
-    PQCRYPTO_AVAILABLE = False
-
 from .audit import audit_log, set_audit_logger
 
-# Hashing and utilities ------------------------------------------------------
+# Hashing --------------------------------------------------------------------
 from .hashing import (
     blake2b_hash,
     blake3_hash,
-    blake3_hash_v2,
     sha3_256_hash,
     sha3_512_hash,
     sha256_hash,
     sha384_hash,
     sha512_hash,
 )
-from .pipeline import Pipeline, PipelineVisualizer
-from .rich_logging import get_rich_logger
-from .viz import HandshakeFlowWidget, KeyGraphWidget, SessionTimelineWidget
+
 from .protocols import (
     KeyManager,
     SignalReceiver,
@@ -159,40 +127,8 @@ from .utils import (
     secure_zero,
     to_pem,
 )
+
 from .x509 import generate_csr, load_certificate, self_sign_certificate
-
-# Optional homomorphic encryption -------------------------------------------
-try:  # pragma: no cover - optional dependency
-    from .homomorphic import add as fhe_add  # noqa: F401
-    from .homomorphic import decrypt as fhe_decrypt  # noqa: F401
-    from .homomorphic import encrypt as fhe_encrypt  # noqa: F401
-    from .homomorphic import keygen as fhe_keygen  # noqa: F401
-    from .homomorphic import multiply as fhe_multiply  # noqa: F401
-
-    FHE_AVAILABLE = True
-except Exception:  # pragma: no cover - handle missing Pyfhel
-    FHE_AVAILABLE = False
-
-# Zero-knowledge proofs ------------------------------------------------------
-bulletproof: Any
-try:  # pragma: no cover - optional dependency
-    from .zk import bulletproof as bulletproof_module
-
-    bulletproof = bulletproof_module
-    BULLETPROOF_AVAILABLE = True
-except Exception:  # pragma: no cover - handle missing dependency
-    bulletproof = None
-    BULLETPROOF_AVAILABLE = False
-
-zksnark: Any
-try:  # pragma: no cover - optional dependency
-    from .zk import zksnark as zksnark_module
-
-    zksnark = zksnark_module
-    ZKSNARK_AVAILABLE = getattr(zksnark_module, "ZKSNARK_AVAILABLE", False)
-except Exception:  # pragma: no cover - handle missing dependency
-    zksnark = None
-    ZKSNARK_AVAILABLE = False
 
 __all__ = [
     # Encryption
@@ -239,11 +175,8 @@ __all__ = [
     "HybridEncryptor",
     # Signatures
     "generate_ed25519_keypair",
-    "generate_ed448_keypair",
     "sign_message",
-    "sign_message_ed448",
     "verify_signature",
-    "verify_signature_ed448",
     "serialize_ed25519_private_key",
     "serialize_ed25519_public_key",
     "load_ed25519_private_key",
@@ -255,12 +188,6 @@ __all__ = [
     "serialize_ecdsa_public_key",
     "load_ecdsa_private_key",
     "load_ecdsa_public_key",
-    # BLS Signatures
-    "generate_bls_keypair",
-    "bls_sign",
-    "bls_verify",
-    "bls_aggregate",
-    "bls_aggregate_verify",
     # Hashing
     "sha384_hash",
     "sha256_hash",
@@ -269,7 +196,6 @@ __all__ = [
     "sha3_512_hash",
     "blake2b_hash",
     "blake3_hash",
-    "blake3_hash_v2",
     # Key Management
     "generate_aes_key",
     "rotate_aes_key",
@@ -301,15 +227,11 @@ __all__ = [
     "encode_encrypted_message",
     "decode_encrypted_message",
     "KeyManager",
+    # x509
     "generate_csr",
     "self_sign_certificate",
     "load_certificate",
-    "Pipeline",
-    "PipelineVisualizer",
-    "get_rich_logger",
-    "HandshakeFlowWidget",
-    "KeyGraphWidget",
-    "SessionTimelineWidget",
+    # Audit
     "audit_log",
     "set_audit_logger",
     # Signal Protocol
@@ -324,40 +246,9 @@ __all__ = [
     "SignatureVerificationError",
     "MissingDependencyError",
     "ProtocolError",
+    # Backends
     "available_backends",
     "use_backend",
     "select_backend",
 ]
 
-# Conditional exports -------------------------------------------------------
-if PQCRYPTO_AVAILABLE:
-    __all__.extend(
-        [
-            "generate_kyber_keypair",
-            "kyber_encrypt",
-            "kyber_decrypt",
-            "generate_dilithium_keypair",
-            "dilithium_sign",
-            "dilithium_verify",
-            "generate_sphincs_keypair",
-            "sphincs_sign",
-            "sphincs_verify",
-        ]
-    )
-
-if FHE_AVAILABLE:
-    __all__.extend(
-        [
-            "fhe_keygen",
-            "fhe_encrypt",
-            "fhe_decrypt",
-            "fhe_add",
-            "fhe_multiply",
-        ]
-    )
-
-# Zero-knowledge proofs modules
-if BULLETPROOF_AVAILABLE:
-    __all__.append("bulletproof")
-if ZKSNARK_AVAILABLE:
-    __all__.append("zksnark")

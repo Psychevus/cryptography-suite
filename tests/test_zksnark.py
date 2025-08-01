@@ -1,6 +1,6 @@
 import unittest
 
-from cryptography_suite import zksnark
+from cryptography_suite.experimental import zksnark
 
 
 @unittest.skipUnless(

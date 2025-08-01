@@ -241,7 +241,8 @@ def main():
     # Homomorphic Encryption Demo
     print("\n=== Homomorphic Encryption ===")
     try:
-        from cryptography_suite.homomorphic import (
+        from cryptography_suite.experimental import (
+            FHE_AVAILABLE,
             fhe_keygen,
             fhe_encrypt,
             fhe_decrypt,
@@ -249,12 +250,15 @@ def main():
             fhe_multiply,
         )
 
-        fhe = fhe_keygen("CKKS")
-        c1 = fhe_encrypt(fhe, 10.5)
-        c2 = fhe_encrypt(fhe, 5.25)
-        print("Decrypted Sum:", fhe_decrypt(fhe, fhe_add(fhe, c1, c2)))
-        print("Decrypted Product:", fhe_decrypt(fhe, fhe_multiply(fhe, c1, c2)))
-    except ImportError:
+        if FHE_AVAILABLE:
+            fhe = fhe_keygen("CKKS")
+            c1 = fhe_encrypt(fhe, 10.5)
+            c2 = fhe_encrypt(fhe, 5.25)
+            print("Decrypted Sum:", fhe_decrypt(fhe, fhe_add(fhe, c1, c2)))
+            print("Decrypted Product:", fhe_decrypt(fhe, fhe_multiply(fhe, c1, c2)))
+        else:
+            print("Pyfhel not installed; skipping homomorphic encryption demo.")
+    except Exception:
         print("Pyfhel not installed; skipping homomorphic encryption demo.")
 
 

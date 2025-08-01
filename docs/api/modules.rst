@@ -1,7 +1,26 @@
 API Reference
 =============
 
+Core API
+--------
+
 .. automodule:: cryptography_suite
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Experimental API
+----------------
+
+.. automodule:: cryptography_suite.experimental
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Legacy API
+----------
+
+.. automodule:: cryptography_suite.legacy
     :members:
     :undoc-members:
     :show-inheritance:
