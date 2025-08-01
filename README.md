@@ -182,7 +182,7 @@ cryptosuite-fuzz --runs 1000
 - **Hybrid Encryption**: Combine RSA/ECIES with AES-GCM for performance and security.
 - **Post-Quantum Cryptography**: Kyber key encapsulation and Dilithium signatures for quantum-safe workflows.
 - **XChaCha20-Poly1305**: Modern stream cipher support when ``cryptography`` exposes ``XChaCha20Poly1305``.
-- **Salsa20 and Ascon**: Deprecated and provided for reference only. **Not recommended for production**, removed from public imports, and scheduled for removal in v4.0.0. Use ``chacha20_stream_encrypt`` or authenticated ciphers like ``AESGCMEncrypt`` instead.
+- **Salsa20 and Ascon**: Deprecated and provided for reference only. **Not recommended for production**, removed from public imports, and scheduled for removal in v4.0.0. Use authenticated ciphers like ``chacha20_encrypt``/``xchacha_encrypt`` or ``AESGCMEncrypt`` instead.
 - **Audit Logging**: Decorators and helpers for encrypted audit trails.
 - **KeyVault Management**: Context manager to safely handle in-memory keys.
 - **Password-Authenticated Key Exchange (PAKE)**: SPAKE2 protocol implementation for secure password-based key exchange.
@@ -194,10 +194,28 @@ cryptosuite-fuzz --runs 1000
 
 ---
 
+## Backend Matrix
+
+| Primitive | Backend | Notes |
+| --- | --- | --- |
+| AES-GCM | pyca/cryptography | Authoritative |
+| ChaCha20-Poly1305 / XChaCha20-Poly1305 | pyca/cryptography | Authoritative |
+| Salsa20 | PyCryptodome (optional) | Deprecated; provided for reference only |
+| Ascon-128a | Pure Python | Experimental |
+| RSA, ECDSA, Ed25519, Ed448 | pyca/cryptography | Authoritative |
+| BLS12-381 | py_ecc | Optional |
+| SHA-2, SHA-3, BLAKE2b | pyca/cryptography | Authoritative |
+| BLAKE3 | blake3 | Authoritative |
+| Argon2id, Scrypt, PBKDF2, HKDF | pyca/cryptography | Authoritative |
+| Kyber, Dilithium (PQC) | pqcrypto (optional) | Optional |
+
+See [`docs/backend_consistency.md`](docs/backend_consistency.md) for
+policies on backend usage.
+
 ## ⚠️ Security Considerations
 
-- **Insecure Ciphers**: Functions such as `chacha20_stream_encrypt`
-  do not provide authentication and should only be used for educational purposes.
+- **Insecure Ciphers**: Optional helpers like `salsa20_encrypt` provide no
+  authentication and should only be used for educational purposes.
   The deprecated `salsa20_encrypt` will be removed in v4.0.0.
 - **Verbose Mode**: Enabling `VERBOSE_MODE` leaks sensitive information to stdout; never
   enable it in production.

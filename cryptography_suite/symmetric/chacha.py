@@ -1,5 +1,11 @@
 from __future__ import annotations
 
+"""ChaCha20-Poly1305 helpers using :mod:`pyca/cryptography`.
+
+The ``pyca/cryptography`` backend is authoritative for ChaCha20-Poly1305 and
+XChaCha20-Poly1305 in this project.
+"""
+
 import base64
 from os import urandom
 

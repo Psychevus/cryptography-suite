@@ -3,8 +3,6 @@ pqcrypto
 py_ecc
 spake2
 blake3
-pynacl
-pycryptodome
 PyYAML
 rich
 ipywidgets

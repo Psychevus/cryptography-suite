@@ -1,3 +1,10 @@
+"""Digital signature helpers built on :mod:`pyca/cryptography`.
+
+Ed25519, Ed448, ECDSA, and RSA operations in this project rely exclusively on
+``pyca/cryptography``. Alternative libraries such as PyNaCl or PyCryptodome are
+not used and should be avoided in production code.
+"""
+
 from cryptography.hazmat.primitives.asymmetric import (
     ed25519,
     ed448,

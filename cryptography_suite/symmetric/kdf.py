@@ -1,5 +1,11 @@
 from __future__ import annotations
 
+"""Key-derivation helpers using :mod:`pyca/cryptography`.
+
+Argon2id, Scrypt, PBKDF2, and HKDF are provided via ``pyca/cryptography`` and
+serve as the authoritative implementations.
+"""
+
 from os import urandom
 
 from cryptography.exceptions import InvalidKey

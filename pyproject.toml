@@ -43,9 +43,7 @@ dependencies = [
     "py_ecc",
     "spake2",
     "blake3",
-    "pynacl",
-    "pycryptodome"
-    , "PyYAML"
+    "PyYAML"
     , "Jinja2"
     , "rich"
     , "ipywidgets"
@@ -56,6 +54,7 @@ dependencies = [
 pqc = ["pqcrypto"]
 fhe = ["Pyfhel"]
 zk = ["pybulletproofs", "PySNARK"]
+salsa20 = ["pycryptodome"]
 dev = [
     "pytest",
     "pytest-cov",
