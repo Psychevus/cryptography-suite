@@ -216,9 +216,7 @@ policies on backend usage.
 
 ## ⚠️ Security Considerations
 
-- **Insecure Ciphers**: Optional helpers like `salsa20_encrypt` provide no
-  authentication and should only be used for educational purposes.
-  The deprecated `salsa20_encrypt` will be removed in v4.0.0.
+- **Experimental/Insecure Primitives**: Functions like `salsa20_encrypt` or `ascon_encrypt` are for research/education only and will be removed in v4.0.0. They are NOT supported for production use. If you depend on them, migrate now.
 - **Verbose Mode**: Enabling `VERBOSE_MODE` leaks sensitive information to stdout; never
   enable it in production.
 - **Private Key Protection**: Always supply a password when saving private keys to PEM

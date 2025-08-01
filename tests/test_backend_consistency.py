@@ -2,7 +2,7 @@ import pathlib
 import re
 
 ALLOWED = {
-    pathlib.Path("cryptography_suite/optional/salsa20.py"),
+    pathlib.Path("cryptography_suite/experimental/salsa20.py"),
     pathlib.Path("examples/vulnerable.py"),
 }
 
