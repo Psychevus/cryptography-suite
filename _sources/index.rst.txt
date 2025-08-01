@@ -27,6 +27,8 @@ formally verified, misuse-resistant workflows.
 - HSM, YubiKey, PKCS#11, Cloud KMS Plugin Architecture
 - Fuzzing Harness & Property-Based Testing
 - Supply-Chain Attestation, SLSA, and Reproducible Builds
+- Signal Protocol components (X3DH + Double Ratchet) for demo use (*experimental, not production-ready*)
+- Post-Quantum primitives: Kyber KEM, Dilithium signatures, and *experimental* SPHINCS+ (requires `pip install "cryptography-suite[pqc]"`)
 
 
 .. toctree::

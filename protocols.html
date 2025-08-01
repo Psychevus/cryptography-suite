@@ -256,7 +256,8 @@
           <section id="protocol-notes">
 <h1>Protocol Notes<a class="headerlink" href="#protocol-notes" title="Link to this heading">¶</a></h1>
 <p>The suite provides a light-weight X3DH implementation used for Signal-like
-sessions. During session setup the receiver verifies that the sender’s
+sessions. <strong>This Signal Protocol support is experimental and intended for
+demonstrations only; it is not production-ready.</strong> During session setup the receiver verifies that the sender’s
 <code class="docutils literal notranslate"><span class="pre">signed_prekey</span></code> is signed with the sender’s identity key using the helper
 <code class="docutils literal notranslate"><span class="pre">verify_signed_prekey</span></code>. A failed verification raises
 <code class="docutils literal notranslate"><span class="pre">SignatureVerificationError</span></code>.</p>
