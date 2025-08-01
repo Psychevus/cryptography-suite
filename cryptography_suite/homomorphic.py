@@ -179,8 +179,6 @@ __all__ = [
     "PYFHEL_AVAILABLE",
     "HEParams",
     "keygen",
-    "encrypt",
-    "decrypt",
     "add",
     "multiply",
     "serialize_context",
