@@ -218,6 +218,7 @@
 <li class="toctree-l1"><a class="reference internal" href="security.html">Security Notes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/modules.html">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/pipeline.html">Pipeline DSL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/public_api_table.html">Public API Inventory</a></li>
 </ul>
 
 </div>
@@ -342,126 +343,9 @@ formally verified, misuse-resistant workflows.</p>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="security.html">Security Notes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/modules.html">API Reference</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.CryptographySuiteError"><code class="docutils literal notranslate"><span class="pre">CryptographySuiteError</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.DecryptionError"><code class="docutils literal notranslate"><span class="pre">DecryptionError</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.EncryptionError"><code class="docutils literal notranslate"><span class="pre">EncryptionError</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.HandshakeFlowWidget"><code class="docutils literal notranslate"><span class="pre">HandshakeFlowWidget</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.HybridEncryptor"><code class="docutils literal notranslate"><span class="pre">HybridEncryptor</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.KeyDerivationError"><code class="docutils literal notranslate"><span class="pre">KeyDerivationError</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.KeyGraphWidget"><code class="docutils literal notranslate"><span class="pre">KeyGraphWidget</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.KeyManager"><code class="docutils literal notranslate"><span class="pre">KeyManager</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.KeyVault"><code class="docutils literal notranslate"><span class="pre">KeyVault</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.MissingDependencyError"><code class="docutils literal notranslate"><span class="pre">MissingDependencyError</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.Pipeline"><code class="docutils literal notranslate"><span class="pre">Pipeline</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.PipelineVisualizer"><code class="docutils literal notranslate"><span class="pre">PipelineVisualizer</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.ProtocolError"><code class="docutils literal notranslate"><span class="pre">ProtocolError</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.SPAKE2Client"><code class="docutils literal notranslate"><span class="pre">SPAKE2Client</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.SPAKE2Server"><code class="docutils literal notranslate"><span class="pre">SPAKE2Server</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.SessionTimelineWidget"><code class="docutils literal notranslate"><span class="pre">SessionTimelineWidget</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.SignalReceiver"><code class="docutils literal notranslate"><span class="pre">SignalReceiver</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.SignalSender"><code class="docutils literal notranslate"><span class="pre">SignalSender</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.SignatureVerificationError"><code class="docutils literal notranslate"><span class="pre">SignatureVerificationError</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.argon2_decrypt"><code class="docutils literal notranslate"><span class="pre">argon2_decrypt()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.argon2_encrypt"><code class="docutils literal notranslate"><span class="pre">argon2_encrypt()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.audit_log"><code class="docutils literal notranslate"><span class="pre">audit_log()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.available_backends"><code class="docutils literal notranslate"><span class="pre">available_backends()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.base62_decode"><code class="docutils literal notranslate"><span class="pre">base62_decode()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.base62_encode"><code class="docutils literal notranslate"><span class="pre">base62_encode()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.blake2b_hash"><code class="docutils literal notranslate"><span class="pre">blake2b_hash()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.blake3_hash"><code class="docutils literal notranslate"><span class="pre">blake3_hash()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.blake3_hash_v2"><code class="docutils literal notranslate"><span class="pre">blake3_hash_v2()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.bls_aggregate"><code class="docutils literal notranslate"><span class="pre">bls_aggregate()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.bls_aggregate_verify"><code class="docutils literal notranslate"><span class="pre">bls_aggregate_verify()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.bls_sign"><code class="docutils literal notranslate"><span class="pre">bls_sign()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.bls_verify"><code class="docutils literal notranslate"><span class="pre">bls_verify()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.chacha20_decrypt"><code class="docutils literal notranslate"><span class="pre">chacha20_decrypt()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.chacha20_decrypt_aead"><code class="docutils literal notranslate"><span class="pre">chacha20_decrypt_aead()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.chacha20_encrypt"><code class="docutils literal notranslate"><span class="pre">chacha20_encrypt()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.chacha20_encrypt_aead"><code class="docutils literal notranslate"><span class="pre">chacha20_encrypt_aead()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.constant_time_compare"><code class="docutils literal notranslate"><span class="pre">constant_time_compare()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.create_shares"><code class="docutils literal notranslate"><span class="pre">create_shares()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.decode_encrypted_message"><code class="docutils literal notranslate"><span class="pre">decode_encrypted_message()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.decrypt_file"><code class="docutils literal notranslate"><span class="pre">decrypt_file()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.decrypt_file_async"><code class="docutils literal notranslate"><span class="pre">decrypt_file_async()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.derive_hkdf"><code class="docutils literal notranslate"><span class="pre">derive_hkdf()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.derive_key_argon2"><code class="docutils literal notranslate"><span class="pre">derive_key_argon2()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.derive_key_pbkdf2"><code class="docutils literal notranslate"><span class="pre">derive_key_pbkdf2()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.derive_key_scrypt"><code class="docutils literal notranslate"><span class="pre">derive_key_scrypt()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.derive_x25519_shared_key"><code class="docutils literal notranslate"><span class="pre">derive_x25519_shared_key()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.derive_x448_shared_key"><code class="docutils literal notranslate"><span class="pre">derive_x448_shared_key()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.ec_decrypt"><code class="docutils literal notranslate"><span class="pre">ec_decrypt()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.ec_encrypt"><code class="docutils literal notranslate"><span class="pre">ec_encrypt()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.encode_encrypted_message"><code class="docutils literal notranslate"><span class="pre">encode_encrypted_message()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.encrypt_file"><code class="docutils literal notranslate"><span class="pre">encrypt_file()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.encrypt_file_async"><code class="docutils literal notranslate"><span class="pre">encrypt_file_async()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.from_pem"><code class="docutils literal notranslate"><span class="pre">from_pem()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.generate_aes_key"><code class="docutils literal notranslate"><span class="pre">generate_aes_key()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.generate_bls_keypair"><code class="docutils literal notranslate"><span class="pre">generate_bls_keypair()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.generate_csr"><code class="docutils literal notranslate"><span class="pre">generate_csr()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.generate_ec_keypair"><code class="docutils literal notranslate"><span class="pre">generate_ec_keypair()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.generate_ecdsa_keypair"><code class="docutils literal notranslate"><span class="pre">generate_ecdsa_keypair()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.generate_ed25519_keypair"><code class="docutils literal notranslate"><span class="pre">generate_ed25519_keypair()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.generate_ed448_keypair"><code class="docutils literal notranslate"><span class="pre">generate_ed448_keypair()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.generate_hotp"><code class="docutils literal notranslate"><span class="pre">generate_hotp()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.generate_rsa_keypair"><code class="docutils literal notranslate"><span class="pre">generate_rsa_keypair()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.generate_rsa_keypair_async"><code class="docutils literal notranslate"><span class="pre">generate_rsa_keypair_async()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.generate_salt"><code class="docutils literal notranslate"><span class="pre">generate_salt()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.generate_secure_random_string"><code class="docutils literal notranslate"><span class="pre">generate_secure_random_string()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.generate_totp"><code class="docutils literal notranslate"><span class="pre">generate_totp()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.generate_x25519_keypair"><code class="docutils literal notranslate"><span class="pre">generate_x25519_keypair()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.generate_x448_keypair"><code class="docutils literal notranslate"><span class="pre">generate_x448_keypair()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.get_rich_logger"><code class="docutils literal notranslate"><span class="pre">get_rich_logger()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.hybrid_decrypt"><code class="docutils literal notranslate"><span class="pre">hybrid_decrypt()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.hybrid_encrypt"><code class="docutils literal notranslate"><span class="pre">hybrid_encrypt()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.initialize_signal_session"><code class="docutils literal notranslate"><span class="pre">initialize_signal_session()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.kdf_pbkdf2"><code class="docutils literal notranslate"><span class="pre">kdf_pbkdf2()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.key_exists"><code class="docutils literal notranslate"><span class="pre">key_exists()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.load_certificate"><code class="docutils literal notranslate"><span class="pre">load_certificate()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.load_ecdsa_private_key"><code class="docutils literal notranslate"><span class="pre">load_ecdsa_private_key()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.load_ecdsa_public_key"><code class="docutils literal notranslate"><span class="pre">load_ecdsa_public_key()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.load_ed25519_private_key"><code class="docutils literal notranslate"><span class="pre">load_ed25519_private_key()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.load_ed25519_public_key"><code class="docutils literal notranslate"><span class="pre">load_ed25519_public_key()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.load_private_key"><code class="docutils literal notranslate"><span class="pre">load_private_key()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.load_private_key_from_file"><code class="docutils literal notranslate"><span class="pre">load_private_key_from_file()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.load_public_key"><code class="docutils literal notranslate"><span class="pre">load_public_key()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.load_public_key_from_file"><code class="docutils literal notranslate"><span class="pre">load_public_key_from_file()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.pbkdf2_decrypt"><code class="docutils literal notranslate"><span class="pre">pbkdf2_decrypt()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.pbkdf2_encrypt"><code class="docutils literal notranslate"><span class="pre">pbkdf2_encrypt()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.pem_to_json"><code class="docutils literal notranslate"><span class="pre">pem_to_json()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.reconstruct_secret"><code class="docutils literal notranslate"><span class="pre">reconstruct_secret()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.rotate_aes_key"><code class="docutils literal notranslate"><span class="pre">rotate_aes_key()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.scrypt_decrypt"><code class="docutils literal notranslate"><span class="pre">scrypt_decrypt()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.scrypt_encrypt"><code class="docutils literal notranslate"><span class="pre">scrypt_encrypt()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.secure_save_key_to_file"><code class="docutils literal notranslate"><span class="pre">secure_save_key_to_file()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.secure_zero"><code class="docutils literal notranslate"><span class="pre">secure_zero()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.select_backend"><code class="docutils literal notranslate"><span class="pre">select_backend()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.self_sign_certificate"><code class="docutils literal notranslate"><span class="pre">self_sign_certificate()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.serialize_ecdsa_private_key"><code class="docutils literal notranslate"><span class="pre">serialize_ecdsa_private_key()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.serialize_ecdsa_public_key"><code class="docutils literal notranslate"><span class="pre">serialize_ecdsa_public_key()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.serialize_ed25519_private_key"><code class="docutils literal notranslate"><span class="pre">serialize_ed25519_private_key()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.serialize_ed25519_public_key"><code class="docutils literal notranslate"><span class="pre">serialize_ed25519_public_key()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.serialize_private_key"><code class="docutils literal notranslate"><span class="pre">serialize_private_key()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.serialize_public_key"><code class="docutils literal notranslate"><span class="pre">serialize_public_key()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.set_audit_logger"><code class="docutils literal notranslate"><span class="pre">set_audit_logger()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.sha256_hash"><code class="docutils literal notranslate"><span class="pre">sha256_hash()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.sha384_hash"><code class="docutils literal notranslate"><span class="pre">sha384_hash()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.sha3_256_hash"><code class="docutils literal notranslate"><span class="pre">sha3_256_hash()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.sha3_512_hash"><code class="docutils literal notranslate"><span class="pre">sha3_512_hash()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.sha512_hash"><code class="docutils literal notranslate"><span class="pre">sha512_hash()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.sign_message"><code class="docutils literal notranslate"><span class="pre">sign_message()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.sign_message_ecdsa"><code class="docutils literal notranslate"><span class="pre">sign_message_ecdsa()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.sign_message_ed448"><code class="docutils literal notranslate"><span class="pre">sign_message_ed448()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.to_pem"><code class="docutils literal notranslate"><span class="pre">to_pem()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.use_backend"><code class="docutils literal notranslate"><span class="pre">use_backend()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.verify_derived_key_pbkdf2"><code class="docutils literal notranslate"><span class="pre">verify_derived_key_pbkdf2()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.verify_derived_key_scrypt"><code class="docutils literal notranslate"><span class="pre">verify_derived_key_scrypt()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.verify_hotp"><code class="docutils literal notranslate"><span class="pre">verify_hotp()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.verify_signature"><code class="docutils literal notranslate"><span class="pre">verify_signature()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.verify_signature_ecdsa"><code class="docutils literal notranslate"><span class="pre">verify_signature_ecdsa()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.verify_signature_ed448"><code class="docutils literal notranslate"><span class="pre">verify_signature_ed448()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.verify_totp"><code class="docutils literal notranslate"><span class="pre">verify_totp()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.xchacha_decrypt"><code class="docutils literal notranslate"><span class="pre">xchacha_decrypt()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#cryptography_suite.xchacha_encrypt"><code class="docutils literal notranslate"><span class="pre">xchacha_encrypt()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/modules.html#module-cryptography_suite">Core API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/modules.html#module-cryptography_suite.experimental">Experimental API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/modules.html#module-cryptography_suite.legacy">Legacy API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/modules.html#selecting-a-backend">Selecting a backend</a></li>
 </ul>
 </li>
@@ -477,6 +361,7 @@ formally verified, misuse-resistant workflows.</p>
 <li class="toctree-l2"><a class="reference internal" href="api/pipeline.html#cryptography_suite.pipeline.register_module"><code class="docutils literal notranslate"><span class="pre">register_module()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="api/public_api_table.html">Public API Inventory</a></li>
 </ul>
 </div>
 </section>

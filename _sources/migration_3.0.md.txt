@@ -37,8 +37,8 @@ accordingly.
 ## Example
 
 ```python
-from cryptography_suite import Pipeline, use_backend
-from cryptography_suite.pipeline import AESGCMEncrypt, AESGCMDecrypt
+from cryptography_suite import use_backend
+from cryptography_suite.pipeline import Pipeline, AESGCMEncrypt, AESGCMDecrypt
 
 with use_backend("pyca"):
     encrypt = AESGCMEncrypt(password="pass")

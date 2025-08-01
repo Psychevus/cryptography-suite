@@ -218,6 +218,7 @@
 <li class="toctree-l1"><a class="reference internal" href="security.html">Security Notes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/modules.html">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/pipeline.html">Pipeline DSL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/public_api_table.html">Public API Inventory</a></li>
 </ul>
 
 </div>
@@ -300,8 +301,8 @@ been deleted.</p></li>
 </section>
 <section id="example">
 <h2>Example<a class="headerlink" href="#example" title="Link to this heading">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cryptography_suite</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span><span class="p">,</span> <span class="n">use_backend</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">cryptography_suite.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">AESGCMEncrypt</span><span class="p">,</span> <span class="n">AESGCMDecrypt</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cryptography_suite</span><span class="w"> </span><span class="kn">import</span> <span class="n">use_backend</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cryptography_suite.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span><span class="p">,</span> <span class="n">AESGCMEncrypt</span><span class="p">,</span> <span class="n">AESGCMDecrypt</span>
 
 <span class="k">with</span> <span class="n">use_backend</span><span class="p">(</span><span class="s2">&quot;pyca&quot;</span><span class="p">):</span>
     <span class="n">encrypt</span> <span class="o">=</span> <span class="n">AESGCMEncrypt</span><span class="p">(</span><span class="n">password</span><span class="o">=</span><span class="s2">&quot;pass&quot;</span><span class="p">)</span>
