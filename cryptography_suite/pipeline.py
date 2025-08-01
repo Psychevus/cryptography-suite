@@ -8,7 +8,7 @@ pipeline steps.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Callable, Generic, Iterable, Protocol, TypeVar
+from typing import Any, Callable, Generic, Iterable, Protocol, TypeVar, cast
 import json
 import logging
 
@@ -203,7 +203,8 @@ class AESGCMEncrypt(CryptoModule[str, str]):
     def run(self, data: str) -> str:
         from .symmetric import aes_encrypt
 
-        return aes_encrypt(data, self.password, kdf=self.kdf)
+        # aes_encrypt returns ``str`` when ``raw_output`` is ``False`` (default)
+        return cast(str, aes_encrypt(data, self.password, kdf=self.kdf))
 
     def to_proverif(self) -> str:  # pragma: no cover - simple serialization
         return f"aesgcm_encrypt({self.kdf})"
