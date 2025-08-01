@@ -12,7 +12,6 @@ from cryptography_suite.protocols import (
     load_private_key_from_file,
     load_public_key_from_file,
     key_exists,
-    generate_ec_keypair_and_save,
     KeyManager,
 )
 
@@ -58,7 +57,7 @@ class TestKeyManagement(unittest.TestCase):
 
     def test_secure_save_and_load_ec_keys(self):
         """Test generating, saving, and loading EC keys."""
-        generate_ec_keypair_and_save(
+        self.km.generate_ec_keypair_and_save(
             self.private_key_path, self.public_key_path, self.password
         )
         self.assertTrue(key_exists(self.private_key_path))
@@ -102,12 +101,37 @@ class TestKeyManagement(unittest.TestCase):
     def test_generate_ec_keypair_and_save_with_invalid_curve(self):
         """Test generating EC key pair with invalid curve."""
         with self.assertRaises(TypeError):
-            generate_ec_keypair_and_save(
+            self.km.generate_ec_keypair_and_save(
                 self.private_key_path,
                 self.public_key_path,
                 self.password,
                 curve="invalid_curve",
             )
+
+    def test_generate_ed25519_and_ed448_keypair_and_save(self):
+        """Generate and load EdDSA key pairs using KeyManager."""
+        ed_priv = "ed_priv.pem"
+        ed_pub = "ed_pub.pem"
+        ed448_priv = "ed448_priv.pem"
+        ed448_pub = "ed448_pub.pem"
+
+        try:
+            self.km.generate_ed25519_keypair_and_save(ed_priv, ed_pub, self.password)
+            self.km.generate_ed448_keypair_and_save(ed448_priv, ed448_pub, self.password)
+
+            priv = load_private_key_from_file(ed_priv, self.password)
+            pub = load_public_key_from_file(ed_pub)
+            self.assertIsNotNone(priv)
+            self.assertIsNotNone(pub)
+
+            priv2 = load_private_key_from_file(ed448_priv, self.password)
+            pub2 = load_public_key_from_file(ed448_pub)
+            self.assertIsNotNone(priv2)
+            self.assertIsNotNone(pub2)
+        finally:
+            for f in (ed_priv, ed_pub, ed448_priv, ed448_pub):
+                if os.path.exists(f):
+                    os.remove(f)
 
 
 if __name__ == "__main__":
