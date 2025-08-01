@@ -142,6 +142,10 @@ def encrypt(key: bytes, nonce: bytes, associated_data: bytes, plaintext: bytes) 
     """Encrypt and authenticate using Ascon-128a.
 
     .. warning:: This cipher is experimental and **not recommended for production**.
+
+    Deprecated: will be removed in v4.0.0. Use
+    :func:`cryptography_suite.aead.chacha20_encrypt_aead` or
+    :func:`cryptography_suite.symmetric.aes_encrypt` instead.
     """
     S = _initialize(key, nonce)
     _process_ad(S, associated_data)
@@ -155,6 +159,10 @@ def decrypt(key: bytes, nonce: bytes, associated_data: bytes, ciphertext: bytes)
     """Decrypt and verify using Ascon-128a.
 
     .. warning:: This cipher is experimental and **not recommended for production**.
+
+    Deprecated: will be removed in v4.0.0. Use
+    :func:`cryptography_suite.aead.chacha20_decrypt_aead` or
+    :func:`cryptography_suite.symmetric.aes_decrypt` instead.
     """
     if len(ciphertext) < 16:
         raise DecryptionError("Ciphertext too short.")

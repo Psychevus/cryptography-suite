@@ -163,7 +163,10 @@ def kdf_pbkdf2(password: str, salt: bytes, iterations: int, length: int) -> byte
 
 @deprecated("derive_pbkdf2 is deprecated; use kdf_pbkdf2")
 def derive_pbkdf2(password: str, salt: bytes, iterations: int, length: int) -> bytes:
-    """Deprecated alias for :func:`kdf_pbkdf2`."""
+    """Deprecated alias for :func:`kdf_pbkdf2`.
+
+    Deprecated: will be removed in v4.0.0. Use :func:`kdf_pbkdf2` instead.
+    """
 
     return kdf_pbkdf2(password, salt, iterations, length)
 

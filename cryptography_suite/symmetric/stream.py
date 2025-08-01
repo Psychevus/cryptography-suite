@@ -26,6 +26,9 @@ def salsa20_encrypt(message: bytes, key: bytes, nonce: bytes) -> bytes:
 
     The ``key`` must be 32 bytes and ``nonce`` must be 8 bytes.
     Encryption is deterministic for a given key and nonce.
+
+    Deprecated: will be removed in v4.0.0. Use
+    :func:`chacha20_stream_encrypt` instead.
     """
     if not message:
         raise EncryptionError("Message cannot be empty.")
@@ -40,7 +43,11 @@ def salsa20_encrypt(message: bytes, key: bytes, nonce: bytes) -> bytes:
 
 @deprecated("Salsa20 is deprecated and not recommended for production.")
 def salsa20_decrypt(ciphertext: bytes, key: bytes, nonce: bytes) -> bytes:
-    """INSECURE: Decrypt data encrypted with :func:`salsa20_encrypt`."""
+    """INSECURE: Decrypt data encrypted with :func:`salsa20_encrypt`.
+
+    Deprecated: will be removed in v4.0.0. Use
+    :func:`chacha20_stream_decrypt` instead.
+    """
     if not ciphertext:
         raise DecryptionError("Ciphertext cannot be empty.")
     if not isinstance(key, (bytes, bytearray)) or len(key) != CHACHA20_KEY_SIZE:
