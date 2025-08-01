@@ -201,13 +201,15 @@ class AESGCMEncrypt(CryptoModule[str, str]):
     kdf: str = "argon2"
 
     def run(self, data: str) -> str:
-        from .symmetric import aes_encrypt
+        from .symmetric import aes as _aes_mod
         import warnings
 
         # aes_encrypt returns ``str`` when ``raw_output`` is ``False`` (default)
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=DeprecationWarning)
-            return cast(str, aes_encrypt(data, self.password, kdf=self.kdf))
+            return cast(
+                str, _aes_mod.aes_encrypt(data, self.password, kdf=self.kdf)
+            )
 
     def to_proverif(self) -> str:  # pragma: no cover - simple serialization
         return f"aesgcm_encrypt({self.kdf})"
@@ -244,12 +246,12 @@ class AESGCMDecrypt(CryptoModule[str, str]):
     kdf: str = "argon2"
 
     def run(self, data: str) -> str:
-        from .symmetric import aes_decrypt
+        from .symmetric import aes as _aes_mod
         import warnings
 
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=DeprecationWarning)
-            return aes_decrypt(data, self.password, kdf=self.kdf)
+            return _aes_mod.aes_decrypt(data, self.password, kdf=self.kdf)
 
     def to_proverif(self) -> str:  # pragma: no cover - simple serialization
         return f"aesgcm_decrypt({self.kdf})"

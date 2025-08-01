@@ -344,8 +344,6 @@ def argon2_decrypt(encrypted_data: str, password: str) -> str:
 
 
 __all__ = [
-    "aes_encrypt",
-    "aes_decrypt",
     "encrypt_file",
     "decrypt_file",
     "encrypt_file_async",

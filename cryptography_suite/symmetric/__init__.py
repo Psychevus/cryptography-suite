@@ -1,8 +1,6 @@
 """Symmetric cryptography primitives."""
 
 from .aes import (
-    aes_encrypt,
-    aes_decrypt,
     encrypt_file,
     decrypt_file,
     encrypt_file_async,
@@ -36,8 +34,6 @@ from .kdf import (
 )
 
 __all__ = [
-    "aes_encrypt",
-    "aes_decrypt",
     "encrypt_file",
     "decrypt_file",
     "encrypt_file_async",
