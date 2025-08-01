@@ -8,6 +8,7 @@ class KeyStore(Protocol):
     """Common interface for key store backends."""
 
     name: str
+    status: str
 
     def list_keys(self) -> list[str]:
         """Return available key identifiers."""

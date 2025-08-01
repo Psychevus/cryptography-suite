@@ -248,7 +248,7 @@ def keystore_cli(argv: list[str] | None = None) -> None:
     sub = parser.add_subparsers(dest="action", required=True)
     sub.add_parser("list", help="List available keystores")
     sub.add_parser("test", help="Test keystore connectivity")
-    mig = sub.add_parser("migrate", help="Migrate keys between keystores")
+    mig = sub.add_parser("migrate", help=argparse.SUPPRESS)
     mig.add_argument("--from", dest="src", required=True)
     mig.add_argument("--to", dest="dst", required=True)
     args = parser.parse_args(argv)
@@ -257,7 +257,9 @@ def keystore_cli(argv: list[str] | None = None) -> None:
 
     if args.action == "list":
         for name in list_keystores():
-            print(name)
+            cls = get_keystore(name)
+            status = getattr(cls, "status", "unknown")
+            print(f"{name} ({status})")
     elif args.action == "test":
         for name in list_keystores():
             cls = get_keystore(name)
@@ -266,15 +268,8 @@ def keystore_cli(argv: list[str] | None = None) -> None:
             except Exception:
                 ok = False
             print(f"{name}: {'ok' if ok else 'fail'}")
-    else:  # migrate
-        src_cls = get_keystore(args.src)
-        dst_cls = get_keystore(args.dst)
-        src = src_cls()
-        dst = dst_cls()
-        if hasattr(src, "export_all_to"):
-            src.export_all_to(dst)  # type: ignore[attr-defined]
-        else:
-            print(f"Migration from {args.src} to {args.dst} not implemented")
+    elif args.action == "migrate":
+        print("Key migration is not implemented")
 
 
 def export_cli(argv: list[str] | None = None) -> None:
