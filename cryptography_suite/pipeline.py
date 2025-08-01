@@ -201,10 +201,15 @@ class AESGCMEncrypt(CryptoModule[str, str]):
     kdf: str = "argon2"
 
     def run(self, data: str) -> str:
-        from .symmetric import aes_encrypt
+        from .symmetric import aes as _aes_mod
+        import warnings
 
         # aes_encrypt returns ``str`` when ``raw_output`` is ``False`` (default)
-        return cast(str, aes_encrypt(data, self.password, kdf=self.kdf))
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=DeprecationWarning)
+            return cast(
+                str, _aes_mod.aes_encrypt(data, self.password, kdf=self.kdf)
+            )
 
     def to_proverif(self) -> str:  # pragma: no cover - simple serialization
         return f"aesgcm_encrypt({self.kdf})"
@@ -241,15 +246,79 @@ class AESGCMDecrypt(CryptoModule[str, str]):
     kdf: str = "argon2"
 
     def run(self, data: str) -> str:
-        from .symmetric import aes_decrypt
+        from .symmetric import aes as _aes_mod
+        import warnings
 
-        return aes_decrypt(data, self.password, kdf=self.kdf)
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=DeprecationWarning)
+            return _aes_mod.aes_decrypt(data, self.password, kdf=self.kdf)
 
     def to_proverif(self) -> str:  # pragma: no cover - simple serialization
         return f"aesgcm_decrypt({self.kdf})"
 
     def to_tamarin(self) -> str:  # pragma: no cover - simple serialization
         return f"aesgcm_decrypt({self.kdf})"
+
+
+@register_module
+@dataclass
+class RSAEncrypt(CryptoModule[bytes, str | bytes]):
+    """Encrypt data using RSA-OAEP.
+
+    Parameters
+    ----------
+    public_key:
+        The :class:`~cryptography.hazmat.primitives.asymmetric.rsa.RSAPublicKey`
+        used for encryption.
+    raw_output:
+        When ``True`` return raw bytes instead of Base64 encoded text.
+    """
+
+    public_key: Any
+    raw_output: bool = False
+
+    def run(self, data: bytes) -> str | bytes:
+        from .asymmetric import rsa_encrypt
+        import warnings
+
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=DeprecationWarning)
+            return rsa_encrypt(data, self.public_key, raw_output=self.raw_output)
+
+    def to_proverif(self) -> str:  # pragma: no cover - simple serialization
+        return "rsa_encrypt"
+
+    def to_tamarin(self) -> str:  # pragma: no cover - simple serialization
+        return "rsa_encrypt"
+
+
+@register_module
+@dataclass
+class RSADecrypt(CryptoModule[str | bytes, bytes]):
+    """Decrypt RSA-OAEP ciphertext.
+
+    Parameters
+    ----------
+    private_key:
+        The :class:`~cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey`
+        used for decryption.
+    """
+
+    private_key: Any
+
+    def run(self, data: str | bytes) -> bytes:
+        from .asymmetric import rsa_decrypt
+        import warnings
+
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=DeprecationWarning)
+            return rsa_decrypt(data, self.private_key)
+
+    def to_proverif(self) -> str:  # pragma: no cover - simple serialization
+        return "rsa_decrypt"
+
+    def to_tamarin(self) -> str:  # pragma: no cover - simple serialization
+        return "rsa_decrypt"
 
 
 __all__ = [
@@ -260,4 +329,6 @@ __all__ = [
     "list_modules",
     "AESGCMEncrypt",
     "AESGCMDecrypt",
+    "RSAEncrypt",
+    "RSADecrypt",
 ]

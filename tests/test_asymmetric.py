@@ -3,8 +3,6 @@ import base64
 from cryptography_suite.asymmetric import (
     generate_rsa_keypair,
     generate_rsa_keypair_async,
-    rsa_encrypt,
-    rsa_decrypt,
     serialize_private_key,
     serialize_public_key,
     load_private_key,
@@ -17,6 +15,15 @@ from cryptography_suite.asymmetric import (
     ec_encrypt,
     ec_decrypt,
 )
+from cryptography_suite.pipeline import RSAEncrypt, RSADecrypt
+
+
+def rsa_encrypt(data, public_key, *, raw_output=False):
+    return RSAEncrypt(public_key=public_key, raw_output=raw_output).run(data)
+
+
+def rsa_decrypt(data, private_key):
+    return RSADecrypt(private_key=private_key).run(data)
 from cryptography.hazmat.primitives.asymmetric import rsa, x25519, x448, ec
 from cryptography_suite.errors import CryptographySuiteError
 

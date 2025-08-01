@@ -38,6 +38,7 @@ formally verified, misuse-resistant workflows.
    architecture.md
    protocols.md
    pipeline.md
+   pipeline_coverage.md
    cli.md
    formal.md
    fuzzing.md
@@ -45,6 +46,7 @@ formally verified, misuse-resistant workflows.
    release_process.md
    migration_3.0.md
    migration_4.0.md
+   migration_pipeline_api.md
    threat_model.md
    visualization.md
    security.rst

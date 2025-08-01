@@ -29,8 +29,6 @@ from .asymmetric import (
     generate_x25519_keypair,
     load_private_key,
     load_public_key,
-    rsa_decrypt,
-    rsa_encrypt,
     serialize_private_key,
     serialize_public_key,
 )
@@ -68,8 +66,6 @@ from .hybrid import HybridEncryptor, hybrid_decrypt, hybrid_encrypt
 
 # Symmetric primitives -------------------------------------------------------
 from .symmetric import (
-    aes_decrypt,
-    aes_encrypt,
     argon2_decrypt,
     argon2_encrypt,
     chacha20_decrypt,
@@ -202,8 +198,6 @@ except Exception:  # pragma: no cover - handle missing dependency
 
 __all__ = [
     # Encryption
-    "aes_encrypt",
-    "aes_decrypt",
     "chacha20_encrypt",
     "chacha20_decrypt",
     "chacha20_encrypt_aead",
@@ -233,8 +227,6 @@ __all__ = [
     # Asymmetric
     "generate_rsa_keypair",
     "generate_rsa_keypair_async",
-    "rsa_encrypt",
-    "rsa_decrypt",
     "serialize_private_key",
     "serialize_public_key",
     "load_private_key",

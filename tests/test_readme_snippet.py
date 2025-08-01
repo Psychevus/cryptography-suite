@@ -2,12 +2,11 @@
 
 Example from the documentation::
 
-    >>> from cryptography_suite.asymmetric import (
-    ...     generate_rsa_keypair, rsa_encrypt, rsa_decrypt
-    ... )
+    >>> from cryptography_suite.asymmetric import generate_rsa_keypair
+    >>> from cryptography_suite.pipeline import RSAEncrypt, RSADecrypt
     >>> priv, pub = generate_rsa_keypair()
-    >>> ct = rsa_encrypt(b"data", pub)
-    >>> rsa_decrypt(ct, priv)
+    >>> ct = RSAEncrypt(public_key=pub).run(b"data")
+    >>> RSADecrypt(private_key=priv).run(ct)
     b'data'
 """
 

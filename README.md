@@ -176,7 +176,7 @@ cryptosuite-fuzz --runs 1000
 - **Hybrid Encryption**: Combine RSA/ECIES with AES-GCM for performance and security.
 - **Post-Quantum Cryptography**: Kyber key encapsulation and Dilithium signatures for quantum-safe workflows.
 - **XChaCha20-Poly1305**: Modern stream cipher support when ``cryptography`` exposes ``XChaCha20Poly1305``.
-- **Salsa20 and Ascon**: Deprecated and provided for reference only. **Not recommended for production**, removed from public imports, and scheduled for removal in v4.0.0. Use ``chacha20_stream_encrypt`` or authenticated ciphers like ``aes_encrypt`` instead.
+- **Salsa20 and Ascon**: Deprecated and provided for reference only. **Not recommended for production**, removed from public imports, and scheduled for removal in v4.0.0. Use ``chacha20_stream_encrypt`` or authenticated ciphers like ``AESGCMEncrypt`` instead.
 - **Audit Logging**: Decorators and helpers for encrypted audit trails.
 - **KeyVault Management**: Context manager to safely handle in-memory keys.
 - **Password-Authenticated Key Exchange (PAKE)**: SPAKE2 protocol implementation for secure password-based key exchange.
@@ -200,6 +200,22 @@ cryptosuite-fuzz --runs 1000
 
 ---
 
+## Migration to Pipeline API
+
+Legacy one-shot helpers such as ``aes_encrypt`` and ``rsa_encrypt`` are now
+**deprecated**. New code should build pipelines using modules like
+``AESGCMEncrypt`` and ``RSAEncrypt``. See ``docs/migration_pipeline_api.md`` for
+full details.
+
+```
+from cryptography_suite.pipeline import Pipeline, AESGCMEncrypt, AESGCMDecrypt
+
+p = Pipeline() >> AESGCMEncrypt(password="pw") >> AESGCMDecrypt(password="pw")
+assert p.run("secret") == "secret"
+```
+
+---
+
 ## 💡 Usage Examples
 
 ### Symmetric Encryption
@@ -207,19 +223,19 @@ cryptosuite-fuzz --runs 1000
 Encrypt and decrypt messages using AES-GCM with password-derived keys.
 
 ```python
-from cryptography_suite.symmetric import aes_encrypt, aes_decrypt
+from cryptography_suite.pipeline import AESGCMEncrypt, AESGCMDecrypt
 
 message: str = "Highly Confidential Information"
 password: str = "ultra_secure_password"
 
-encrypted_message: str = aes_encrypt(message, password)
+encrypted_message: str = AESGCMEncrypt(password=password).run(message)
 print(f"Encrypted: {encrypted_message}")
 
-decrypted_message: str = aes_decrypt(encrypted_message, password)
+decrypted_message: str = AESGCMDecrypt(password=password).run(encrypted_message)
 print(f"Decrypted: {decrypted_message}")
 
-scrypt_encrypted: str = aes_encrypt(message, password, kdf="scrypt")
-print(aes_decrypt(scrypt_encrypted, password, kdf="scrypt"))
+scrypt_encrypted: str = AESGCMEncrypt(password=password, kdf="scrypt").run(message)
+print(AESGCMDecrypt(password=password, kdf="scrypt").run(scrypt_encrypted))
 ```
 
 Argon2id support is provided by the `cryptography` package and requires no
@@ -264,19 +280,18 @@ default. Pass ``raw_output=True`` to obtain raw bytes instead.
 from cryptography_suite.asymmetric import (
     ec_encrypt,
     generate_rsa_keypair,
-    rsa_encrypt,
-    rsa_decrypt,
     ec_decrypt,
     generate_x25519_keypair,
 )
+from cryptography_suite.pipeline import RSAEncrypt, RSADecrypt
 
 private_key, public_key = generate_rsa_keypair()
 message: bytes = b"Secure Data Transfer"
 
-encrypted_message: str = rsa_encrypt(message, public_key)
+encrypted_message: str = RSAEncrypt(public_key=public_key).run(message)
 print(f"Encrypted: {encrypted_message}")
 
-decrypted_message: bytes = rsa_decrypt(encrypted_message, private_key)
+decrypted_message: bytes = RSADecrypt(private_key=private_key).run(encrypted_message)
 print(f"Decrypted: {decrypted_message}")
 
 # Non-blocking key generation using a ThreadPoolExecutor. The call returns a

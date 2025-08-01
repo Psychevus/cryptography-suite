@@ -12,16 +12,12 @@ from time import sleep
 
 from cryptography_suite import (
     # Symmetric Encryption
-    aes_encrypt,
-    aes_decrypt,
     chacha20_encrypt,
     chacha20_decrypt,
     encrypt_file,
     decrypt_file,
     # Asymmetric Encryption
     generate_rsa_keypair,
-    rsa_encrypt,
-    rsa_decrypt,
     serialize_private_key,
     serialize_public_key,
     load_private_key,
@@ -61,6 +57,12 @@ from cryptography_suite import (
     base62_decode,
     generate_secure_random_string,
 )
+from cryptography_suite.pipeline import (
+    AESGCMEncrypt,
+    AESGCMDecrypt,
+    RSAEncrypt,
+    RSADecrypt,
+)
 
 
 def main():
@@ -70,8 +72,12 @@ def main():
     symmetric_password = "strong_password"
 
     # AES Encryption with Scrypt KDF
-    encrypted_aes = aes_encrypt(plaintext, symmetric_password, kdf="scrypt")
-    decrypted_aes = aes_decrypt(encrypted_aes, symmetric_password, kdf="scrypt")
+    encrypted_aes = AESGCMEncrypt(password=symmetric_password, kdf="scrypt").run(
+        plaintext
+    )
+    decrypted_aes = AESGCMDecrypt(password=symmetric_password, kdf="scrypt").run(
+        encrypted_aes
+    )
     print(f"AES Encrypted: {encrypted_aes}")
     print(f"AES Decrypted: {decrypted_aes}")
 
@@ -103,8 +109,8 @@ def main():
     rsa_private_key, rsa_public_key = generate_rsa_keypair()
     message = b"Hello, Asymmetric Encryption!"
 
-    rsa_ciphertext = rsa_encrypt(message, rsa_public_key)
-    rsa_plaintext = rsa_decrypt(rsa_ciphertext, rsa_private_key)
+    rsa_ciphertext = RSAEncrypt(public_key=rsa_public_key).run(message)
+    rsa_plaintext = RSADecrypt(private_key=rsa_private_key).run(rsa_ciphertext)
     print(f"RSA Decrypted Message: {rsa_plaintext.decode()}")
 
     # Key Serialization and Loading
