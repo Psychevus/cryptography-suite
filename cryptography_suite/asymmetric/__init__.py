@@ -1,6 +1,7 @@
 from typing import Tuple, Callable, Optional
 from concurrent.futures import Future, ThreadPoolExecutor
 from ..errors import EncryptionError, DecryptionError
+from ..utils import deprecated
 import base64
 
 from cryptography.hazmat.primitives import serialization, hashes, constant_time
@@ -68,6 +69,7 @@ def generate_rsa_keypair_async(
     return fut
 
 
+@deprecated("rsa_encrypt is deprecated; use the RSAEncrypt pipeline module")
 def rsa_encrypt(
     plaintext: bytes,
     public_key: rsa.RSAPublicKey,
@@ -75,6 +77,9 @@ def rsa_encrypt(
     raw_output: bool = False,
 ) -> str | bytes:
     """Encrypt ``plaintext`` for ``public_key`` using RSA-OAEP with SHA-256.
+
+    This one-shot helper will be removed in a future release. Prefer
+    ``RSAEncrypt`` from :mod:`cryptography_suite.pipeline`.
 
     By default the ciphertext is returned as a Base64-encoded string for ease of
     storage and transmission. Set ``raw_output=True`` to receive the raw byte
@@ -98,9 +103,12 @@ def rsa_encrypt(
     return base64.b64encode(ciphertext).decode()
 
 
+@deprecated("rsa_decrypt is deprecated; use the RSADecrypt pipeline module")
 def rsa_decrypt(ciphertext: bytes | str, private_key: rsa.RSAPrivateKey) -> bytes:
-    """
-    Decrypts ciphertext using RSA-OAEP with SHA-256.
+    """Decrypt ``ciphertext`` using RSA-OAEP with SHA-256.
+
+    This one-shot helper will be removed in a future release. Prefer
+    ``RSADecrypt`` from :mod:`cryptography_suite.pipeline`.
     """
     if not isinstance(private_key, rsa.RSAPrivateKey):
         raise TypeError("Invalid RSA private key provided.")

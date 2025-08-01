@@ -12,6 +12,7 @@ from ..errors import (
     MissingDependencyError,
     KeyDerivationError,
 )
+from ..utils import deprecated
 from ..debug import verbose_print
 
 from ..constants import NONCE_SIZE, SALT_SIZE
@@ -22,6 +23,7 @@ CHUNK_SIZE = 4096
 TAG_SIZE = 16  # AES-GCM authentication tag size
 
 
+@deprecated("aes_encrypt is deprecated; use the AESGCMEncrypt pipeline module")
 def aes_encrypt(
     plaintext: str,
     password: str,
@@ -29,7 +31,10 @@ def aes_encrypt(
     *,
     raw_output: bool = False,
 ) -> str | bytes:
-    """Encrypt plaintext using AES-GCM with a password-derived key.
+    """Encrypt ``plaintext`` using AES-GCM with a password-derived key.
+
+    This one-shot helper will be removed in a future release. Prefer
+    ``AESGCMEncrypt`` from :mod:`cryptography_suite.pipeline`.
 
     Argon2id is used by default. Pass ``kdf='scrypt'`` or ``kdf='pbkdf2'`` for
     compatibility with older data.
@@ -58,12 +63,16 @@ def aes_encrypt(
     return base64.b64encode(data).decode()
 
 
+@deprecated("aes_decrypt is deprecated; use the AESGCMDecrypt pipeline module")
 def aes_decrypt(
     encrypted_data: bytes | str,
     password: str,
     kdf: str = "argon2",
 ) -> str:
     """Decrypt AES-GCM encrypted data using a password-derived key.
+
+    This one-shot helper will be removed in a future release. Prefer
+    ``AESGCMDecrypt`` from :mod:`cryptography_suite.pipeline`.
 
     Argon2id is used by default. Pass ``kdf='scrypt'`` or ``kdf='pbkdf2'`` for
     compatibility with data encrypted using those KDFs.

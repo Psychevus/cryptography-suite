@@ -8,16 +8,17 @@ import cryptography_suite.debug as debug
 def reload_modules():
     importlib.reload(debug)
     importlib.reload(importlib.import_module('cryptography_suite.symmetric.aes'))
+    importlib.reload(importlib.import_module('cryptography_suite.pipeline'))
 
 
 def test_verbose_mode_env_variable(tmp_path):
     _ = tmp_path  # unused fixture to satisfy vulture
     os.environ['VERBOSE_MODE'] = '1'
     reload_modules()
-    from cryptography_suite.symmetric import aes_encrypt
+    from cryptography_suite.pipeline import AESGCMEncrypt
 
     with patch('builtins.print') as mock_print:
-        aes_encrypt('msg', 'pass')
+        AESGCMEncrypt(password='pass').run('msg')
 
     assert any('Derived key' in call.args[0] for call in mock_print.call_args_list)
     os.environ.pop('VERBOSE_MODE')

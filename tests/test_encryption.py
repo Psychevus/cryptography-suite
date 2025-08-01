@@ -3,9 +3,8 @@ import os
 import unittest
 from unittest.mock import patch
 
+from cryptography_suite.pipeline import AESGCMEncrypt, AESGCMDecrypt
 from cryptography_suite.symmetric import (
-    aes_encrypt,
-    aes_decrypt,
     chacha20_encrypt,
     chacha20_decrypt,
     derive_key_argon2,
@@ -18,6 +17,14 @@ from cryptography_suite.errors import (
     DecryptionError,
     KeyDerivationError,
 )
+
+
+def aes_encrypt(plaintext, password, kdf="argon2", *, raw_output=False):
+    return AESGCMEncrypt(password=password, kdf=kdf).run(plaintext)
+
+
+def aes_decrypt(encrypted_data, password, kdf="argon2"):
+    return AESGCMDecrypt(password=password, kdf=kdf).run(encrypted_data)
 
 
 class TestEncryption(unittest.TestCase):

@@ -70,7 +70,13 @@ def hybrid_encrypt(
     aes_key = urandom(32)
 
     if isinstance(public_key, rsa.RSAPublicKey):
-        encrypted_key = cast(bytes, rsa_encrypt(aes_key, public_key, raw_output=True))
+        import warnings
+
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=DeprecationWarning)
+            encrypted_key = cast(
+                bytes, rsa_encrypt(aes_key, public_key, raw_output=True)
+            )
     elif isinstance(public_key, x25519.X25519PublicKey):
         encrypted_key = cast(bytes, ec_encrypt(aes_key, public_key, raw_output=True))
     else:
@@ -135,7 +141,11 @@ def hybrid_decrypt(
         raise DecryptionError("Invalid encrypted payload.")
 
     if isinstance(private_key, rsa.RSAPrivateKey):
-        aes_key = rsa_decrypt(enc_key, private_key)
+        import warnings
+
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=DeprecationWarning)
+            aes_key = rsa_decrypt(enc_key, private_key)
     elif isinstance(private_key, x25519.X25519PrivateKey):
         aes_key = ec_decrypt(enc_key, private_key)
     else:
