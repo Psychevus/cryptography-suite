@@ -7,6 +7,7 @@ from .errors import (
     KeyDerivationError,
     MissingDependencyError,
     ProtocolError,
+    UnsupportedAlgorithm,
     SignatureVerificationError,
 )
 
@@ -239,6 +240,7 @@ __all__ = [
     "SignatureVerificationError",
     "MissingDependencyError",
     "ProtocolError",
+    "UnsupportedAlgorithm",
     # Backends
     "available_backends",
     "use_backend",

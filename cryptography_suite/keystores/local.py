@@ -98,3 +98,24 @@ class LocalKeyStore:
     @audit_log
     def unwrap(self, key_id: str, wrapped_key: bytes) -> bytes:
         return self.decrypt(key_id, wrapped_key)
+
+    @audit_log
+    def export_key(self, key_id: str) -> Tuple[bytes, dict]:
+        key_path = self.dir / f"{key_id}.pem"
+        raw = key_path.read_bytes()
+        _, algo = self._load_key(key_id)
+        return raw, {"id": key_id, "type": algo}
+
+    @audit_log
+    def import_key(self, raw: bytes, meta: dict) -> str:
+        key_id = cast(str, meta.get("id", "imported"))
+        key_path = self.dir / f"{key_id}.pem"
+        if key_path.exists():
+            i = 1
+            while (self.dir / f"{key_id}_{i}.pem").exists():
+                i += 1
+            key_id = f"{key_id}_{i}"
+            key_path = self.dir / f"{key_id}.pem"
+        key_path.write_bytes(raw)
+        (key_path.with_suffix(".json")).write_text(json.dumps({"type": meta.get("type")}))
+        return key_id

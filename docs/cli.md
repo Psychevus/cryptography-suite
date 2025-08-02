@@ -45,5 +45,12 @@ requires ``pip install cryptography-suite[aws]``)
 
 Use ``cryptography-suite keystore list`` to display the available backends
 with their status and ``cryptography-suite keystore test`` to verify
-connectivity.  The ``migrate`` subcommand is reserved for future use and
-currently prints ``Not Implemented``.
+connectivity.  Keys can be moved between backends with ``keystore migrate``:
+
+```bash
+cryptography-suite keystore migrate --from local --to mock_hsm --dry-run
+```
+
+Omit ``--key`` to migrate all keys.  Only migrations from ``local`` to
+``aws-kms`` and ``local`` to/from ``mock_hsm`` are supported.  Cross-algorithm
+imports are rejected.

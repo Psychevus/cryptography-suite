@@ -69,6 +69,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e .[dev]
           pip install pytest pytest-cov coverage mypy hypothesis
+      - name: Dry-run keystore migration
+        run: cryptography-suite keystore migrate --from local --to mock_hsm --dry-run
       - name: Run Tests with Coverage
         run: |
           coverage run --rcfile=.coveragerc -m pytest

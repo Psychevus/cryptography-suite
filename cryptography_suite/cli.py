@@ -250,9 +250,11 @@ def keystore_cli(argv: list[str] | None = None) -> None:
     sub = parser.add_subparsers(dest="action", required=True)
     sub.add_parser("list", help="List available keystores")
     sub.add_parser("test", help="Test keystore connectivity")
-    mig = sub.add_parser("migrate", help=argparse.SUPPRESS)
+    mig = sub.add_parser("migrate", help="Migrate keys between keystores")
     mig.add_argument("--from", dest="src", required=True)
     mig.add_argument("--to", dest="dst", required=True)
+    mig.add_argument("--key", dest="key")
+    mig.add_argument("--dry-run", action="store_true")
     args = parser.parse_args(argv)
 
     load_plugins()
@@ -271,7 +273,37 @@ def keystore_cli(argv: list[str] | None = None) -> None:
                 ok = False
             print(f"{name}: {'ok' if ok else 'fail'}")
     elif args.action == "migrate":
-        print("Keystore migration not implemented")
+        import hashlib
+
+        try:
+            Src = get_keystore(args.src)
+            Dst = get_keystore(args.dst)
+        except KeyError as exc:
+            print(f"Unknown keystore: {exc}")
+            sys.exit(1)
+
+        src = Src()
+        dst = Dst()
+        ids = [args.key] if args.key else src.list_keys()
+        stats = []
+        for key_id in ids:
+            try:
+                raw, meta = src.export_key(key_id)
+                new_id = key_id
+                if not args.dry_run:
+                    new_id = dst.import_key(raw, meta)
+                fp = hashlib.sha256(raw).hexdigest()[:16]
+                stats.append((key_id, new_id, meta.get("type"), fp))
+                print(f"{key_id} -> {new_id}")
+            except Exception as exc:  # pragma: no cover - user feedback
+                print(f"Error migrating {key_id}: {exc}")
+                sys.exit(1)
+        if stats:
+            header = ("Old ID", "New ID", "Algorithm", "Fingerprint")
+            row = "{:<20} {:<20} {:<10} {:<32}"
+            print(row.format(*header))
+            for old_id, new_id, algo, fp in stats:
+                print(row.format(old_id, new_id, algo, fp))
 
 
 def export_cli(argv: list[str] | None = None) -> None:

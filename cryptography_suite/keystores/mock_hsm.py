@@ -15,6 +15,7 @@ class MockHSMKeyStore:
 
     def __init__(self) -> None:
         self._keys: dict[str, bytes] = {"test": b"secret"}
+        self._meta: dict[str, dict] = {"test": {"type": "raw"}}
 
     def list_keys(self) -> List[str]:
         return list(self._keys.keys())
@@ -39,3 +40,16 @@ class MockHSMKeyStore:
     @audit_log
     def unwrap(self, key_id: str, wrapped_key: bytes) -> bytes:
         return wrapped_key[::-1]
+
+    @audit_log
+    def export_key(self, key_id: str) -> tuple[bytes, dict]:
+        data = self._keys[key_id]
+        meta = self._meta.get(key_id, {"type": "raw"})
+        return data, {"id": key_id, **meta}
+
+    @audit_log
+    def import_key(self, raw: bytes, meta: dict) -> str:
+        key_id = meta.get("id", f"k{len(self._keys)}")
+        self._keys[key_id] = raw
+        self._meta[key_id] = {"type": meta.get("type", "raw")}
+        return key_id

@@ -5,6 +5,7 @@ from importlib import import_module
 
 from . import register_keystore
 from ..audit import audit_log
+from ..errors import UnsupportedAlgorithm
 
 if TYPE_CHECKING:  # pragma: no cover - used only for typing
     import boto3  # type: ignore[import]  # noqa: F401
@@ -60,3 +61,18 @@ class AWSKMSKeyStore:
     @audit_log
     def unwrap(self, key_id: str, wrapped_key: bytes) -> bytes:
         return self.decrypt(key_id, wrapped_key)
+
+    @audit_log
+    def export_key(self, key_id: str):  # pragma: no cover - not supported
+        raise NotImplementedError("AWS KMS does not support key export")
+
+    @audit_log
+    def import_key(self, raw: bytes, meta: dict) -> str:
+        algo = meta.get("type")
+        if algo not in {"rsa", "ecdsa", "ed25519"}:
+            raise UnsupportedAlgorithm(algo)
+        try:
+            self.client.import_key(KeyId=meta.get("id"), KeyMaterial=raw)
+        except Exception as exc:  # pragma: no cover - passthrough
+            raise RuntimeError("KMS import failed") from exc
+        return meta.get("id", "")
