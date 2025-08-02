@@ -513,6 +513,19 @@ def main(argv: list[str] | None = None) -> None:
     migrate_parser.add_argument(
         "--to", dest="dst", required=True, choices=["file", "vault", "hsm"]
     )
+    migrate_parser.add_argument(
+        "--batch", action="store_true", help="Run non-interactive batch mode"
+    )
+    migrate_parser.add_argument(
+        "--ignore-errors",
+        action="store_true",
+        help="Continue migrating after errors in batch mode",
+    )
+    migrate_parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Log actions without persisting keys",
+    )
 
     # File operations subcommand
     file_parser = sub.add_parser(
@@ -599,7 +612,14 @@ def main(argv: list[str] | None = None) -> None:
         module = util.module_from_spec(spec)
         assert spec.loader is not None
         spec.loader.exec_module(module)
-        module.wizard_cli(["--from", args.src, "--to", args.dst])
+        argv2 = ["--from", args.src, "--to", args.dst]
+        if getattr(args, "batch", False):
+            argv2.append("--batch")
+        if getattr(args, "ignore_errors", False):
+            argv2.append("--ignore-errors")
+        if getattr(args, "dry_run", False):
+            argv2.append("--dry-run")
+        module.wizard_cli(argv2)
     elif args.cmd in ("file", "encrypt", "decrypt"):
         if args.cmd == "file":
             mode = args.file_cmd

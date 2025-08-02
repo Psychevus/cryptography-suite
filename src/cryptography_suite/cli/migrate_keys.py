@@ -1,4 +1,9 @@
-"""Interactive key migration wizard."""
+"""Key migration utilities.
+
+This module provides an interactive wizard and a non-interactive batch mode
+for migrating keys between in-memory backends. All operations keep keys in
+memory only and append actions to a tamper-evident ``audit.log`` file.
+"""
 
 from __future__ import annotations
 
@@ -106,11 +111,15 @@ class AuditLogger:
         self._last_hash = digest
 
 
-def migrate_wizard(source: InMemoryBackend, target: InMemoryBackend) -> None:
+def migrate_wizard(
+    source: InMemoryBackend,
+    target: InMemoryBackend,
+    logger: AuditLogger,
+    dry_run: bool = False,
+) -> None:
     """Run interactive migration wizard."""
 
     console = Console()
-    logger = AuditLogger(Path("audit.log"))
     keys = list(source.list_keys())
     if not keys:
         console.print("[yellow]No keys available in source backend[/yellow]")
@@ -128,9 +137,12 @@ def migrate_wizard(source: InMemoryBackend, target: InMemoryBackend) -> None:
             "Migrate this key?", choices=["y", "n", "all", "skip"], default="n"
         )
         if choice in {"y", "all"}:
-            target.store_key(info)
-            logger.log("migrate", f"{info.identifier}:{source.name}->{target.name}")
-            console.print(f"[green]Migrated {info.identifier}[/green]")
+            action = "dry-run" if dry_run else "migrate"
+            if not dry_run:
+                target.store_key(info)
+            logger.log(action, f"{info.identifier}:{source.name}->{target.name}")
+            verb = "Would migrate" if dry_run else "Migrated"
+            console.print(f"[green]{verb} {info.identifier}[/green]")
             if choice == "all":
                 migrate_all = True
         elif choice == "skip":
@@ -142,13 +154,83 @@ def migrate_wizard(source: InMemoryBackend, target: InMemoryBackend) -> None:
             console.print(f"[yellow]Skipped {info.identifier}[/yellow]")
 
 
+def migrate_batch(
+    source: InMemoryBackend,
+    target: InMemoryBackend,
+    logger: AuditLogger,
+    ignore_errors: bool = False,
+    dry_run: bool = False,
+) -> None:
+    """Run non-interactive batch migration."""
+
+    console = Console()
+    keys = list(source.list_keys())
+    if not keys:
+        console.print("[yellow]No keys available in source backend[/yellow]")
+        return
+
+    results: list[tuple[str, str]] = []
+    for idx, info in enumerate(keys):
+        try:
+            if dry_run:
+                logger.log(
+                    "dry-run", f"{info.identifier}:{source.name}->{target.name}"
+                )
+                results.append((info.identifier, "skipped"))
+                continue
+            target.store_key(info)
+            logger.log("migrate", f"{info.identifier}:{source.name}->{target.name}")
+            results.append((info.identifier, "success"))
+        except Exception as exc:  # pragma: no cover - defensive
+            logger.log("error", f"{info.identifier}:{exc}")
+            results.append((info.identifier, "failed"))
+            if not ignore_errors:
+                for remaining in keys[idx + 1 :]:
+                    results.append((remaining.identifier, "skipped"))
+                    logger.log("skip", remaining.identifier)
+                break
+
+    table = Table(title="Migration Summary")
+    table.add_column("Key")
+    table.add_column("Result")
+    icons = {"success": "✅", "skipped": "⚠️", "failed": "❌"}
+    for ident, status in results:
+        table.add_row(ident, f"{icons[status]} {status}")
+    console.print(table)
+
+
 def wizard_cli(argv: Optional[list[str]] = None) -> None:
-    """CLI wrapper for the migration wizard."""
+    """CLI wrapper for key migration modes."""
 
     parser = argparse.ArgumentParser(description="Migrate keys between backends")
     parser.add_argument("--from", dest="src", required=True, choices=BACKENDS.keys())
     parser.add_argument("--to", dest="dst", required=True, choices=BACKENDS.keys())
+    parser.add_argument(
+        "--batch", action="store_true", help="Run non-interactive batch mode"
+    )
+    parser.add_argument(
+        "--ignore-errors",
+        action="store_true",
+        help="Continue migrating after errors in batch mode",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Log actions without persisting keys",
+    )
     args = parser.parse_args(argv)
+
     source = BACKENDS[args.src]
     target = BACKENDS[args.dst]
-    migrate_wizard(source, target)
+    logger = AuditLogger(Path("audit.log"))
+
+    if args.batch:
+        migrate_batch(
+            source,
+            target,
+            logger,
+            ignore_errors=args.ignore_errors,
+            dry_run=args.dry_run,
+        )
+    else:
+        migrate_wizard(source, target, logger, dry_run=args.dry_run)
