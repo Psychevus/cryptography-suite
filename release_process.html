@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Migrating to Cryptography Suite 3.0.0" href="migration_3.0.html" /><link rel="prev" title="Misuse-Resistant Checking" href="mypy_plugin.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Release Checklist" href="release_checklist.html" /><link rel="prev" title="Misuse-Resistant Checking" href="mypy_plugin.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
         <title>Release Process - cryptography-suite 3.0.0 documentation</title>
@@ -209,6 +209,7 @@
 <li class="toctree-l1"><a class="reference internal" href="fuzzing.html">Fuzzing and Property Testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mypy_plugin.html">Misuse-Resistant Checking</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Release Process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release_checklist.html">Release Checklist</a></li>
 <li class="toctree-l1"><a class="reference internal" href="migration_3.0.html">Migrating to Cryptography Suite 3.0.0</a></li>
 <li class="toctree-l1"><a class="reference internal" href="migration_4.0.html">Migration Guide to Cryptography Suite 4.0.0</a></li>
 <li class="toctree-l1"><a class="reference internal" href="migration_pipeline_api.html">Migration to Pipeline API</a></li>
@@ -268,17 +269,35 @@
 <section id="steps">
 <h2>Steps<a class="headerlink" href="#steps" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
-<li><p>CI runs <code class="docutils literal notranslate"><span class="pre">tools/reproducible_build.py</span></code> to build the wheel and sdist with <code class="docutils literal notranslate"><span class="pre">SOURCE_DATE_EPOCH</span></code> set.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">reproducibility.yml</span></code> verifies that two independent builds produce identical hashes.</p></li>
-<li><p>After tests pass, <code class="docutils literal notranslate"><span class="pre">release.yml</span></code> signs the artifacts using GitHub OIDC and <code class="docutils literal notranslate"><span class="pre">cosign</span></code>.</p></li>
-<li><p>A CycloneDX SBOM is generated and attached to the GitHub Release.</p></li>
-<li><p>Release notes are extracted from <code class="docutils literal notranslate"><span class="pre">CHANGELOG.md</span></code> and published to PyPI.</p></li>
+<li><p>A fresh virtual environment installs pinned build tools via
+<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-r</span> <span class="pre">requirements-release.txt</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tools/reproducible_build.py</span></code> builds the wheel and sdist with
+<code class="docutils literal notranslate"><span class="pre">SOURCE_DATE_EPOCH</span></code> set to ensure determinism.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tools/generate_sbom.py</span></code> creates a CycloneDX SBOM in <code class="docutils literal notranslate"><span class="pre">dist/sbom.json</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">slsa-framework/slsa-github-generator</span></code> produces a
+<code class="docutils literal notranslate"><span class="pre">provenance.intoto.jsonl</span></code> attestation.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cosign</span> <span class="pre">sign-blob</span></code> signs every artifact (wheel, sdist, SBOM, provenance).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">reprotest</span></code> verifies the build in varying environments for reproducibility.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tools/release_lint.py</span></code> checks that SBOM, provenance and signatures are
+present before publishing.</p></li>
+<li><p>Release notes are extracted from <code class="docutils literal notranslate"><span class="pre">CHANGELOG.md</span></code> and the artifacts,
+signatures and attestations are uploaded to PyPI and GitHub Releases.</p></li>
 </ol>
-<p>Users can verify a downloaded artifact with:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>tools/verify_artifact.py<span class="w"> </span>dist/cryptography_suite-&lt;version&gt;-py3-none-any.whl<span class="w"> </span>&lt;sha256&gt;
+<p>Users can verify a downloaded wheel with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cosign<span class="w"> </span>verify-blob<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--certificate<span class="w"> </span><span class="s2">&quot;&lt;artifact&gt;.sig&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--certificate-identity-regexp<span class="w"> </span><span class="s2">&quot;github.com/.*&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--certificate-oidc-issuer<span class="w"> </span><span class="s2">&quot;https://token.actions.githubusercontent.com&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="s2">&quot;&lt;artifact&gt;&quot;</span>
 </pre></div>
 </div>
-<p>The expected hashes are published alongside each release.</p>
+<p>The SBOM (<code class="docutils literal notranslate"><span class="pre">sbom.json</span></code>) can be inspected with tools such as
+<code class="docutils literal notranslate"><span class="pre">cyclonedx-bom</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cyclonedx-bom<span class="w"> </span>--input-file<span class="w"> </span>sbom.json<span class="w"> </span>--summary
+</pre></div>
+</div>
+<p>Expected SHA256 hashes are published alongside each release for
+additional manual verification.</p>
 </section>
 </section>
 
@@ -287,12 +306,12 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="migration_3.0.html">
+          <a class="next-page" href="release_checklist.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Migrating to Cryptography Suite 3.0.0</div>
+                <div class="title">Release Checklist</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
