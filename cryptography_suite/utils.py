@@ -8,6 +8,7 @@ import string
 import warnings
 from functools import wraps
 from typing import TYPE_CHECKING, Any, Mapping, TypeAlias, cast
+from pathlib import Path
 
 from cryptography.hazmat.primitives.asymmetric import (
     ec,
@@ -233,6 +234,22 @@ def from_pem(pem_str: str) -> PrivateKeyTypes | PublicKeyTypes:
             from .errors import DecryptionError
 
             raise DecryptionError(f"Invalid PEM data: {exc}") from exc
+
+
+def is_encrypted_pem(path: str | Path) -> bool:
+    """Return ``True`` if the PEM file at ``path`` is encrypted."""
+    from cryptography.hazmat.primitives import serialization
+
+    pem_bytes = Path(path).read_bytes()
+    try:
+        serialization.load_pem_private_key(pem_bytes, password=None)
+        return False
+    except TypeError as exc:
+        if "encrypted" in str(exc).lower():
+            return True
+        raise
+    except ValueError:
+        return False
 
 
 def pem_to_json(key: PrivateKeyTypes | PublicKeyTypes) -> str:

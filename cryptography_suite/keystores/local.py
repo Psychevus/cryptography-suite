@@ -1,12 +1,16 @@
 from __future__ import annotations
 
 import json
+import os
+import warnings
 from pathlib import Path
 from typing import List, Tuple, cast
 
 from . import register_keystore
 from ..audit import audit_log
 from ..asymmetric import rsa_decrypt
+from ..errors import StrictKeyPolicyError
+from ..utils import is_encrypted_pem
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ed25519, rsa, ec
 from ..asymmetric.signatures import (
@@ -37,6 +41,13 @@ class LocalKeyStore:
         key_path = self.dir / f"{key_id}.pem"
         if not key_path.exists():
             raise FileNotFoundError(key_path)
+        policy = os.getenv("CRYPTOSUITE_STRICT_KEYS")
+        if policy and not is_encrypted_pem(key_path):
+            msg = f"Unencrypted private key: {key_path}"
+            if policy == "1":
+                raise StrictKeyPolicyError(msg)
+            elif policy == "warn":
+                warnings.warn(msg, UserWarning)
         with open(key_path, "rb") as f:
             pem = f.read()
             key = serialization.load_pem_private_key(pem, password=None)
@@ -109,6 +120,19 @@ class LocalKeyStore:
     @audit_log
     def import_key(self, raw: bytes, meta: dict) -> str:
         key_id = cast(str, meta.get("id", "imported"))
+        policy = os.getenv("CRYPTOSUITE_STRICT_KEYS")
+        if policy:
+            try:
+                serialization.load_pem_private_key(raw, password=None)
+                encrypted = False
+            except TypeError as exc:
+                encrypted = "encrypted" in str(exc).lower()
+            if not encrypted:
+                msg = "Importing unencrypted private key"
+                if policy == "1":
+                    raise StrictKeyPolicyError(msg)
+                elif policy == "warn":
+                    warnings.warn(msg, UserWarning)
         key_path = self.dir / f"{key_id}.pem"
         if key_path.exists():
             i = 1
