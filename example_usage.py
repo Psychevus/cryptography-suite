@@ -232,11 +232,11 @@ def main():
     os.remove(ec_private)
     os.remove(ec_public)
 
-    # Rotate AES Key
-    aes_key = generate_aes_key()
-    print(f"Original AES Key: {aes_key.hex()}")
-    rotated_key = rotate_aes_key()
-    print(f"Rotated AES Key: {rotated_key.hex()}")
+    # Rotate AES Key using KeyVault wrappers
+    with generate_aes_key() as aes_key:
+        print(f"Original AES Key: {aes_key.hex()}")
+    with rotate_aes_key() as rotated_key:
+        print(f"Rotated AES Key: {rotated_key.hex()}")
 
     # Homomorphic Encryption Demo
     print("\n=== Homomorphic Encryption ===")

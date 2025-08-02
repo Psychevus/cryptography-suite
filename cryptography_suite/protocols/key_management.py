@@ -19,6 +19,7 @@ from ..asymmetric.signatures import (
     generate_ed448_keypair,
 )
 from ..errors import DecryptionError
+from ..utils import KeyVault
 
 logger = logging.getLogger(__name__)
 
@@ -26,18 +27,28 @@ logger = logging.getLogger(__name__)
 DEFAULT_AES_KEY_SIZE = 32  # 256 bits
 
 
-def generate_aes_key() -> bytes:
+def generate_aes_key(*, sensitive: bool = True) -> KeyVault | bytes:
     """
     Generates a secure random AES key.
+
+    When ``sensitive`` is ``True`` (default) the key is wrapped in a
+    :class:`KeyVault` so it can be reliably zeroized after use. Set
+    ``sensitive=False`` to obtain raw bytes without zeroization guarantees.
     """
-    return os.urandom(DEFAULT_AES_KEY_SIZE)
+    key = os.urandom(DEFAULT_AES_KEY_SIZE)
+    return KeyVault(key) if sensitive else key
 
 
-def rotate_aes_key() -> bytes:
+def rotate_aes_key(*, sensitive: bool = True) -> KeyVault | bytes:
     """
     Generates a new AES key to replace the old one.
+
+    Parameters
+    ----------
+    sensitive: bool, optional
+        If ``True`` return the key wrapped in :class:`KeyVault`.
     """
-    return generate_aes_key()
+    return generate_aes_key(sensitive=sensitive)
 
 
 def generate_random_password(length: int = 32) -> str:

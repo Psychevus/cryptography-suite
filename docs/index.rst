@@ -55,6 +55,7 @@ formally verified, misuse-resistant workflows.
    backend_consistency.md
    feature_maturity.md
    roadmap.md
+   zeroization_faq.md
    security.rst
    api/modules
    api/pipeline

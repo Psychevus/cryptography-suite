@@ -9,14 +9,17 @@ the ``py_ecc`` library which offers a well-vetted pairing implementation.
 """
 
 from os import urandom
-from typing import Iterable, List, Sequence, Tuple
+from typing import Iterable, List, Sequence, Tuple, Union
 import base64
 
 from py_ecc.bls import G2Basic
 from ..errors import KeyDerivationError, SignatureVerificationError
+from ..utils import KeyVault
 
 
-def generate_bls_keypair(seed: bytes | None = None) -> Tuple[int, bytes]:
+def generate_bls_keypair(
+    seed: bytes | None = None, *, sensitive: bool = True
+) -> Tuple[Union[int, KeyVault], bytes]:
     """Generate a BLS12-381 key pair.
 
     Parameters
@@ -24,12 +27,16 @@ def generate_bls_keypair(seed: bytes | None = None) -> Tuple[int, bytes]:
     seed : bytes | None, optional
         Optional 32-byte seed used as input key material. When ``None`` a
         cryptographically secure random seed is generated.
+    sensitive : bool, optional
+        If ``True`` (default) the private key is returned wrapped in
+        :class:`KeyVault` for zeroization after use. Set to ``False`` to
+        receive the key as a Python integer.
 
     Returns
     -------
-    Tuple[int, bytes]
-        The private key as an integer and the corresponding public key as
-        a byte string.
+    Tuple[Union[int, KeyVault], bytes]
+        The private key as either an integer or a :class:`KeyVault`-wrapped
+        byte string, and the corresponding public key.
     """
     if seed is not None and len(seed) == 0:
         raise KeyDerivationError("Seed cannot be empty.")
@@ -37,11 +44,14 @@ def generate_bls_keypair(seed: bytes | None = None) -> Tuple[int, bytes]:
     ikm = seed if seed is not None else urandom(32)
     sk = G2Basic.KeyGen(ikm)
     pk = G2Basic.SkToPk(sk)
+    if sensitive:
+        sk_bytes = sk.to_bytes(32, "big")
+        return KeyVault(sk_bytes), pk
     return sk, pk
 
 
 def bls_sign(
-    message: bytes, private_key: int, *, raw_output: bool = False
+    message: bytes, private_key: Union[int, bytes, bytearray, KeyVault], *, raw_output: bool = False
 ) -> str | bytes:
     """Sign a message using the BLS signature scheme.
 
@@ -49,8 +59,9 @@ def bls_sign(
     ----------
     message : bytes
         Message to sign.
-    private_key : int
-        Private key generated via :func:`generate_bls_keypair`.
+    private_key : int | bytes | KeyVault
+        Private key generated via :func:`generate_bls_keypair`. It may be
+        provided as a :class:`KeyVault` instance or raw integer/bytes.
 
     Returns
     -------
@@ -59,8 +70,12 @@ def bls_sign(
     """
     if not message:
         raise SignatureVerificationError("Message cannot be empty.")
+    if isinstance(private_key, KeyVault):
+        private_key = int.from_bytes(bytes(private_key), "big")
+    elif isinstance(private_key, (bytes, bytearray)):
+        private_key = int.from_bytes(private_key, "big")
     if not isinstance(private_key, int):
-        raise TypeError("Private key must be an int.")
+        raise TypeError("Private key must be an int or bytes.")
     sig = G2Basic.Sign(private_key, message)
     if raw_output:
         return sig
