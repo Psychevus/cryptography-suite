@@ -219,8 +219,12 @@ policies on backend usage.
 - **Experimental/Insecure Primitives**: Functions like `salsa20_encrypt` or `ascon_encrypt` are for research/education only and will be removed in v4.0.0. They are NOT supported for production use. If you depend on them, migrate now.
 - **Verbose Mode**: Enabling `VERBOSE_MODE` leaks sensitive information to stdout; never
   enable it in production.
-- **Private Key Protection**: Always supply a password when saving private keys to PEM
-  with `serialize_private_key` or `KeyManager.save_private_key`.
+- **Private Key Protection**: Private keys should always be stored encrypted, either with a strong
+  password or in a hardware-backed keystore (HSM, KMS, etc.). Unencrypted PEMs are only acceptable
+  for testing or inside protected containers. When using `serialize_private_key` or
+  `KeyManager.save_private_key`, always provide a password.
+- **Strict Key Storage**: Set the environment variable ``CRYPTOSUITE_STRICT_KEYS=1`` to forbid
+  saving unencrypted private keys entirely.
 - **TOTP/HOTP Hash Choice**: TOTP and HOTP use SHA-1 by default for RFC compatibility,
   but stronger hash functions are supported. These algorithms are suitable for
   second-factor authentication, NOT as general-purpose hash functions.
@@ -540,11 +544,12 @@ with KeyVault(key_material) as buf:
 Persist key pairs to disk with the high-level ``KeyManager`` helper.
 
 ```python
-from cryptography_suite.protocols import KeyManager
+from cryptography_suite.protocols import KeyManager, generate_random_password
 
 km = KeyManager()
-km.generate_rsa_keypair_and_save("rsa_priv.pem", "rsa_pub.pem", "password")
-km.generate_ec_keypair_and_save("ec_priv.pem", "ec_pub.pem", "password")
+password = generate_random_password()
+km.generate_rsa_keypair_and_save("rsa_priv.pem", "rsa_pub.pem", password)
+km.generate_ec_keypair_and_save("ec_priv.pem", "ec_pub.pem", password)
 ```
 
 ## Advanced Protocols

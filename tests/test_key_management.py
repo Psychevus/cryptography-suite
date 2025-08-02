@@ -8,6 +8,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa, ec
 from cryptography_suite.protocols import (
     generate_aes_key,
     rotate_aes_key,
+    generate_random_password,
     secure_save_key_to_file,
     load_private_key_from_file,
     load_public_key_from_file,
@@ -34,6 +35,13 @@ class TestKeyManagement(unittest.TestCase):
         key = generate_aes_key()
         self.assertIsInstance(key, bytes)
         self.assertEqual(len(key), 32)
+
+    def test_generate_random_password(self):
+        pwd = generate_random_password(24)
+        self.assertEqual(len(pwd), 24)
+        self.assertTrue(any(c.islower() for c in pwd))
+        self.assertTrue(any(c.isupper() for c in pwd))
+        self.assertTrue(any(c.isdigit() for c in pwd))
 
     def test_rotate_aes_key(self):
         """Test AES key rotation."""

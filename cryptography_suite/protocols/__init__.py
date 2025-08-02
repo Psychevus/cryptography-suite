@@ -6,6 +6,7 @@ from .pake import SPAKE2Client, SPAKE2Server
 from .key_management import (
     generate_aes_key,
     rotate_aes_key,
+    generate_random_password,
     secure_save_key_to_file,
     load_private_key_from_file,
     load_public_key_from_file,
@@ -24,6 +25,7 @@ __all__ = [
     "SPAKE2Server",
     "generate_aes_key",
     "rotate_aes_key",
+    "generate_random_password",
     "secure_save_key_to_file",
     "load_private_key_from_file",
     "load_public_key_from_file",

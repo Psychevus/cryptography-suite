@@ -34,6 +34,23 @@ class TestKeyManagerClass(unittest.TestCase):
         loaded = self.km.load_private_key(self.filepath, self.password)
         self.assertIsInstance(loaded, rsa.RSAPrivateKey)
 
+    def test_warning_on_unencrypted_save(self):
+        priv, _ = generate_rsa_keypair()
+        with self.assertLogs(
+            "cryptography_suite.protocols.key_management", level="WARNING"
+        ) as cm:
+            self.km.save_private_key(priv, self.filepath)
+        self.assertIn("Saving private key unencrypted", "\n".join(cm.output))
+
+    def test_strict_env_var_blocks_unencrypted_save(self):
+        priv, _ = generate_rsa_keypair()
+        os.environ["CRYPTOSUITE_STRICT_KEYS"] = "1"
+        try:
+            with self.assertRaises(ValueError):
+                self.km.save_private_key(priv, self.filepath)
+        finally:
+            os.environ.pop("CRYPTOSUITE_STRICT_KEYS", None)
+
     def test_rotate_keys(self):
         self.km.rotate_keys(self.key_dir)
         self.assertTrue(os.path.exists(os.path.join(self.key_dir, "private_key.pem")))
