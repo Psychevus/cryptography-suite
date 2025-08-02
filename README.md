@@ -41,9 +41,15 @@
 | AESGCMDecrypt | cryptography_suite.pipeline | Yes | No | No | stable |  |
 | AESGCMEncrypt | cryptography_suite.pipeline | Yes | No | No | stable |  |
 | BULLETPROOF_AVAILABLE |  | No | Yes | No | experimental |  |
+| ECIESX25519Decrypt | cryptography_suite.pipeline | Yes | No | No | stable |  |
+| ECIESX25519Encrypt | cryptography_suite.pipeline | Yes | No | No | stable |  |
 | FHE_AVAILABLE |  | No | No | No | experimental |  |
 | HandshakeFlowWidget | cryptography_suite.viz.widgets | No | No | No | experimental |  |
+| HybridDecrypt | cryptography_suite.pipeline | Yes | No | No | stable |  |
+| HybridEncrypt | cryptography_suite.pipeline | Yes | No | No | stable |  |
 | KeyGraphWidget | cryptography_suite.viz.widgets | No | No | No | experimental |  |
+| KyberDecrypt | cryptography_suite.pipeline | Yes | No | No | experimental |  |
+| KyberEncrypt | cryptography_suite.pipeline | Yes | No | No | experimental |  |
 | PQCRYPTO_AVAILABLE |  | No | Yes | No | experimental |  |
 | RSADecrypt | cryptography_suite.pipeline | Yes | No | No | stable |  |
 | RSAEncrypt | cryptography_suite.pipeline | Yes | No | No | stable |  |
@@ -313,6 +319,8 @@ from cryptography_suite.pipeline import Pipeline, AESGCMEncrypt, AESGCMDecrypt
 p = Pipeline() >> AESGCMEncrypt(password="pw") >> AESGCMDecrypt(password="pw")
 assert p.run("secret") == "secret"
 ```
+
+For a catalog of built-in modules see [docs/pipeline_catalog.md](docs/pipeline_catalog.md).
 
 ---
 

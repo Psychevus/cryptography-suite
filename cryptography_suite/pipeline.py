@@ -339,6 +339,146 @@ class RSADecrypt(CryptoModule[str | bytes, bytes]):
         return "rsa_decrypt"
 
 
+@register_module
+@dataclass
+class ECIESX25519Encrypt(CryptoModule[bytes, str | bytes]):
+    """Encrypt data using ECIES with X25519."""
+
+    public_key: Any
+    raw_output: bool = False
+
+    def run(self, data: bytes) -> str | bytes:
+        from .asymmetric import ec_encrypt
+        import warnings
+
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=DeprecationWarning)
+            return ec_encrypt(data, self.public_key, raw_output=self.raw_output)
+
+    def to_proverif(self) -> str:  # pragma: no cover - simple serialization
+        return "eciesx25519_encrypt"
+
+    def to_tamarin(self) -> str:  # pragma: no cover - simple serialization
+        return "eciesx25519_encrypt"
+
+
+@register_module
+@dataclass
+class ECIESX25519Decrypt(CryptoModule[str | bytes, bytes]):
+    """Decrypt ECIES X25519 ciphertext."""
+
+    private_key: Any
+
+    def run(self, data: str | bytes) -> bytes:
+        from .asymmetric import ec_decrypt
+        import warnings
+
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=DeprecationWarning)
+            return ec_decrypt(data, self.private_key)
+
+    def to_proverif(self) -> str:  # pragma: no cover - simple serialization
+        return "eciesx25519_decrypt"
+
+    def to_tamarin(self) -> str:  # pragma: no cover - simple serialization
+        return "eciesx25519_decrypt"
+
+
+@register_module
+@dataclass
+class HybridEncrypt(CryptoModule[bytes, Any]):
+    """Encrypt data using hybrid RSA/ECIES + AES-GCM."""
+
+    public_key: Any
+    raw_output: bool = False
+
+    def run(self, data: bytes) -> Any:
+        from .hybrid import hybrid_encrypt
+        import warnings
+
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=DeprecationWarning)
+            return hybrid_encrypt(data, self.public_key, raw_output=self.raw_output)
+
+    def to_proverif(self) -> str:  # pragma: no cover - simple serialization
+        return "hybrid_encrypt"
+
+    def to_tamarin(self) -> str:  # pragma: no cover - simple serialization
+        return "hybrid_encrypt"
+
+
+@register_module
+@dataclass
+class HybridDecrypt(CryptoModule[Any, bytes]):
+    """Decrypt data produced by :class:`HybridEncrypt`."""
+
+    private_key: Any
+
+    def run(self, data: Any) -> bytes:
+        from .hybrid import hybrid_decrypt
+        import warnings
+
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=DeprecationWarning)
+            return hybrid_decrypt(self.private_key, data)
+
+    def to_proverif(self) -> str:  # pragma: no cover - simple serialization
+        return "hybrid_decrypt"
+
+    def to_tamarin(self) -> str:  # pragma: no cover - simple serialization
+        return "hybrid_decrypt"
+
+
+@register_module
+@dataclass
+class KyberEncrypt(CryptoModule[bytes, tuple[str | bytes, str | bytes]]):
+    """Encrypt data using Kyber and AES-GCM."""
+
+    public_key: bytes
+    level: int = 512
+    raw_output: bool = False
+
+    def run(self, data: bytes) -> tuple[str | bytes, str | bytes]:
+        from .pqc import kyber_encrypt
+        import warnings
+
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=DeprecationWarning)
+            return kyber_encrypt(
+                self.public_key, data, level=self.level, raw_output=self.raw_output
+            )
+
+    def to_proverif(self) -> str:  # pragma: no cover - simple serialization
+        return f"kyber_encrypt({self.level})"
+
+    def to_tamarin(self) -> str:  # pragma: no cover - simple serialization
+        return f"kyber_encrypt({self.level})"
+
+
+@register_module
+@dataclass
+class KyberDecrypt(CryptoModule[tuple[str | bytes, str | bytes], bytes]):
+    """Decrypt data produced by :class:`KyberEncrypt`."""
+
+    private_key: Any
+    level: int = 512
+
+    def run(self, data: tuple[str | bytes, str | bytes]) -> bytes:
+        from .pqc import kyber_decrypt
+        import warnings
+
+        ct, ss = data
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=DeprecationWarning)
+            return kyber_decrypt(self.private_key, ct, ss, level=self.level)
+
+    def to_proverif(self) -> str:  # pragma: no cover - simple serialization
+        return f"kyber_decrypt({self.level})"
+
+    def to_tamarin(self) -> str:  # pragma: no cover - simple serialization
+        return f"kyber_decrypt({self.level})"
+
+
 __all__ = [
     "CryptoModule",
     "Pipeline",
@@ -349,4 +489,10 @@ __all__ = [
     "AESGCMDecrypt",
     "RSAEncrypt",
     "RSADecrypt",
+    "ECIESX25519Encrypt",
+    "ECIESX25519Decrypt",
+    "HybridEncrypt",
+    "HybridDecrypt",
+    "KyberEncrypt",
+    "KyberDecrypt",
 ]
