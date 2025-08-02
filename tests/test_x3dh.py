@@ -4,13 +4,17 @@ from cryptography_suite.experimental.signal import (
     x3dh_initiator,
     x3dh_responder,
 )
+import warnings
 from cryptography_suite.asymmetric import generate_x25519_keypair
 from cryptography_suite.errors import SignatureVerificationError
 
 
 class TestX3DH(unittest.TestCase):
     def test_invalid_signed_prekey(self):
-        sender, receiver = initialize_signal_session()
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            sender, receiver = initialize_signal_session()
+        self.assertTrue(any("Signal Protocol" in str(wi.message) for wi in w))
         bundle = list(sender.handshake_bundle)
         bundle[3] = b"bad"  # corrupt signature
         with self.assertRaises(SignatureVerificationError):

@@ -222,6 +222,12 @@ policies on backend usage.
 - **Private Key Protection**: Always supply a password when saving private keys to PEM
   with `serialize_private_key` or `KeyManager.save_private_key`.
 
+### Signal Protocol: Experimental Demo Only
+
+This module is not a full Signal implementation. It lacks critical security
+properties and should never be used for production or high-assurance
+messaging.
+
 ---
 
 ## Migration to Pipeline API
@@ -572,8 +578,8 @@ print(ec_decrypt(cipher, priv))
 from cryptography_suite.experimental.signal import initialize_signal_session
 
 sender, receiver = initialize_signal_session()
-msg: bytes = sender.encrypt(b"hi")
-print(receiver.decrypt(msg))
+demo_msg: bytes = sender.encrypt(b"demo")  # demo-only data
+print(receiver.decrypt(demo_msg))
 ```
 
 ## Hashing
