@@ -42,6 +42,7 @@ formally verified, misuse-resistant workflows.
    pipeline.md
    pipeline_coverage.md
    cli.md
+   keystore.md
    keystore_plugins.md
    formal.md
    fuzzing.md

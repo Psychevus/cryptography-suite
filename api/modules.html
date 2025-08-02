@@ -204,6 +204,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../pipeline.html">Pipeline API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pipeline_coverage.html">Pipeline API Coverage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cli.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../keystore.html">Keystore Migration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../keystore_plugins.html">KeyStore Plugin Development</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../formal.html">Formal Verification Support</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../fuzzing.html">Fuzzing and Property Testing</a></li>
@@ -437,6 +438,13 @@ linger until the interpreter frees them.</p>
 <em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">SignatureVerificationError</span></span><a class="headerlink" href="#cryptography_suite.SignatureVerificationError" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#cryptography_suite.CryptographySuiteError" title="cryptography_suite.errors.CryptographySuiteError"><code class="xref py py-class docutils literal notranslate"><span class="pre">CryptographySuiteError</span></code></a></p>
 <p>Raised when signature verification fails.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="cryptography_suite.UnsupportedAlgorithm">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">UnsupportedAlgorithm</span></span><a class="headerlink" href="#cryptography_suite.UnsupportedAlgorithm" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cryptography_suite.CryptographySuiteError" title="cryptography_suite.errors.CryptographySuiteError"><code class="xref py py-class docutils literal notranslate"><span class="pre">CryptographySuiteError</span></code></a></p>
+<p>Raised when attempting to use an unsupported algorithm.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -1513,6 +1521,7 @@ byte string, and the corresponding public key.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#cryptography_suite.SignatureVerificationError"><code class="docutils literal notranslate"><span class="pre">SignatureVerificationError</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.UnsupportedAlgorithm"><code class="docutils literal notranslate"><span class="pre">UnsupportedAlgorithm</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.argon2_decrypt"><code class="docutils literal notranslate"><span class="pre">argon2_decrypt()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.argon2_encrypt"><code class="docutils literal notranslate"><span class="pre">argon2_encrypt()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.audit_log"><code class="docutils literal notranslate"><span class="pre">audit_log()</span></code></a></li>
