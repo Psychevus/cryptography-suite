@@ -2,6 +2,7 @@ import hmac
 import time
 import base64
 import struct
+import warnings
 from hashlib import sha1, sha256, sha512
 from typing import Optional
 from ..errors import ProtocolError
@@ -19,7 +20,21 @@ def _pad_base32(secret: str) -> str:
 def generate_hotp(secret: str, counter: int, digits: int = 6, algorithm: str = 'sha1') -> str:
     """
     Generates an HOTP code based on a shared secret and counter.
+
+    By default, this implementation uses SHA-1 for compatibility with existing
+    standards (RFC 4226/RFC 6238). SHA-256 and SHA-512 are supported as
+    alternatives via the ``algorithm`` parameter. For high-security use, prefer
+    SHA-256 or higher if your authenticator supports it.
     """
+    if algorithm == 'sha1':
+        warnings.warn(
+            (
+                "Defaulting to SHA-1 for compatibility. SHA-256 or SHA-512 are "
+                "recommended for high-security use."
+            ),
+            UserWarning,
+            stacklevel=2,
+        )
     try:
         key = base64.b32decode(_pad_base32(secret), casefold=True)
     except Exception as e:
@@ -52,9 +67,16 @@ def verify_hotp(
 ) -> bool:
     """
     Verifies an HOTP code within the allowed counter window.
+
+    By default, this implementation uses SHA-1 for compatibility with existing
+    standards (RFC 4226/RFC 6238). SHA-256 and SHA-512 are supported as
+    alternatives via the ``algorithm`` parameter. For high-security use, prefer
+    SHA-256 or higher if your authenticator supports it.
     """
     for offset in range(-window, window + 1):
-        calculated_code = generate_hotp(secret, counter + offset, digits, algorithm)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", UserWarning)
+            calculated_code = generate_hotp(secret, counter + offset, digits, algorithm)
         if hmac.compare_digest(calculated_code, code):
             return True
     return False
@@ -69,6 +91,11 @@ def generate_totp(
 ) -> str:
     """
     Generates a TOTP code based on a shared secret.
+
+    By default, this implementation uses SHA-1 for compatibility with existing
+    standards (RFC 6238). SHA-256 and SHA-512 are supported as alternatives via
+    the ``algorithm`` parameter. For high-security use, prefer SHA-256 or higher
+    if your authenticator supports it.
     """
     if timestamp is None:
         timestamp = int(time.time())
@@ -88,6 +115,11 @@ def verify_totp(
 ) -> bool:
     """
     Verifies a TOTP code within the allowed time window.
+
+    By default, this implementation uses SHA-1 for compatibility with existing
+    standards (RFC 6238). SHA-256 and SHA-512 are supported as alternatives via
+    the ``algorithm`` parameter. For high-security use, prefer SHA-256 or higher
+    if your authenticator supports it.
     """
     if timestamp is None:
         timestamp = int(time.time())

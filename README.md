@@ -221,6 +221,9 @@ policies on backend usage.
   enable it in production.
 - **Private Key Protection**: Always supply a password when saving private keys to PEM
   with `serialize_private_key` or `KeyManager.save_private_key`.
+- **TOTP/HOTP Hash Choice**: TOTP and HOTP use SHA-1 by default for RFC compatibility,
+  but stronger hash functions are supported. These algorithms are suitable for
+  second-factor authentication, NOT as general-purpose hash functions.
 
 ### Signal Protocol: Experimental Demo Only
 
