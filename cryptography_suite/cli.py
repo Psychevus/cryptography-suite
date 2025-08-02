@@ -245,7 +245,12 @@ def keystore_cli(argv: list[str] | None = None) -> None:
     """Manage registered keystores."""
 
     from pathlib import Path
-    from .keystores import load_plugins, list_keystores, get_keystore
+    from .keystores import (
+        load_plugins,
+        list_keystores,
+        get_keystore,
+        failed_plugins,
+    )
 
     parser = argparse.ArgumentParser(description="Keystore management")
     sub = parser.add_subparsers(dest="action", required=True)
@@ -263,6 +268,7 @@ def keystore_cli(argv: list[str] | None = None) -> None:
     args = parser.parse_args(argv)
 
     load_plugins()
+    failed = failed_plugins()
 
     if args.action == "list":
         for name in list_keystores():
@@ -278,6 +284,10 @@ def keystore_cli(argv: list[str] | None = None) -> None:
             except Exception:
                 pass
             print(f"{name} ({status}){extra}")
+        for name in failed:
+            print(f"{name} (broken)")
+        if failed:
+            sys.exit(1)
     elif args.action == "test":
         for name in list_keystores():
             cls = get_keystore(name)
@@ -293,6 +303,10 @@ def keystore_cli(argv: list[str] | None = None) -> None:
             except Exception:
                 ok = False
             print(f"{name}: {'ok' if ok else 'fail'}{extra}")
+        for name in failed:
+            print(f"{name}: broken")
+        if failed:
+            sys.exit(1)
     elif args.action == "import":
         ks_cls = get_keystore("local")
         ks = ks_cls()
