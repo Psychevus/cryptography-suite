@@ -47,6 +47,7 @@ formally verified, misuse-resistant workflows.
    pkcs11.md
    formal.md
    fuzzing.md
+   testing.md
    mypy_plugin.md
    release_process.md
    release_checklist.md
