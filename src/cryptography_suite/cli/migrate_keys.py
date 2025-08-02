@@ -8,11 +8,17 @@ memory only and append actions to a tamper-evident ``audit.log`` file.
 from __future__ import annotations
 
 import argparse
+import base64
 import datetime as dt
 import hashlib
+import json
+import logging
 from dataclasses import dataclass
+from logging.handlers import SysLogHandler
 from pathlib import Path
 from typing import Dict, Iterable, Optional
+
+import requests
 
 from rich.console import Console
 from rich.prompt import Prompt
@@ -134,11 +140,30 @@ BACKENDS: Dict[str, InMemoryBackend] = {
 
 
 class AuditLogger:
-    """Append-only tamper-evident logger."""
+    """Append-only logger with hash chaining and Ed25519 signatures."""
 
-    def __init__(self, path: Path) -> None:
+    def __init__(
+        self,
+        path: Path,
+        *,
+        syslog: bool = False,
+        webhook: Optional[str] = None,
+    ) -> None:
         self.path = path
+        self.webhook = webhook
         self._last_hash = self._load_last_hash()
+        self._signer = ed25519.Ed25519PrivateKey.generate()
+        self.public_key_bytes = self._signer.public_key().public_bytes(
+            encoding=serialization.Encoding.Raw,
+            format=serialization.PublicFormat.Raw,
+        )
+        self._syslog_logger: Optional[logging.Logger] = None
+        if syslog:
+            logger = logging.getLogger("migrate_keys.siem")
+            handler = SysLogHandler(address=("localhost", 514))
+            logger.addHandler(handler)
+            logger.setLevel(logging.INFO)
+            self._syslog_logger = logger
 
     def _load_last_hash(self) -> str:
         if not self.path.exists():
@@ -147,16 +172,67 @@ class AuditLogger:
         with self.path.open("r", encoding="utf8") as fh:
             for line in fh:
                 if line.strip():
-                    last = line.rsplit("|", 1)[-1].strip()
+                    parts = line.strip().split("|")
+                    last = parts[-2] if len(parts) >= 5 else parts[-1]
         return last
 
     def log(self, action: str, details: str) -> None:
         ts = dt.datetime.now(dt.timezone.utc).isoformat()
         entry = f"{ts}|{action}|{details}"
         digest = hashlib.sha256((self._last_hash + entry).encode()).hexdigest()
+        signature = self._signer.sign(digest.encode())
+        sig_b64 = base64.b64encode(signature).decode()
         with self.path.open("a", encoding="utf8") as fh:
-            fh.write(f"{entry}|{digest}\n")
+            fh.write(f"{entry}|{digest}|{sig_b64}\n")
         self._last_hash = digest
+        if self._syslog_logger:
+            try:
+                self._syslog_logger.info(f"{entry}|{digest}")
+            except Exception:  # pragma: no cover - syslog best effort
+                pass
+        if self.webhook:
+            try:
+                requests.post(
+                    self.webhook,
+                    json={"entry": entry, "digest": digest, "signature": sig_b64},
+                    timeout=5,
+                )
+            except Exception:  # pragma: no cover - network best effort
+                pass
+
+    def export_report(self, dest: Path) -> None:
+        """Export log entries and a signed digest to ``dest``."""
+
+        entries = []
+        if self.path.exists():
+            with self.path.open("r", encoding="utf8") as fh:
+                for line in fh:
+                    if not line.strip():
+                        continue
+                    parts = line.strip().split("|")
+                    if len(parts) >= 5:
+                        ts, action, details, digest, sig = parts
+                    else:  # backward compatibility with unsigned logs
+                        ts, action, details, digest = parts
+                        sig = ""
+                    entries.append(
+                        {
+                            "timestamp": ts,
+                            "action": action,
+                            "details": details,
+                            "digest": digest,
+                            "signature": sig,
+                        }
+                    )
+        final_digest = self._last_hash
+        report_sig = base64.b64encode(self._signer.sign(final_digest.encode())).decode()
+        data = {
+            "entries": entries,
+            "final_digest": final_digest,
+            "public_key": base64.b64encode(self.public_key_bytes).decode(),
+            "signature": report_sig,
+        }
+        dest.write_text(json.dumps(data, indent=2), encoding="utf8")
 
 
 def migrate_wizard(
@@ -248,7 +324,7 @@ def migrate_batch(
             )
             results.append((info.identifier, "success"))
         except Exception as exc:  # pragma: no cover - defensive
-            logger.log("error", f"{info.identifier}:{exc}")
+            logger.log("error", f"{info.identifier}:{type(exc).__name__}")
             results.append((info.identifier, "failed"))
             if not ignore_errors:
                 for remaining in keys[idx + 1 :]:
@@ -288,11 +364,23 @@ def wizard_cli(argv: Optional[list[str]] = None) -> None:
         action="store_true",
         help="Log actions without persisting keys",
     )
+    parser.add_argument(
+        "--forensics-report",
+        help="Export migration evidence to the specified JSON file",
+    )
+    parser.add_argument(
+        "--syslog", action="store_true", help="Mirror audit log to syslog"
+    )
+    parser.add_argument(
+        "--webhook", help="POST audit entries to a webhook URL"
+    )
     args = parser.parse_args(argv)
 
     source = BACKENDS[args.src]
     target = BACKENDS[args.dst]
-    logger = AuditLogger(Path("audit.log"))
+    logger = AuditLogger(
+        Path("audit.log"), syslog=args.syslog, webhook=args.webhook
+    )
 
     if args.batch:
         migrate_batch(
@@ -304,3 +392,5 @@ def wizard_cli(argv: Optional[list[str]] = None) -> None:
         )
     else:
         migrate_wizard(source, target, logger, dry_run=args.dry_run)
+    if args.forensics_report:
+        logger.export_report(Path(args.forensics_report))
