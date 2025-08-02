@@ -35,7 +35,7 @@ def read_log(path: Path):
     return text
 
 
-def test_wizard_interactive(tmp_path, monkeypatch):
+def test_wizard_interactive(tmp_path, monkeypatch, capsys):
     src = InMemoryBackend.with_sample_keys("file")
     dst = InMemoryBackend("vault")
     log = tmp_path / "audit.log"
@@ -44,10 +44,20 @@ def test_wizard_interactive(tmp_path, monkeypatch):
     monkeypatch.setattr(migrate_keys.Prompt, "ask", lambda *a, **k: next(responses))
 
     migrate_wizard(src, dst, logger)
+    out = capsys.readouterr().out
+    assert "hybrid" in out  # PQ hybrid warning shown
 
-    assert set(dst._keys) == {"ecc", "ed"}
+    assert set(dst._keys) == {"ecc", "ed", "kyber", "dilithium"}
     lines = read_log(log)
-    assert [line.split("|")[1] for line in lines] == ["skip", "migrate", "migrate"]
+    assert [line.split("|")[1] for line in lines] == [
+        "skip",
+        "migrate",
+        "migrate",
+        "migrate",
+        "migrate",
+    ]
+    kyber_line = next(l for l in lines if "kyber" in l)
+    assert "Kyber/3:file->vault" in kyber_line
     assert {p.name for p in tmp_path.iterdir()} == {"audit.log"}
 
 
@@ -61,7 +71,7 @@ def test_batch_dry_run(tmp_path):
 
     assert dst._keys == {}
     lines = read_log(log)
-    assert len(lines) == 3
+    assert len(lines) == 5
     assert all("dry-run" in line for line in lines)
     assert {p.name for p in tmp_path.iterdir()} == {"audit.log"}
 
@@ -81,7 +91,7 @@ def test_batch_error_handling(tmp_path, monkeypatch):
 
     lines = read_log(log)
     actions = [line.split("|")[1] for line in lines]
-    assert actions == ["error", "skip", "skip"]
+    assert actions == ["error", "skip", "skip", "skip", "skip"]
     assert dst._keys == {}
 
     # now test ignore_errors
@@ -105,6 +115,6 @@ def test_batch_error_handling(tmp_path, monkeypatch):
     lines2 = read_log(log2)
     actions2 = [line.split("|")[1] for line in lines2]
     assert actions2[0] == "error"
-    assert actions2.count("migrate") == 2
-    assert set(dst2._keys) == {"ecc", "ed"}
+    assert actions2.count("migrate") == 4
+    assert set(dst2._keys) == {"ecc", "ed", "kyber", "dilithium"}
     assert {p.name for p in tmp_path.iterdir()} == {"audit.log", "audit2.log"}

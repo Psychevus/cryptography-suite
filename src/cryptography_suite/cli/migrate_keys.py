@@ -21,6 +21,32 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ec, ed25519, rsa
 
 
+class PQPublicKey:
+    """Minimal representation of a post-quantum public key."""
+
+    def __init__(self, algorithm: str, security_level: int, mode: str = "pq") -> None:
+        self.algorithm = algorithm
+        self.security_level = security_level
+        self.mode = mode
+
+    def public_bytes(self, *_, **__) -> bytes:
+        """Return deterministic bytes for fingerprinting."""
+        data = f"{self.algorithm}:{self.security_level}:{self.mode}"
+        return data.encode()
+
+
+class PQPrivateKey:
+    """Minimal in-memory PQ private key."""
+
+    def __init__(self, algorithm: str, security_level: int, mode: str = "pq") -> None:
+        self.algorithm = algorithm
+        self.security_level = security_level
+        self.mode = mode
+
+    def public_key(self) -> PQPublicKey:
+        return PQPublicKey(self.algorithm, self.security_level, self.mode)
+
+
 @dataclass
 class KeyInfo:
     """Representation of a key within a backend."""
@@ -36,7 +62,21 @@ class KeyInfo:
             return "ECC"
         if isinstance(self.key_obj, ed25519.Ed25519PrivateKey):
             return "Ed25519"
+        if isinstance(self.key_obj, PQPrivateKey):
+            return self.key_obj.algorithm
         return "Unknown"
+
+    @property
+    def security_level(self) -> str:
+        if isinstance(self.key_obj, rsa.RSAPrivateKey):
+            return str(self.key_obj.key_size)
+        if isinstance(self.key_obj, ec.EllipticCurvePrivateKey):
+            return self.key_obj.curve.name
+        if isinstance(self.key_obj, ed25519.Ed25519PrivateKey):
+            return "128"
+        if isinstance(self.key_obj, PQPrivateKey):
+            return str(self.key_obj.security_level)
+        return "unknown"
 
     @property
     def fingerprint(self) -> str:
@@ -53,6 +93,12 @@ class KeyInfo:
             and self.key_obj.key_size < 2048
         )
 
+    @property
+    def pq_mode(self) -> Optional[str]:
+        if isinstance(self.key_obj, PQPrivateKey):
+            return self.key_obj.mode
+        return None
+
 
 class InMemoryBackend:
     """Simple in-memory backend for demonstration."""
@@ -67,6 +113,8 @@ class InMemoryBackend:
             "rsa": rsa.generate_private_key(public_exponent=65537, key_size=2048),
             "ecc": ec.generate_private_key(ec.SECP256R1()),
             "ed": ed25519.Ed25519PrivateKey.generate(),
+            "kyber": PQPrivateKey("Kyber", 3, mode="hybrid"),
+            "dilithium": PQPrivateKey("Dilithium", 5),
         }
         return cls(name, keys)
 
@@ -128,11 +176,16 @@ def migrate_wizard(
     for info in keys:
         table = Table(show_header=False)
         table.add_row("Identifier", info.identifier)
-        table.add_row("Type", info.key_type)
+        table.add_row("Algorithm", info.key_type)
+        table.add_row("Security", info.security_level)
         table.add_row("Fingerprint", info.fingerprint)
         console.print(table)
         if info.insecure:
             console.print("[red]Warning: RSA key <2048 bits[/red]")
+        if info.pq_mode in {"hybrid", "legacy"}:
+            console.print(
+                f"[yellow]Warning: PQ key in {info.pq_mode} mode[/yellow]"
+            )
         choice = "y" if migrate_all else Prompt.ask(
             "Migrate this key?", choices=["y", "n", "all", "skip"], default="n"
         )
@@ -140,7 +193,11 @@ def migrate_wizard(
             action = "dry-run" if dry_run else "migrate"
             if not dry_run:
                 target.store_key(info)
-            logger.log(action, f"{info.identifier}:{source.name}->{target.name}")
+            logger.log(
+                action,
+                f"{info.identifier}:{info.key_type}/{info.security_level}:"
+                f"{source.name}->{target.name}",
+            )
             verb = "Would migrate" if dry_run else "Migrated"
             console.print(f"[green]{verb} {info.identifier}[/green]")
             if choice == "all":
@@ -150,7 +207,10 @@ def migrate_wizard(
             console.print("[yellow]Skipping remaining keys[/yellow]")
             break
         else:
-            logger.log("skip", info.identifier)
+            logger.log(
+                "skip",
+                f"{info.identifier}:{info.key_type}/{info.security_level}",
+            )
             console.print(f"[yellow]Skipped {info.identifier}[/yellow]")
 
 
@@ -174,12 +234,18 @@ def migrate_batch(
         try:
             if dry_run:
                 logger.log(
-                    "dry-run", f"{info.identifier}:{source.name}->{target.name}"
+                    "dry-run",
+                    f"{info.identifier}:{info.key_type}/{info.security_level}:"
+                    f"{source.name}->{target.name}",
                 )
                 results.append((info.identifier, "skipped"))
                 continue
             target.store_key(info)
-            logger.log("migrate", f"{info.identifier}:{source.name}->{target.name}")
+            logger.log(
+                "migrate",
+                f"{info.identifier}:{info.key_type}/{info.security_level}:"
+                f"{source.name}->{target.name}",
+            )
             results.append((info.identifier, "success"))
         except Exception as exc:  # pragma: no cover - defensive
             logger.log("error", f"{info.identifier}:{exc}")
@@ -187,7 +253,11 @@ def migrate_batch(
             if not ignore_errors:
                 for remaining in keys[idx + 1 :]:
                     results.append((remaining.identifier, "skipped"))
-                    logger.log("skip", remaining.identifier)
+                    logger.log(
+                        "skip",
+                        f"{remaining.identifier}:{remaining.key_type}/"
+                        f"{remaining.security_level}",
+                    )
                 break
 
     table = Table(title="Migration Summary")
