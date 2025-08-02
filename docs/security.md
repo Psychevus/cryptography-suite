@@ -11,3 +11,8 @@ This project aims to carefully handle sensitive data in memory. Key features:
 While these mechanisms help reduce residual secrets in memory, absolute
 zeroization cannot be guaranteed on all operating systems and Python
 implementations.
+
+- Private keys should always be stored encrypted, either with a strong password or
+  in a hardware-backed keystore (HSM, KMS, etc.). Unencrypted PEMs are only
+  acceptable for testing or inside protected containers. Set the environment
+  variable `CRYPTOSUITE_STRICT_KEYS=1` to prohibit saving unencrypted keys.

@@ -1,4 +1,7 @@
+import logging
 import os
+import secrets
+import string
 from ..utils import deprecated
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ec
@@ -17,6 +20,8 @@ from ..asymmetric.signatures import (
 )
 from ..errors import DecryptionError
 
+logger = logging.getLogger(__name__)
+
 # Constants
 DEFAULT_AES_KEY_SIZE = 32  # 256 bits
 
@@ -33,6 +38,22 @@ def rotate_aes_key() -> bytes:
     Generates a new AES key to replace the old one.
     """
     return generate_aes_key()
+
+
+def generate_random_password(length: int = 32) -> str:
+    """Generate a cryptographically strong random password.
+
+    The password contains ASCII letters, digits and punctuation characters.
+
+    Args:
+        length: Desired length of the password. Defaults to 32 characters.
+
+    Returns:
+        A random string suitable for encrypting private keys.
+    """
+
+    alphabet = string.ascii_letters + string.digits + string.punctuation
+    return "".join(secrets.choice(alphabet) for _ in range(length))
 
 
 def secure_save_key_to_file(key_data: bytes, filepath: str):
@@ -127,7 +148,10 @@ class KeyManager:
     ) -> None:
         """Save a private key in PEM format.
 
-        If ``password`` is provided the key is wrapped using AES-256-CBC.
+        If ``password`` is provided the key is wrapped using AES-256-CBC. If no
+        ``password`` is supplied the key is written in cleartext (mode 0600) and
+        a warning is logged. Setting the ``CRYPTOSUITE_STRICT_KEYS`` environment
+        variable to ``1`` will instead raise a ``ValueError``.
         """
 
         if password:
@@ -135,6 +159,20 @@ class KeyManager:
                 serialization.BestAvailableEncryption(password.encode())
             )
         else:
+            if os.getenv("CRYPTOSUITE_STRICT_KEYS", "").lower() in {
+                "1",
+                "true",
+                "yes",
+            }:
+                raise ValueError(
+                    "Saving unencrypted private keys is disabled by "
+                    "CRYPTOSUITE_STRICT_KEYS"
+                )
+            logger.warning(
+                "Warning: Saving private key unencrypted (PEM format, mode 0600). "
+                "This is NOT recommended for production or shared environments. "
+                "Always use a strong password or a hardware keystore."
+            )
             encryption = serialization.NoEncryption()
 
         pem_data = private_key.private_bytes(

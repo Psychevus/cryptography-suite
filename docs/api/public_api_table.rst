@@ -255,6 +255,9 @@ Public API Inventory
    * - ``generate_secure_random_string``
      - Generates a secure random string using Base62 encoding.
      - Core
+   * - ``generate_random_password``
+     - Generate a cryptographically strong random password string.
+     - Core
    * - ``KeyVault``
      - Context manager for sensitive key storage.
      - Core
