@@ -784,15 +784,27 @@ plaintext = rsa_decrypt(ciphertext, private_key)
 
 This project provides deterministic builds and signed release artifacts.
 Every GitHub release ships with a CycloneDX SBOM, a SLSA provenance
-attestation and `cosign` signatures. Verify a downloaded wheel with:
+attestation and `cosign` signatures.
 
-```bash
-cosign verify-blob \
-  --certificate "<artifact>.sig" \
-  --certificate-identity-regexp "github.com/.*" \
-  --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
-  "<artifact>"
-```
+### Verifying Downloads
+
+1. Verify the wheel's signature:
+
+   ```bash
+   cosign verify --certificate-identity "https://github.com/Psychevus/cryptography-suite/.github/workflows/release.yml@refs/tags/v3.0.0" <wheel>.sig <wheel>
+   ```
+
+2. Validate the checksums:
+
+   ```bash
+   sha256sum -c checksums.txt
+   ```
+
+3. Inspect the SLSA provenance:
+
+   ```bash
+   jq '.subject | .name' provenance.intoto.jsonl
+   ```
 
 The SBOM (`sbom.json`) can be inspected via `cyclonedx-bom` or `pip sbom`.
 Reproducibility is tested in CI via `reproducibility.yml`. See
