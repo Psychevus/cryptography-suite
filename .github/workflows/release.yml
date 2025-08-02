@@ -33,11 +33,34 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v3
-      - name: Build package
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install locked dependencies
         run: |
-          python -m pip install --upgrade build cyclonedx-bom
-          python -m build
-          cyclonedx-py -o sbom.xml
+          python -m pip install --upgrade pip
+          pip install -r requirements-release.txt
+      - name: Build artifacts in clean environment
+        run: python tools/reproducible_build.py
+      - name: Generate SBOM
+        run: python tools/generate_sbom.py
+      - name: Generate provenance
+        uses: slsa-framework/slsa-github-generator@v2
+        with:
+          artifact_path: dist
+          provenance-name: provenance.intoto.jsonl
+          upload-assets: false
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3
+      - name: Sign artifacts
+        env:
+          COSIGN_EXPERIMENTAL: '1'
+        run: |
+          for f in dist/*; do
+            cosign sign-blob --yes "$f"
+          done
+      - name: Lint release artifacts
+        run: python tools/release_lint.py
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
       - name: Extract release notes
@@ -49,10 +72,4 @@ jobs:
       - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release create "$GITHUB_REF_NAME" -F notes.txt dist/* sbom.xml
-      - name: Install cosign
-        uses: sigstore/cosign-installer@v3
-      - name: Sign artifacts
-        env:
-          COSIGN_EXPERIMENTAL: '1'
-        run: cosign sign-blob --yes dist/* sbom.xml
+        run: gh release create "$GITHUB_REF_NAME" -F notes.txt dist/*

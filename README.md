@@ -712,10 +712,21 @@ plaintext = rsa_decrypt(ciphertext, private_key)
 ## 🔐 Supply Chain Security
 
 This project provides deterministic builds and signed release artifacts.
-Every GitHub release includes a CycloneDX SBOM and a `cosign` signature.
+Every GitHub release ships with a CycloneDX SBOM, a SLSA provenance
+attestation and `cosign` signatures. Verify a downloaded wheel with:
+
+```bash
+cosign verify-blob \
+  --certificate "<artifact>.sig" \
+  --certificate-identity-regexp "github.com/.*" \
+  --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+  "<artifact>"
+```
+
+The SBOM (`sbom.json`) can be inspected via `cyclonedx-bom` or `pip sbom`.
 Reproducibility is tested in CI via `reproducibility.yml`. See
 [release process documentation](docs/release_process.md) for details on
-verifying artifacts with `tools/verify_artifact.py`.
+verifying artifacts and SBOM contents.
 
 ---
 
