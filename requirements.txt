@@ -8,3 +8,4 @@ rich
 ipywidgets
 networkx
 jinja2
+requests
