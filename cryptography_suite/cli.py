@@ -458,6 +458,8 @@ def main(argv: list[str] | None = None) -> None:
     ks_parser.add_argument("action", choices=["list", "test", "migrate"])
     ks_parser.add_argument("--from", dest="src")
     ks_parser.add_argument("--to", dest="dst")
+    ks_parser.add_argument("--key", dest="key")
+    ks_parser.add_argument("--dry-run", action="store_true")
 
     # File operations subcommand
     file_parser = sub.add_parser(
@@ -522,6 +524,10 @@ def main(argv: list[str] | None = None) -> None:
             argv2.extend(["--from", args.src])
         if args.dst:
             argv2.extend(["--to", args.dst])
+        if args.key:
+            argv2.extend(["--key", args.key])
+        if getattr(args, "dry_run", False):
+            argv2.append("--dry-run")
         keystore_cli(argv2)
     elif args.cmd in ("file", "encrypt", "decrypt"):
         if args.cmd == "file":
