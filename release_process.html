@@ -286,14 +286,24 @@ present before publishing.</p></li>
 <li><p>Release notes are extracted from <code class="docutils literal notranslate"><span class="pre">CHANGELOG.md</span></code> and the artifacts,
 signatures and attestations are uploaded to PyPI and GitHub Releases.</p></li>
 </ol>
-<p>Users can verify a downloaded wheel with:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cosign<span class="w"> </span>verify-blob<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--certificate<span class="w"> </span><span class="s2">&quot;&lt;artifact&gt;.sig&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--certificate-identity-regexp<span class="w"> </span><span class="s2">&quot;github.com/.*&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--certificate-oidc-issuer<span class="w"> </span><span class="s2">&quot;https://token.actions.githubusercontent.com&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span><span class="s2">&quot;&lt;artifact&gt;&quot;</span>
+<p>Users can verify a downloaded wheel and related artifacts:</p>
+<ol class="arabic">
+<li><p>Verify the wheel’s signature:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cosign<span class="w"> </span>verify<span class="w"> </span>--certificate-identity<span class="w"> </span><span class="s2">&quot;https://github.com/Psychevus/cryptography-suite/.github/workflows/release.yml@refs/tags/v3.0.0&quot;</span><span class="w"> </span>&lt;wheel&gt;.sig<span class="w"> </span>&lt;wheel&gt;
 </pre></div>
 </div>
+</li>
+<li><p>Validate the checksums:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sha256sum<span class="w"> </span>-c<span class="w"> </span>checksums.txt
+</pre></div>
+</div>
+</li>
+<li><p>Inspect the SLSA provenance:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>jq<span class="w"> </span><span class="s1">&#39;.subject | .name&#39;</span><span class="w"> </span>provenance.intoto.jsonl
+</pre></div>
+</div>
+</li>
+</ol>
 <p>The SBOM (<code class="docutils literal notranslate"><span class="pre">sbom.json</span></code>) can be inspected with tools such as
 <code class="docutils literal notranslate"><span class="pre">cyclonedx-bom</span></code>:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cyclonedx-bom<span class="w"> </span>--input-file<span class="w"> </span>sbom.json<span class="w"> </span>--summary

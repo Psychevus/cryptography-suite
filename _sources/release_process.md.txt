@@ -18,15 +18,25 @@ This project aims for fully reproducible builds and signed artifacts. Releases a
 8. Release notes are extracted from `CHANGELOG.md` and the artifacts,
    signatures and attestations are uploaded to PyPI and GitHub Releases.
 
-Users can verify a downloaded wheel with:
+Users can verify a downloaded wheel and related artifacts:
 
-```bash
-cosign verify-blob \
-  --certificate "<artifact>.sig" \
-  --certificate-identity-regexp "github.com/.*" \
-  --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
-  "<artifact>"
-```
+1. Verify the wheel's signature:
+
+   ```bash
+   cosign verify --certificate-identity "https://github.com/Psychevus/cryptography-suite/.github/workflows/release.yml@refs/tags/v3.0.0" <wheel>.sig <wheel>
+   ```
+
+2. Validate the checksums:
+
+   ```bash
+   sha256sum -c checksums.txt
+   ```
+
+3. Inspect the SLSA provenance:
+
+   ```bash
+   jq '.subject | .name' provenance.intoto.jsonl
+   ```
 
 The SBOM (`sbom.json`) can be inspected with tools such as
 `cyclonedx-bom`:
