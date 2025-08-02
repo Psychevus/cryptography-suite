@@ -86,3 +86,11 @@ class PKCS11KeyStore:
 
 Refer to :mod:`cryptography_suite.keystores.pkcs11` for a copy of this
 skeleton in the source tree.
+
+## Third-party plugin troubleshooting
+
+If your plugin fails to load it will be listed as ``broken`` when running
+``cryptography-suite keystore list``. The command exits with a non-zero status
+to highlight the problem but still displays the table of other available
+keystores. Inspect the logged error message and verify that all dependencies
+for the plugin are installed correctly.
