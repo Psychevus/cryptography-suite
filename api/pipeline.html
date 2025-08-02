@@ -421,6 +421,211 @@ pipeline steps.</p>
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.ECIESX25519Decrypt">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cryptography_suite.pipeline.</span></span><span class="sig-name descname"><span class="pre">ECIESX25519Decrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">private_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cryptography_suite.pipeline.ECIESX25519Decrypt" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cryptography_suite.pipeline.CryptoModule" title="cryptography_suite.pipeline.CryptoModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">CryptoModule</span></code></a>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code>]</p>
+<p>Decrypt ECIES X25519 ciphertext.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.ECIESX25519Decrypt.private_key">
+<span class="sig-name descname"><span class="pre">private_key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Any</span></em><a class="headerlink" href="#cryptography_suite.pipeline.ECIESX25519Decrypt.private_key" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.ECIESX25519Decrypt.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.ECIESX25519Decrypt.run" title="Link to this definition">¶</a></dt>
+<dd><p>Run the module on the provided data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.ECIESX25519Decrypt.to_proverif">
+<span class="sig-name descname"><span class="pre">to_proverif</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.ECIESX25519Decrypt.to_proverif" title="Link to this definition">¶</a></dt>
+<dd><p>Return a ProVerif representation of the module.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.ECIESX25519Decrypt.to_tamarin">
+<span class="sig-name descname"><span class="pre">to_tamarin</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.ECIESX25519Decrypt.to_tamarin" title="Link to this definition">¶</a></dt>
+<dd><p>Return a Tamarin representation of the module.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.ECIESX25519Encrypt">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cryptography_suite.pipeline.</span></span><span class="sig-name descname"><span class="pre">ECIESX25519Encrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">public_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cryptography_suite.pipeline.ECIESX25519Encrypt" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cryptography_suite.pipeline.CryptoModule" title="cryptography_suite.pipeline.CryptoModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">CryptoModule</span></code></a>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code>]</p>
+<p>Encrypt data using ECIES with X25519.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.ECIESX25519Encrypt.public_key">
+<span class="sig-name descname"><span class="pre">public_key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Any</span></em><a class="headerlink" href="#cryptography_suite.pipeline.ECIESX25519Encrypt.public_key" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.ECIESX25519Encrypt.raw_output">
+<span class="sig-name descname"><span class="pre">raw_output</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#cryptography_suite.pipeline.ECIESX25519Encrypt.raw_output" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.ECIESX25519Encrypt.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.ECIESX25519Encrypt.run" title="Link to this definition">¶</a></dt>
+<dd><p>Run the module on the provided data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.ECIESX25519Encrypt.to_proverif">
+<span class="sig-name descname"><span class="pre">to_proverif</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.ECIESX25519Encrypt.to_proverif" title="Link to this definition">¶</a></dt>
+<dd><p>Return a ProVerif representation of the module.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.ECIESX25519Encrypt.to_tamarin">
+<span class="sig-name descname"><span class="pre">to_tamarin</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.ECIESX25519Encrypt.to_tamarin" title="Link to this definition">¶</a></dt>
+<dd><p>Return a Tamarin representation of the module.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.HybridDecrypt">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cryptography_suite.pipeline.</span></span><span class="sig-name descname"><span class="pre">HybridDecrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">private_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cryptography_suite.pipeline.HybridDecrypt" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cryptography_suite.pipeline.CryptoModule" title="cryptography_suite.pipeline.CryptoModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">CryptoModule</span></code></a>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">Any</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code>]</p>
+<p>Decrypt data produced by <a class="reference internal" href="#cryptography_suite.pipeline.HybridEncrypt" title="cryptography_suite.pipeline.HybridEncrypt"><code class="xref py py-class docutils literal notranslate"><span class="pre">HybridEncrypt</span></code></a>.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.HybridDecrypt.private_key">
+<span class="sig-name descname"><span class="pre">private_key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Any</span></em><a class="headerlink" href="#cryptography_suite.pipeline.HybridDecrypt.private_key" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.HybridDecrypt.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.HybridDecrypt.run" title="Link to this definition">¶</a></dt>
+<dd><p>Run the module on the provided data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.HybridDecrypt.to_proverif">
+<span class="sig-name descname"><span class="pre">to_proverif</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.HybridDecrypt.to_proverif" title="Link to this definition">¶</a></dt>
+<dd><p>Return a ProVerif representation of the module.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.HybridDecrypt.to_tamarin">
+<span class="sig-name descname"><span class="pre">to_tamarin</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.HybridDecrypt.to_tamarin" title="Link to this definition">¶</a></dt>
+<dd><p>Return a Tamarin representation of the module.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.HybridEncrypt">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cryptography_suite.pipeline.</span></span><span class="sig-name descname"><span class="pre">HybridEncrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">public_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cryptography_suite.pipeline.HybridEncrypt" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cryptography_suite.pipeline.CryptoModule" title="cryptography_suite.pipeline.CryptoModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">CryptoModule</span></code></a>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">Any</span></code>]</p>
+<p>Encrypt data using hybrid RSA/ECIES + AES-GCM.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.HybridEncrypt.public_key">
+<span class="sig-name descname"><span class="pre">public_key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Any</span></em><a class="headerlink" href="#cryptography_suite.pipeline.HybridEncrypt.public_key" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.HybridEncrypt.raw_output">
+<span class="sig-name descname"><span class="pre">raw_output</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#cryptography_suite.pipeline.HybridEncrypt.raw_output" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.HybridEncrypt.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.HybridEncrypt.run" title="Link to this definition">¶</a></dt>
+<dd><p>Run the module on the provided data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.HybridEncrypt.to_proverif">
+<span class="sig-name descname"><span class="pre">to_proverif</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.HybridEncrypt.to_proverif" title="Link to this definition">¶</a></dt>
+<dd><p>Return a ProVerif representation of the module.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.HybridEncrypt.to_tamarin">
+<span class="sig-name descname"><span class="pre">to_tamarin</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.HybridEncrypt.to_tamarin" title="Link to this definition">¶</a></dt>
+<dd><p>Return a Tamarin representation of the module.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.KyberDecrypt">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cryptography_suite.pipeline.</span></span><span class="sig-name descname"><span class="pre">KyberDecrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">private_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">512</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cryptography_suite.pipeline.KyberDecrypt" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cryptography_suite.pipeline.CryptoModule" title="cryptography_suite.pipeline.CryptoModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">CryptoModule</span></code></a>[<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code>]</p>
+<p>Decrypt data produced by <a class="reference internal" href="#cryptography_suite.pipeline.KyberEncrypt" title="cryptography_suite.pipeline.KyberEncrypt"><code class="xref py py-class docutils literal notranslate"><span class="pre">KyberEncrypt</span></code></a>.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.KyberDecrypt.level">
+<span class="sig-name descname"><span class="pre">level</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">512</span></em><a class="headerlink" href="#cryptography_suite.pipeline.KyberDecrypt.level" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.KyberDecrypt.private_key">
+<span class="sig-name descname"><span class="pre">private_key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Any</span></em><a class="headerlink" href="#cryptography_suite.pipeline.KyberDecrypt.private_key" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.KyberDecrypt.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.KyberDecrypt.run" title="Link to this definition">¶</a></dt>
+<dd><p>Run the module on the provided data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.KyberDecrypt.to_proverif">
+<span class="sig-name descname"><span class="pre">to_proverif</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.KyberDecrypt.to_proverif" title="Link to this definition">¶</a></dt>
+<dd><p>Return a ProVerif representation of the module.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.KyberDecrypt.to_tamarin">
+<span class="sig-name descname"><span class="pre">to_tamarin</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.KyberDecrypt.to_tamarin" title="Link to this definition">¶</a></dt>
+<dd><p>Return a Tamarin representation of the module.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.KyberEncrypt">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cryptography_suite.pipeline.</span></span><span class="sig-name descname"><span class="pre">KyberEncrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">public_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">512</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cryptography_suite.pipeline.KyberEncrypt" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cryptography_suite.pipeline.CryptoModule" title="cryptography_suite.pipeline.CryptoModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">CryptoModule</span></code></a>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code>]]</p>
+<p>Encrypt data using Kyber and AES-GCM.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.KyberEncrypt.level">
+<span class="sig-name descname"><span class="pre">level</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">512</span></em><a class="headerlink" href="#cryptography_suite.pipeline.KyberEncrypt.level" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.KyberEncrypt.public_key">
+<span class="sig-name descname"><span class="pre">public_key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bytes</span></em><a class="headerlink" href="#cryptography_suite.pipeline.KyberEncrypt.public_key" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.KyberEncrypt.raw_output">
+<span class="sig-name descname"><span class="pre">raw_output</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#cryptography_suite.pipeline.KyberEncrypt.raw_output" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.KyberEncrypt.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.KyberEncrypt.run" title="Link to this definition">¶</a></dt>
+<dd><p>Run the module on the provided data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.KyberEncrypt.to_proverif">
+<span class="sig-name descname"><span class="pre">to_proverif</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.KyberEncrypt.to_proverif" title="Link to this definition">¶</a></dt>
+<dd><p>Return a ProVerif representation of the module.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.KyberEncrypt.to_tamarin">
+<span class="sig-name descname"><span class="pre">to_tamarin</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.KyberEncrypt.to_tamarin" title="Link to this definition">¶</a></dt>
+<dd><p>Return a Tamarin representation of the module.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="cryptography_suite.pipeline.Pipeline">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cryptography_suite.pipeline.</span></span><span class="sig-name descname"><span class="pre">Pipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">modules:</span> <span class="pre">list[~cryptography_suite.pipeline.CryptoModule[~typing.Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">~typing.Any]]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracked_secrets:</span> <span class="pre">list[str]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cryptography_suite.pipeline.Pipeline" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">Input</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">Output</span></code>]</p>
@@ -673,6 +878,53 @@ importable from <a class="reference internal" href="#module-cryptography_suite.p
 <li><a class="reference internal" href="#cryptography_suite.pipeline.CryptoModule.run"><code class="docutils literal notranslate"><span class="pre">CryptoModule.run()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.pipeline.CryptoModule.to_proverif"><code class="docutils literal notranslate"><span class="pre">CryptoModule.to_proverif()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.pipeline.CryptoModule.to_tamarin"><code class="docutils literal notranslate"><span class="pre">CryptoModule.to_tamarin()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.ECIESX25519Decrypt"><code class="docutils literal notranslate"><span class="pre">ECIESX25519Decrypt</span></code></a><ul>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.ECIESX25519Decrypt.private_key"><code class="docutils literal notranslate"><span class="pre">ECIESX25519Decrypt.private_key</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.ECIESX25519Decrypt.run"><code class="docutils literal notranslate"><span class="pre">ECIESX25519Decrypt.run()</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.ECIESX25519Decrypt.to_proverif"><code class="docutils literal notranslate"><span class="pre">ECIESX25519Decrypt.to_proverif()</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.ECIESX25519Decrypt.to_tamarin"><code class="docutils literal notranslate"><span class="pre">ECIESX25519Decrypt.to_tamarin()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.ECIESX25519Encrypt"><code class="docutils literal notranslate"><span class="pre">ECIESX25519Encrypt</span></code></a><ul>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.ECIESX25519Encrypt.public_key"><code class="docutils literal notranslate"><span class="pre">ECIESX25519Encrypt.public_key</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.ECIESX25519Encrypt.raw_output"><code class="docutils literal notranslate"><span class="pre">ECIESX25519Encrypt.raw_output</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.ECIESX25519Encrypt.run"><code class="docutils literal notranslate"><span class="pre">ECIESX25519Encrypt.run()</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.ECIESX25519Encrypt.to_proverif"><code class="docutils literal notranslate"><span class="pre">ECIESX25519Encrypt.to_proverif()</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.ECIESX25519Encrypt.to_tamarin"><code class="docutils literal notranslate"><span class="pre">ECIESX25519Encrypt.to_tamarin()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.HybridDecrypt"><code class="docutils literal notranslate"><span class="pre">HybridDecrypt</span></code></a><ul>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.HybridDecrypt.private_key"><code class="docutils literal notranslate"><span class="pre">HybridDecrypt.private_key</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.HybridDecrypt.run"><code class="docutils literal notranslate"><span class="pre">HybridDecrypt.run()</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.HybridDecrypt.to_proverif"><code class="docutils literal notranslate"><span class="pre">HybridDecrypt.to_proverif()</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.HybridDecrypt.to_tamarin"><code class="docutils literal notranslate"><span class="pre">HybridDecrypt.to_tamarin()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.HybridEncrypt"><code class="docutils literal notranslate"><span class="pre">HybridEncrypt</span></code></a><ul>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.HybridEncrypt.public_key"><code class="docutils literal notranslate"><span class="pre">HybridEncrypt.public_key</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.HybridEncrypt.raw_output"><code class="docutils literal notranslate"><span class="pre">HybridEncrypt.raw_output</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.HybridEncrypt.run"><code class="docutils literal notranslate"><span class="pre">HybridEncrypt.run()</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.HybridEncrypt.to_proverif"><code class="docutils literal notranslate"><span class="pre">HybridEncrypt.to_proverif()</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.HybridEncrypt.to_tamarin"><code class="docutils literal notranslate"><span class="pre">HybridEncrypt.to_tamarin()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.KyberDecrypt"><code class="docutils literal notranslate"><span class="pre">KyberDecrypt</span></code></a><ul>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.KyberDecrypt.level"><code class="docutils literal notranslate"><span class="pre">KyberDecrypt.level</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.KyberDecrypt.private_key"><code class="docutils literal notranslate"><span class="pre">KyberDecrypt.private_key</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.KyberDecrypt.run"><code class="docutils literal notranslate"><span class="pre">KyberDecrypt.run()</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.KyberDecrypt.to_proverif"><code class="docutils literal notranslate"><span class="pre">KyberDecrypt.to_proverif()</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.KyberDecrypt.to_tamarin"><code class="docutils literal notranslate"><span class="pre">KyberDecrypt.to_tamarin()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.KyberEncrypt"><code class="docutils literal notranslate"><span class="pre">KyberEncrypt</span></code></a><ul>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.KyberEncrypt.level"><code class="docutils literal notranslate"><span class="pre">KyberEncrypt.level</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.KyberEncrypt.public_key"><code class="docutils literal notranslate"><span class="pre">KyberEncrypt.public_key</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.KyberEncrypt.raw_output"><code class="docutils literal notranslate"><span class="pre">KyberEncrypt.raw_output</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.KyberEncrypt.run"><code class="docutils literal notranslate"><span class="pre">KyberEncrypt.run()</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.KyberEncrypt.to_proverif"><code class="docutils literal notranslate"><span class="pre">KyberEncrypt.to_proverif()</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.KyberEncrypt.to_tamarin"><code class="docutils literal notranslate"><span class="pre">KyberEncrypt.to_tamarin()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#cryptography_suite.pipeline.Pipeline"><code class="docutils literal notranslate"><span class="pre">Pipeline</span></code></a><ul>
