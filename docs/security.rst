@@ -31,3 +31,17 @@ Signal Protocol: Experimental Demo Only
 The ``cryptography_suite.experimental.signal`` module is not a full Signal
 implementation. It lacks critical security properties and should never be
 used for production or high-assurance messaging.
+
+Supply Chain Security
+---------------------
+
+All release artifacts are built in isolated environments with pinned
+dependencies. Each GitHub release contains:
+
+* a CycloneDX SBOM (``sbom.json``),
+* a SLSA provenance attestation (``provenance.intoto.jsonl``), and
+* ``cosign`` signatures for every file.
+
+To verify a download, use ``cosign verify-blob`` against the artifact and
+inspect the SBOM with ``cyclonedx-bom`` or ``pip sbom``. Detailed
+instructions are available in :doc:`release_process`.

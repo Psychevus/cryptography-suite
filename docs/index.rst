@@ -47,6 +47,7 @@ formally verified, misuse-resistant workflows.
    fuzzing.md
    mypy_plugin.md
    release_process.md
+   release_checklist.md
    migration_3.0.md
    migration_4.0.md
    migration_pipeline_api.md
