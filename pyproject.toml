@@ -67,6 +67,7 @@ async = ["aiofiles"]
 docs = ["sphinx", "furo", "myst-parser", "sphinxcontrib-mermaid"]
 viz = ["rich", "ipywidgets", "networkx"]
 aws = ["boto3"]
+hsm = ["python-pkcs11>=0.9"]
 
 [project.scripts]
 cryptography-suite = "cryptography_suite.cli:main"
