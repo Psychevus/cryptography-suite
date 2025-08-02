@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Protocol, runtime_checkable
+from typing import Any, Dict, Protocol, Tuple, runtime_checkable
 
 
 @runtime_checkable
@@ -24,3 +24,9 @@ class KeyStore(Protocol):
 
     def unwrap(self, key_id: str, wrapped_key: bytes) -> bytes:
         """Unwrap ``wrapped_key`` using ``key_id``."""
+
+    def export_key(self, key_id: str) -> Tuple[bytes, Dict[str, Any]]:
+        """Return raw key material and associated metadata."""
+
+    def import_key(self, raw: bytes, meta: Dict[str, Any]) -> str:
+        """Import ``raw`` with ``meta`` and return the new key identifier."""

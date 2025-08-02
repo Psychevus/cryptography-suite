@@ -163,6 +163,15 @@ cryptography-suite file decrypt --in encrypted.bin --out output.txt --password m
 cryptography-suite export examples/formal/pipeline.yaml --format proverif
 ```
 
+### Keystore Migration
+
+```bash
+cryptography-suite keystore migrate --from local --to mock_hsm --dry-run
+```
+
+Omit `--key` to stream all keys. Only `local` → `aws-kms` and `local` ↔ `mock_hsm`
+are supported. Migrating between different algorithms is not supported.
+
 ### Fuzzing
 
 Execute the fuzz harness locally:

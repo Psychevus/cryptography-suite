@@ -24,3 +24,7 @@ class MissingDependencyError(CryptographySuiteError):
 
 class ProtocolError(CryptographySuiteError):
     """Raised when a protocol implementation encounters an error."""
+
+
+class UnsupportedAlgorithm(CryptographySuiteError):
+    """Raised when attempting to use an unsupported algorithm."""
