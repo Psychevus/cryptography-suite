@@ -221,16 +221,24 @@ Public API Inventory
      - Server-side implementation of the SPAKE2 protocol.
      - Core
    * - ``generate_totp``
-     - Generates a TOTP code based on a shared secret.
+     - Generates a TOTP code based on a shared secret. Uses SHA-1 by default
+       for RFC compatibility; SHA-256 and SHA-512 are supported via
+       parameters. Prefer SHA-256 or higher if supported.
      - Core
    * - ``verify_totp``
-     - Verifies a TOTP code within the allowed time window.
+     - Verifies a TOTP code within the allowed time window. Uses SHA-1 by
+       default; SHA-256 and SHA-512 are supported via parameters. Prefer
+       stronger digests when possible.
      - Core
    * - ``generate_hotp``
-     - Generates an HOTP code based on a shared secret and counter.
+     - Generates an HOTP code based on a shared secret and counter. Uses
+       SHA-1 by default for RFC compatibility; SHA-256 and SHA-512 are
+       supported via parameters. Prefer SHA-256 or higher if supported.
      - Core
    * - ``verify_hotp``
-     - Verifies an HOTP code within the allowed counter window.
+     - Verifies an HOTP code within the allowed counter window. Uses SHA-1
+       by default; SHA-256 and SHA-512 are supported via parameters. Prefer
+       stronger digests when possible.
      - Core
    * - ``base62_encode``
      - Encodes byte data into Base62 format.

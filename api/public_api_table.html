@@ -558,19 +558,27 @@
 <td><p>Core</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">generate_totp</span></code></p></td>
-<td><p>Generates a TOTP code based on a shared secret.</p></td>
+<td><p>Generates a TOTP code based on a shared secret. Uses SHA-1 by default
+for RFC compatibility; SHA-256 and SHA-512 are supported via
+parameters. Prefer SHA-256 or higher if supported.</p></td>
 <td><p>Core</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">verify_totp</span></code></p></td>
-<td><p>Verifies a TOTP code within the allowed time window.</p></td>
+<td><p>Verifies a TOTP code within the allowed time window. Uses SHA-1 by
+default; SHA-256 and SHA-512 are supported via parameters. Prefer
+stronger digests when possible.</p></td>
 <td><p>Core</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">generate_hotp</span></code></p></td>
-<td><p>Generates an HOTP code based on a shared secret and counter.</p></td>
+<td><p>Generates an HOTP code based on a shared secret and counter. Uses
+SHA-1 by default for RFC compatibility; SHA-256 and SHA-512 are
+supported via parameters. Prefer SHA-256 or higher if supported.</p></td>
 <td><p>Core</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">verify_hotp</span></code></p></td>
-<td><p>Verifies an HOTP code within the allowed counter window.</p></td>
+<td><p>Verifies an HOTP code within the allowed counter window. Uses SHA-1
+by default; SHA-256 and SHA-512 are supported via parameters. Prefer
+stronger digests when possible.</p></td>
 <td><p>Core</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">base62_encode</span></code></p></td>
