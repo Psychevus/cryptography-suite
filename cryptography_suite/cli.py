@@ -263,15 +263,31 @@ def keystore_cli(argv: list[str] | None = None) -> None:
         for name in list_keystores():
             cls = get_keystore(name)
             status = getattr(cls, "status", "unknown")
-            print(f"{name} ({status})")
+            extra = ""
+            try:
+                ks = cls()
+                label = getattr(ks, "token_label", None)
+                serial = getattr(ks, "token_serial", None)
+                if label and serial:
+                    extra = f" - {label} ({serial})"
+            except Exception:
+                pass
+            print(f"{name} ({status}){extra}")
     elif args.action == "test":
         for name in list_keystores():
             cls = get_keystore(name)
+            extra = ""
             try:
-                ok = cls().test_connection()
+                ks = cls()
+                ok = ks.test_connection()
+                if ok:
+                    label = getattr(ks, "token_label", None)
+                    serial = getattr(ks, "token_serial", None)
+                    if label and serial:
+                        extra = f" - {label} ({serial})"
             except Exception:
                 ok = False
-            print(f"{name}: {'ok' if ok else 'fail'}")
+            print(f"{name}: {'ok' if ok else 'fail'}{extra}")
     elif args.action == "migrate":
         import hashlib
 
