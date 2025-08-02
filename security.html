@@ -274,6 +274,12 @@ erase memory. A fallback to <code class="docutils literal notranslate"><span cla
 <p>While these mechanisms help reduce residual secrets in memory, absolute
 zeroization cannot be guaranteed on all operating systems and Python
 implementations.</p>
+<ul class="simple">
+<li><p>Private keys should always be stored encrypted, either with a strong password or
+in a hardware-backed keystore (HSM, KMS, etc.). Unencrypted PEMs are only
+acceptable for testing or inside protected containers. Set the environment
+variable <code class="docutils literal notranslate"><span class="pre">CRYPTOSUITE_STRICT_KEYS=1</span></code> to prohibit saving unencrypted keys.</p></li>
+</ul>
 </section>
 
         </article>
