@@ -23,6 +23,7 @@ from .pqc import (
     SPHINCS_AVAILABLE,
 )
 from .protocols.key_management import KeyManager
+from .utils import KeyVault
 
 from .zk.bulletproof import (
     prove as bp_prove,
@@ -173,7 +174,8 @@ def keygen_cli(argv: list[str] | None = None) -> None:
         else:
             pk, sk = generate_sphincs_keypair()
         print(pk.hex())
-        print(sk.hex())
+        sk_bytes = bytes(sk) if isinstance(sk, KeyVault) else sk
+        print(sk_bytes.hex())
 
 
 def hash_cli(argv: list[str] | None = None) -> None:
