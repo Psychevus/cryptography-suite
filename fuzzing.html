@@ -265,6 +265,7 @@
           <section id="fuzzing-and-property-testing">
 <h1>Fuzzing and Property Testing<a class="headerlink" href="#fuzzing-and-property-testing" title="Link to this heading">¶</a></h1>
 <p>This project includes fuzzing harnesses powered by <a class="reference external" href="https://github.com/google/atheris">Google Atheris</a> and property-based tests built with <a class="reference external" href="https://hypothesis.readthedocs.io/">Hypothesis</a>.</p>
+<p>Atheris primarily helps surface memory corruption and input-parsing issues by exercising functions with large volumes of malformed data. Hypothesis targets semantic properties and invariants such as round-trip encryption and correct error handling. Neither technique can prove cryptographic soundness; they only increase confidence by exploring a wide range of behaviours.</p>
 <section id="local-usage">
 <h2>Local Usage<a class="headerlink" href="#local-usage" title="Link to this heading">¶</a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="o">[</span>dev<span class="o">]</span>
@@ -280,7 +281,52 @@ cryptosuite-fuzz<span class="w"> </span>--runs<span class="w"> </span><span clas
 </section>
 <section id="limitations">
 <h2>Limitations<a class="headerlink" href="#limitations" title="Link to this heading">¶</a></h2>
-<p>Argon2-based functionality is skipped when the underlying cryptography backend does not provide Argon2.</p>
+<ul class="simple">
+<li><p>Atheris focuses on finding crashes and unexpected exceptions. It does not reason about protocol correctness or key strength.</p></li>
+<li><p>Hypothesis checks logical properties but cannot exhaust the entire input space.</p></li>
+<li><p>No fuzzing strategy can guarantee cryptographic security.</p></li>
+<li><p>Argon2-based functionality is skipped when the underlying cryptography backend does not provide Argon2.</p></li>
+</ul>
+</section>
+<section id="test-coverage-matrix">
+<h2>Test Coverage Matrix<a class="headerlink" href="#test-coverage-matrix" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Primitive</p></th>
+<th class="head"><p>Unit Tests</p></th>
+<th class="head"><p>Fuzz Harness</p></th>
+<th class="head"><p>Property Tests</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>AES-GCM</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">tests/test_encryption.py</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">fuzz/fuzz_aes.py</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">tests/test_aes_property.py</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>RSA</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">tests/test_asymmetric.py</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">fuzz/fuzz_rsa.py</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">tests/test_rsa_property.py</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>ECIES</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">tests/test_asymmetric.py</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">fuzz/fuzz_ecies.py</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">tests/test_ecies_property.py</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Pipeline modules</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">tests/test_pipeline.py</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">fuzz/fuzz_pipeline.py</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">tests/test_pipeline_property.py</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="contribution-requirements">
+<h2>Contribution Requirements<a class="headerlink" href="#contribution-requirements" title="Link to this heading">¶</a></h2>
+<p>New cryptographic primitives or backend implementations must include unit tests, an Atheris fuzzing harness, and Hypothesis property tests before they can be merged.</p>
 </section>
 </section>
 
@@ -343,6 +389,8 @@ cryptosuite-fuzz<span class="w"> </span>--runs<span class="w"> </span><span clas
 <li><a class="reference internal" href="#local-usage">Local Usage</a></li>
 <li><a class="reference internal" href="#continuous-integration">Continuous Integration</a></li>
 <li><a class="reference internal" href="#limitations">Limitations</a></li>
+<li><a class="reference internal" href="#test-coverage-matrix">Test Coverage Matrix</a></li>
+<li><a class="reference internal" href="#contribution-requirements">Contribution Requirements</a></li>
 </ul>
 </li>
 </ul>
