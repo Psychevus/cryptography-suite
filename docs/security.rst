@@ -13,7 +13,9 @@ Security Considerations
   :func:`cryptography_suite.serialize_private_key` or using
   :class:`cryptography_suite.protocols.key_management.KeyManager`, always supply a
   password so the key material is encrypted. Set the environment variable
-  ``CRYPTOSUITE_STRICT_KEYS=1`` to forbid saving unencrypted keys entirely.
+  ``CRYPTOSUITE_STRICT_KEYS=1`` to refuse loading or saving unencrypted keys
+  (raising ``StrictKeyPolicyError``). Use ``CRYPTOSUITE_STRICT_KEYS=warn`` to
+  only emit a warning.
 
 Zeroization & Memory Safety
 ---------------------------

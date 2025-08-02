@@ -9,6 +9,7 @@ from .errors import (
     ProtocolError,
     UnsupportedAlgorithm,
     SignatureVerificationError,
+    StrictKeyPolicyError,
 )
 
 __version__ = "3.0.0"
@@ -241,6 +242,7 @@ __all__ = [
     "MissingDependencyError",
     "ProtocolError",
     "UnsupportedAlgorithm",
+    "StrictKeyPolicyError",
     # Backends
     "available_backends",
     "use_backend",

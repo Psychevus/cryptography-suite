@@ -233,8 +233,9 @@ policies on backend usage.
   password or in a hardware-backed keystore (HSM, KMS, etc.). Unencrypted PEMs are only acceptable
   for testing or inside protected containers. When using `serialize_private_key` or
   `KeyManager.save_private_key`, always provide a password.
-- **Strict Key Storage**: Set the environment variable ``CRYPTOSUITE_STRICT_KEYS=1`` to forbid
-  saving unencrypted private keys entirely.
+- **Strict Key Storage**: Set the environment variable ``CRYPTOSUITE_STRICT_KEYS=1`` to refuse
+  loading or saving unencrypted private keys (raising ``StrictKeyPolicyError``). Use
+  ``CRYPTOSUITE_STRICT_KEYS=warn`` to only emit a warning.
 - **TOTP/HOTP Hash Choice**: TOTP and HOTP use SHA-1 by default for RFC compatibility,
   but stronger hash functions are supported. These algorithms are suitable for
   second-factor authentication, NOT as general-purpose hash functions.

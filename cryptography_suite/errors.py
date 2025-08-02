@@ -28,3 +28,7 @@ class ProtocolError(CryptographySuiteError):
 
 class UnsupportedAlgorithm(CryptographySuiteError):
     """Raised when attempting to use an unsupported algorithm."""
+
+
+class StrictKeyPolicyError(CryptographySuiteError):
+    """Raised when strict key policy prohibits unencrypted PEM usage."""
