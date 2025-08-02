@@ -1,8 +1,10 @@
+import os
 import sys
 import types
 from pathlib import Path
 from unittest.mock import MagicMock
 
+import pytest
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ed25519, ec, rsa
 
@@ -118,3 +120,19 @@ class ExtKS:
     (tmp_path / "ext.py").write_text(plugin_code)
     load_plugins(directory=str(tmp_path))
     assert "ext" in list_keystores()
+
+
+def test_plugin_failure_isolated(tmp_path: Path, capsys):
+    broken_dir = tmp_path / "keystores"
+    broken_dir.mkdir()
+    (broken_dir / "broken.py").write_text("raise RuntimeError('boom')")
+    cwd = os.getcwd()
+    os.chdir(tmp_path)
+    try:
+        with pytest.raises(SystemExit) as exc:
+            keystore_cli(["list"])
+        assert exc.value.code != 0
+        out = capsys.readouterr().out
+        assert "broken (broken)" in out
+    finally:
+        os.chdir(cwd)
