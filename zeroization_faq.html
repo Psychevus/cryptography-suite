@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Migrating to Cryptography Suite 3.0.0" href="migration_3.0.html" /><link rel="prev" title="Misuse-Resistant Checking" href="mypy_plugin.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Security Notes" href="security.html" /><link rel="prev" title="Experimental Feature Roadmap" href="roadmap.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
-        <title>Release Process - cryptography-suite 3.0.0 documentation</title>
+        <title>Zeroization in Python FAQ - cryptography-suite 3.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -208,7 +208,7 @@
 <li class="toctree-l1"><a class="reference internal" href="formal.html">Formal Verification Support</a></li>
 <li class="toctree-l1"><a class="reference internal" href="fuzzing.html">Fuzzing and Property Testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mypy_plugin.html">Misuse-Resistant Checking</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Release Process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release_process.html">Release Process</a></li>
 <li class="toctree-l1"><a class="reference internal" href="migration_3.0.html">Migrating to Cryptography Suite 3.0.0</a></li>
 <li class="toctree-l1"><a class="reference internal" href="migration_4.0.html">Migration Guide to Cryptography Suite 4.0.0</a></li>
 <li class="toctree-l1"><a class="reference internal" href="migration_pipeline_api.html">Migration to Pipeline API</a></li>
@@ -217,7 +217,7 @@
 <li class="toctree-l1"><a class="reference internal" href="backend_consistency.html">Backend Consistency</a></li>
 <li class="toctree-l1"><a class="reference internal" href="feature_maturity.html">Feature Maturity</a></li>
 <li class="toctree-l1"><a class="reference internal" href="roadmap.html">Experimental Feature Roadmap</a></li>
-<li class="toctree-l1"><a class="reference internal" href="zeroization_faq.html">Zeroization in Python FAQ</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Zeroization in Python FAQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="security.html">Security Notes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/modules.html">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/pipeline.html">Pipeline DSL</a></li>
@@ -242,7 +242,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="_sources/release_process.md.txt" title="View this page">
+  <a class="muted-link" href="_sources/zeroization_faq.md.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -262,23 +262,33 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="release-process">
-<h1>Release Process<a class="headerlink" href="#release-process" title="Link to this heading">¶</a></h1>
-<p>This project aims for fully reproducible builds and signed artifacts. Releases are created via GitHub Actions.</p>
-<section id="steps">
-<h2>Steps<a class="headerlink" href="#steps" title="Link to this heading">¶</a></h2>
-<ol class="arabic simple">
-<li><p>CI runs <code class="docutils literal notranslate"><span class="pre">tools/reproducible_build.py</span></code> to build the wheel and sdist with <code class="docutils literal notranslate"><span class="pre">SOURCE_DATE_EPOCH</span></code> set.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">reproducibility.yml</span></code> verifies that two independent builds produce identical hashes.</p></li>
-<li><p>After tests pass, <code class="docutils literal notranslate"><span class="pre">release.yml</span></code> signs the artifacts using GitHub OIDC and <code class="docutils literal notranslate"><span class="pre">cosign</span></code>.</p></li>
-<li><p>A CycloneDX SBOM is generated and attached to the GitHub Release.</p></li>
-<li><p>Release notes are extracted from <code class="docutils literal notranslate"><span class="pre">CHANGELOG.md</span></code> and published to PyPI.</p></li>
-</ol>
-<p>Users can verify a downloaded artifact with:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>tools/verify_artifact.py<span class="w"> </span>dist/cryptography_suite-&lt;version&gt;-py3-none-any.whl<span class="w"> </span>&lt;sha256&gt;
+          <section id="zeroization-in-python-faq">
+<h1>Zeroization in Python FAQ<a class="headerlink" href="#zeroization-in-python-faq" title="Link to this heading">¶</a></h1>
+<section id="can-python-securely-erase-secrets-from-memory">
+<h2>Can Python securely erase secrets from memory?<a class="headerlink" href="#can-python-securely-erase-secrets-from-memory" title="Link to this heading">¶</a></h2>
+<p>Not for arbitrary objects. Python’s immutable <code class="docutils literal notranslate"><span class="pre">bytes</span></code> objects may be
+copied or interned by the interpreter and are only released during garbage
+collection. The library’s :class:<code class="docutils literal notranslate"><span class="pre">~cryptography_suite.utils.KeyVault</span></code> and
+:func:<code class="docutils literal notranslate"><span class="pre">~cryptography_suite.utils.secure_zero</span></code> helpers operate on mutable
+<code class="docutils literal notranslate"><span class="pre">bytearray</span></code> buffers so that sensitive data can be overwritten in place.</p>
+</section>
+<section id="what-should-i-use-for-private-keys-or-session-secrets">
+<h2>What should I use for private keys or session secrets?<a class="headerlink" href="#what-should-i-use-for-private-keys-or-session-secrets" title="Link to this heading">¶</a></h2>
+<p>Generate keys with <code class="docutils literal notranslate"><span class="pre">sensitive=True</span></code> or wrap existing byte strings in
+<code class="docutils literal notranslate"><span class="pre">KeyVault</span></code>. Access the underlying bytes within a <code class="docutils literal notranslate"><span class="pre">with</span></code> block:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cryptography_suite.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_aes_key</span>
+
+<span class="k">with</span> <span class="n">generate_aes_key</span><span class="p">()</span> <span class="k">as</span> <span class="n">key_bytes</span><span class="p">:</span>
+    <span class="n">use_key</span><span class="p">(</span><span class="n">key_bytes</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The expected hashes are published alongside each release.</p>
+</section>
+<section id="do-native-backends-handle-zeroization">
+<h2>Do native backends handle zeroization?<a class="headerlink" href="#do-native-backends-handle-zeroization" title="Link to this heading">¶</a></h2>
+<p>Yes. Underlying libraries such as OpenSSL employ their own secure memory
+management and wipe key material when freed. When cryptographic objects are
+created via these backends, zeroization occurs inside the native code even
+though Python cannot directly guarantee it.</p>
 </section>
 </section>
 
@@ -287,23 +297,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="migration_3.0.html">
+          <a class="next-page" href="security.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Migrating to Cryptography Suite 3.0.0</div>
+                <div class="title">Security Notes</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="mypy_plugin.html">
+          <a class="prev-page" href="roadmap.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Misuse-Resistant Checking</div>
+                <div class="title">Experimental Feature Roadmap</div>
                 
               </div>
             </a>
@@ -337,8 +347,10 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Release Process</a><ul>
-<li><a class="reference internal" href="#steps">Steps</a></li>
+<li><a class="reference internal" href="#">Zeroization in Python FAQ</a><ul>
+<li><a class="reference internal" href="#can-python-securely-erase-secrets-from-memory">Can Python securely erase secrets from memory?</a></li>
+<li><a class="reference internal" href="#what-should-i-use-for-private-keys-or-session-secrets">What should I use for private keys or session secrets?</a></li>
+<li><a class="reference internal" href="#do-native-backends-handle-zeroization">Do native backends handle zeroization?</a></li>
 </ul>
 </li>
 </ul>

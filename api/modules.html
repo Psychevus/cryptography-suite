@@ -217,6 +217,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../backend_consistency.html">Backend Consistency</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../feature_maturity.html">Feature Maturity</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../roadmap.html">Experimental Feature Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zeroization_faq.html">Zeroization in Python FAQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../security.html">Security Notes</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline.html">Pipeline DSL</a></li>
@@ -372,6 +373,10 @@ variable to <code class="docutils literal notranslate"><span class="pre">1</span
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">KeyVault</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytearray</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cryptography_suite.KeyVault" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Context manager for sensitive key storage.</p>
+<p>Secrets wrapped by <code class="docutils literal notranslate"><span class="pre">KeyVault</span></code> are wiped from memory when the
+context exits or the object is garbage collected. Plain <code class="docutils literal notranslate"><span class="pre">bytes</span></code>
+values passed around in Python cannot be reliably erased and may
+linger until the interpreter frees them.</p>
 </dd></dl>
 
 <dl class="py exception">
@@ -631,8 +636,11 @@ authentication tag.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cryptography_suite.generate_aes_key">
-<span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">generate_aes_key</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="headerlink" href="#cryptography_suite.generate_aes_key" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">generate_aes_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensitive</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#cryptography_suite.KeyVault" title="cryptography_suite.utils.KeyVault"><span class="pre">KeyVault</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></span><a class="headerlink" href="#cryptography_suite.generate_aes_key" title="Link to this definition">¶</a></dt>
 <dd><p>Generates a secure random AES key.</p>
+<p>When <code class="docutils literal notranslate"><span class="pre">sensitive</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code> (default) the key is wrapped in a
+<a class="reference internal" href="#cryptography_suite.KeyVault" title="cryptography_suite.KeyVault"><code class="xref py py-class docutils literal notranslate"><span class="pre">KeyVault</span></code></a> so it can be reliably zeroized after use. Set
+<code class="docutils literal notranslate"><span class="pre">sensitive=False</span></code> to obtain raw bytes without zeroization guarantees.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -849,8 +857,13 @@ public key. The message itself is encrypted with AES-GCM.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cryptography_suite.rotate_aes_key">
-<span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">rotate_aes_key</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="headerlink" href="#cryptography_suite.rotate_aes_key" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">rotate_aes_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensitive</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#cryptography_suite.KeyVault" title="cryptography_suite.utils.KeyVault"><span class="pre">KeyVault</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></span><a class="headerlink" href="#cryptography_suite.rotate_aes_key" title="Link to this definition">¶</a></dt>
 <dd><p>Generates a new AES key to replace the old one.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sensitive</strong> (<em>bool</em><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> return the key wrapped in <a class="reference internal" href="#cryptography_suite.KeyVault" title="cryptography_suite.KeyVault"><code class="xref py py-class docutils literal notranslate"><span class="pre">KeyVault</span></code></a>.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -872,7 +885,11 @@ public key. The message itself is encrypted with AES-GCM.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="cryptography_suite.secure_zero">
 <span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">secure_zero</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytearray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cryptography_suite.secure_zero" title="Link to this definition">¶</a></dt>
-<dd><p>Overwrite <code class="docutils literal notranslate"><span class="pre">data</span></code> with zeros in-place using <code class="docutils literal notranslate"><span class="pre">memset_s</span></code> if available.</p>
+<dd><p>Overwrite <code class="docutils literal notranslate"><span class="pre">data</span></code> with zeros in-place.</p>
+<p>Only mutable <code class="docutils literal notranslate"><span class="pre">bytearray</span></code> objects can be wiped in Python. Passing
+an immutable <code class="docutils literal notranslate"><span class="pre">bytes</span></code> instance will raise <code class="docutils literal notranslate"><span class="pre">TypeError</span></code> and the
+original data may remain in memory until garbage collection. Use
+<a class="reference internal" href="#cryptography_suite.KeyVault" title="cryptography_suite.KeyVault"><code class="xref py py-class docutils literal notranslate"><span class="pre">KeyVault</span></code></a> or convert to <code class="docutils literal notranslate"><span class="pre">bytearray</span></code> before calling.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -1308,13 +1325,14 @@ code.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cryptography_suite.legacy.bls_sign">
-<span class="sig-prename descclassname"><span class="pre">cryptography_suite.legacy.</span></span><span class="sig-name descname"><span class="pre">bls_sign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">private_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></span><a class="headerlink" href="#cryptography_suite.legacy.bls_sign" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">cryptography_suite.legacy.</span></span><span class="sig-name descname"><span class="pre">bls_sign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">private_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytearray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#cryptography_suite.KeyVault" title="cryptography_suite.utils.KeyVault"><span class="pre">KeyVault</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></span><a class="headerlink" href="#cryptography_suite.legacy.bls_sign" title="Link to this definition">¶</a></dt>
 <dd><p>Sign a message using the BLS signature scheme.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>message</strong> (<em>bytes</em>) – Message to sign.</p></li>
-<li><p><strong>private_key</strong> (<em>int</em>) – Private key generated via <a class="reference internal" href="#cryptography_suite.legacy.generate_bls_keypair" title="cryptography_suite.legacy.generate_bls_keypair"><code class="xref py py-func docutils literal notranslate"><span class="pre">generate_bls_keypair()</span></code></a>.</p></li>
+<li><p><strong>private_key</strong> (<em>int</em><em> | </em><em>bytes</em><em> | </em><a class="reference internal" href="#cryptography_suite.KeyVault" title="cryptography_suite.KeyVault"><em>KeyVault</em></a>) – Private key generated via <a class="reference internal" href="#cryptography_suite.legacy.generate_bls_keypair" title="cryptography_suite.legacy.generate_bls_keypair"><code class="xref py py-func docutils literal notranslate"><span class="pre">generate_bls_keypair()</span></code></a>. It may be
+provided as a <code class="xref py py-class docutils literal notranslate"><span class="pre">KeyVault</span></code> instance or raw integer/bytes.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1349,19 +1367,24 @@ code.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cryptography_suite.legacy.generate_bls_keypair">
-<span class="sig-prename descclassname"><span class="pre">cryptography_suite.legacy.</span></span><span class="sig-name descname"><span class="pre">generate_bls_keypair</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#cryptography_suite.legacy.generate_bls_keypair" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">cryptography_suite.legacy.</span></span><span class="sig-name descname"><span class="pre">generate_bls_keypair</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensitive</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#cryptography_suite.KeyVault" title="cryptography_suite.utils.KeyVault"><span class="pre">KeyVault</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#cryptography_suite.legacy.generate_bls_keypair" title="Link to this definition">¶</a></dt>
 <dd><p>Generate a BLS12-381 key pair.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>seed</strong> (<em>bytes</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Optional 32-byte seed used as input key material. When <code class="docutils literal notranslate"><span class="pre">None</span></code> a
-cryptographically secure random seed is generated.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>seed</strong> (<em>bytes</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Optional 32-byte seed used as input key material. When <code class="docutils literal notranslate"><span class="pre">None</span></code> a
+cryptographically secure random seed is generated.</p></li>
+<li><p><strong>sensitive</strong> (<em>bool</em><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default) the private key is returned wrapped in
+<code class="xref py py-class docutils literal notranslate"><span class="pre">KeyVault</span></code> for zeroization after use. Set to <code class="docutils literal notranslate"><span class="pre">False</span></code> to
+receive the key as a Python integer.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The private key as an integer and the corresponding public key as
-a byte string.</p>
+<dd class="field-even"><p>The private key as either an integer or a <code class="xref py py-class docutils literal notranslate"><span class="pre">KeyVault</span></code>-wrapped
+byte string, and the corresponding public key.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Tuple[int, bytes]</p>
+<dd class="field-odd"><p>Tuple[Union[int, <a class="reference internal" href="#cryptography_suite.KeyVault" title="cryptography_suite.KeyVault">KeyVault</a>], bytes]</p>
 </dd>
 </dl>
 </dd></dl>
