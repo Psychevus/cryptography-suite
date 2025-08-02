@@ -52,15 +52,27 @@ _KYBER_LEVEL_MAP = {512: ml_kem_512, 768: ml_kem_768, 1024: ml_kem_1024}
 _DILITHIUM_LEVEL_MAP = {2: ml_dsa_44, 3: ml_dsa_65, 5: ml_dsa_87}
 
 
-def generate_kyber_keypair(level: int = 512) -> Tuple[bytes, bytes]:
-    """Generate a Kyber key pair for the given ``level``."""
+def generate_kyber_keypair(
+    level: int = 512, *, sensitive: bool = True
+) -> Tuple[bytes, KeyVault | bytes]:
+    """Generate a Kyber key pair for the given ``level``.
+
+    Parameters
+    ----------
+    level : int
+        Kyber security level (512, 768 or 1024).
+    sensitive : bool, optional
+        If ``True`` (default) the private key is wrapped in :class:`KeyVault`
+        so it can be securely erased after use.
+    """
     if not PQCRYPTO_AVAILABLE:
         raise ImportError("pqcrypto is required for Kyber functions")
 
     alg = _KYBER_LEVEL_MAP.get(level)
     if alg is None:
         raise EncryptionError("Invalid Kyber level")
-    return alg.generate_keypair()
+    pk, sk = alg.generate_keypair()
+    return pk, KeyVault(sk) if sensitive else sk
 
 
 def kyber_encrypt(
@@ -99,7 +111,7 @@ def kyber_encrypt(
 
 
 def kyber_decrypt(
-    private_key: bytes,
+    private_key: bytes | KeyVault,
     ciphertext: bytes | str,
     shared_secret: bytes | str | None = None,
     *,
@@ -107,8 +119,9 @@ def kyber_decrypt(
 ) -> bytes:
     """Decrypt data encrypted by :func:`kyber_encrypt`.
 
-    ``shared_secret`` becomes optional. When omitted the function decapsulates
-    it from ``ciphertext`` using the provided Kyber ``level``.
+    ``private_key`` may be raw bytes or a :class:`KeyVault` returned by
+    :func:`generate_kyber_keypair`. ``shared_secret`` becomes optional; when
+    omitted the function decapsulates it from ``ciphertext``.
     """
     if not PQCRYPTO_AVAILABLE:
         raise ImportError("pqcrypto is required for Kyber functions")
@@ -136,7 +149,8 @@ def kyber_decrypt(
     kem_ct = ciphertext[:ct_size]
     salt = ciphertext[ct_size : ct_size + 16]
     enc = ciphertext[ct_size + 16 :]
-    ss_check = alg.decrypt(private_key, kem_ct)
+    priv = bytes(private_key) if isinstance(private_key, KeyVault) else private_key
+    ss_check = alg.decrypt(priv, kem_ct)
     if shared_secret is None:
         shared_secret = ss_check
     elif not hmac.compare_digest(ss_check, shared_secret):
@@ -150,25 +164,34 @@ def kyber_decrypt(
         return aesgcm.decrypt(nonce, ct, None)
 
 
-def generate_dilithium_keypair() -> Tuple[bytes, bytes]:
-    """Generate a Dilithium key pair using level 2 parameters."""
+def generate_dilithium_keypair(*, sensitive: bool = True) -> Tuple[bytes, KeyVault | bytes]:
+    """Generate a Dilithium key pair using level 2 parameters.
+
+    When ``sensitive`` is ``True`` (default) the private key is wrapped in
+    :class:`KeyVault`.
+    """
     if not PQCRYPTO_AVAILABLE:
         raise ImportError("pqcrypto is required for Dilithium functions")
 
-    return ml_dsa_44.generate_keypair()
+    pk, sk = ml_dsa_44.generate_keypair()
+    return pk, KeyVault(sk) if sensitive else sk
 
 
 def dilithium_sign(
-    private_key: bytes,
+    private_key: bytes | KeyVault,
     message: bytes,
     *,
     raw_output: bool = False,
 ) -> str | bytes:
-    """Sign a message using Dilithium level 2."""
+    """Sign a message using Dilithium level 2.
+
+    ``private_key`` may be provided as raw bytes or a :class:`KeyVault`.
+    """
     if not PQCRYPTO_AVAILABLE:
         raise ImportError("pqcrypto is required for Dilithium functions")
 
-    sig = ml_dsa_44.sign(private_key, message)
+    key = bytes(private_key) if isinstance(private_key, KeyVault) else private_key
+    sig = ml_dsa_44.sign(key, message)
     if raw_output:
         return sig
     return base64.b64encode(sig).decode()
@@ -195,22 +218,31 @@ def dilithium_verify(
         return False
 
 
-def generate_sphincs_keypair() -> Tuple[bytes, bytes]:
-    """Generate a SPHINCS+ key pair using a 128-bit security level."""
+def generate_sphincs_keypair(*, sensitive: bool = True) -> Tuple[bytes, KeyVault | bytes]:
+    """Generate a SPHINCS+ key pair using a 128-bit security level.
+
+    When ``sensitive`` is ``True`` (default) the private key is wrapped in
+    :class:`KeyVault`.
+    """
     if not PQCRYPTO_AVAILABLE or not SPHINCS_AVAILABLE:
         raise ImportError("pqcrypto with SPHINCS+ support is required")
 
-    return _sphincs_module.generate_keypair()
+    pk, sk = _sphincs_module.generate_keypair()
+    return pk, KeyVault(sk) if sensitive else sk
 
 
 def sphincs_sign(
-    private_key: bytes, message: bytes, *, raw_output: bool = False
+    private_key: bytes | KeyVault, message: bytes, *, raw_output: bool = False
 ) -> str | bytes:
-    """Sign ``message`` with SPHINCS+ returning Base64 by default."""
+    """Sign ``message`` with SPHINCS+ returning Base64 by default.
+
+    ``private_key`` may be a byte string or :class:`KeyVault`.
+    """
     if not PQCRYPTO_AVAILABLE or not SPHINCS_AVAILABLE:
         raise ImportError("pqcrypto with SPHINCS+ support is required")
 
-    sig = _sphincs_module.sign(private_key, message)
+    key = bytes(private_key) if isinstance(private_key, KeyVault) else private_key
+    sig = _sphincs_module.sign(key, message)
     if raw_output:
         return sig
     return base64.b64encode(sig).decode()

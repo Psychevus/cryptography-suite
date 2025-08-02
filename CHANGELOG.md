@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 ## [Unreleased]
 
+### Added
+- ``sensitive`` parameter for key generation functions returning
+  :class:`KeyVault`-wrapped secrets by default.
+- Documentation on zeroization guarantees and Python's memory limitations.
+
 ### Deprecated
 - `derive_pbkdf2` alias in `symmetric.kdf` (use `kdf_pbkdf2`; will be removed in v4.0.0).
 - Legacy helpers `generate_rsa_keypair_and_save` and `generate_ec_keypair_and_save`

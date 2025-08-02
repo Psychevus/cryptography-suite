@@ -44,8 +44,9 @@ pipeline-driven workflows. Major enhancements include:
   libraries or hardware modules.
 - **Declarative Pipeline DSL** for composing verifiable workflows.
 - **Misuse-Resistant Type System** via a dedicated mypy plugin.
-- **Automatic Zeroization & Constant-Time Operations** to protect secrets in
-  memory.
+- **Zeroization Tools & Constant-Time Operations** – ``KeyVault`` and
+  ``secure_zero`` enable best-effort memory wiping, but plain ``bytes`` may
+  persist until garbage collection.
 - **Formal Verification Export** to ProVerif and Tamarin for rigorous analysis.
 - **Stub Generator** to scaffold new applications and services.
 - **Rich Logging, Progress Bars & Interactive Widgets** for real-time insight.
@@ -537,6 +538,22 @@ from cryptography_suite.utils import KeyVault
 key_material = b"supersecretkey"
 with KeyVault(key_material) as buf:
     use_key(buf)
+```
+
+### Zeroization & Memory Safety
+
+This library provides tools (``KeyVault``, ``secure_zero``) for explicit
+zeroization of secrets. However, due to Python's memory model, secrets
+stored as plain ``bytes`` may remain in memory until garbage collected.
+For highest assurance, always use ``KeyVault`` or the ``sensitive=True``
+option on key-generation functions when handling private keys or session
+secrets.
+
+```python
+from cryptography_suite.protocols import generate_aes_key
+
+with generate_aes_key() as key_bytes:
+    use_key(key_bytes)
 ```
 
 ### KeyManager File Handling

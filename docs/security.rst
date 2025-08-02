@@ -15,6 +15,16 @@ Security Considerations
   password so the key material is encrypted. Set the environment variable
   ``CRYPTOSUITE_STRICT_KEYS=1`` to forbid saving unencrypted keys entirely.
 
+Zeroization & Memory Safety
+---------------------------
+
+``cryptography-suite`` provides tools (``KeyVault``, ``secure_zero``) for
+explicit zeroization of secrets. Because Python's ``bytes`` objects are
+immutable and managed by the garbage collector, sensitive data handled as
+plain ``bytes`` may persist in memory until collection occurs. For highest
+assurance, wrap secrets in ``KeyVault`` or generate them with the
+``sensitive=True`` option so they can be securely wiped.
+
 Signal Protocol: Experimental Demo Only
 ---------------------------------------
 

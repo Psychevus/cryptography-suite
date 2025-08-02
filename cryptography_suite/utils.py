@@ -55,7 +55,13 @@ def base62_decode(data: str) -> bytes:
 
 
 def secure_zero(data: bytearray) -> None:
-    """Overwrite ``data`` with zeros in-place using ``memset_s`` if available."""
+    """Overwrite ``data`` with zeros in-place.
+
+    Only mutable ``bytearray`` objects can be wiped in Python. Passing
+    an immutable ``bytes`` instance will raise ``TypeError`` and the
+    original data may remain in memory until garbage collection. Use
+    :class:`KeyVault` or convert to ``bytearray`` before calling.
+    """
 
     if not isinstance(data, bytearray):
         raise TypeError("secure_zero expects a bytearray")
@@ -113,7 +119,13 @@ def generate_secure_random_string(length: int = 32) -> str:
 
 
 class KeyVault:
-    """Context manager for sensitive key storage."""
+    """Context manager for sensitive key storage.
+
+    Secrets wrapped by ``KeyVault`` are wiped from memory when the
+    context exits or the object is garbage collected. Plain ``bytes``
+    values passed around in Python cannot be reliably erased and may
+    linger until the interpreter frees them.
+    """
 
     def __init__(self, key: bytes | bytearray):
         if not isinstance(key, (bytes, bytearray)):
@@ -127,6 +139,9 @@ class KeyVault:
         """Zero the stored key on exit."""
         secure_zero(self._key)
         return False
+
+    def __bytes__(self) -> bytes:  # pragma: no cover - helper for APIs
+        return bytes(self._key)
 
     def __del__(self):  # pragma: no cover - best effort cleanup
         try:

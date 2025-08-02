@@ -32,7 +32,7 @@ class TestKeyManagement(unittest.TestCase):
 
     def test_generate_aes_key(self):
         """Test AES key generation."""
-        key = generate_aes_key()
+        key = generate_aes_key(sensitive=False)
         self.assertIsInstance(key, bytes)
         self.assertEqual(len(key), 32)
 
@@ -45,8 +45,8 @@ class TestKeyManagement(unittest.TestCase):
 
     def test_rotate_aes_key(self):
         """Test AES key rotation."""
-        old_key = generate_aes_key()
-        new_key = rotate_aes_key()
+        old_key = generate_aes_key(sensitive=False)
+        new_key = rotate_aes_key(sensitive=False)
         self.assertNotEqual(old_key, new_key)
 
     def test_secure_save_and_load_rsa_keys(self):

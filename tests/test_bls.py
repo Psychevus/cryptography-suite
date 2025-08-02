@@ -62,7 +62,7 @@ class TestBLS(unittest.TestCase):
             "4aefed8f4d665569ec636b04f36ff6fd853f66283d413843761acbda652fd43d"
         )
 
-        sk, pk = generate_bls_keypair(seed)
+        sk, pk = generate_bls_keypair(seed, sensitive=False)
         self.assertEqual(sk, expected_sk)
         self.assertEqual(pk, expected_pk)
 
