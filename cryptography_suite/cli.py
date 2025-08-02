@@ -244,12 +244,17 @@ def backends_cli(argv: list[str] | None = None) -> None:
 def keystore_cli(argv: list[str] | None = None) -> None:
     """Manage registered keystores."""
 
+    from pathlib import Path
     from .keystores import load_plugins, list_keystores, get_keystore
 
     parser = argparse.ArgumentParser(description="Keystore management")
     sub = parser.add_subparsers(dest="action", required=True)
     sub.add_parser("list", help="List available keystores")
     sub.add_parser("test", help="Test keystore connectivity")
+    imp = sub.add_parser("import", help="Import a PEM key into the local keystore")
+    imp.add_argument("--file", required=True)
+    imp.add_argument("--name", required=True)
+    imp.add_argument("--password")
     mig = sub.add_parser("migrate", help="Migrate keys between keystores")
     mig.add_argument("--from", dest="src", required=True)
     mig.add_argument("--to", dest="dst", required=True)
@@ -288,6 +293,12 @@ def keystore_cli(argv: list[str] | None = None) -> None:
             except Exception:
                 ok = False
             print(f"{name}: {'ok' if ok else 'fail'}{extra}")
+    elif args.action == "import":
+        ks_cls = get_keystore("local")
+        ks = ks_cls()
+        pem = Path(args.file).read_bytes()
+        new_id = ks.import_key(pem, args.name, args.password)
+        print(new_id)
     elif args.action == "migrate":
         import hashlib
 
