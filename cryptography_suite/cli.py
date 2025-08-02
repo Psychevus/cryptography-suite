@@ -502,6 +502,18 @@ def main(argv: list[str] | None = None) -> None:
     ks_parser.add_argument("--key", dest="key")
     ks_parser.add_argument("--dry-run", action="store_true")
 
+    migrate_parser = sub.add_parser(
+        "migrate-keys",
+        help="Migrate keys between backends",
+        description="Interactive key migration wizard",
+    )
+    migrate_parser.add_argument(
+        "--from", dest="src", required=True, choices=["file", "vault", "hsm"]
+    )
+    migrate_parser.add_argument(
+        "--to", dest="dst", required=True, choices=["file", "vault", "hsm"]
+    )
+
     # File operations subcommand
     file_parser = sub.add_parser(
         "file",
@@ -570,6 +582,24 @@ def main(argv: list[str] | None = None) -> None:
         if getattr(args, "dry_run", False):
             argv2.append("--dry-run")
         keystore_cli(argv2)
+    elif args.cmd == "migrate-keys":
+        from importlib import util
+        from pathlib import Path
+
+        mod_path = (
+            Path(__file__).resolve().parent.parent
+            / "src"
+            / "cryptography_suite"
+            / "cli"
+            / "migrate_keys.py"
+        )
+        spec = util.spec_from_file_location(
+            "cryptography_suite.cli.migrate_keys", mod_path
+        )
+        module = util.module_from_spec(spec)
+        assert spec.loader is not None
+        spec.loader.exec_module(module)
+        module.wizard_cli(["--from", args.src, "--to", args.dst])
     elif args.cmd in ("file", "encrypt", "decrypt"):
         if args.cmd == "file":
             mode = args.file_cmd
