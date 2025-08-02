@@ -32,6 +32,7 @@ WARNING_MSG = (
     "use for real secure messaging."
 )
 
+
 @dataclass
 class EncryptedMessage:
     """Container for an encrypted message."""
