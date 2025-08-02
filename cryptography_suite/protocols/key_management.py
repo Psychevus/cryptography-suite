@@ -54,17 +54,35 @@ def rotate_aes_key(*, sensitive: bool = True) -> KeyVault | bytes:
 def generate_random_password(length: int = 32) -> str:
     """Generate a cryptographically strong random password.
 
-    The password contains ASCII letters, digits and punctuation characters.
+    Guarantees at least one lowercase letter, uppercase letter, digit and
+    punctuation character. Remaining characters are drawn from the union of
+    those sets and the result is shuffled for unpredictability.
 
     Args:
-        length: Desired length of the password. Defaults to 32 characters.
+        length: Desired length of the password. Must be at least ``4`` and
+            defaults to 32 characters.
 
     Returns:
         A random string suitable for encrypting private keys.
     """
 
-    alphabet = string.ascii_letters + string.digits + string.punctuation
-    return "".join(secrets.choice(alphabet) for _ in range(length))
+    if length < 4:
+        raise ValueError("length must be at least 4")
+
+    rng = secrets.SystemRandom()
+
+    categories = [
+        string.ascii_lowercase,
+        string.ascii_uppercase,
+        string.digits,
+        string.punctuation,
+    ]
+
+    password_chars = [rng.choice(cat) for cat in categories]
+    alphabet = "".join(categories)
+    password_chars.extend(rng.choice(alphabet) for _ in range(length - len(password_chars)))
+    rng.shuffle(password_chars)
+    return "".join(password_chars)
 
 
 def secure_save_key_to_file(key_data: bytes, filepath: str):
