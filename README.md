@@ -33,6 +33,58 @@
 - **Cross-Platform Compatibility**: Fully compatible with macOS, Linux, and Windows environments.
 - **Rigorous Testing**: ~**99%** test coverage as of v3.0.0, ensuring reliability and robustness.
 
+## 🔍 Support Matrix
+
+<!-- SUPPORT-MATRIX-START -->
+| Feature | Module | Pipeline? | CLI? | Keystore? | Status | Extra |
+| --- | --- | --- | --- | --- | --- | --- |
+| AESGCMDecrypt | cryptography_suite.pipeline | Yes | No | No | stable |  |
+| AESGCMEncrypt | cryptography_suite.pipeline | Yes | No | No | stable |  |
+| BULLETPROOF_AVAILABLE |  | No | Yes | No | experimental |  |
+| FHE_AVAILABLE |  | No | No | No | experimental |  |
+| HandshakeFlowWidget | cryptography_suite.viz.widgets | No | No | No | experimental |  |
+| KeyGraphWidget | cryptography_suite.viz.widgets | No | No | No | experimental |  |
+| PQCRYPTO_AVAILABLE |  | No | Yes | No | experimental |  |
+| RSADecrypt | cryptography_suite.pipeline | Yes | No | No | stable |  |
+| RSAEncrypt | cryptography_suite.pipeline | Yes | No | No | stable |  |
+| SIGNAL_AVAILABLE |  | No | No | No | experimental |  |
+| SPHINCS_AVAILABLE |  | No | Yes | No | experimental |  |
+| SessionTimelineWidget | cryptography_suite.viz.widgets | No | No | No | experimental |  |
+| SignalReceiver | cryptography_suite.experimental.signal | No | No | No | experimental |  |
+| SignalSender | cryptography_suite.experimental.signal | No | No | No | experimental |  |
+| ZKSNARK_AVAILABLE |  | No | Yes | No | experimental |  |
+| blake3_hash_v2 | cryptography_suite.hashing | No | No | No | deprecated |  |
+| bls_aggregate | cryptography_suite.asymmetric.bls | No | No | No | deprecated |  |
+| bls_aggregate_verify | cryptography_suite.asymmetric.bls | No | No | No | deprecated |  |
+| bls_sign | cryptography_suite.asymmetric.bls | No | No | No | deprecated |  |
+| bls_verify | cryptography_suite.asymmetric.bls | No | No | No | deprecated |  |
+| bulletproof |  | No | Yes | No | experimental |  |
+| dilithium_sign |  | No | No | No | experimental |  |
+| dilithium_verify |  | No | No | No | experimental |  |
+| fhe_add | cryptography_suite.homomorphic | No | No | No | experimental |  |
+| fhe_decrypt | cryptography_suite.homomorphic | No | No | No | experimental |  |
+| fhe_encrypt | cryptography_suite.homomorphic | No | No | No | experimental |  |
+| fhe_keygen | cryptography_suite.homomorphic | No | No | No | experimental |  |
+| fhe_load_context | cryptography_suite.homomorphic | No | No | No | experimental |  |
+| fhe_multiply | cryptography_suite.homomorphic | No | No | No | experimental |  |
+| fhe_serialize_context | cryptography_suite.homomorphic | No | No | No | experimental |  |
+| generate_bls_keypair | cryptography_suite.asymmetric.bls | No | No | No | deprecated |  |
+| generate_dilithium_keypair |  | No | Yes | No | experimental |  |
+| generate_ed448_keypair | cryptography_suite.asymmetric.signatures | No | No | No | deprecated |  |
+| generate_kyber_keypair |  | No | Yes | No | experimental |  |
+| generate_sphincs_keypair |  | No | Yes | No | experimental |  |
+| initialize_signal_session | cryptography_suite.experimental.signal | No | No | No | experimental |  |
+| kyber_decrypt |  | No | No | No | experimental |  |
+| kyber_encrypt |  | No | No | No | experimental |  |
+| sign_message_ed448 | cryptography_suite.asymmetric.signatures | No | No | No | deprecated |  |
+| sphincs_sign |  | No | No | No | experimental |  |
+| sphincs_verify |  | No | No | No | experimental |  |
+| verify_signature_ed448 | cryptography_suite.asymmetric.signatures | No | No | No | deprecated |  |
+| x3dh_initiator | cryptography_suite.experimental.signal | No | No | No | experimental |  |
+| x3dh_responder | cryptography_suite.experimental.signal | No | No | No | experimental |  |
+| zksnark |  | No | Yes | No | experimental |  |
+<!-- SUPPORT-MATRIX-END -->
+
 ---
 
 ## ✨ Version 3.0.0 Highlights
