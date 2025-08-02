@@ -11,6 +11,7 @@
 [![Provenance](https://img.shields.io/badge/provenance-signed-blue)](docs/release_process.md)
 [![Signed Releases](https://img.shields.io/badge/releases-signed-brightgreen)](docs/release_process.md)
 [![Fuzzed & Property-Tested](https://img.shields.io/badge/fuzzed--property--tested-true-brightgreen)](docs/fuzzing.md)
+[![Testing Docs](https://img.shields.io/badge/testing-docs-blue)](docs/testing.md)
 [![Misuse-Resistant](https://img.shields.io/badge/misuse--resistant-enabled-success)](docs/mypy_plugin.md)
 [![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.md)
 

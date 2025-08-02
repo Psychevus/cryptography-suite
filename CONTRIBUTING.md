@@ -4,6 +4,7 @@ We welcome contributions to *cryptography-suite*. Please follow these basic
 practices when submitting patches:
 
 - **Tests**: Include unit tests for any behavior change.
+- **Property & Fuzz Tests**: For new cryptographic code, include Hypothesis property tests and an Atheris fuzz harness.
 - **Style**: Keep code readable and consistent with the existing style.
 
 ## One-shot helpers
