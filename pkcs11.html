@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Security Notes" href="security.html" /><link rel="prev" title="Experimental Feature Roadmap" href="roadmap.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Formal Verification Support" href="formal.html" /><link rel="prev" title="KeyStore Plugin Development" href="keystore_plugins.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
-        <title>Zeroization in Python FAQ - cryptography-suite 3.0.0 documentation</title>
+        <title>Using Hardware HSM (PKCS#11) - cryptography-suite 3.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -206,7 +206,7 @@
 <li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="keystore.html">Keystore Migration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="keystore_plugins.html">KeyStore Plugin Development</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pkcs11.html">Using Hardware HSM (PKCS#11)</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Using Hardware HSM (PKCS#11)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="formal.html">Formal Verification Support</a></li>
 <li class="toctree-l1"><a class="reference internal" href="fuzzing.html">Fuzzing and Property Testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mypy_plugin.html">Misuse-Resistant Checking</a></li>
@@ -220,7 +220,7 @@
 <li class="toctree-l1"><a class="reference internal" href="backend_consistency.html">Backend Consistency</a></li>
 <li class="toctree-l1"><a class="reference internal" href="feature_maturity.html">Feature Maturity</a></li>
 <li class="toctree-l1"><a class="reference internal" href="roadmap.html">Experimental Feature Roadmap</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Zeroization in Python FAQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zeroization_faq.html">Zeroization in Python FAQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="security.html">Security Notes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/modules.html">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/pipeline.html">Pipeline DSL</a></li>
@@ -245,7 +245,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="_sources/zeroization_faq.md.txt" title="View this page">
+  <a class="muted-link" href="_sources/pkcs11.md.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -265,33 +265,34 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="zeroization-in-python-faq">
-<h1>Zeroization in Python FAQ<a class="headerlink" href="#zeroization-in-python-faq" title="Link to this heading">¶</a></h1>
-<section id="can-python-securely-erase-secrets-from-memory">
-<h2>Can Python securely erase secrets from memory?<a class="headerlink" href="#can-python-securely-erase-secrets-from-memory" title="Link to this heading">¶</a></h2>
-<p>Not for arbitrary objects. Python’s immutable <code class="docutils literal notranslate"><span class="pre">bytes</span></code> objects may be
-copied or interned by the interpreter and are only released during garbage
-collection. The library’s :class:<code class="docutils literal notranslate"><span class="pre">~cryptography_suite.utils.KeyVault</span></code> and
-:func:<code class="docutils literal notranslate"><span class="pre">~cryptography_suite.utils.secure_zero</span></code> helpers operate on mutable
-<code class="docutils literal notranslate"><span class="pre">bytearray</span></code> buffers so that sensitive data can be overwritten in place.</p>
-</section>
-<section id="what-should-i-use-for-private-keys-or-session-secrets">
-<h2>What should I use for private keys or session secrets?<a class="headerlink" href="#what-should-i-use-for-private-keys-or-session-secrets" title="Link to this heading">¶</a></h2>
-<p>Generate keys with <code class="docutils literal notranslate"><span class="pre">sensitive=True</span></code> or wrap existing byte strings in
-<code class="docutils literal notranslate"><span class="pre">KeyVault</span></code>. Access the underlying bytes within a <code class="docutils literal notranslate"><span class="pre">with</span></code> block:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cryptography_suite.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_aes_key</span>
-
-<span class="k">with</span> <span class="n">generate_aes_key</span><span class="p">()</span> <span class="k">as</span> <span class="n">key_bytes</span><span class="p">:</span>
-    <span class="n">use_key</span><span class="p">(</span><span class="n">key_bytes</span><span class="p">)</span>
+          <section id="using-hardware-hsm-pkcs-11">
+<h1>Using Hardware HSM (PKCS#11)<a class="headerlink" href="#using-hardware-hsm-pkcs-11" title="Link to this heading">¶</a></h1>
+<p>The suite can interface with hardware security modules via the PKCS#11
+standard.  Install the optional dependency with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>cryptography-suite<span class="o">[</span>hsm<span class="o">]</span>
+</pre></div>
+</div>
+<p>Configuration can be provided through environment variables or a
+<code class="docutils literal notranslate"><span class="pre">~/.cryptosuite.toml</span></code> file under the <code class="docutils literal notranslate"><span class="pre">[pkcs11]</span></code> section:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[pkcs11]</span>
+<span class="n">library_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/usr/lib/softhsm/libsofthsm2.so&quot;</span>
+<span class="n">token_label</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;TestToken&quot;</span>
+<span class="n">pin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;1234&quot;</span>
+</pre></div>
+</div>
+<section id="softhsm-quickstart">
+<h2>SoftHSM Quickstart<a class="headerlink" href="#softhsm-quickstart" title="Link to this heading">¶</a></h2>
+<p>SoftHSMv2 offers a software implementation of an HSM for development:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>softhsm2-util<span class="w"> </span>--init-token<span class="w"> </span>--slot<span class="w"> </span><span class="m">0</span><span class="w"> </span>--label<span class="w"> </span><span class="s2">&quot;TestToken&quot;</span><span class="w"> </span>--pin<span class="w"> </span><span class="m">1234</span><span class="w"> </span>--so-pin<span class="w"> </span><span class="m">0000</span>
+cryptography-suite<span class="w"> </span>keystore<span class="w"> </span>list
 </pre></div>
 </div>
 </section>
-<section id="do-native-backends-handle-zeroization">
-<h2>Do native backends handle zeroization?<a class="headerlink" href="#do-native-backends-handle-zeroization" title="Link to this heading">¶</a></h2>
-<p>Yes. Underlying libraries such as OpenSSL employ their own secure memory
-management and wipe key material when freed. When cryptographic objects are
-created via these backends, zeroization occurs inside the native code even
-though Python cannot directly guarantee it.</p>
+<section id="security-caveats">
+<h2>Security Caveats<a class="headerlink" href="#security-caveats" title="Link to this heading">¶</a></h2>
+<p>SoftHSM is <strong>not</strong> a secure HSM.  It stores key material on disk and lacks
+physical protections.  Use a real hardware module in production and ensure
+proper access controls around the PKCS#11 library and PIN management.</p>
 </section>
 </section>
 
@@ -300,23 +301,23 @@ though Python cannot directly guarantee it.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="security.html">
+          <a class="next-page" href="formal.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Security Notes</div>
+                <div class="title">Formal Verification Support</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="roadmap.html">
+          <a class="prev-page" href="keystore_plugins.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Experimental Feature Roadmap</div>
+                <div class="title">KeyStore Plugin Development</div>
                 
               </div>
             </a>
@@ -350,10 +351,9 @@ though Python cannot directly guarantee it.</p>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Zeroization in Python FAQ</a><ul>
-<li><a class="reference internal" href="#can-python-securely-erase-secrets-from-memory">Can Python securely erase secrets from memory?</a></li>
-<li><a class="reference internal" href="#what-should-i-use-for-private-keys-or-session-secrets">What should I use for private keys or session secrets?</a></li>
-<li><a class="reference internal" href="#do-native-backends-handle-zeroization">Do native backends handle zeroization?</a></li>
+<li><a class="reference internal" href="#">Using Hardware HSM (PKCS#11)</a><ul>
+<li><a class="reference internal" href="#softhsm-quickstart">SoftHSM Quickstart</a></li>
+<li><a class="reference internal" href="#security-caveats">Security Caveats</a></li>
 </ul>
 </li>
 </ul>

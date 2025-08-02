@@ -44,6 +44,7 @@ formally verified, misuse-resistant workflows.
    cli.md
    keystore.md
    keystore_plugins.md
+   pkcs11.md
    formal.md
    fuzzing.md
    mypy_plugin.md
