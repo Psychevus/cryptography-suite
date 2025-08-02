@@ -4,6 +4,7 @@ from cryptography_suite.asymmetric import generate_x25519_keypair, ec_encrypt, e
 
 PRIVATE_KEY, PUBLIC_KEY = generate_x25519_keypair()
 
+
 def TestOneInput(data: bytes) -> None:
     fdp = atheris.FuzzedDataProvider(data)
     msg = fdp.ConsumeBytes(128)
@@ -14,6 +15,7 @@ def TestOneInput(data: bytes) -> None:
             raise RuntimeError("Roundtrip mismatch")
     except Exception:
         pass
+
 
 atheris.Setup(sys.argv, TestOneInput)
 atheris.Fuzz()

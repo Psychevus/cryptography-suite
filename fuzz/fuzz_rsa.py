@@ -5,6 +5,7 @@ from cryptography_suite.pipeline import RSAEncrypt, RSADecrypt
 
 PRIVATE_KEY, PUBLIC_KEY = generate_rsa_keypair(key_size=2048)
 
+
 def TestOneInput(data: bytes) -> None:
     fdp = atheris.FuzzedDataProvider(data)
     msg = fdp.ConsumeBytes(128)
@@ -15,6 +16,7 @@ def TestOneInput(data: bytes) -> None:
             raise RuntimeError("Roundtrip mismatch")
     except Exception:
         pass
+
 
 atheris.Setup(sys.argv, TestOneInput)
 atheris.Fuzz()
