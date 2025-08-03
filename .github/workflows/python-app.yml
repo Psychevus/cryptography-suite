@@ -135,13 +135,13 @@ jobs:
       - name: Seed keys
         run: |
           python - <<'PY'
-import pkcs11
-lib = pkcs11.lib('/usr/lib/softhsm/libsofthsm2.so')
-token = lib.get_token(token_label='TestToken')
-with token.open(user_pin='1234') as session:
-    if not list(session.get_objects()):
-        session.generate_keypair(pkcs11.KeyType.RSA, 2048, label='rsa')
-PY
+          import pkcs11
+          lib = pkcs11.lib('/usr/lib/softhsm/libsofthsm2.so')
+          token = lib.get_token(token_label='TestToken')
+          with token.open(user_pin='1234') as session:
+              if not list(session.get_objects()):
+                  session.generate_keypair(pkcs11.KeyType.RSA, 2048, label='rsa')
+          PY
       - name: Run pkcs11 tests
         env:
           PKCS11_LIBRARY: /usr/lib/softhsm/libsofthsm2.so
