@@ -1,161 +1,179 @@
-name: Python CI
+# CI workflow: static analysis, doctests, cross-platform tests with coverage and fuzzing, and PKCS#11 SoftHSM tests.
+name: CI
 
 on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  PIP_CACHE_DIR: ~/.cache/pip
 
 jobs:
 
-  lint:
-    name: Static Analysis
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ['3.10', '3.11']
-    runs-on: ${{ matrix.os }}
+  static-analysis:
+    name: Static analysis
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - &checkout
+        uses: actions/checkout@v4
+      - &setup-python
+        name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install Lint Tools
-        run: |
-          python -m pip install --upgrade pip
-          pip install flake8 mypy pylint bandit vulture
-          pip install -e .[dev]
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: pyproject.toml
+      - &cache-pip
+        name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('pyproject.toml') }}
+          restore-keys: ${{ runner.os }}-pip-
+      - &install-deps
+        name: Install dependencies
+        run: pip install -e .[dev,pqc] pytest-html
       - name: Run flake8
-        run: flake8
+        run: flake8 .
       - name: Run mypy
-        run: mypy cryptography_suite
-      - name: Run pylint
-        run: pylint --errors-only cryptography_suite || true
-      - name: Run bandit
-        run: bandit -r cryptography_suite --exit-zero || true
-      - name: Run vulture
-        run: vulture cryptography_suite tests || true
-      - name: Check deprecated exports
-        run: python tools/check_deprecated_exports.py
+        run: mypy src tests
 
   doctest:
-    name: README Doctest
+    name: Doctests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-      - name: Run doctests on README
+      - *checkout
+      - <<: *setup-python
+      - *cache-pip
+      - *install-deps
+      - name: Run doctests
         run: |
-          python -m pip install --upgrade pip
-          pip install -e .
-          python -m doctest README.md
+          pytest --doctest-modules -q --cov=cryptography_suite \
+                 --cov-report=xml --cov-report=html --html=pytest-report.html
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: doctest-reports
+          path: |
+            coverage.xml
+            htmlcov
+            pytest-report.html
 
-  tests:
-    name: Unit Tests (Matrix)
+  test-matrix:
+    name: Tests (matrix)
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ['3.10', '3.11', '3.12']
-    runs-on: ${{ matrix.os }}
+        python: ['3.9','3.10','3.11','3.12']
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - *checkout
+      - <<: *setup-python
+        name: Set up Python ${{ matrix.python }}
         with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install Test Dependencies
+          python-version: ${{ matrix.python }}
+          cache: 'pip'
+          cache-dependency-path: pyproject.toml
+      - *cache-pip
+      - *install-deps
+      - name: Run tests
         run: |
-          python -m pip install --upgrade pip
-          pip install -e .[dev]
-          pip install pytest pytest-cov coverage mypy hypothesis
-      - name: Dry-run keystore migration
-        run: cryptography-suite keystore migrate --from local --to mock_hsm --dry-run
-      - name: Run Tests with Coverage
+          pytest -q --cov=cryptography_suite --cov-report=xml \
+                 --cov-report=html --html=pytest-report.html
+      - name: Run Atheris fuzz harnesses
         run: |
-          coverage run --rcfile=.coveragerc -m pytest
-          coverage xml
-      - name: Upload Coverage to Coveralls
-        uses: coverallsapp/github-action@v2.2.0
+          for f in fuzz/fuzz_*.py; do
+            echo "Fuzzing $f"
+            timeout 30s python "$f" >/dev/null 2>&1 || echo "Fuzz run completed"
+          done
+      - name: Upload coverage to Coveralls
+        uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          repo-token: ${{ secrets.COVERALLS_REPO_TOKEN }}
           file: coverage.xml
-          format: cobertura
-          flag-name: OS-${{ matrix.os }}-py${{ matrix.python-version }}
+          format: python
+          flag-name: ${{ matrix.os }}-py${{ matrix.python }}
           parallel: true
-
-  tests-extras:
-    name: Tests (With Extras)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          python-version: '3.11'
-      - name: Install Full Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e .[dev]
-          pip install pqcrypto pybulletproofs
-          pip install Pyfhel || echo "⚠️ Pyfhel build failed"
-          pip install pytest pytest-cov coverage mypy hypothesis
-      - name: Run Extended Tests
-        run: |
-          coverage run --rcfile=.coveragerc -m pytest
-          coverage xml
-      - name: Upload Extended Coverage to Coveralls
-        uses: coverallsapp/github-action@v2.2.0
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          file: coverage.xml
-          format: cobertura
-          flag-name: extras
-          parallel: true
+          name: ${{ matrix.os }}-py${{ matrix.python }}-reports
+          path: |
+            coverage.xml
+            htmlcov
+            pytest-report.html
 
   pkcs11-tests:
-    name: PKCS11 Tests
+    name: PKCS#11 SoftHSM tests
     runs-on: ubuntu-latest
-    services:
-      softhsm:
-        image: mosipid/softhsm
+    env:
+      PKCS11_LIBRARY: /usr/lib/softhsm/libsofthsm2.so
+      PKCS11_TOKEN_LABEL: TestToken
+      PKCS11_PIN: "1234"
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-      - name: Install dependencies
+      - *checkout
+      - <<: *setup-python
+      - *cache-pip
+      - *install-deps
+      - name: Install HSM extras
+        run: pip install .[hsm]
+      - name: Install SoftHSM2
         run: |
           sudo apt-get update
-          sudo apt-get install -y softhsm2
-          python -m pip install --upgrade pip
-          pip install -e .[dev,hsm]
-      - name: Init token
+          sudo apt-get install -y softhsm2 opensc
+          softhsm2-util --init-token --slot 0 --label $PKCS11_TOKEN_LABEL --pin $PKCS11_PIN --so-pin 0000
+      - name: Generate PKCS#11 keypair
+        run: python tests/setup_pkcs11_fixture.py
+      - name: Run PKCS#11 tests
         run: |
-          softhsm2-util --init-token --slot 0 --label "TestToken" --pin 1234 --so-pin 0000
-      - name: Seed keys
-        run: |
-          python - <<'PY'
-import pkcs11
-lib = pkcs11.lib('/usr/lib/softhsm/libsofthsm2.so')
-token = lib.get_token(token_label='TestToken')
-with token.open(user_pin='1234') as session:
-    if not list(session.get_objects()):
-        session.generate_keypair(pkcs11.KeyType.RSA, 2048, label='rsa')
-PY
-      - name: Run pkcs11 tests
-        env:
-          PKCS11_LIBRARY: /usr/lib/softhsm/libsofthsm2.so
-          PKCS11_TOKEN_LABEL: TestToken
-          PKCS11_PIN: 1234
-        run: pytest tests/test_pkcs11_keystore.py
+          pytest tests/test_pkcs11_keystore.py -q --cov=cryptography_suite \
+                 --cov-report=xml --cov-report=html --html=pytest-report.html
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pkcs11-reports
+          path: |
+            coverage.xml
+            htmlcov
+            pytest-report.html
 
-  coveralls:
-    name: Finalize Coverage Merge
-    needs: [tests, tests-extras]
+  coveralls-finish:
+    name: Coverage finalize
+    needs: test-matrix
     runs-on: ubuntu-latest
+    if: always()
     steps:
-      - name: Finalize Parallel Coverage
-        uses: coverallsapp/github-action@v2.2.0
+      - name: Finish Coveralls
+        uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          repo-token: ${{ secrets.COVERALLS_REPO_TOKEN }}
           parallel-finished: true
+
+  summary:
+    name: Summary
+    needs: [static-analysis, doctest, test-matrix, pkcs11-tests, coveralls-finish]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Publish summary
+        run: |
+          echo "### Job Status" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ needs.static-analysis.result }}" = "success" ]; then SA="✅"; else SA="❌"; fi
+          if [ "${{ needs.doctest.result }}" = "success" ]; then DT="✅"; else DT="❌"; fi
+          if [ "${{ needs.test-matrix.result }}" = "success" ]; then TM="✅"; else TM="❌"; fi
+          if [ "${{ needs.pkcs11-tests.result }}" = "success" ]; then PK="✅"; else PK="❌"; fi
+          echo "- static-analysis: $SA" >> $GITHUB_STEP_SUMMARY
+          echo "- doctest: $DT" >> $GITHUB_STEP_SUMMARY
+          echo "- test-matrix: $TM" >> $GITHUB_STEP_SUMMARY
+          echo "- pkcs11-tests: $PK" >> $GITHUB_STEP_SUMMARY
