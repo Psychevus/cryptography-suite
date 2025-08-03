@@ -101,11 +101,13 @@ class PKCS11KeyStore:
             yield self._session_cache
 
     def _get_key(self, session, label: str):
-        objs = session.get_objects(
-            {Attribute.CLASS: ObjectClass.PRIVATE_KEY, Attribute.LABEL: label}
+        objs = list(
+            session.get_objects(
+                {Attribute.CLASS: ObjectClass.PRIVATE_KEY, Attribute.LABEL: label}
+            )
         )
-        for obj in objs:
-            return obj
+        if objs:
+            return objs[0]
         raise FileNotFoundError(label)
 
     # ------------------------------------------------------------------
