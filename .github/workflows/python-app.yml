@@ -115,6 +115,8 @@ jobs:
   pkcs11-tests:
     name: PKCS11 Tests
     runs-on: ubuntu-latest
+    env:
+      SOFTHSM2_CONF: /etc/softhsm/softhsm2.conf
     services:
       softhsm:
         image: mosipid/softhsm
@@ -127,6 +129,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y softhsm2
+          sudo chown -R $USER:$USER /etc/softhsm /var/lib/softhsm
           python -m pip install --upgrade pip
           pip install -e .[dev,hsm]
       - name: Init token
