@@ -15,6 +15,8 @@ from ..errors import StrictKeyPolicyError
 from ..utils import is_encrypted_pem
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ed25519, rsa, ec
+
+PrivateKey = ed25519.Ed25519PrivateKey | ec.EllipticCurvePrivateKey | rsa.RSAPrivateKey
 from ..asymmetric.signatures import (
     sign_message,
     sign_message_ecdsa,
@@ -39,7 +41,7 @@ class LocalKeyStore:
     def test_connection(self) -> bool:
         return True
 
-    def _load_key(self, key_id: str) -> Tuple[object, str]:
+    def _load_key(self, key_id: str) -> Tuple[PrivateKey, str]:
         key_path = self.dir / f"{key_id}.pem"
         if not key_path.exists():
             raise FileNotFoundError(key_path)
@@ -79,7 +81,7 @@ class LocalKeyStore:
                 raise ValueError("Unsupported key type")
             meta_path.write_text(json.dumps({"type": algo}))
 
-        return key, cast(str, algo)
+        return cast(PrivateKey, key), cast(str, algo)
 
     @audit_log
     def sign(self, key_id: str, data: bytes) -> bytes:
@@ -125,14 +127,14 @@ class LocalKeyStore:
         _, algo = self._load_key(key_id)
         return raw, {"id": key_id, "type": algo}
 
-    def _fingerprint(self, key: object) -> str:
+    def _fingerprint(self, key: PrivateKey) -> str:
         pub = key.public_key().public_bytes(
             serialization.Encoding.DER,
             serialization.PublicFormat.SubjectPublicKeyInfo,
         )
         return hashlib.sha256(pub).hexdigest()
 
-    def _algo(self, key: object) -> str:
+    def _algo(self, key: PrivateKey) -> str:
         if isinstance(key, ed25519.Ed25519PrivateKey):
             return "ed25519"
         if isinstance(key, ec.EllipticCurvePrivateKey):
@@ -143,7 +145,7 @@ class LocalKeyStore:
 
     @audit_log
     def add_key(
-        self, private_key_obj: object, name: str, password: str | None = None
+        self, private_key_obj: PrivateKey, name: str, password: str | None = None
     ) -> str:
         algo = self._algo(private_key_obj)
         fingerprint = self._fingerprint(private_key_obj)
@@ -155,7 +157,9 @@ class LocalKeyStore:
             if policy == "1":
                 raise StrictKeyPolicyError(msg)
             warnings.warn(msg, UserWarning)
-            encryption = serialization.NoEncryption()
+            encryption: serialization.KeySerializationEncryption = (
+                serialization.NoEncryption()
+            )
         else:
             encryption = serialization.BestAvailableEncryption(password.encode())
         pem = private_key_obj.private_bytes(

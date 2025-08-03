@@ -15,8 +15,13 @@ except Exception:  # pragma: no cover - fallback for older Python
     tomllib = None  # type: ignore
 
 try:  # optional dependency
-    import pkcs11
-    from pkcs11 import Attribute, ObjectClass, KeyType, Mechanism
+    import pkcs11  # type: ignore[import-not-found, import-untyped]
+    from pkcs11 import (  # type: ignore[import-not-found, import-untyped]
+        Attribute,
+        ObjectClass,
+        KeyType,
+        Mechanism,
+    )
 except Exception:  # pragma: no cover - dependency missing
     pkcs11 = None  # type: ignore
 

@@ -9,6 +9,8 @@ import subprocess
 import sys
 from .errors import MissingDependencyError, DecryptionError
 from .protocols import generate_totp
+from pathlib import Path
+from typing import cast
 from .hashing import (
     sha3_256_hash,
     sha3_512_hash,
@@ -308,7 +310,9 @@ def keystore_cli(argv: list[str] | None = None) -> None:
         if failed:
             sys.exit(1)
     elif args.action == "import":
-        ks_cls = get_keystore("local")
+        from .keystores.local import LocalKeyStore
+
+        ks_cls = cast(type[LocalKeyStore], get_keystore("local"))
         ks = ks_cls()
         pem = Path(args.file).read_bytes()
         new_id = ks.import_key(pem, args.name, args.password)
@@ -609,8 +613,9 @@ def main(argv: list[str] | None = None) -> None:
         spec = util.spec_from_file_location(
             "cryptography_suite.cli.migrate_keys", mod_path
         )
+        if spec is None or spec.loader is None:
+            raise RuntimeError("Unable to load migrate_keys module")
         module = util.module_from_spec(spec)
-        assert spec.loader is not None
         spec.loader.exec_module(module)
         argv2 = ["--from", args.src, "--to", args.dst]
         if getattr(args, "batch", False):
