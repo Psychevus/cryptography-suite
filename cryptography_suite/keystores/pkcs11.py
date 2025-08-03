@@ -113,7 +113,10 @@ class PKCS11KeyStore:
         with self._session() as session:
             keys = []
             for obj in session.get_objects({Attribute.CLASS: ObjectClass.PRIVATE_KEY}):
-                label = obj.get(Attribute.LABEL)
+                if hasattr(obj, "get"):
+                    label = obj.get(Attribute.LABEL)
+                else:  # python-pkcs11 < 0.9
+                    label = obj[Attribute.LABEL]
                 if isinstance(label, bytes):
                     label = label.decode()
                 keys.append(label)

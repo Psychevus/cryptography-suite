@@ -110,6 +110,11 @@ jobs:
     name: PKCS11 tests
     runs-on: ubuntu-latest
     needs: tests
+    env:
+      PKCS11_LIBRARY: /usr/lib/softhsm/libsofthsm2.so
+      PKCS11_TOKEN_LABEL: TestToken
+      PKCS11_PIN: 1234
+      SOFTHSM2_CONF: ${{ github.workspace }}/softhsm2.conf
     steps:
       - uses: actions/checkout@v4
 
@@ -132,28 +137,17 @@ jobs:
           pip install -e .[dev,hsm]
           pip install pytest pytest-cov
 
-      - name: Initialize SoftHSM token
+      - name: Configure SoftHSM
         run: |
-          softhsm2-util --init-token --slot 0 --label "TestToken" \
-            --pin 1234 --so-pin 0000
-
-      - name: Seed token with keys
-        run: |
-          cat <<'PY' > seed_pkcs11.py
-          import pkcs11
-          lib = pkcs11.lib('/usr/lib/softhsm/libsofthsm2.so')
-          token = lib.get_token(token_label='TestToken')
-          with token.open(user_pin='1234') as session:
-              if not list(session.get_objects()):
-                  session.generate_keypair(pkcs11.KeyType.RSA, 2048, label='rsa')
-          PY
-          python seed_pkcs11.py
+          mkdir -p "$(dirname "$SOFTHSM2_CONF")/tokens"
+          cat <<EOF > "$SOFTHSM2_CONF"
+          directories.tokendir = $(dirname "$SOFTHSM2_CONF")/tokens
+          objectstore.backend = file
+          EOF
+          softhsm2-util --init-token --free --label "$PKCS11_TOKEN_LABEL" \
+            --pin $PKCS11_PIN --so-pin 0000
 
       - name: Run PKCS11 tests with coverage
-        env:
-          PKCS11_LIBRARY: /usr/lib/softhsm/libsofthsm2.so
-          PKCS11_TOKEN_LABEL: TestToken
-          PKCS11_PIN: 1234
         run: |
           coverage run --rcfile=.coveragerc -m pytest tests/test_pkcs11_keystore.py
           coverage xml

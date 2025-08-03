@@ -36,7 +36,16 @@ def test_sign_decrypt_roundtrip(ks):
     data = b"hello"
     with ks._session() as session:  # type: ignore[attr-defined]
         key = ks._get_key(session, "rsa")  # type: ignore[attr-defined]
-        ciphertext = key.public_key.encrypt(data, mechanism=pkcs11.Mechanism.RSA_PKCS)
+        pub = getattr(key, "public_key", None)
+        if pub is None:
+            objs = session.get_objects(
+                {
+                    pkcs11.Attribute.CLASS: pkcs11.ObjectClass.PUBLIC_KEY,
+                    pkcs11.Attribute.LABEL: "rsa",
+                }
+            )
+            pub = next(objs)
+        ciphertext = pub.encrypt(data, mechanism=pkcs11.Mechanism.RSA_PKCS)
     assert ks.decrypt("rsa", ciphertext) == data
     sig = ks.sign("rsa", data)
     assert isinstance(sig, bytes) and sig
