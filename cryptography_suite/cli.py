@@ -9,7 +9,6 @@ import subprocess
 import sys
 from .errors import MissingDependencyError, DecryptionError
 from .protocols import generate_totp
-from pathlib import Path
 from typing import cast
 from .hashing import (
     sha3_256_hash,

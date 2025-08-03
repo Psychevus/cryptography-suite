@@ -8,20 +8,21 @@ import datetime as dt
 from pathlib import Path
 from typing import List, Tuple, cast
 
-from . import register_keystore
-from ..audit import audit_log
-from ..asymmetric import rsa_decrypt
-from ..errors import StrictKeyPolicyError
-from ..utils import is_encrypted_pem
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ed25519, rsa, ec
 
-PrivateKey = ed25519.Ed25519PrivateKey | ec.EllipticCurvePrivateKey | rsa.RSAPrivateKey
+from . import register_keystore
+from ..audit import audit_log
+from ..asymmetric import rsa_decrypt
 from ..asymmetric.signatures import (
     sign_message,
     sign_message_ecdsa,
     sign_message_rsa,
 )
+from ..errors import StrictKeyPolicyError
+from ..utils import is_encrypted_pem
+
+PrivateKey = ed25519.Ed25519PrivateKey | ec.EllipticCurvePrivateKey | rsa.RSAPrivateKey
 
 
 @register_keystore("local")
