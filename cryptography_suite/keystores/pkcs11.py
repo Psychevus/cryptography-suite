@@ -43,7 +43,9 @@ class PKCS11KeyStore:
                  token_label: str | None = None,
                  pin: str | None = None) -> None:
         if pkcs11 is None:  # pragma: no cover - dependency missing
-            raise ImportError("python-pkcs11>=0.9 is required for PKCS11KeyStore")
+            raise ImportError(
+                "python-pkcs11>=0.8.1 is required for PKCS11KeyStore"
+            )
 
         library_path, token_label, pin = self._load_config(
             library_path, token_label, pin
