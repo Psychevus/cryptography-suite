@@ -191,6 +191,10 @@ For optional functionality install extras:
 pip install "cryptography-suite[pqc,fhe,zk]"
 ```
 
+To include deprecated stream ciphers:
+
+> pip install cryptography-suite[legacy]
+
 The **SPHINCS+** signature helpers are included in the `pqc` extra and are experimental/demo-only.
 
 > **Note**: Requires Python 3.10 or higher. Homomorphic encryption features need `Pyfhel` installed separately if the `fhe` extra is not used.

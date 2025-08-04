@@ -55,7 +55,6 @@ dependencies = [
 pqc = ["pqcrypto"]
 fhe = ["Pyfhel"]
 zk = ["pybulletproofs", "PySNARK"]
-salsa20 = ["pycryptodome"]
 dev = [
     "pytest",
     "pytest-cov",
@@ -69,6 +68,7 @@ docs = ["sphinx", "furo", "myst-parser", "sphinxcontrib-mermaid"]
 viz = ["rich", "ipywidgets", "networkx"]
 aws = ["boto3"]
 hsm = ["python-pkcs11>=0.8.1"]
+legacy = ["salsa20>=0.9", "ascon>=1.2"]
 
 [project.scripts]
 cryptography-suite = "cryptography_suite.cli:main"

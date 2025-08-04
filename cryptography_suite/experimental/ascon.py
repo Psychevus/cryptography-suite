@@ -6,17 +6,20 @@ This pure-Python implementation is experimental and **not recommended for
 production use**.
 """
 
+import warnings
 from typing import List
 import hmac
+
+from cryptography.utils import CryptographyDeprecationWarning
 
 from ..errors import EncryptionError, DecryptionError
 from ..utils import deprecated
 
-DEPRECATED_MSG = (
-    "This function is deprecated and will be removed in v4.0.0. For reference/education only. DO NOT USE IN PRODUCTION."
+warnings.warn(
+    "Legacy cipher loaded; consider modern alternative",
+    CryptographyDeprecationWarning,
+    stacklevel=2,
 )
-
-raise RuntimeError(DEPRECATED_MSG)
 
 # Original Ascon-128a implementation retained for educational purposes only.
 

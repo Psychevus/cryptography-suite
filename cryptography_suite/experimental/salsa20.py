@@ -1,13 +1,16 @@
 from __future__ import annotations
 
+import warnings
+from cryptography.utils import CryptographyDeprecationWarning
+
 from ..errors import EncryptionError, DecryptionError
 from ..constants import CHACHA20_KEY_SIZE
 
-DEPRECATED_MSG = (
-    "This function is deprecated and will be removed in v4.0.0. For reference/education only. DO NOT USE IN PRODUCTION."
+warnings.warn(
+    "Legacy cipher loaded; consider modern alternative",
+    CryptographyDeprecationWarning,
+    stacklevel=2,
 )
-
-raise RuntimeError(DEPRECATED_MSG)
 
 # Reference implementation retained for educational purposes only.
 
