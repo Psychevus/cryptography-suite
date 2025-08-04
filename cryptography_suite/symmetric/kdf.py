@@ -41,6 +41,9 @@ ARGON2_MEMORY_COST = int(getenv("CRYPTOSUITE_ARGON2_MEMORY_COST", "65536"))
 ARGON2_TIME_COST = int(getenv("CRYPTOSUITE_ARGON2_TIME_COST", "3"))
 ARGON2_PARALLELISM = int(getenv("CRYPTOSUITE_ARGON2_PARALLELISM", "1"))
 
+# ``Argon2`` is the default KDF when available; otherwise fall back to Scrypt.
+DEFAULT_KDF = "argon2" if ARGON2_AVAILABLE else "scrypt"
+
 
 def generate_salt(size: int = SALT_SIZE) -> bytes:
     """Generate a cryptographically secure random salt."""
@@ -177,11 +180,11 @@ def derive_pbkdf2(password: str, salt: bytes, iterations: int, length: int) -> b
     return kdf_pbkdf2(password, salt, iterations, length)
 
 
-def select_kdf(password: str, salt: bytes, kdf: str = "argon2", *, key_size: int = AES_KEY_SIZE) -> bytes:
+def select_kdf(password: str, salt: bytes, kdf: str = DEFAULT_KDF, *, key_size: int = AES_KEY_SIZE) -> bytes:
     """Return a key derived using the specified KDF.
 
-    Supported values for ``kdf`` are ``"argon2"`` (default), ``"scrypt"`` and
-    ``"pbkdf2"``.
+    Supported values for ``kdf`` are ``"argon2"`` (default when available),
+    ``"scrypt"`` and ``"pbkdf2"``.
     """
 
     if kdf == "scrypt":
@@ -198,6 +201,7 @@ __all__ = [
     "CHACHA20_KEY_SIZE",
     "SALT_SIZE",
     "NONCE_SIZE",
+    "DEFAULT_KDF",
     "derive_key_scrypt",
     "verify_derived_key_scrypt",
     "derive_key_pbkdf2",

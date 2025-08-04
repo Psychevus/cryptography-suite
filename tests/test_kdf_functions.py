@@ -1,6 +1,10 @@
 import unittest
 
-from cryptography_suite.symmetric.kdf import derive_hkdf, kdf_pbkdf2
+from cryptography_suite.symmetric.kdf import (
+    derive_hkdf,
+    kdf_pbkdf2,
+    ARGON2_AVAILABLE,
+)
 
 
 class TestKdfFunctions(unittest.TestCase):
@@ -30,6 +34,7 @@ class TestKdfFunctions(unittest.TestCase):
         out3 = kdf_pbkdf2(password, salt, 2000, 32)
         self.assertNotEqual(out1, out3)
 
+    @unittest.skipUnless(ARGON2_AVAILABLE, "Argon2id KDF not available")
     def test_argon2_env_overrides(self):
         import os, importlib
 
