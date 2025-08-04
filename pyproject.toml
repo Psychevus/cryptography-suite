@@ -39,7 +39,7 @@ classifiers = [
 ]
 
 dependencies = [
-    "cryptography>=41.0.3",
+    "cryptography==42.0.4",
     "py_ecc",
     "spake2",
     "blake3",
