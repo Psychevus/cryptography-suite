@@ -17,5 +17,7 @@ jobs:
       - name: Install
         run: pip install -e .[dev]
       - name: pip-audit
-        uses: pypa/gh-action-pip-audit@v1
+        uses: pypa/gh-action-pip-audit@v1.1.0
+        with:
+          internal-be-careful-extra-flags: "--fail-on high"
         # Fail the workflow if any vulnerabilities of severity HIGH or greater are found
