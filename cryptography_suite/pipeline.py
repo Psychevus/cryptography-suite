@@ -13,6 +13,7 @@ import json
 import logging
 
 from .rich_logging import PipelineProgress, get_rich_logger
+from .symmetric.kdf import DEFAULT_KDF
 
 Input = TypeVar("Input", contravariant=True)
 Output = TypeVar("Output", covariant=True)
@@ -183,7 +184,7 @@ class AESGCMEncrypt(CryptoModule[str, str]):
     password:
         Password used to derive the encryption key.
     kdf:
-        Key-derivation function name (``"argon2"`` by default).
+        Key-derivation function name (``"argon2"`` by default when available).
     backend:
         Optional backend name to use for this operation only.
 
@@ -200,7 +201,7 @@ class AESGCMEncrypt(CryptoModule[str, str]):
     """
 
     password: str
-    kdf: str = "argon2"
+    kdf: str = DEFAULT_KDF
     backend: str | None = None
 
     def run(self, data: str) -> str:
@@ -237,7 +238,7 @@ class AESGCMDecrypt(CryptoModule[str, str]):
     password:
         Password used to derive the decryption key.
     kdf:
-        Key-derivation function name (``"argon2"`` by default).
+        Key-derivation function name (``"argon2"`` by default when available).
     backend:
         Optional backend name to use for this operation only.
 
@@ -254,7 +255,7 @@ class AESGCMDecrypt(CryptoModule[str, str]):
     """
 
     password: str
-    kdf: str = "argon2"
+    kdf: str = DEFAULT_KDF
     backend: str | None = None
 
     def run(self, data: str) -> str:

@@ -23,7 +23,7 @@ from ..utils import deprecated
 from ..debug import verbose_print
 
 from ..constants import NONCE_SIZE, SALT_SIZE
-from .kdf import select_kdf
+from .kdf import select_kdf, DEFAULT_KDF
 
 # Constants for streaming file encryption
 CHUNK_SIZE = 4096
@@ -34,7 +34,7 @@ TAG_SIZE = 16  # AES-GCM authentication tag size
 def aes_encrypt(
     plaintext: str,
     password: str,
-    kdf: str = "argon2",
+    kdf: str = DEFAULT_KDF,
     *,
     raw_output: bool = False,
 ) -> str | bytes:
@@ -43,8 +43,9 @@ def aes_encrypt(
     This one-shot helper will be removed in a future release. Prefer
     ``AESGCMEncrypt`` from :mod:`cryptography_suite.pipeline`.
 
-    Argon2id is used by default. Pass ``kdf='scrypt'`` or ``kdf='pbkdf2'`` for
-    compatibility with older data.
+    Argon2id is used by default when available. Pass ``kdf='scrypt'`` or
+    ``kdf='pbkdf2'`` for compatibility with older data or when Argon2 support
+    is missing.
     """
     if not plaintext:
         raise EncryptionError("Plaintext cannot be empty.")
@@ -74,15 +75,16 @@ def aes_encrypt(
 def aes_decrypt(
     encrypted_data: bytes | str,
     password: str,
-    kdf: str = "argon2",
+    kdf: str = DEFAULT_KDF,
 ) -> str:
     """Decrypt AES-GCM encrypted data using a password-derived key.
 
     This one-shot helper will be removed in a future release. Prefer
     ``AESGCMDecrypt`` from :mod:`cryptography_suite.pipeline`.
 
-    Argon2id is used by default. Pass ``kdf='scrypt'`` or ``kdf='pbkdf2'`` for
-    compatibility with data encrypted using those KDFs.
+    Argon2id is used by default when available. Pass ``kdf='scrypt'`` or
+    ``kdf='pbkdf2'`` for compatibility with data encrypted using those KDFs or
+    when Argon2 support is missing.
     """
     if not encrypted_data:
         raise DecryptionError("Encrypted data cannot be empty.")
@@ -124,12 +126,13 @@ def encrypt_file(
     input_file_path: str,
     output_file_path: str,
     password: str,
-    kdf: str = "argon2",
+    kdf: str = DEFAULT_KDF,
 ) -> None:
     """Encrypt a file using AES-GCM with a password-derived key.
 
-    Argon2id is used by default. Specify ``kdf='scrypt'`` or ``kdf='pbkdf2'`` to
-    maintain compatibility with existing files.
+    Argon2id is used by default when available. Specify ``kdf='scrypt'`` or
+    ``kdf='pbkdf2'`` to maintain compatibility with existing files or when
+    Argon2 support is missing.
 
     The file is processed in chunks to avoid loading the entire file into
     memory. The output file begins with the salt and nonce and ends with the
@@ -167,12 +170,13 @@ def decrypt_file(
     encrypted_file_path: str,
     output_file_path: str,
     password: str,
-    kdf: str = "argon2",
+    kdf: str = DEFAULT_KDF,
 ) -> None:
     """Decrypt a file encrypted with AES-GCM using a password-derived key.
 
-    Argon2id is used by default. Specify ``kdf='scrypt'`` or ``kdf='pbkdf2'`` if
-    the file was encrypted using one of those KDFs.
+    Argon2id is used by default when available. Specify ``kdf='scrypt'`` or
+    ``kdf='pbkdf2'`` if the file was encrypted using one of those KDFs or when
+    Argon2 support is missing.
 
     Data is streamed in chunks, verifying the authentication tag at the end.
     The output file is removed if decryption fails.
@@ -222,7 +226,7 @@ async def encrypt_file_async(
     input_file_path: str,
     output_file_path: str,
     password: str,
-    kdf: str = "argon2",
+    kdf: str = DEFAULT_KDF,
 ) -> None:
     """Asynchronously encrypt a file using AES-GCM with a password-derived key.
 
@@ -271,7 +275,7 @@ async def decrypt_file_async(
     encrypted_file_path: str,
     output_file_path: str,
     password: str,
-    kdf: str = "argon2",
+    kdf: str = DEFAULT_KDF,
 ) -> None:
     """Asynchronously decrypt a file encrypted with AES-GCM using a password-derived key."""
 

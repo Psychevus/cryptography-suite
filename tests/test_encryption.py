@@ -11,6 +11,7 @@ from cryptography_suite.symmetric import (
     encrypt_file,
     decrypt_file,
 )
+from cryptography_suite.symmetric.kdf import ARGON2_AVAILABLE, DEFAULT_KDF
 from cryptography_suite.errors import (
     CryptographySuiteError,
     EncryptionError,
@@ -19,11 +20,11 @@ from cryptography_suite.errors import (
 )
 
 
-def aes_encrypt(plaintext, password, kdf="argon2", *, raw_output=False):
+def aes_encrypt(plaintext, password, kdf=DEFAULT_KDF, *, raw_output=False):
     return AESGCMEncrypt(password=password, kdf=kdf).run(plaintext)
 
 
-def aes_decrypt(encrypted_data, password, kdf="argon2"):
+def aes_decrypt(encrypted_data, password, kdf=DEFAULT_KDF):
     return AESGCMDecrypt(password=password, kdf=kdf).run(encrypted_data)
 
 
@@ -45,12 +46,14 @@ class TestEncryption(unittest.TestCase):
         decrypted = aes_decrypt(encrypted, self.password, kdf="pbkdf2")
         self.assertEqual(self.message, decrypted)
 
+    @unittest.skipUnless(ARGON2_AVAILABLE, "Argon2id KDF not available")
     def test_aes_encrypt_decrypt_argon2(self):
         """Test AES encryption and decryption with Argon2id KDF."""
         encrypted = aes_encrypt(self.message, self.password, kdf="argon2")
         decrypted = aes_decrypt(encrypted, self.password, kdf="argon2")
         self.assertEqual(self.message, decrypted)
 
+    @unittest.skipUnless(ARGON2_AVAILABLE, "Argon2id KDF not available")
     def test_derive_key_argon2(self):
         """Test Argon2id key derivation is deterministic and correct length."""
         salt = os.urandom(16)
@@ -59,6 +62,7 @@ class TestEncryption(unittest.TestCase):
         self.assertEqual(key1, key2)
         self.assertEqual(len(key1), 32)
 
+    @unittest.skipUnless(ARGON2_AVAILABLE, "Argon2id KDF not available")
     def test_derive_key_argon2_different_salt(self):
         """Different salts should produce different Argon2id keys."""
         salt1 = os.urandom(16)
@@ -78,12 +82,14 @@ class TestEncryption(unittest.TestCase):
         with self.assertRaises(CryptographySuiteError):
             aes_encrypt(self.empty_message, self.password)
 
+    @unittest.skipUnless(ARGON2_AVAILABLE, "Argon2id KDF not available")
     def test_chacha20_encrypt_decrypt(self):
         """Test ChaCha20 encryption and decryption."""
         encrypted = chacha20_encrypt(self.message, self.password)
         decrypted = chacha20_decrypt(encrypted, self.password)
         self.assertEqual(self.message, decrypted)
 
+    @unittest.skipUnless(ARGON2_AVAILABLE, "Argon2id KDF not available")
     def test_chacha20_decrypt_with_wrong_password(self):
         """Test ChaCha20 decryption with incorrect password."""
         encrypted = chacha20_encrypt(self.message, self.password)
