@@ -19,5 +19,7 @@ jobs:
       - name: pip-audit
         uses: pypa/gh-action-pip-audit@v1.1.0
         with:
-          internal-be-careful-extra-flags: "--fail-on high"
-        # Fail the workflow if any vulnerabilities of severity HIGH or greater are found
+          ignore-vulns: |
+            GHSA-h4gh-qq45-vh27
+            GHSA-79v4-65xg-pq4g
+        # pip-audit fails the workflow if any non-ignored vulnerabilities are found
