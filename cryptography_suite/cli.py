@@ -431,6 +431,13 @@ def main(argv: list[str] | None = None) -> None:
         action="version",
         version=f"%(prog)s {__version__}",
     )
+    parser.add_argument(
+        "--experimental",
+        action="append",
+        choices=["gcm-sst"],
+        default=[],
+        help="Enable preview features",
+    )
     sub = parser.add_subparsers(dest="cmd", required=True)
 
     keygen_parser = sub.add_parser(
@@ -565,6 +572,12 @@ def main(argv: list[str] | None = None) -> None:
     dec_alias.add_argument("--password", required=True)
 
     args = parser.parse_args(argv)
+
+    if "gcm-sst" in args.experimental:
+        # Lazy import to avoid importing experimental modules unless requested
+        import crypto_suite.aead as _aead  # type: ignore[import-not-found]
+
+        _aead.DEFAULT = "GCM-SST"
 
     if args.cmd == "keygen":
         argv2: list[str] = [args.scheme]
