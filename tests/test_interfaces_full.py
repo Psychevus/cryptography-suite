@@ -20,7 +20,7 @@ from cryptography_suite.protocols import (
 )
 import warnings
 
-from cryptography_suite.experimental.signal import (
+from cryptography_suite.experimental.signal_demo import (
     initialize_signal_session,
     SignalReceiver,
     SignalSender,

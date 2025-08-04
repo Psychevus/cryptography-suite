@@ -1,7 +1,8 @@
 import unittest
 import warnings
+import unittest
 
-from cryptography_suite.experimental.signal import initialize_signal_session
+from cryptography_suite.experimental.signal_demo import initialize_signal_session
 
 
 class TestSignalProtocol(unittest.TestCase):

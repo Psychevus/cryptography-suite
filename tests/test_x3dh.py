@@ -1,5 +1,5 @@
 import unittest
-from cryptography_suite.experimental.signal import (
+from cryptography_suite.experimental.signal_demo import (
     initialize_signal_session,
     x3dh_initiator,
     x3dh_responder,
