@@ -282,10 +282,11 @@ implementations.</p>
 <ul class="simple">
 <li><p>Private keys should always be stored encrypted, either with a strong password or
 in a hardware-backed keystore (HSM, KMS, etc.). Unencrypted PEMs are only
-acceptable for testing or inside protected containers. Set the environment
-variable <code class="docutils literal notranslate"><span class="pre">CRYPTOSUITE_STRICT_KEYS=1</span></code> to refuse loading or saving
-unencrypted keys (raising :class:<code class="docutils literal notranslate"><span class="pre">StrictKeyPolicyError</span></code>). Use
-<code class="docutils literal notranslate"><span class="pre">CRYPTOSUITE_STRICT_KEYS=warn</span></code> to merely emit a warning.</p></li>
+acceptable for testing or inside protected containers. By default the library
+emits a warning when encountering such files. Set the environment variable
+<code class="docutils literal notranslate"><span class="pre">CRYPTOSUITE_STRICT_KEYS=error</span></code> to refuse loading or saving unencrypted keys.
+To disable this protection entirely – which carries significant risk – set
+<code class="docutils literal notranslate"><span class="pre">CRYPTOSUITE_STRICT_KEYS=0</span></code> or <code class="docutils literal notranslate"><span class="pre">CRYPTOSUITE_STRICT_KEYS=false</span></code>.</p></li>
 </ul>
 </section>
 

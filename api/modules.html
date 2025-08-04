@@ -367,7 +367,7 @@
 <p>If <code class="docutils literal notranslate"><span class="pre">password</span></code> is provided the key is wrapped using AES-256-CBC. If no
 <code class="docutils literal notranslate"><span class="pre">password</span></code> is supplied the key is written in cleartext (mode 0600) and
 a warning is logged. Setting the <code class="docutils literal notranslate"><span class="pre">CRYPTOSUITE_STRICT_KEYS</span></code> environment
-variable to <code class="docutils literal notranslate"><span class="pre">1</span></code> will instead raise a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>.</p>
+variable to <code class="docutils literal notranslate"><span class="pre">error</span></code> will instead raise a <code class="docutils literal notranslate"><span class="pre">SecurityError</span></code>.</p>
 </dd></dl>
 
 </dd></dl>
