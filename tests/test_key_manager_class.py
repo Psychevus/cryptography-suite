@@ -6,6 +6,9 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 
 from cryptography_suite.asymmetric import generate_rsa_keypair
 from cryptography_suite.protocols import KeyManager
+from cryptography_suite.errors import SecurityError
+import importlib
+import cryptography_suite.config as config
 
 
 class TestKeyManagerClass(unittest.TestCase):
@@ -44,12 +47,14 @@ class TestKeyManagerClass(unittest.TestCase):
 
     def test_strict_env_var_blocks_unencrypted_save(self):
         priv, _ = generate_rsa_keypair()
-        os.environ["CRYPTOSUITE_STRICT_KEYS"] = "1"
+        os.environ["CRYPTOSUITE_STRICT_KEYS"] = "error"
+        importlib.reload(config)
         try:
-            with self.assertRaises(ValueError):
+            with self.assertRaises(SecurityError):
                 self.km.save_private_key(priv, self.filepath)
         finally:
             os.environ.pop("CRYPTOSUITE_STRICT_KEYS", None)
+            importlib.reload(config)
 
     def test_rotate_keys(self):
         self.km.rotate_keys(self.key_dir)

@@ -14,7 +14,8 @@ implementations.
 
 - Private keys should always be stored encrypted, either with a strong password or
   in a hardware-backed keystore (HSM, KMS, etc.). Unencrypted PEMs are only
-  acceptable for testing or inside protected containers. Set the environment
-  variable ``CRYPTOSUITE_STRICT_KEYS=1`` to refuse loading or saving
-  unencrypted keys (raising :class:`StrictKeyPolicyError`). Use
-  ``CRYPTOSUITE_STRICT_KEYS=warn`` to merely emit a warning.
+  acceptable for testing or inside protected containers. By default the library
+  emits a warning when encountering such files. Set the environment variable
+  ``CRYPTOSUITE_STRICT_KEYS=error`` to refuse loading or saving unencrypted keys.
+  To disable this protection entirely – which carries significant risk – set
+  ``CRYPTOSUITE_STRICT_KEYS=0`` or ``CRYPTOSUITE_STRICT_KEYS=false``.

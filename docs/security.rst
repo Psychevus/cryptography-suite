@@ -14,10 +14,11 @@ Security Considerations
   testing or inside protected containers. When serializing private keys with
   :func:`cryptography_suite.serialize_private_key` or using
   :class:`cryptography_suite.protocols.key_management.KeyManager`, always supply a
-  password so the key material is encrypted. Set the environment variable
-  ``CRYPTOSUITE_STRICT_KEYS=1`` to refuse loading or saving unencrypted keys
-  (raising ``StrictKeyPolicyError``). Use ``CRYPTOSUITE_STRICT_KEYS=warn`` to
-  only emit a warning.
+  password so the key material is encrypted. By default the library warns when
+  encountering unencrypted key files. Set the environment variable
+  ``CRYPTOSUITE_STRICT_KEYS=error`` to refuse loading or saving such keys. To
+  disable this protection entirely – **at your own risk** – set
+  ``CRYPTOSUITE_STRICT_KEYS=0`` or ``CRYPTOSUITE_STRICT_KEYS=false``.
 
 Zeroization & Memory Safety
 ---------------------------

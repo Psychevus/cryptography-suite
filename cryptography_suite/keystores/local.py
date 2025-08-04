@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import os
 import warnings
 import hashlib
 import datetime as dt
@@ -21,6 +20,7 @@ from ..asymmetric.signatures import (
 )
 from ..errors import StrictKeyPolicyError
 from ..utils import is_encrypted_pem
+from .. import config
 
 PrivateKey = ed25519.Ed25519PrivateKey | ec.EllipticCurvePrivateKey | rsa.RSAPrivateKey
 
@@ -46,13 +46,12 @@ class LocalKeyStore:
         key_path = self.dir / f"{key_id}.pem"
         if not key_path.exists():
             raise FileNotFoundError(key_path)
-        policy = os.getenv("CRYPTOSUITE_STRICT_KEYS")
-        if policy and not is_encrypted_pem(key_path):
+        policy = config.STRICT_KEYS
+        if policy in {"warn", "error"} and not is_encrypted_pem(key_path):
             msg = f"Unencrypted private key: {key_path}"
-            if policy == "1":
+            if policy == "error":
                 raise StrictKeyPolicyError(msg)
-            elif policy == "warn":
-                warnings.warn(msg, UserWarning)
+            warnings.warn(msg, UserWarning)
         meta_path = key_path.with_suffix(".json")
         password = None
         if meta_path.exists():
@@ -152,12 +151,13 @@ class LocalKeyStore:
         fingerprint = self._fingerprint(private_key_obj)
         key_id = fingerprint[:16]
         key_path = self.dir / f"{key_id}.pem"
-        policy = os.getenv("CRYPTOSUITE_STRICT_KEYS")
+        policy = config.STRICT_KEYS
         if not password:
             msg = "Adding unencrypted private key"
-            if policy == "1":
+            if policy == "error":
                 raise StrictKeyPolicyError(msg)
-            warnings.warn(msg, UserWarning)
+            if policy == "warn":
+                warnings.warn(msg, UserWarning)
             encryption: serialization.KeySerializationEncryption = (
                 serialization.NoEncryption()
             )
@@ -187,8 +187,8 @@ class LocalKeyStore:
         if isinstance(name_or_meta, dict):
             meta = name_or_meta
             key_id = cast(str, meta.get("id", "imported"))
-            policy = os.getenv("CRYPTOSUITE_STRICT_KEYS")
-            if policy:
+            policy = config.STRICT_KEYS
+            if policy in {"warn", "error"}:
                 try:
                     serialization.load_pem_private_key(raw, password=None)
                     encrypted = False
@@ -196,10 +196,9 @@ class LocalKeyStore:
                     encrypted = "encrypted" in str(exc).lower()
                 if not encrypted:
                     msg = "Importing unencrypted private key"
-                    if policy == "1":
+                    if policy == "error":
                         raise StrictKeyPolicyError(msg)
-                    elif policy == "warn":
-                        warnings.warn(msg, UserWarning)
+                    warnings.warn(msg, UserWarning)
             key_path = self.dir / f"{key_id}.pem"
             if key_path.exists():
                 i = 1
