@@ -21,7 +21,7 @@ from cryptography.hazmat.primitives.asymmetric import (
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from .hybrid import EncryptedHybridMessage
-from .experimental.signal_demo import EncryptedMessage
+    from .experimental.signal_demo import EncryptedMessage
 
 BASE62_ALPHABET = string.digits + string.ascii_letters
 
