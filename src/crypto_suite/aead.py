@@ -10,6 +10,11 @@ from .nonce import KeyRotationRequired, NonceManager
 BYTE_LIMIT = 2**54  # 2**24 GiB
 NONCE_SIZE = 12
 
+# Default AEAD algorithm used by high level helpers. This value can be
+# monkey-patched at runtime (e.g. via ``--experimental gcm-sst`` CLI flag)
+# to switch to alternate constructions.
+DEFAULT = "GCM"
+
 
 class AesGcm:
     """AES-GCM wrapper with nonce management and usage limits."""
