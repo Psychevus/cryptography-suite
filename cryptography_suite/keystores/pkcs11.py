@@ -15,8 +15,13 @@ except Exception:  # pragma: no cover - fallback for older Python
     tomllib = None  # type: ignore
 
 try:  # optional dependency
-    import pkcs11
-    from pkcs11 import Attribute, ObjectClass, KeyType, Mechanism
+    import pkcs11  # type: ignore[import-not-found, import-untyped]
+    from pkcs11 import (  # type: ignore[import-not-found, import-untyped]
+        Attribute,
+        ObjectClass,
+        KeyType,
+        Mechanism,
+    )
 except Exception:  # pragma: no cover - dependency missing
     pkcs11 = None  # type: ignore
 
@@ -43,7 +48,9 @@ class PKCS11KeyStore:
                  token_label: str | None = None,
                  pin: str | None = None) -> None:
         if pkcs11 is None:  # pragma: no cover - dependency missing
-            raise ImportError("python-pkcs11>=0.9 is required for PKCS11KeyStore")
+            raise ImportError(
+                "python-pkcs11>=0.8.1 is required for PKCS11KeyStore"
+            )
 
         library_path, token_label, pin = self._load_config(
             library_path, token_label, pin
@@ -101,19 +108,28 @@ class PKCS11KeyStore:
             yield self._session_cache
 
     def _get_key(self, session, label: str):
-        objs = session.get_objects(
-            {Attribute.CLASS: ObjectClass.PRIVATE_KEY, Attribute.LABEL: label}
-        )
-        for obj in objs:
-            return obj
-        raise FileNotFoundError(label)
+        try:
+            priv = session.get_key(
+                object_class=ObjectClass.PRIVATE_KEY, label=label
+            )
+        except pkcs11.NoSuchKey:  # type: ignore[attr-defined]
+            raise FileNotFoundError(label)
+
+        try:
+            pub = session.get_key(
+                object_class=ObjectClass.PUBLIC_KEY, label=label
+            )
+            priv.public_key = pub  # type: ignore[attr-defined]
+        except pkcs11.NoSuchKey:  # type: ignore[attr-defined]
+            pass
+        return priv
 
     # ------------------------------------------------------------------
     def list_keys(self) -> List[str]:
         with self._session() as session:
             keys = []
             for obj in session.get_objects({Attribute.CLASS: ObjectClass.PRIVATE_KEY}):
-                label = obj.get(Attribute.LABEL)
+                label = obj.label
                 if isinstance(label, bytes):
                     label = label.decode()
                 keys.append(label)
