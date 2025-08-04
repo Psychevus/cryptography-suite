@@ -150,6 +150,18 @@ class KeyVault:
         except Exception:
             pass
 
+    def _write_pem(self, path: str | Path, *, encrypted: bool) -> None:
+        """Write key material to ``path`` enforcing strict key policy."""
+        from .config import STRICT_KEYS
+        from .errors import SecurityError
+
+        if STRICT_KEYS in {"warn", "error"} and not encrypted:
+            msg = "Unencrypted key file detected"
+            if STRICT_KEYS == "error":
+                raise SecurityError(msg)
+            warnings.warn(msg, UserWarning, stacklevel=2)
+        Path(path).write_bytes(bytes(self._key))
+
 
 PrivateKeyTypes: TypeAlias = (
     rsa.RSAPrivateKey

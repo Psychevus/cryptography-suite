@@ -30,5 +30,9 @@ class UnsupportedAlgorithm(CryptographySuiteError):
     """Raised when attempting to use an unsupported algorithm."""
 
 
+class SecurityError(CryptographySuiteError):
+    """Raised when a security policy is violated."""
+
+
 class StrictKeyPolicyError(CryptographySuiteError):
     """Raised when strict key policy prohibits unencrypted PEM usage."""

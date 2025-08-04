@@ -18,8 +18,9 @@ from ..asymmetric.signatures import (
     generate_ed25519_keypair,
     generate_ed448_keypair,
 )
-from ..errors import DecryptionError
+from ..errors import DecryptionError, SecurityError
 from ..utils import KeyVault
+from .. import config
 
 logger = logging.getLogger(__name__)
 
@@ -180,7 +181,7 @@ class KeyManager:
         If ``password`` is provided the key is wrapped using AES-256-CBC. If no
         ``password`` is supplied the key is written in cleartext (mode 0600) and
         a warning is logged. Setting the ``CRYPTOSUITE_STRICT_KEYS`` environment
-        variable to ``1`` will instead raise a ``ValueError``.
+        variable to ``error`` will instead raise a ``SecurityError``.
         """
 
         if password:
@@ -188,20 +189,17 @@ class KeyManager:
                 serialization.BestAvailableEncryption(password.encode())
             )
         else:
-            if os.getenv("CRYPTOSUITE_STRICT_KEYS", "").lower() in {
-                "1",
-                "true",
-                "yes",
-            }:
-                raise ValueError(
+            if config.STRICT_KEYS == "error":
+                raise SecurityError(
                     "Saving unencrypted private keys is disabled by "
                     "CRYPTOSUITE_STRICT_KEYS"
                 )
-            logger.warning(
-                "Warning: Saving private key unencrypted (PEM format, mode 0600). "
-                "This is NOT recommended for production or shared environments. "
-                "Always use a strong password or a hardware keystore."
-            )
+            if config.STRICT_KEYS == "warn":
+                logger.warning(
+                    "Warning: Saving private key unencrypted (PEM format, mode 0600). "
+                    "This is NOT recommended for production or shared environments. "
+                    "Always use a strong password or a hardware keystore."
+                )
             encryption = serialization.NoEncryption()
 
         pem_data = private_key.private_bytes(
