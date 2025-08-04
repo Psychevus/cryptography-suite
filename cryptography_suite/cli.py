@@ -575,7 +575,7 @@ def main(argv: list[str] | None = None) -> None:
 
     if "gcm-sst" in args.experimental:
         # Lazy import to avoid importing experimental modules unless requested
-        import crypto_suite.aead as _aead
+        import crypto_suite.aead as _aead  # type: ignore[import-not-found]
 
         _aead.DEFAULT = "GCM-SST"
 
