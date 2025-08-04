@@ -108,19 +108,28 @@ class PKCS11KeyStore:
             yield self._session_cache
 
     def _get_key(self, session, label: str):
-        objs = session.get_objects(
-            {Attribute.CLASS: ObjectClass.PRIVATE_KEY, Attribute.LABEL: label}
-        )
-        for obj in objs:
-            return obj
-        raise FileNotFoundError(label)
+        try:
+            priv = session.get_key(
+                object_class=ObjectClass.PRIVATE_KEY, label=label
+            )
+        except pkcs11.NoSuchKey:  # type: ignore[attr-defined]
+            raise FileNotFoundError(label)
+
+        try:
+            pub = session.get_key(
+                object_class=ObjectClass.PUBLIC_KEY, label=label
+            )
+            priv.public_key = pub  # type: ignore[attr-defined]
+        except pkcs11.NoSuchKey:  # type: ignore[attr-defined]
+            pass
+        return priv
 
     # ------------------------------------------------------------------
     def list_keys(self) -> List[str]:
         with self._session() as session:
             keys = []
             for obj in session.get_objects({Attribute.CLASS: ObjectClass.PRIVATE_KEY}):
-                label = obj.get(Attribute.LABEL)
+                label = obj.label
                 if isinstance(label, bytes):
                     label = label.decode()
                 keys.append(label)
