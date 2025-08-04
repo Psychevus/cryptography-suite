@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import ctypes
 import ctypes.util
-import hmac
 import secrets
 import string
 import warnings
 from functools import wraps
+from hmac import compare_digest as ct_equal
 from typing import TYPE_CHECKING, Any, Mapping, TypeAlias, cast
 from pathlib import Path
 
@@ -93,8 +93,7 @@ def secure_zero(data: bytearray) -> None:
 
 def constant_time_compare(val1: bytes | bytearray, val2: bytes | bytearray) -> bool:
     """Return ``True`` if ``val1`` equals ``val2`` using a timing-safe check."""
-
-    return hmac.compare_digest(bytes(val1), bytes(val2))
+    return ct_equal(bytes(val1), bytes(val2))
 
 
 def deprecated(message: str = "This function is deprecated."):

@@ -3,6 +3,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from cryptography_suite.utils import ct_equal
+
 ROOT = Path(__file__).resolve().parents[1]
 DIST = ROOT / "dist"
 
@@ -24,7 +26,7 @@ def build_and_hash(tag: str) -> dict[str, str]:
 
 
 def verify(artifact: Path, expected_hash: str) -> bool:
-    return sha256(artifact) == expected_hash
+    return ct_equal(sha256(artifact), expected_hash)
 
 
 if __name__ == "__main__":
