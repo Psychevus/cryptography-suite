@@ -8,6 +8,8 @@ be used in production code.
 """
 
 import base64
+import binascii
+import logging
 import os
 from os import urandom
 
@@ -20,10 +22,13 @@ from ..errors import (
     KeyDerivationError,
 )
 from ..utils import deprecated
-from ..debug import verbose_print
+from ..debug import VERBOSE, verbose_print
 
 from ..constants import NONCE_SIZE, SALT_SIZE
 from .kdf import select_kdf, DEFAULT_KDF
+
+
+logger = logging.getLogger(__name__)
 
 # Constants for streaming file encryption
 CHUNK_SIZE = 4096
@@ -65,6 +70,10 @@ def aes_encrypt(
     verbose_print(f"Nonce: {nonce.hex()}")
     verbose_print("Mode: AES-GCM")
     ciphertext = aesgcm.encrypt(nonce, plaintext.encode(), None)
+    if VERBOSE:
+        if logger.level > logging.DEBUG:
+            raise RuntimeError("Verbose mode requires DEBUG level")
+        logger.debug("ciphertext=%s", binascii.hexlify(ciphertext)[:32])
     data = salt + nonce + ciphertext
     if raw_output:
         return data
@@ -158,6 +167,10 @@ def encrypt_file(
         with open(input_file_path, "rb") as f_in, open(output_file_path, "wb") as f_out:
             data = f_in.read()
             ct = aesgcm.encrypt(nonce, data, None)
+            if VERBOSE:
+                if logger.level > logging.DEBUG:
+                    raise RuntimeError("Verbose mode requires DEBUG level")
+                logger.debug("ciphertext=%s", binascii.hexlify(ct)[:32])
             f_out.write(salt + nonce + ct)
     except Exception as exc:
         # Remove potentially partial output on error
@@ -264,6 +277,10 @@ async def encrypt_file_async(
         ):
             data = await f_in.read()
             ct = aesgcm.encrypt(nonce, data, None)
+            if VERBOSE:
+                if logger.level > logging.DEBUG:
+                    raise RuntimeError("Verbose mode requires DEBUG level")
+                logger.debug("ciphertext=%s", binascii.hexlify(ct)[:32])
             await f_out.write(salt + nonce + ct)
     except Exception as exc:  # pragma: no cover - high-level error handling
         if os.path.exists(output_file_path):
