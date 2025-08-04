@@ -1,7 +1,12 @@
 import unittest
 import warnings
+import os
+import pytest
 
-from cryptography_suite.experimental.signal import initialize_signal_session
+if not os.getenv("CRYPTOSUITE_ALLOW_EXPERIMENTAL"):
+    pytest.skip("experimental features disabled", allow_module_level=True)
+
+from cryptography_suite.experimental.signal_demo import initialize_signal_session
 
 
 class TestSignalProtocol(unittest.TestCase):

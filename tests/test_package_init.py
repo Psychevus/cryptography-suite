@@ -1,4 +1,7 @@
 import importlib
+import os
+import sys
+import pytest
 
 
 def test_init_without_optional_modules() -> None:
@@ -8,7 +11,12 @@ def test_init_without_optional_modules() -> None:
     assert "bulletproof" not in core_all
     assert "zksnark" not in core_all
 
-    experimental = importlib.import_module("cryptography_suite.experimental")
-    assert hasattr(experimental, "BULLETPROOF_AVAILABLE")
-    assert hasattr(experimental, "ZKSNARK_AVAILABLE")
+    if os.getenv("CRYPTOSUITE_ALLOW_EXPERIMENTAL"):
+        experimental = importlib.import_module("cryptography_suite.experimental")
+        assert hasattr(experimental, "BULLETPROOF_AVAILABLE")
+        assert hasattr(experimental, "ZKSNARK_AVAILABLE")
+    else:
+        sys.modules.pop("cryptography_suite.experimental", None)
+        with pytest.raises(ImportError):
+            importlib.import_module("cryptography_suite.experimental")
 

@@ -1,5 +1,9 @@
 """Cryptography Suite Package Initialization."""
 
+from typing import TYPE_CHECKING
+import importlib
+import os
+
 from .errors import (
     CryptographySuiteError,
     DecryptionError,
@@ -248,3 +252,13 @@ __all__ = [
     "use_backend",
     "select_backend",
 ]
+
+
+def __getattr__(name: str):
+    if name == "experimental":
+        if TYPE_CHECKING or os.getenv("CRYPTOSUITE_ALLOW_EXPERIMENTAL"):
+            return importlib.import_module(".experimental", __name__)
+        raise ImportError(
+            "Experimental features require CRYPTOSUITE_ALLOW_EXPERIMENTAL=1"
+        )
+    raise AttributeError(name)

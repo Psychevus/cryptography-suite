@@ -1,10 +1,16 @@
 import unittest
-from cryptography_suite.experimental.signal import (
+import warnings
+import os
+import pytest
+
+if not os.getenv("CRYPTOSUITE_ALLOW_EXPERIMENTAL"):
+    pytest.skip("experimental features disabled", allow_module_level=True)
+
+from cryptography_suite.experimental.signal_demo import (
     initialize_signal_session,
     x3dh_initiator,
     x3dh_responder,
 )
-import warnings
 from cryptography_suite.asymmetric import generate_x25519_keypair
 from cryptography_suite.errors import SignatureVerificationError
 
