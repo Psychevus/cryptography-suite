@@ -1,4 +1,8 @@
+import os
 import pytest
+
+if not os.getenv("CRYPTOSUITE_ALLOW_EXPERIMENTAL"):
+    pytest.skip("experimental features disabled", allow_module_level=True)
 
 from cryptography_suite.experimental import bulletproof
 

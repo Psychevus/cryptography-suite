@@ -2,8 +2,12 @@ import importlib
 import sys
 import types
 import base64
+import os
 
 import pytest
+
+if not os.getenv("CRYPTOSUITE_ALLOW_EXPERIMENTAL"):
+    pytest.skip("experimental features disabled", allow_module_level=True)
 from cryptography_suite.errors import DecryptionError
 from cryptography.exceptions import InvalidKey
 from cryptography.hazmat.primitives.asymmetric import x25519

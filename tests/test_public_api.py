@@ -1,5 +1,8 @@
 from cryptography_suite import __all__ as core_all
-from cryptography_suite.experimental import __all__ as experimental_all
+try:
+    from cryptography_suite.experimental import __all__ as experimental_all
+except ImportError:  # pragma: no cover - experimental disabled
+    experimental_all = []
 from cryptography_suite.legacy import __all__ as legacy_all
 
 
