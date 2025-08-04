@@ -30,14 +30,12 @@ if TYPE_CHECKING or os.getenv("CRYPTOSUITE_ALLOW_EXPERIMENTAL"):
 
     SIGNAL_AVAILABLE = True
 
-
     WARNING_MSG = (
         "Signal Protocol demo: This implementation is not production-grade and "
         "omits critical features (multi-session, message headers, robust identity "
         "binding, etc.). Use only for research, prototyping, or education. Do not "
         "use for real secure messaging."
     )
-
 
     @dataclass
     class EncryptedMessage:
@@ -47,20 +45,17 @@ if TYPE_CHECKING or os.getenv("CRYPTOSUITE_ALLOW_EXPERIMENTAL"):
         nonce: bytes
         ciphertext: bytes
 
-
     def _hkdf(ikm: bytes, salt: bytes | None, info: bytes, length: int) -> bytes:
         """HKDF-SHA256 helper used for key derivation."""
 
         hkdf = HKDF(algorithm=hashes.SHA256(), length=length, salt=salt, info=info)
         return hkdf.derive(ikm)
 
-
     def _kdf_rk(root_key: bytes, dh_out: bytes) -> Tuple[bytes, bytes]:
         """Derive new root and chain keys from a DH output."""
 
         out = _hkdf(dh_out, root_key, b"dr_rk", 64)
         return out[:32], out[32:]
-
 
     def _kdf_ck(chain_key: bytes) -> Tuple[bytes, bytes]:
         """Derive the next chain key and message key."""
@@ -73,7 +68,6 @@ if TYPE_CHECKING or os.getenv("CRYPTOSUITE_ALLOW_EXPERIMENTAL"):
         h.update(b"1")
         mk = h.finalize()
         return next_ck, mk
-
 
     def x3dh_initiator(
         id_priv: x25519.X25519PrivateKey,
@@ -97,7 +91,6 @@ if TYPE_CHECKING or os.getenv("CRYPTOSUITE_ALLOW_EXPERIMENTAL"):
             master += dh4
         return _hkdf(master, None, b"x3dh", 32)
 
-
     def x3dh_responder(
         id_priv: x25519.X25519PrivateKey,
         prekey_priv: x25519.X25519PrivateKey,
@@ -119,7 +112,6 @@ if TYPE_CHECKING or os.getenv("CRYPTOSUITE_ALLOW_EXPERIMENTAL"):
             verbose_print(f"DH4: {dh4.hex()}")
             master += dh4
         return _hkdf(master, None, b"x3dh", 32)
-
 
     class DoubleRatchet:
         """Minimal Double Ratchet implementation.
@@ -204,7 +196,6 @@ if TYPE_CHECKING or os.getenv("CRYPTOSUITE_ALLOW_EXPERIMENTAL"):
 
             self.recv_chain_key, msg_key = _kdf_ck(self.recv_chain_key)
             return AESGCM(msg_key).decrypt(message.nonce, message.ciphertext, None)
-
 
     class SignalSender:
         """Sender that initiates a Signal session.
@@ -304,7 +295,6 @@ if TYPE_CHECKING or os.getenv("CRYPTOSUITE_ALLOW_EXPERIMENTAL"):
 
             return self.ratchet.decrypt(message)
 
-
     class SignalReceiver:
         """Receiver that responds to a Signal session.
 
@@ -383,7 +373,6 @@ if TYPE_CHECKING or os.getenv("CRYPTOSUITE_ALLOW_EXPERIMENTAL"):
             if self.ratchet is None:
                 raise ProtocolError("Session not initialized")
             return self.ratchet.decrypt(message)
-
 
     def initialize_signal_session(*, use_one_time_prekey: bool = False) -> Tuple[SignalSender, SignalReceiver]:
         """Convenience function to create two parties with a shared session.
