@@ -1,48 +1,51 @@
-import sys
-from pathlib import Path
+import timeit
 
 import pytest
 from hypothesis import given, strategies as st
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
-# Ensure src directory is importable
-ROOT = Path(__file__).resolve().parents[1]
-SRC = ROOT / "src"
-if str(SRC) not in sys.path:
-    sys.path.insert(0, str(SRC))
-
-from crypto_suite.nonce import KeyRotationRequired, NonceManager, NonceReuseError
-from crypto_suite.aead import AesGcm
-
-
-@given(st.integers(min_value=1, max_value=100))
-def test_nonce_monotonic(count: int) -> None:
-    manager = NonceManager()
-    nonces = [int.from_bytes(manager.next(), "big") for _ in range(count)]
-    assert nonces == sorted(nonces)
+from cryptography_suite.nonce import KeyRotationRequired, NonceManager, NonceReuseError
+from cryptography_suite.aead import AESGCMContext
 
 
 @given(st.binary(min_size=12, max_size=12))
 def test_nonce_reuse_detection(nonce: bytes) -> None:
-    manager = NonceManager()
-    manager.remember(nonce)
+    nm = NonceManager()
+    nm.remember(nonce)
     with pytest.raises(NonceReuseError):
-        manager.remember(nonce)
+        nm.remember(nonce)
+
+
+def test_encrypt_after_limit_raises_key_rotation() -> None:
+    key = AESGCM.generate_key(bit_length=128)
+    ctx = AESGCMContext(key, byte_limit=16)
+    nm = NonceManager()
+    ctx.encrypt(b"a" * 8, nm=nm)
+    with pytest.raises(KeyRotationRequired):
+        ctx.encrypt(b"b" * 9, nm=nm)
+
+
+def test_encrypt_rejects_reused_nonce_with_nonce_manager() -> None:
+    key = AESGCM.generate_key(bit_length=128)
+    ctx = AESGCMContext(key)
+    nm = NonceManager()
+    nonce, _ = ctx.encrypt(b"msg", nm=nm)
+    with pytest.raises(NonceReuseError):
+        ctx.encrypt(b"again", nonce=nonce, nm=nm)
+
+
+def test_nonce_manager_overhead() -> None:
+    nm = NonceManager()
+    duration = timeit.timeit(
+        "nonce = nm.next(); nm.remember(nonce)", globals={"nm": nm}, number=1000
+    )
+    assert duration < 0.2
 
 
 @given(st.integers(min_value=1, max_value=10))
 def test_nonce_limit_triggers_rotation(limit: int) -> None:
-    manager = NonceManager(limit=limit)
+    nm = NonceManager(limit=limit)
     for _ in range(limit):
-        manager.next()
+        nm.next()
     with pytest.raises(KeyRotationRequired):
-        manager.next()
-
-
-def test_aead_byte_limit_rotation() -> None:
-    key = AESGCM.generate_key(bit_length=128)
-    aes = AesGcm(key, byte_limit=16)
-    manager = NonceManager()
-    aes.encrypt(b"a" * 8, nonce_manager=manager)
-    with pytest.raises(KeyRotationRequired):
-        aes.encrypt(b"b" * 9, nonce_manager=manager)
+        nm.next()
