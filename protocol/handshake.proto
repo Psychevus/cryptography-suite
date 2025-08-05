@@ -1,0 +1,11 @@
+syntax = "proto3";
+package crypto_suite;
+
+message HandshakeHello {
+  // Ordered by preference (strongest first).
+  repeated string supported_kem = 1;
+}
+
+enum Alert {
+  NoCommonKEM = 0;
+}
