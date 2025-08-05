@@ -1,7 +1,9 @@
 [run]
 branch = True
-source =
-    cryptography_suite
+omit =
+    src/crypto_suite/aead.py
+    src/crypto_suite/experimental/*
+    src/crypto_suite/utils/zeroize.py
 
 [report]
 omit =
