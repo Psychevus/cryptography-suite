@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import threading
 from hmac import compare_digest
-from typing import Iterable, Protocol, Optional
+from typing import Iterator, Protocol, Optional
 
 
 class KeyRotationRequired(RuntimeError):
@@ -16,7 +16,7 @@ class NonceReuseError(RuntimeError):
 class StateStore(Protocol):
     """Minimal protocol for storing seen nonces."""
 
-    def __iter__(self) -> Iterable[bytes]:
+    def __iter__(self) -> Iterator[bytes]:
         ...
 
     def add(self, item: bytes) -> None:
