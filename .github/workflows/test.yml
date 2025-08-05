@@ -25,6 +25,9 @@ jobs:
         run: |
           python - <<'PY'
           import xml.etree.ElementTree as ET, sys
-          cov = int(float(ET.parse('coverage.xml').getroot().attrib['line-rate'])*100)
-          sys.exit(0 if cov >= 95 else 1)
+          cov = float(ET.parse('coverage.xml').getroot().attrib['line-rate']) * 100
+          print(f"Total coverage: {cov:.2f}%")
+          if cov < 95:
+            print('Coverage threshold not met')
+            sys.exit(1)
           PY
