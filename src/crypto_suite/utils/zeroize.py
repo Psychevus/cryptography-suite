@@ -6,6 +6,7 @@ import ctypes
 import ctypes.util
 import gc
 import platform
+import os
 import time
 
 try:  # Optional dependency
@@ -13,16 +14,28 @@ try:  # Optional dependency
 except Exception:  # pragma: no cover - cffi not installed
     FFI = None  # type: ignore
 
-libc = ctypes.CDLL(ctypes.util.find_library("c") or None)
-_libc_memset = libc.memset
-_libc_memset.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_size_t]
-_libc_memset.restype = ctypes.c_void_p
+_libc_name = ctypes.util.find_library("c")
+if _libc_name is None and os.name == "nt":  # pragma: no cover - Windows lookup
+    _libc_name = ctypes.util.find_library("msvcrt") or "msvcrt"
+try:
+    _libc = ctypes.CDLL(_libc_name) if _libc_name else None
+except Exception:  # pragma: no cover - libc load failure
+    _libc = None
+if _libc is not None:
+    _libc_memset = _libc.memset
+    _libc_memset.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_size_t]
+    _libc_memset.restype = ctypes.c_void_p
+else:
+    _libc_memset = None
 
 
 def _memset(addr: ctypes.c_void_p, value: int, size: int) -> None:
     """Invoke libc's ``memset`` to overwrite memory."""
 
-    _libc_memset(addr, value, size)
+    if _libc_memset is not None:
+        _libc_memset(addr, value, size)
+    else:  # pragma: no cover - libc unavailable
+        ctypes.memset(addr, value, size)
 
 
 def _secure_zero_pypy(obj: bytearray) -> None:
