@@ -1,0 +1,31 @@
+name: Test Coverage
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+          pip install pytest pytest-cov
+      - name: Run tests
+        run: |
+          pytest --cov=crypto_suite --cov-report=xml
+      - name: Fail if coverage < 95 %
+        run: |
+          python - <<'PY'
+          import xml.etree.ElementTree as ET, sys
+          cov = int(float(ET.parse('coverage.xml').getroot().attrib['line-rate'])*100)
+          sys.exit(0 if cov >= 95 else 1)
+          PY
