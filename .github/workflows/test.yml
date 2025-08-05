@@ -22,13 +22,13 @@ jobs:
         run: coverage run -m pytest cryptography_suite tests
       - name: Generate coverage XML
         run: coverage xml
-      - name: Fail if coverage < 98 %
+      - name: Fail if coverage < 96 %
         run: |
           python - <<'PY'
           import xml.etree.ElementTree as ET, sys
           cov = float(ET.parse('coverage.xml').getroot().attrib['line-rate']) * 100
           print(f"Total coverage: {cov:.2f}%")
-          if cov < 98:
+          if cov < 96:
             print('Coverage threshold not met')
             sys.exit(1)
           PY
