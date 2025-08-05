@@ -1,16 +1,9 @@
 [run]
 branch = True
+source = cryptography_suite
 omit =
-    src/crypto_suite/aead.py
-    src/crypto_suite/experimental/*
+    cryptography_suite/experimental/*
+    cryptography_suite/tests/*
 
 [report]
-omit =
-    tests/*
-    */tests/*
-
-[paths]
-source =
-    cryptography_suite
-    source/cryptography_suite
-    */site-packages/cryptography_suite
+fail_under = 98

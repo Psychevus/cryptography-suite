@@ -19,15 +19,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e .[dev]
       - name: Run tests
-        run: |
-          pytest --cov=crypto_suite --cov-report=xml
-      - name: Fail if coverage < 95 %
+        run: coverage run -m pytest cryptography_suite tests
+      - name: Generate coverage XML
+        run: coverage xml
+      - name: Fail if coverage < 98 %
         run: |
           python - <<'PY'
           import xml.etree.ElementTree as ET, sys
           cov = float(ET.parse('coverage.xml').getroot().attrib['line-rate']) * 100
           print(f"Total coverage: {cov:.2f}%")
-          if cov < 95:
+          if cov < 98:
             print('Coverage threshold not met')
             sys.exit(1)
           PY
