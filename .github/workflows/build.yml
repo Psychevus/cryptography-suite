@@ -44,7 +44,7 @@ jobs:
       - name: Trivy fs scan
         run: trivy fs --severity HIGH,CRITICAL --exit-code 1 .
       - name: Upload wheels
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.os }}-wheels
           path: dist/*.whl
