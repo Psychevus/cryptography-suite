@@ -25,6 +25,7 @@ jobs:
           python-version: '3.12'
       - name: Install build tools
         run: |
+          python3 -m ensurepip --upgrade
           python3 -m pip install --upgrade pip
           python3 -m pip install cibuildwheel==2.18 pip-audit
       - name: Build wheels
