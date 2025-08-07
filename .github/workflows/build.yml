@@ -31,6 +31,8 @@ jobs:
             python3 -m pip install --upgrade pip --user --break-system-packages
             python3 -m pip install --user cibuildwheel==2.18 pip-audit --break-system-packages
       - name: Build wheels
+        env:
+          CFLAGS: -O2 -fstack-protector-strong -fPIC
         run: python3 -m cibuildwheel --output-dir wheelhouse
       - name: Auditwheel repair
         run: |

@@ -51,6 +51,9 @@ dependencies = [
     , "requests"
 ]
 
+[project.entry-points."cryptosuite.aead"]
+"gcm-sst" = "crypto_suite.experimental.aes_gcm_sst:aes_gcm_sst_encrypt"
+
 [project.optional-dependencies]
 pqc = ["pqcrypto"]
 fhe = ["Pyfhel"]
