@@ -24,20 +24,18 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install build tools
-        env:
-          PIP_BREAK_SYSTEM_PACKAGES: "1"
         run: |
-          python3 -m ensurepip --upgrade
-          python3 -m pip install --upgrade pip
-          python3 -m pip install cibuildwheel==2.18 pip-audit
+          python3 -m ensurepip --upgrade --user
+          python3 -m pip install --upgrade pip --user --break-system-packages
+          python3 -m pip install --user cibuildwheel==2.18 pip-audit --break-system-packages
       - name: Build wheels
         run: python3 -m cibuildwheel --output-dir wheelhouse
       - name: Auditwheel repair
         run: |
-          python3 -m pip install auditwheel
+          python3 -m pip install --user auditwheel --break-system-packages
           mkdir -p dist
           for whl in wheelhouse/*.whl; do
-            auditwheel repair "$whl" -w dist
+            python3 -m auditwheel repair "$whl" -w dist
           done
       - name: pip audit
         run: python3 -m pip_audit
