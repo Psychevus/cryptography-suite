@@ -38,11 +38,20 @@ def _memset(addr: ctypes.c_void_p, value: int, size: int) -> None:
         ctypes.memset(addr, value, size)
 
 
+def _pypy_memset(addr: ctypes.c_void_p, value: int, size: int) -> None:
+    """Call ``libc.memset`` directly for PyPy."""
+
+    if _libc_memset is not None:
+        _libc_memset(addr, value, size)  # pragma: no cover - PyPy only
+    else:  # pragma: no cover - libc unavailable
+        ctypes.memset(addr, value, size)  # pragma: no cover - libc unavailable
+
+
 def _secure_zero_pypy(obj: bytearray) -> None:
     """Best-effort zeroization for PyPy JIT frames."""
 
     buf = (ctypes.c_char * len(obj)).from_buffer(obj)  # pragma: no cover - PyPy only
-    _memset(ctypes.addressof(buf), 0, len(obj))  # pragma: no cover - PyPy only
+    _pypy_memset(ctypes.addressof(buf), 0, len(obj))  # pragma: no cover - PyPy only
     if hasattr(buf, "release"):  # pragma: no cover - PyPy only
         buf.release()  # pragma: no cover - PyPy only
 
@@ -92,7 +101,7 @@ def secure_zero(data: bytearray) -> None:
     buf = (ctypes.c_char * len(data)).from_buffer(data)
 
     if platform.python_implementation() == "PyPy":
-        _memset(ctypes.addressof(buf), 0, len(data))  # pragma: no cover - PyPy only
+        _pypy_memset(ctypes.addressof(buf), 0, len(data))  # pragma: no cover - PyPy only
         if hasattr(buf, "release"):  # pragma: no cover - PyPy only
             buf.release()  # pragma: no cover - PyPy only
         del data[:]  # pragma: no cover - PyPy only
