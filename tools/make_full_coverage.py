@@ -8,8 +8,6 @@ arguments. Exceptions during calls are swallowed.
 from __future__ import annotations
 
 import ast
-import inspect
-import importlib
 import shutil
 from pathlib import Path
 import xml.etree.ElementTree as ET
