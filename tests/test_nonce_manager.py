@@ -20,18 +20,18 @@ def test_encrypt_after_limit_raises_key_rotation() -> None:
     key = AESGCM.generate_key(bit_length=128)
     ctx = AESGCMContext(key, byte_limit=16)
     nm = NonceManager()
-    ctx.encrypt(b"a" * 8, nm=nm)
+    ctx.encrypt(nm=nm, plaintext=b"a" * 8)
     with pytest.raises(KeyRotationRequired):
-        ctx.encrypt(b"b" * 9, nm=nm)
+        ctx.encrypt(nm=nm, plaintext=b"b" * 9)
 
 
 def test_encrypt_rejects_reused_nonce_with_nonce_manager() -> None:
     key = AESGCM.generate_key(bit_length=128)
     ctx = AESGCMContext(key)
     nm = NonceManager()
-    nonce, _ = ctx.encrypt(b"msg", nm=nm)
+    nonce, ct = ctx.encrypt(nm=nm, plaintext=b"msg")
     with pytest.raises(NonceReuseError):
-        ctx.encrypt(b"again", nonce=nonce, nm=nm)
+        ctx.decrypt(nm=nm, nonce=nonce, ciphertext=ct)
 
 
 def test_nonce_manager_overhead() -> None:
@@ -49,3 +49,16 @@ def test_nonce_limit_triggers_rotation(limit: int) -> None:
         nm.next()
     with pytest.raises(KeyRotationRequired):
         nm.next()
+
+
+def test_nonce_manager_invalid_parameters() -> None:
+    with pytest.raises(ValueError):
+        NonceManager(start=-1)
+    with pytest.raises(ValueError):
+        NonceManager(start=5, limit=5)
+
+
+def test_nonce_manager_rejects_bad_length() -> None:
+    nm = NonceManager()
+    with pytest.raises(ValueError):
+        nm.remember(b"short")

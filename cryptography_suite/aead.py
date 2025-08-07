@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import threading
-from typing import Optional
 
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM, ChaCha20Poly1305
 
@@ -63,6 +62,8 @@ class AESGCMContext:
         self._aesgcm = AESGCM(key)
         self._byte_limit = byte_limit
         self._bytes_processed = 0
+        # count of messages processed with this key
+        self._msg_counter: int = 0
         self._lock = threading.Lock()
 
     @property
@@ -71,39 +72,36 @@ class AESGCMContext:
 
     def encrypt(
         self,
-        plaintext: bytes,
         *,
-        nonce: Optional[bytes] = None,
-        associated_data: Optional[bytes] = None,
-        nm: Optional[NonceManager] = None,
+        nm: NonceManager,
+        plaintext: bytes,
+        aad: bytes = b"",
     ) -> tuple[bytes, bytes]:
         """Encrypt ``plaintext`` and return ``(nonce, ciphertext)``."""
-        if nm is not None:
-            if nonce is None:
-                nonce = nm.next()
-            nm.remember(nonce)
-        elif nonce is None:
-            raise ValueError("nonce or NonceManager required")
+        nonce = nm.next()
+        nm.remember(nonce)
         with self._lock:
             if self._bytes_processed + len(plaintext) > self._byte_limit:
                 raise KeyRotationRequired("byte limit reached")
             self._bytes_processed += len(plaintext)
-        ciphertext = self._aesgcm.encrypt(nonce, plaintext, associated_data)
+            self._msg_counter += 1
+            if self._msg_counter > 2**32:
+                raise KeyRotationRequired("2^32 message cap reached")
+        ciphertext = self._aesgcm.encrypt(nonce, plaintext, aad)
         return nonce, ciphertext
 
     def decrypt(
         self,
-        ciphertext: bytes,
         *,
+        nm: NonceManager,
         nonce: bytes,
-        associated_data: Optional[bytes] = None,
-        nm: Optional[NonceManager] = None,
+        ciphertext: bytes,
+        aad: bytes = b"",
     ) -> bytes:
         """Decrypt ``ciphertext`` using ``nonce``."""
-        if nm is not None:
-            nm.remember(nonce)
+        nm.remember(nonce)
         with self._lock:
             if self._bytes_processed + len(ciphertext) > self._byte_limit:
                 raise KeyRotationRequired("byte limit reached")
             self._bytes_processed += len(ciphertext)
-        return self._aesgcm.decrypt(nonce, ciphertext, associated_data)
+        return self._aesgcm.decrypt(nonce, ciphertext, aad)

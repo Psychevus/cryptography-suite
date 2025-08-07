@@ -19,6 +19,12 @@ class NonceManager:
         Initial counter value.
     limit:
         Maximum number of nonces allowed before requiring key rotation.
+
+    Notes
+    -----
+    The default ``limit`` of :math:`2^{32}` matches the AES-GCM message
+    cap and ensures callers rotate keys before exceeding the safe
+    number of encryptions.
     """
 
     def __init__(self, *, start: int = 0, limit: int = 2**32) -> None:

@@ -9,4 +9,8 @@ class NonceReuseError(RuntimeError):
 
 
 class KeyRotationRequired(RuntimeError):
-    """Raised when cryptographic keys must be rotated."""
+    """Raised when cryptographic keys must be rotated.
+
+    Used when either the byte limit or message cap for an AEAD key has
+    been reached.
+    """
