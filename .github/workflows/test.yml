@@ -19,7 +19,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e .[dev]
       - name: Run tests
-        run: coverage run -m pytest cryptography_suite tests
+        run: coverage run --rcfile=.coveragerc -m pytest cryptography_suite tests
       - name: Coverage gate
         run: |
           coverage xml -i
