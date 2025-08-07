@@ -4,7 +4,6 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cryptography-suite"
-requires = ["setuptools>=68", "wheel"]
 dynamic = ["version"]
 description = "A comprehensive and secure cryptographic toolkit."
 readme = "README.md"
