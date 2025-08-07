@@ -22,7 +22,7 @@ jobs:
         run: coverage run --rcfile=.coveragerc -m pytest cryptography_suite tests
       - name: Coverage gate
         run: |
-          coverage xml -i --fail-under=0
+          coverage xml -i --rcfile=.coveragerc --fail-under=0
           python - <<'PY'
           import xml.etree.ElementTree as ET, sys
           rate = float(ET.parse('coverage.xml').getroot().attrib['line-rate'])
