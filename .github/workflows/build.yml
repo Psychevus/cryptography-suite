@@ -1,0 +1,55 @@
+name: Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+          - os: manylinux_x86_64
+            container: quay.io/pypa/manylinux_2_28_x86_64
+          - os: musllinux_x86_64
+            container: quay.io/pypa/musllinux_1_2_x86_64
+    runs-on: ubuntu-latest
+    container: ${{ matrix.container }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        if: matrix.os == 'ubuntu-latest'
+        with:
+          python-version: '3.12'
+        - name: Install build tools
+          env:
+            PIP_BREAK_SYSTEM_PACKAGES: "1"
+          run: |
+            python3 -m ensurepip --upgrade --user
+            python3 -m pip install --upgrade pip --user --break-system-packages
+            python3 -m pip install --user cibuildwheel==2.18 pip-audit --break-system-packages
+      - name: Build wheels
+        env:
+          CFLAGS: -O2 -fstack-protector-strong -fPIC
+        run: python3 -m cibuildwheel --output-dir wheelhouse
+      - name: Auditwheel repair
+        run: |
+          python3 -m pip install --user auditwheel --break-system-packages
+          mkdir -p dist
+          for whl in wheelhouse/*.whl; do
+            python3 -m auditwheel repair "$whl" -w dist
+          done
+      - name: pip audit
+        run: python3 -m pip_audit
+      - name: Install Trivy
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+      - name: Trivy fs scan
+        run: trivy fs --severity HIGH,CRITICAL --exit-code 1 .
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.os }}-wheels
+          path: dist/*.whl

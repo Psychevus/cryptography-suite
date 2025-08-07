@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cryptography-suite"
-version = "3.0.0"
+dynamic = ["version"]
 description = "A comprehensive and secure cryptographic toolkit."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -39,7 +39,7 @@ classifiers = [
 ]
 
 dependencies = [
-    "cryptography==42.0.4",
+    "cryptography>=44.0.1",
     "py_ecc",
     "spake2",
     "blake3",
@@ -50,6 +50,9 @@ dependencies = [
     , "networkx"
     , "requests"
 ]
+
+[project.entry-points."cryptosuite.aead"]
+"gcm-sst" = "crypto_suite.experimental.aes_gcm_sst:aes_gcm_sst_encrypt"
 
 [project.optional-dependencies]
 pqc = ["pqcrypto"]
@@ -80,6 +83,9 @@ Homepage = "https://github.com/Psychevus/cryptography-suite"
 Documentation = "https://psychevus.github.io/cryptography-suite"
 Source = "https://github.com/Psychevus/cryptography-suite"
 Tracker = "https://github.com/Psychevus/cryptography-suite/issues"
+
+[tool.setuptools.dynamic]
+version = {attr = "cryptography_suite.__version__"}
 
 [tool.setuptools]
 include-package-data = true
