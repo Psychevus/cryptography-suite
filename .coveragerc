@@ -2,5 +2,9 @@
 source = cryptography_suite
 omit =
     cryptography_suite/experimental/*
+    cryptography_suite/tests/*
+    src/cryptography_suite/*
+    */__init__.py
 
 [report]
+fail_under = 99
