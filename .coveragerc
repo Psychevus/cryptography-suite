@@ -1,6 +1,10 @@
 [run]
+branch = True
 source = cryptography_suite
 omit =
     cryptography_suite/experimental/*
+    cryptography_suite/tests/*
+    */__init__.py
 
 [report]
+fail_under = 99
