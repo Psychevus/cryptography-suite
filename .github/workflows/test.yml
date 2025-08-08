@@ -28,3 +28,10 @@ jobs:
           rate = float(ET.parse('coverage.xml').getroot().attrib['line-rate'])
           sys.exit(0 if rate >= 0.99 else 1)
           PY
+      - name: Generate HTML coverage report
+        run: coverage html
+      - name: Upload coverage HTML
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-html
+          path: htmlcov

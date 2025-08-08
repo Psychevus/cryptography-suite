@@ -7,7 +7,7 @@
 [![PyPI Version](https://img.shields.io/pypi/v/cryptography-suite)](https://pypi.org/project/cryptography-suite/)
 [![PyPI Downloads](https://img.shields.io/pypi/dm/cryptography-suite)](https://pypi.org/project/cryptography-suite/)
 [![Build Status](https://github.com/Psychevus/cryptography-suite/actions/workflows/python-app.yml/badge.svg)](https://github.com/Psychevus/cryptography-suite/actions)
-[![Coverage Status](https://coveralls.io/repos/github/Psychevus/cryptography-suite/badge.svg?branch=main)](https://coveralls.io/github/Psychevus/cryptography-suite?branch=main)
+[![Coverage](https://img.shields.io/badge/Coverage-99%25-brightgreen)](docs/testing.md)
 [![Provenance](https://img.shields.io/badge/provenance-signed-blue)](docs/release_process.md)
 [![Signed Releases](https://img.shields.io/badge/releases-signed-brightgreen)](docs/release_process.md)
 [![Fuzzed & Property-Tested](https://img.shields.io/badge/fuzzed--property--tested-true-brightgreen)](docs/fuzzing.md)
