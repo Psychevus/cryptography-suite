@@ -52,8 +52,8 @@ jobs:
           for whl in wheelhouse/*.whl; do
             python3 -m auditwheel repair "$whl" -w dist || cp "$whl" dist/
           done
-      - name: pip audit
-        run: pip audit
+      - name: pip-audit
+        run: python3 -m pip_audit
       - name: Install Trivy
         run: |
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
