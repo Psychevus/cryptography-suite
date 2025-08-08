@@ -8,3 +8,6 @@ omit =
 
 [report]
 fail_under = 99
+
+[html]
+directory = htmlcov
