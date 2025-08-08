@@ -12,11 +12,15 @@ jobs:
         include:
           - os: ubuntu-latest
             cibw_build: "*-manylinux_x86_64"
+            plat_name: manylinux_2_28_x86_64
+            manylinux_image: quay.io/pypa/manylinux_2_28_x86_64
           - os: manylinux_x86_64
             cibw_build: "*-manylinux_x86_64"
+            plat_name: manylinux_2_28_x86_64
             manylinux_image: quay.io/pypa/manylinux_2_28_x86_64
           - os: musllinux_x86_64
             cibw_build: "*-musllinux_x86_64"
+            plat_name: musllinux_1_2_x86_64
             musllinux_image: quay.io/pypa/musllinux_1_2_x86_64
     runs-on: ubuntu-latest
     steps:
@@ -28,9 +32,8 @@ jobs:
         env:
           PIP_BREAK_SYSTEM_PACKAGES: "1"
         run: |
-          python3 -m ensurepip --upgrade
           python3 -m pip install --upgrade pip
-          python3 -m pip install cibuildwheel==2.18 'cryptography>=44.0.1'
+          python3 -m pip install cibuildwheel==2.18 pip-audit 'cryptography>=44.0.1'
       - name: Build wheels
         env:
           CFLAGS: -O2 -fstack-protector-strong -fPIC
@@ -38,6 +41,9 @@ jobs:
           CIBW_ARCHS_LINUX: x86_64
           CIBW_MANYLINUX_X86_64_IMAGE: ${{ matrix.manylinux_image }}
           CIBW_MUSLLINUX_X86_64_IMAGE: ${{ matrix.musllinux_image }}
+          CIBW_BUILD_FRONTEND: build
+          CIBW_CONFIG_SETTINGS: "--build-option=--plat-name=${{ matrix.plat_name }}"
+          CIBW_REPAIR_WHEEL_COMMAND: ""
         run: python3 -m cibuildwheel --output-dir wheelhouse
       - name: Auditwheel repair
         run: |
