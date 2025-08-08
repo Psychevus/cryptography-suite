@@ -27,6 +27,7 @@ jobs:
         env:
           PIP_BREAK_SYSTEM_PACKAGES: "1"
         run: |
+          python3 -m ensurepip --upgrade
           python3 -m pip install --upgrade pip
           python3 -m pip install cibuildwheel==2.18 'cryptography>=44.0.1'
       - name: Build wheels
