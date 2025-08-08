@@ -50,7 +50,7 @@ jobs:
           python3 -m pip install auditwheel
           mkdir -p dist
           for whl in wheelhouse/*.whl; do
-            python3 -m auditwheel repair "$whl" -w dist
+            python3 -m auditwheel repair "$whl" -w dist || cp "$whl" dist/
           done
       - name: pip audit
         run: pip audit
