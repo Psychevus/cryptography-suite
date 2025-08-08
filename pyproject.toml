@@ -1,3 +1,4 @@
+# Packaging configuration for cryptography-suite
 [build-system]
 requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"

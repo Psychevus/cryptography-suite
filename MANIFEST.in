@@ -1,3 +1,4 @@
+# Include essential distribution files
 include LICENSE
 include README.md
 include cryptography_suite/py.typed
