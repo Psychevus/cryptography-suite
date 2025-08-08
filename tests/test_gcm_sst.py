@@ -3,13 +3,16 @@ import os
 import pytest
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
-from crypto_suite.experimental.aes_gcm_sst import (
+os.environ.setdefault("CRYPTOSUITE_ALLOW_EXPERIMENTAL", "1")
+
+from cryptography_suite.experimental.aes_gcm_sst import (
     aes_gcm_sst_decrypt,
     aes_gcm_sst_encrypt,
 )
 
+pytestmark = pytest.mark.experimental
 
-@pytest.mark.experimental
+
 def test_roundtrip() -> None:
     key = AESGCM.generate_key(bit_length=128)
     nonce = os.urandom(12)
