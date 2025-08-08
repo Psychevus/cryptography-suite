@@ -1,5 +1,7 @@
 # Experimental Features
 
+These APIs are unstable and may change or be removed without notice.
+
 ## AES-GCM-SST Preview
 
 The `GCM-SST` mode introduces a synthetic IV derived with HKDF-SHA-512,
@@ -12,7 +14,7 @@ Enable this preview via the command line:
 cryptography-suite --experimental gcm-sst <subcommand>
 ```
 
-This flag monkey-patches `crypto_suite.aead.DEFAULT` to `"GCM-SST"` so
+This flag monkey-patches `cryptography_suite.aead.DEFAULT` to `"GCM-SST"` so
 that higher level helpers choose the new construction.
 
 **Status:** prototype; performance optimized using the C-backed AES-GCM

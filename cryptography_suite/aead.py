@@ -10,6 +10,11 @@ from .constants import CHACHA20_KEY_SIZE, NONCE_SIZE
 from .exceptions import KeyRotationRequired
 from .nonce import NonceManager
 
+# Default AEAD algorithm used by high level helpers. This value can be
+# monkey-patched at runtime (e.g. via ``--experimental gcm-sst`` CLI flag)
+# to switch to alternate constructions.
+DEFAULT = "GCM"
+
 __all__ = ["chacha20_encrypt_aead", "chacha20_decrypt_aead", "AESGCMContext"]
 
 
