@@ -268,6 +268,7 @@
         <article role="main" id="furo-main-content">
           <section id="experimental-features">
 <h1>Experimental Features<a class="headerlink" href="#experimental-features" title="Link to this heading">¶</a></h1>
+<p>These APIs are unstable and may change or be removed without notice.</p>
 <section id="aes-gcm-sst-preview">
 <h2>AES-GCM-SST Preview<a class="headerlink" href="#aes-gcm-sst-preview" title="Link to this heading">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">GCM-SST</span></code> mode introduces a synthetic IV derived with HKDF-SHA-512,
@@ -277,7 +278,7 @@ reduce nonce-misuse risks by mixing a public selector into the IV.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cryptography-suite<span class="w"> </span>--experimental<span class="w"> </span>gcm-sst<span class="w"> </span>&lt;subcommand&gt;
 </pre></div>
 </div>
-<p>This flag monkey-patches <code class="docutils literal notranslate"><span class="pre">crypto_suite.aead.DEFAULT</span></code> to <code class="docutils literal notranslate"><span class="pre">&quot;GCM-SST&quot;</span></code> so
+<p>This flag monkey-patches <code class="docutils literal notranslate"><span class="pre">cryptography_suite.aead.DEFAULT</span></code> to <code class="docutils literal notranslate"><span class="pre">&quot;GCM-SST&quot;</span></code> so
 that higher level helpers choose the new construction.</p>
 <p><strong>Status:</strong> prototype; performance optimized using the C-backed AES-GCM
 implementation from the <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> library and therefore suitable
