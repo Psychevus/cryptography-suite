@@ -13,6 +13,11 @@ Please adhere to our [Code of Conduct](CODE_OF_CONDUCT.md) (placeholder).
 - Include a clear description, checklist of work, and reference relevant issues.
 - Small, frequent pull requests are preferred over large ones.
 
+## Reporting Issues
+
+Use the [bug report template](.github/ISSUE_TEMPLATE/bug_report.md) for defects and the [security report template](.github/ISSUE_TEMPLATE/security_report.md) for potential vulnerabilities.
+For security disclosures, follow the process outlined in our [SECURITY policy](SECURITY.md).
+
 ## Commit Messages
 
 Use [Conventional Commits](https://www.conventionalcommits.org/) such as `feat:`, `fix:`, `docs:`, `test:`, or `chore:`.
