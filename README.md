@@ -922,7 +922,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🤝 Contributions
 
-We welcome contributions from the community. To contribute:
+We welcome contributions from the community. See [CONTRIBUTING.md](CONTRIBUTING.md) for full guidelines and [API stability](docs/api-stability.md) expectations. To contribute:
 
 1. **Fork the Repository**: Click on the 'Fork' button at the top right corner of the repository page.
 2. **Create a New Branch**: Use a descriptive name for your branch (e.g., `feature/new-algorithm`).

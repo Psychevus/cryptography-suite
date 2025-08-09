@@ -1,16 +1,43 @@
-# Contributing Guidelines
+# Contributing
 
-We welcome contributions to *cryptography-suite*. Please follow these basic
-practices when submitting patches:
+We welcome improvements to *cryptography-suite*. This guide outlines what we expect when submitting changes.
 
-- **Tests**: Include unit tests for any behavior change.
-- **Property & Fuzz Tests**: For new cryptographic code, include Hypothesis property tests and an Atheris fuzz harness.
-- **Style**: Keep code readable and consistent with the existing style.
+## Code of Conduct
 
-## One-shot helpers
+Please adhere to our [Code of Conduct](CODE_OF_CONDUCT.md) (placeholder).
 
-Legacy helper functions (e.g. `*_encrypt`, `*_decrypt`) exist only for backward
-compatibility. New helper-style APIs will not be accepted. Any remaining helpers
-must internally delegate to the Pipeline DSL modules. When in doubt, prefer
-adding or extending pipeline stages instead of introducing new helpers.
+## Branching and Pull Requests
 
+- Branch from `main` and keep changes focused on a single topic.
+- Open pull requests against `main`.
+- Include a clear description, checklist of work, and reference relevant issues.
+- Small, frequent pull requests are preferred over large ones.
+
+## Commit Messages
+
+Use [Conventional Commits](https://www.conventionalcommits.org/) such as `feat:`, `fix:`, `docs:`, `test:`, or `chore:`.
+
+## Signed Commits
+
+All commits **must be GPG-signed**.
+
+```bash
+# one-time setup
+gpg --full-generate-key
+git config --global user.signingkey <key-id>
+git config --global commit.gpgsign true
+```
+
+Verify signatures with `git log --show-signature`.
+
+## Testing Requirements
+
+- Unit tests: `tox` or `pytest -q` must pass.
+- Property-based tests: use [Hypothesis](https://hypothesis.readthedocs.io/) for new cryptographic logic.
+- Coverage: maintain **≥95%** line coverage (`pytest --cov`).
+
+## Security Considerations
+
+Pull requests touching security-sensitive code **must include a `Threat Considerations` section** describing potential misuses and mitigations.
+
+Thank you for helping make cryptography-suite safer.

@@ -18,6 +18,8 @@ Please report suspected vulnerabilities to [security@example.com](mailto:securit
 
 Only the latest minor releases within the most recent major version receive security fixes.
 
+See [CONTRIBUTING.md](CONTRIBUTING.md) for requirements on submitting security fixes and [API stability](docs/api-stability.md) for module support levels.
+
 ## Threat scenarios
 
 | Scenario | Risk | Mitigation in library | User responsibilities |
