@@ -1,0 +1,13 @@
+[
+  {"name": "layer:recipes", "color": "bfd4f2", "description": "Changes touching suite.recipes"},
+  {"name": "layer:core", "color": "c2e0c6", "description": "Changes touching suite.core"},
+  {"name": "layer:experimental", "color": "e0c6c6", "description": "Changes touching suite.experimental"},
+  {"name": "type:bug", "color": "d73a4a", "description": "Bug reports"},
+  {"name": "type:feat", "color": "0e8a16", "description": "Feature requests"},
+  {"name": "type:docs", "color": "0075ca", "description": "Documentation"},
+  {"name": "type:security", "color": "a82a2a", "description": "Security issues"},
+  {"name": "status:needs-triage", "color": "fbca04", "description": "Awaiting review"},
+  {"name": "priority:high", "color": "b60205", "description": "High priority"},
+  {"name": "priority:normal", "color": "0e8a16", "description": "Normal priority"},
+  {"name": "priority:low", "color": "d4c5f9", "description": "Low priority"}
+]

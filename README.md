@@ -2,7 +2,7 @@
 
 [![Python Version](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Platform](https://img.shields.io/badge/platform-macOS%20|%20Linux%20|%20Windows-informational)]()
+[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-informational)](<>)
 [![Version](https://img.shields.io/badge/version-3.0.0-blue)](https://github.com/Psychevus/cryptography-suite/releases/tag/v3.0.0)
 [![PyPI Version](https://img.shields.io/pypi/v/cryptography-suite)](https://pypi.org/project/cryptography-suite/)
 [![Build Status](https://github.com/Psychevus/cryptography-suite/actions/workflows/python-app.yml/badge.svg)](https://github.com/Psychevus/cryptography-suite/actions)
@@ -16,19 +16,46 @@
 
 **Cryptography Suite** is an advanced cryptographic toolkit for Python, meticulously engineered for applications demanding robust security and seamless integration. It offers a comprehensive set of cryptographic primitives and protocols, empowering developers and organizations to implement state-of-the-art encryption, hashing, key management, digital signatures, and more.
 
+## Vision & Scope
+
+Goal: Become a full, safe-by-default Python crypto suite that can replace pyca/cryptography for mainstream use while also serving researchers and beginners.
+
+### Audience tiers and APIs
+
+- `suite.recipes`: beginner-safe, opinionated, secure defaults, minimal knobs.
+- `suite.core`: professional-grade primitives with explicit parameters and documented trade-offs.
+- `suite.experimental`: research-only features (PQC/ZK/FHE/Signal demo) with hard warnings.
+  Importing any module from this layer prints a prominent runtime banner.
+
+| Tier | Do | Don't |
+| --- | --- | --- |
+| `recipes` | Use for quick, secure defaults; depend on long-term support | Expect customizable parameters or legacy algorithms |
+| `core` | Build for production with explicit algorithms and parameters | Assume default settings cover all threat models |
+| `experimental` | Explore PQC, ZK, FHE, or protocol demos with caution | Deploy in production or rely on stability |
+
+Threat model (high level): misuse resistance focus, safe defaults, explicit unsafe switches.
+
+Support statement: production support limited to `recipes` and `core`; `experimental` is excluded.
+
+See [Vision details](docs/vision.md) for expansion.
+
 ## 📚 Documentation
 
 👉 [View Full Documentation](https://psychevus.github.io/cryptography-suite/)
 
----
+- [Migration from pyca/cryptography](docs/migration-from-pyca.md)
+- [Recipes cheat sheet](docs/cheatsheets/recipes.md)
+- [Security policy](SECURITY.md)
+
+______________________________________________________________________
 
 ## 🔑 Key Features
 
 - **Comprehensive Functionality**: Symmetric and asymmetric encryption, digital signatures, key management, secret sharing, password-authenticated key exchange (PAKE), and one-time passwords (OTP).
-- **Post-Quantum Primitives**: Kyber KEM, Dilithium signatures, and **experimental SPHINCS+** support (enable via `pip install "cryptography-suite[pqc]"` – demo-only, not production-grade). These are available under ``cryptography_suite.experimental``.
-- **Signal Protocol Demo**: Minimal X3DH + Double Ratchet implementation located in ``cryptography_suite.experimental.signal`` (**experimental, not production-ready**).
-- **Homomorphic Encryption**: Pyfhel-based helpers exposed via ``cryptography_suite.experimental`` (**experimental, demo-only**).
-- **Zero-Knowledge Proof Helpers**: Bulletproof range proofs and zk-SNARK examples under ``cryptography_suite.experimental`` (**experimental**).
+- **Post-Quantum Primitives**: Kyber KEM, Dilithium signatures, and **experimental SPHINCS+** support (enable via `pip install "cryptography-suite[pqc]"` – demo-only, not production-grade). These are available under `cryptography_suite.experimental`.
+- **Signal Protocol Demo**: Minimal X3DH + Double Ratchet implementation located in `cryptography_suite.experimental.signal` (**experimental, not production-ready**).
+- **Homomorphic Encryption**: Pyfhel-based helpers exposed via `cryptography_suite.experimental` (**experimental, demo-only**).
+- **Zero-Knowledge Proof Helpers**: Bulletproof range proofs and zk-SNARK examples under `cryptography_suite.experimental` (**experimental**).
 - **Developer-Friendly API**: Intuitive, well-documented interfaces that simplify integration and accelerate development.
 - **Cross-Platform Compatibility**: Fully compatible with macOS, Linux, and Windows environments.
 - **Rigorous Testing**: ~**99%** test coverage as of v3.0.0, ensuring reliability and robustness.
@@ -36,62 +63,64 @@
 ## 🔍 Support Matrix
 
 <!-- SUPPORT-MATRIX-START -->
+
 | Feature | Module | Pipeline? | CLI? | Keystore? | Status | Extra |
 | --- | --- | --- | --- | --- | --- | --- |
-| AESGCMDecrypt | cryptography_suite.pipeline | Yes | No | No | stable |  |
-| AESGCMEncrypt | cryptography_suite.pipeline | Yes | No | No | stable |  |
-| BULLETPROOF_AVAILABLE |  | No | Yes | No | experimental |  |
-| ECIESX25519Decrypt | cryptography_suite.pipeline | Yes | No | No | stable |  |
-| ECIESX25519Encrypt | cryptography_suite.pipeline | Yes | No | No | stable |  |
-| FHE_AVAILABLE |  | No | No | No | experimental |  |
-| HandshakeFlowWidget | cryptography_suite.viz.widgets | No | No | No | experimental |  |
-| HybridDecrypt | cryptography_suite.pipeline | Yes | No | No | stable |  |
-| HybridEncrypt | cryptography_suite.pipeline | Yes | No | No | stable |  |
-| KeyGraphWidget | cryptography_suite.viz.widgets | No | No | No | experimental |  |
-| KyberDecrypt | cryptography_suite.pipeline | Yes | No | No | experimental |  |
-| KyberEncrypt | cryptography_suite.pipeline | Yes | No | No | experimental |  |
-| PQCRYPTO_AVAILABLE |  | No | Yes | No | experimental |  |
-| RSADecrypt | cryptography_suite.pipeline | Yes | No | No | stable |  |
-| RSAEncrypt | cryptography_suite.pipeline | Yes | No | No | stable |  |
-| SIGNAL_AVAILABLE |  | No | No | No | experimental |  |
-| SPHINCS_AVAILABLE |  | No | Yes | No | experimental |  |
-| SessionTimelineWidget | cryptography_suite.viz.widgets | No | No | No | experimental |  |
-| SignalReceiver | cryptography_suite.experimental.signal | No | No | No | experimental |  |
-| SignalSender | cryptography_suite.experimental.signal | No | No | No | experimental |  |
-| ZKSNARK_AVAILABLE |  | No | Yes | No | experimental |  |
-| blake3_hash_v2 | cryptography_suite.hashing | No | No | No | deprecated |  |
-| bls_aggregate | cryptography_suite.asymmetric.bls | No | No | No | deprecated |  |
-| bls_aggregate_verify | cryptography_suite.asymmetric.bls | No | No | No | deprecated |  |
-| bls_sign | cryptography_suite.asymmetric.bls | No | No | No | deprecated |  |
-| bls_verify | cryptography_suite.asymmetric.bls | No | No | No | deprecated |  |
-| bulletproof |  | No | Yes | No | experimental |  |
-| dilithium_sign |  | No | No | No | experimental |  |
-| dilithium_verify |  | No | No | No | experimental |  |
-| fhe_add | cryptography_suite.homomorphic | No | No | No | experimental |  |
-| fhe_decrypt | cryptography_suite.homomorphic | No | No | No | experimental |  |
-| fhe_encrypt | cryptography_suite.homomorphic | No | No | No | experimental |  |
-| fhe_keygen | cryptography_suite.homomorphic | No | No | No | experimental |  |
-| fhe_load_context | cryptography_suite.homomorphic | No | No | No | experimental |  |
-| fhe_multiply | cryptography_suite.homomorphic | No | No | No | experimental |  |
-| fhe_serialize_context | cryptography_suite.homomorphic | No | No | No | experimental |  |
-| generate_bls_keypair | cryptography_suite.asymmetric.bls | No | No | No | deprecated |  |
-| generate_dilithium_keypair |  | No | Yes | No | experimental |  |
-| generate_ed448_keypair | cryptography_suite.asymmetric.signatures | No | No | No | deprecated |  |
-| generate_kyber_keypair |  | No | Yes | No | experimental |  |
-| generate_sphincs_keypair |  | No | Yes | No | experimental |  |
-| initialize_signal_session | cryptography_suite.experimental.signal | No | No | No | experimental |  |
-| kyber_decrypt |  | No | No | No | experimental |  |
-| kyber_encrypt |  | No | No | No | experimental |  |
-| sign_message_ed448 | cryptography_suite.asymmetric.signatures | No | No | No | deprecated |  |
-| sphincs_sign |  | No | No | No | experimental |  |
-| sphincs_verify |  | No | No | No | experimental |  |
-| verify_signature_ed448 | cryptography_suite.asymmetric.signatures | No | No | No | deprecated |  |
-| x3dh_initiator | cryptography_suite.experimental.signal | No | No | No | experimental |  |
-| x3dh_responder | cryptography_suite.experimental.signal | No | No | No | experimental |  |
-| zksnark |  | No | Yes | No | experimental |  |
+| AESGCMDecrypt | cryptography_suite.pipeline | Yes | No | No | stable | |
+| AESGCMEncrypt | cryptography_suite.pipeline | Yes | No | No | stable | |
+| BULLETPROOF_AVAILABLE | | No | Yes | No | experimental | |
+| ECIESX25519Decrypt | cryptography_suite.pipeline | Yes | No | No | stable | |
+| ECIESX25519Encrypt | cryptography_suite.pipeline | Yes | No | No | stable | |
+| FHE_AVAILABLE | | No | No | No | experimental | |
+| HandshakeFlowWidget | cryptography_suite.viz.widgets | No | No | No | experimental | |
+| HybridDecrypt | cryptography_suite.pipeline | Yes | No | No | stable | |
+| HybridEncrypt | cryptography_suite.pipeline | Yes | No | No | stable | |
+| KeyGraphWidget | cryptography_suite.viz.widgets | No | No | No | experimental | |
+| KyberDecrypt | cryptography_suite.pipeline | Yes | No | No | experimental | |
+| KyberEncrypt | cryptography_suite.pipeline | Yes | No | No | experimental | |
+| PQCRYPTO_AVAILABLE | | No | Yes | No | experimental | |
+| RSADecrypt | cryptography_suite.pipeline | Yes | No | No | stable | |
+| RSAEncrypt | cryptography_suite.pipeline | Yes | No | No | stable | |
+| SIGNAL_AVAILABLE | | No | No | No | experimental | |
+| SPHINCS_AVAILABLE | | No | Yes | No | experimental | |
+| SessionTimelineWidget | cryptography_suite.viz.widgets | No | No | No | experimental | |
+| SignalReceiver | cryptography_suite.experimental.signal | No | No | No | experimental | |
+| SignalSender | cryptography_suite.experimental.signal | No | No | No | experimental | |
+| ZKSNARK_AVAILABLE | | No | Yes | No | experimental | |
+| blake3_hash_v2 | cryptography_suite.hashing | No | No | No | deprecated | |
+| bls_aggregate | cryptography_suite.asymmetric.bls | No | No | No | deprecated | |
+| bls_aggregate_verify | cryptography_suite.asymmetric.bls | No | No | No | deprecated | |
+| bls_sign | cryptography_suite.asymmetric.bls | No | No | No | deprecated | |
+| bls_verify | cryptography_suite.asymmetric.bls | No | No | No | deprecated | |
+| bulletproof | | No | Yes | No | experimental | |
+| dilithium_sign | | No | No | No | experimental | |
+| dilithium_verify | | No | No | No | experimental | |
+| fhe_add | cryptography_suite.homomorphic | No | No | No | experimental | |
+| fhe_decrypt | cryptography_suite.homomorphic | No | No | No | experimental | |
+| fhe_encrypt | cryptography_suite.homomorphic | No | No | No | experimental | |
+| fhe_keygen | cryptography_suite.homomorphic | No | No | No | experimental | |
+| fhe_load_context | cryptography_suite.homomorphic | No | No | No | experimental | |
+| fhe_multiply | cryptography_suite.homomorphic | No | No | No | experimental | |
+| fhe_serialize_context | cryptography_suite.homomorphic | No | No | No | experimental | |
+| generate_bls_keypair | cryptography_suite.asymmetric.bls | No | No | No | deprecated | |
+| generate_dilithium_keypair | | No | Yes | No | experimental | |
+| generate_ed448_keypair | cryptography_suite.asymmetric.signatures | No | No | No | deprecated | |
+| generate_kyber_keypair | | No | Yes | No | experimental | |
+| generate_sphincs_keypair | | No | Yes | No | experimental | |
+| initialize_signal_session | cryptography_suite.experimental.signal | No | No | No | experimental | |
+| kyber_decrypt | | No | No | No | experimental | |
+| kyber_encrypt | | No | No | No | experimental | |
+| sign_message_ed448 | cryptography_suite.asymmetric.signatures | No | No | No | deprecated | |
+| sphincs_sign | | No | No | No | experimental | |
+| sphincs_verify | | No | No | No | experimental | |
+| verify_signature_ed448 | cryptography_suite.asymmetric.signatures | No | No | No | deprecated | |
+| x3dh_initiator | cryptography_suite.experimental.signal | No | No | No | experimental | |
+| x3dh_responder | cryptography_suite.experimental.signal | No | No | No | experimental | |
+| zksnark | | No | Yes | No | experimental | |
+
 <!-- SUPPORT-MATRIX-END -->
 
----
+______________________________________________________________________
 
 ## ✨ Version 3.0.0 Highlights
 
@@ -102,8 +131,8 @@ pipeline-driven workflows. Major enhancements include:
   libraries or hardware modules.
 - **Declarative Pipeline DSL** for composing verifiable workflows.
 - **Misuse-Resistant Type System** via a dedicated mypy plugin.
-- **Zeroization Tools & Constant-Time Operations** – ``KeyVault`` and
-  ``secure_zero`` enable best-effort memory wiping, but plain ``bytes`` may
+- **Zeroization Tools & Constant-Time Operations** – `KeyVault` and
+  `secure_zero` enable best-effort memory wiping, but plain `bytes` may
   persist until garbage collection.
 - **Formal Verification Export** to ProVerif and Tamarin for rigorous analysis.
 - **Stub Generator** to scaffold new applications and services.
@@ -138,7 +167,7 @@ Backend selection is context-local: each thread or async task maintains its
 own active backend when using :func:`use_backend` as a context manager.
 
 *Contributors*: new pipeline modules can be exposed with the
-`@register_module` decorator in ``cryptography_suite.pipeline``.
+`@register_module` decorator in `cryptography_suite.pipeline`.
 
 Visualize and export the pipeline:
 
@@ -163,7 +192,6 @@ print(p.to_proverif())    # formal model output
 - 🧪 **Expanded Test Coverage** for OTP edge cases.
 - 🛠 Internal cleanup and doc updates.
 
-
 ## ✨ Version 2.0.0 Highlights
 
 - **Post-Quantum Readiness**: Kyber KEM and Dilithium signature helpers.
@@ -172,7 +200,7 @@ print(p.to_proverif())    # formal model output
 - **Key Management Enhancements**: `KeyVault` context manager and `KeyManager` utilities.
 - **Audit Logging**: Decorators for tracing operations with optional encrypted logs.
 
----
+______________________________________________________________________
 
 ## 📦 Installation
 
@@ -242,8 +270,7 @@ Execute the fuzz harness locally:
 cryptosuite-fuzz --runs 1000
 ```
 
----
-
+______________________________________________________________________
 
 ## 🔑 Key Features
 
@@ -255,18 +282,18 @@ cryptosuite-fuzz --runs 1000
 - **Secret Sharing**: Implementation of Shamir's Secret Sharing scheme for splitting and reconstructing secrets.
 - **Hybrid Encryption**: Combine RSA/ECIES with AES-GCM for performance and security.
 - **Post-Quantum Cryptography**: Kyber key encapsulation and Dilithium signatures for quantum-safe workflows.
-- **XChaCha20-Poly1305**: Modern stream cipher support when ``cryptography`` exposes ``XChaCha20Poly1305``.
-- **Salsa20 and Ascon**: Deprecated and provided for reference only. **Not recommended for production**, removed from public imports, and scheduled for removal in v4.0.0. Use authenticated ciphers like ``chacha20_encrypt``/``xchacha_encrypt`` or ``AESGCMEncrypt`` instead.
+- **XChaCha20-Poly1305**: Modern stream cipher support when `cryptography` exposes `XChaCha20Poly1305`.
+- **Salsa20 and Ascon**: Deprecated and provided for reference only. **Not recommended for production**, removed from public imports, and scheduled for removal in v4.0.0. Use authenticated ciphers like `chacha20_encrypt`/`xchacha_encrypt` or `AESGCMEncrypt` instead.
 - **Audit Logging**: Decorators and helpers for encrypted audit trails.
 - **KeyVault Management**: Context manager to safely handle in-memory keys.
 - **Password-Authenticated Key Exchange (PAKE)**: SPAKE2 protocol implementation for secure password-based key exchange.
- - **One-Time Passwords (OTP)**: HOTP and TOTP algorithms for generating and verifying one-time passwords.
-   > ⚠️ Secrets used for OTP (TOTP/HOTP) will now be auto-padded to prevent base32 decoding issues. No manual padding is required.
+- **One-Time Passwords (OTP)**: HOTP and TOTP algorithms for generating and verifying one-time passwords.
+  > ⚠️ Secrets used for OTP (TOTP/HOTP) will now be auto-padded to prevent base32 decoding issues. No manual padding is required.
 - **Utility Functions**: Includes Base62 encoding/decoding, secure random string generation, and memory zeroing.
 - **Homomorphic Encryption**: Wrapper around Pyfhel supporting CKKS and BFV schemes. *(experimental)*
 - **Zero-Knowledge Proofs**: Bulletproof range proofs and zk-SNARK preimage proofs (optional dependencies, experimental).
 
----
+______________________________________________________________________
 
 ## Backend Matrix
 
@@ -296,9 +323,9 @@ policies on backend usage.
   for testing or inside protected containers. When using `serialize_private_key` or
   `KeyManager.save_private_key`, always provide a password.
 - **Strict Key Storage**: By default, unencrypted key files trigger a warning. Set
-  ``CRYPTOSUITE_STRICT_KEYS=error`` to refuse loading or saving unencrypted private
+  `CRYPTOSUITE_STRICT_KEYS=error` to refuse loading or saving unencrypted private
   keys (raising an error). To disable these checks entirely – which is **unsafe** – set
-  ``CRYPTOSUITE_STRICT_KEYS=0`` or ``CRYPTOSUITE_STRICT_KEYS=false``.
+  `CRYPTOSUITE_STRICT_KEYS=0` or `CRYPTOSUITE_STRICT_KEYS=false`.
 - **TOTP/HOTP Hash Choice**: TOTP and HOTP use SHA-1 by default for RFC compatibility,
   but stronger hash functions are supported. These algorithms are suitable for
   second-factor authentication, NOT as general-purpose hash functions.
@@ -309,13 +336,13 @@ This module is not a full Signal implementation. It lacks critical security
 properties and should never be used for production or high-assurance
 messaging.
 
----
+______________________________________________________________________
 
 ## Migration to Pipeline API
 
-Legacy one-shot helpers such as ``aes_encrypt`` and ``rsa_encrypt`` are now
+Legacy one-shot helpers such as `aes_encrypt` and `rsa_encrypt` are now
 **deprecated**. New code should build pipelines using modules like
-``AESGCMEncrypt`` and ``RSAEncrypt``. See ``docs/migration_pipeline_api.md`` for
+`AESGCMEncrypt` and `RSAEncrypt`. See `docs/migration_pipeline_api.md` for
 full details.
 
 ```
@@ -327,7 +354,7 @@ assert p.run("secret") == "secret"
 
 For a catalog of built-in modules see [docs/pipeline_catalog.md](docs/pipeline_catalog.md).
 
----
+______________________________________________________________________
 
 ## 💡 Usage Examples
 
@@ -387,7 +414,7 @@ asyncio.run(main())
 Generate RSA key pairs and perform encryption/decryption.
 
 Ciphertext and related binary outputs are returned as Base64 strings by
-default. Pass ``raw_output=True`` to obtain raw bytes instead.
+default. Pass `raw_output=True` to obtain raw bytes instead.
 
 ```python
 from cryptography_suite.asymmetric import (
@@ -589,8 +616,8 @@ parsed = decode_encrypted_message(blob)
 
 ### XChaCha20-Poly1305
 
-Additional stream cipher available when ``cryptography`` exposes
-``XChaCha20Poly1305``. Tested in
+Additional stream cipher available when `cryptography` exposes
+`XChaCha20Poly1305`. Tested in
 [`tests/test_xchacha.py`](tests/test_xchacha.py).
 
 ```python
@@ -604,7 +631,7 @@ plain = xchacha_decrypt(data["ciphertext"], key, data["nonce"])
 
 ### Secure Key Vault
 
-Use ``KeyVault`` to erase keys from memory after use. Unit tests are
+Use `KeyVault` to erase keys from memory after use. Unit tests are
 located in [`tests/test_utils.py`](tests/test_utils.py).
 
 ```python
@@ -617,10 +644,10 @@ with KeyVault(key_material) as buf:
 
 ### Zeroization & Memory Safety
 
-This library provides tools (``KeyVault``, ``secure_zero``) for explicit
+This library provides tools (`KeyVault`, `secure_zero`) for explicit
 zeroization of secrets. However, due to Python's memory model, secrets
-stored as plain ``bytes`` may remain in memory until garbage collected.
-For highest assurance, always use ``KeyVault`` or the ``sensitive=True``
+stored as plain `bytes` may remain in memory until garbage collected.
+For highest assurance, always use `KeyVault` or the `sensitive=True`
 option on key-generation functions when handling private keys or session
 secrets.
 
@@ -633,7 +660,7 @@ with generate_aes_key() as key_bytes:
 
 ### KeyManager File Handling
 
-Persist key pairs to disk with the high-level ``KeyManager`` helper.
+Persist key pairs to disk with the high-level `KeyManager` helper.
 
 ```python
 from cryptography_suite.protocols import KeyManager, generate_random_password
@@ -657,6 +684,7 @@ ck: bytes = c.compute_shared_key(s.generate_message())
 sk: bytes = s.compute_shared_key(c.generate_message())
 print(ck == sk)
 ```
+
 Requires the optional `spake2` package.
 
 ### ECIES Encryption
@@ -704,7 +732,7 @@ print(blake2b_hash(data))
 print(blake3_hash(data))
 ```
 
----
+______________________________________________________________________
 
 ## 🧪 Running Tests
 
@@ -742,7 +770,7 @@ cryptography-suite file encrypt --in secret.txt --out secret.enc --password mypa
 cryptography-suite file decrypt --in secret.enc --out decrypted.txt --password mypass
 ```
 
----
+______________________________________________________________________
 
 ## 🔒 Security Best Practices
 
@@ -754,7 +782,7 @@ cryptography-suite file decrypt --in secret.enc --out decrypted.txt --password m
 - **Post-Quantum Algorithms**: Use Kyber and Dilithium for data requiring long-term secrecy, noting their larger key sizes.
 - **Hybrid Encryption**: Combine classical and PQC schemes during migration to mitigate potential weaknesses.
 
----
+______________________________________________________________________
 
 ## 🛠 Advanced Usage & Customization
 
@@ -763,7 +791,7 @@ cryptography-suite file decrypt --in secret.enc --out decrypted.txt --password m
 - **Integration with Other Libraries**: Seamlessly integrate with other Python libraries and frameworks for enhanced functionality.
 - **Optimized Performance**: Utilize performance profiling tools to optimize cryptographic operations in high-load environments.
 
----
+______________________________________________________________________
 
 ## 🏢 Enterprise Features
 
@@ -771,7 +799,7 @@ cryptography-suite file decrypt --in secret.enc --out decrypted.txt --password m
 
 You can inject keys managed by hardware security modules (HSMs) or cloud key
 management services (KMS) by providing wrapper classes that mimic the standard
-private key interface. These wrappers allow the suite to call ``decrypt`` on the
+private key interface. These wrappers allow the suite to call `decrypt` on the
 external key just like a locally generated one.
 
 ```python
@@ -782,7 +810,7 @@ private_key = load_rsa_private_key("enterprise-key-id")
 plaintext = rsa_decrypt(ciphertext, private_key)
 ```
 
----
+______________________________________________________________________
 
 ## 🔐 Supply Chain Security
 
@@ -798,13 +826,13 @@ attestation and `cosign` signatures.
    cosign verify --certificate-identity "https://github.com/Psychevus/cryptography-suite/.github/workflows/release.yml@refs/tags/v3.0.0" <wheel>.sig <wheel>
    ```
 
-2. Validate the checksums:
+1. Validate the checksums:
 
    ```bash
    sha256sum -c checksums.txt
    ```
 
-3. Inspect the SLSA provenance:
+1. Inspect the SLSA provenance:
 
    ```bash
    jq '.subject | .name' provenance.intoto.jsonl
@@ -815,7 +843,7 @@ Reproducibility is tested in CI via `reproducibility.yml`. See
 [release process documentation](docs/release_process.md) for details on
 verifying artifacts and SBOM contents.
 
----
+______________________________________________________________________
 
 ## 📚 Project Structure
 
@@ -858,59 +886,59 @@ cryptography-suite/
         └── python-app.yml
 ```
 
----
+______________________________________________________________________
 
 ## 🛤 Migration Guide from v1.x to v2.0.0
 
 - **Package Layout**: Functions are now organized in subpackages such as
-  ``cryptography_suite.pqc`` and ``cryptography_suite.protocols``.
-- **New Exceptions**: ``MissingDependencyError`` and ``ProtocolError`` extend
-  ``CryptographySuiteError``.
-- **Return Types**: Encryption helpers may return ``bytes`` when
-  ``raw_output=True``.
-- **Audit and Key Vault**: Use ``audit_log`` and ``KeyVault`` for logging and
+  `cryptography_suite.pqc` and `cryptography_suite.protocols`.
+- **New Exceptions**: `MissingDependencyError` and `ProtocolError` extend
+  `CryptographySuiteError`.
+- **Return Types**: Encryption helpers may return `bytes` when
+  `raw_output=True`.
+- **Audit and Key Vault**: Use `audit_log` and `KeyVault` for logging and
   secure key handling.
-- **Kyber API Updates**: ``kyber_encrypt`` and ``kyber_decrypt`` accept a
-  ``level`` parameter (512/768/1024). ``kyber_decrypt`` now computes the shared
+- **Kyber API Updates**: `kyber_encrypt` and `kyber_decrypt` accept a
+  `level` parameter (512/768/1024). `kyber_decrypt` now computes the shared
   secret automatically when omitted.
-- **Key Management**: ``KeyManager`` now provides ``generate_rsa_keypair_and_save``.
-  The standalone ``generate_rsa_keypair_and_save`` helper is deprecated and will
+- **Key Management**: `KeyManager` now provides `generate_rsa_keypair_and_save`.
+  The standalone `generate_rsa_keypair_and_save` helper is deprecated and will
   be removed in v4.0.0.
-- **KDF Naming**: ``derive_pbkdf2`` is deprecated and will be removed in v4.0.0.
-  Use ``kdf_pbkdf2`` instead.
+- **KDF Naming**: `derive_pbkdf2` is deprecated and will be removed in v4.0.0.
+  Use `kdf_pbkdf2` instead.
 
 ## 🛤 Migration Guide from v2.x to v3.0.0
 
 Version 3.0.0 introduces several breaking changes. To upgrade from 2.x:
 
-- **Backend Selection Required** via ``use_backend``; the library emits a
+- **Backend Selection Required** via `use_backend`; the library emits a
   runtime warning if no backend is explicitly selected.
 - **Pipeline API** replaces chained helper calls.
 - **KeyManager Interfaces Updated** for persistent key handling.
 - **Deprecated Helpers Removed** in favor of pipeline stages.
 - See [migration_3.0.md](docs/migration_3.0.md) for full details.
 
----
+______________________________________________________________________
 
 ## 📜 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
----
+______________________________________________________________________
 
 ## 🤝 Contributions
 
-We welcome contributions from the community. To contribute:
+We welcome contributions from the community. See [CONTRIBUTING.md](CONTRIBUTING.md) for full guidelines and [API stability](docs/api-stability.md) expectations. To contribute:
 
 1. **Fork the Repository**: Click on the 'Fork' button at the top right corner of the repository page.
-2. **Create a New Branch**: Use a descriptive name for your branch (e.g., `feature/new-algorithm`).
-3. **Commit Your Changes**: Make sure to write clear, concise commit messages.
-4. **Push to GitHub**: Push your changes to your forked repository.
-5. **Submit a Pull Request**: Open a pull request to the `main` branch of the original repository.
+1. **Create a New Branch**: Use a descriptive name for your branch (e.g., `feature/new-algorithm`).
+1. **Commit Your Changes**: Make sure to write clear, concise commit messages.
+1. **Push to GitHub**: Push your changes to your forked repository.
+1. **Submit a Pull Request**: Open a pull request to the `main` branch of the original repository.
 
 Please ensure that your contributions adhere to the project's coding standards and include relevant tests.
 
----
+______________________________________________________________________
 
 ## 📬 Contact
 
@@ -919,12 +947,12 @@ For support or inquiries:
 - **Email**: [psychevus@gmail.com](mailto:psychevus@gmail.com)
 - **GitHub Issues**: [Create an Issue](https://github.com/Psychevus/cryptography-suite/issues)
 
----
+______________________________________________________________________
 
 ## 🌟 Acknowledgements
 
 Special thanks to all contributors and users who have helped improve this project through feedback and collaboration.
 
----
+______________________________________________________________________
 
 *Empower your applications with secure and reliable cryptographic functions using Cryptography Suite.*
