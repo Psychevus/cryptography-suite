@@ -16,6 +16,28 @@
 
 **Cryptography Suite** is an advanced cryptographic toolkit for Python, meticulously engineered for applications demanding robust security and seamless integration. It offers a comprehensive set of cryptographic primitives and protocols, empowering developers and organizations to implement state-of-the-art encryption, hashing, key management, digital signatures, and more.
 
+## Vision & Scope
+
+Goal: Become a full, safe-by-default Python crypto suite that can replace pyca/cryptography for mainstream use while also serving researchers and beginners.
+
+### Audience tiers and APIs
+
+- `suite.recipes`: beginner-safe, opinionated, secure defaults, minimal knobs.
+- `suite.core`: professional-grade primitives with explicit parameters and documented trade-offs.
+- `suite.experimental`: research-only features (PQC/ZK/FHE/Signal demo) with hard warnings.
+
+| Tier | Do | Don't |
+| --- | --- | --- |
+| `recipes` | Use for quick, secure defaults; depend on long-term support | Expect customizable parameters or legacy algorithms |
+| `core` | Build for production with explicit algorithms and parameters | Assume default settings cover all threat models |
+| `experimental` | Explore PQC, ZK, FHE, or protocol demos with caution | Deploy in production or rely on stability |
+
+Threat model (high level): misuse resistance focus, safe defaults, explicit unsafe switches.
+
+Support statement: production support limited to `recipes` and `core`; `experimental` is excluded.
+
+See [Vision details](docs/vision.md) for expansion.
+
 ## 📚 Documentation
 
 👉 [View Full Documentation](https://psychevus.github.io/cryptography-suite/)
