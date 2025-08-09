@@ -1,0 +1,12 @@
+site_name: Cryptography Suite
+nav:
+  - Home: index.md
+  - Vision: vision.md
+  - Threat Model: threat-model.md
+  - RFCs: rfc/README.md
+  - API Stability: api-stability.md
+  - Migration: migration-from-pyca.md
+  - Cheatsheets: cheatsheets/recipes.md
+  - Security: security.md
+theme:
+  name: mkdocs
