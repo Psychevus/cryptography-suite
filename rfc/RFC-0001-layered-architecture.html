@@ -1,15 +1,15 @@
 <!doctype html>
-<html class="no-js" lang="en" data-content_root="./">
+<html class="no-js" lang="en" data-content_root="../">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
-        <title>migrate-keys command - cryptography-suite 3.0.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=25af2a20" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
+        <title>RFC-0001: Layered Architecture - cryptography-suite 3.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=25af2a20" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
     
     
 
@@ -166,7 +166,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">cryptography-suite 3.0.0 documentation</div></a>
+      <a href="../index.html"><div class="brand">cryptography-suite 3.0.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -187,11 +187,11 @@
   <aside class="sidebar-drawer">
     <div class="sidebar-container">
       
-      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
   
   <span class="sidebar-brand-text">cryptography-suite 3.0.0 documentation</span>
   
-</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
   <input type="hidden" name="check_keywords" value="yes">
   <input type="hidden" name="area" value="default">
@@ -216,7 +216,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="_sources/usage.md.txt" title="View this page">
+  <a class="muted-link" href="../_sources/rfc/RFC-0001-layered-architecture.md.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -236,51 +236,207 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="migrate-keys-command">
-<h1>migrate-keys command<a class="headerlink" href="#migrate-keys-command" title="Link to this heading">¶</a></h1>
-<p>The <code class="docutils literal notranslate"><span class="pre">migrate-keys</span></code> CLI moves private keys between in-memory backends.
-It supports an interactive wizard and a non-interactive batch mode.</p>
-<section id="interactive-wizard">
-<h2>Interactive wizard<a class="headerlink" href="#interactive-wizard" title="Link to this heading">¶</a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cryptography-suite<span class="w"> </span>migrate-keys<span class="w"> </span>--from<span class="w"> </span>file<span class="w"> </span>--to<span class="w"> </span>vault
-</pre></div>
-</div>
-<p>Each key’s algorithm family, security level, and SHA256 fingerprint are shown.
-The wizard accepts <code class="docutils literal notranslate"><span class="pre">y</span></code>, <code class="docutils literal notranslate"><span class="pre">n</span></code>, <code class="docutils literal notranslate"><span class="pre">all</span></code>, or <code class="docutils literal notranslate"><span class="pre">skip</span></code> for each key.  RSA keys below
-2048 bits are highlighted with a warning.  Post-quantum keys (e.g.,
-CRYSTALS-Kyber, Dilithium) are detected automatically and a warning is emitted
-if they operate in hybrid or legacy mode.</p>
+          <section id="rfc-0001-layered-architecture">
+<h1>RFC-0001: Layered Architecture<a class="headerlink" href="#rfc-0001-layered-architecture" title="Link to this heading">¶</a></h1>
+<section id="context">
+<h2>Context<a class="headerlink" href="#context" title="Link to this heading">¶</a></h2>
+<p>Need to serve beginners, professionals, and researchers without cross-contamination of risk.</p>
 </section>
-<section id="batch-mode">
-<h2>Batch mode<a class="headerlink" href="#batch-mode" title="Link to this heading">¶</a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cryptography-suite<span class="w"> </span>migrate-keys<span class="w"> </span>--from<span class="w"> </span>file<span class="w"> </span>--to<span class="w"> </span>hsm<span class="w"> </span>--batch<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span><span class="o">[</span>--ignore-errors<span class="o">]</span><span class="w"> </span><span class="o">[</span>--dry-run<span class="o">]</span>
-</pre></div>
-</div>
-<p>Runs without prompts.  Stops on the first failure unless
-<code class="docutils literal notranslate"><span class="pre">--ignore-errors</span></code> is supplied.  <code class="docutils literal notranslate"><span class="pre">--dry-run</span></code> logs actions without
-writing any keys to the target.</p>
-<p>To export a signed forensics report or mirror logs to a SIEM:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cryptography-suite<span class="w"> </span>migrate-keys<span class="w"> </span>--from<span class="w"> </span>file<span class="w"> </span>--to<span class="w"> </span>hsm<span class="w"> </span>--batch<span class="w"> </span>--forensics-report<span class="w"> </span>report.json<span class="w"> </span>--syslog
-<span class="c1"># or</span>
-cryptography-suite<span class="w"> </span>migrate-keys<span class="w"> </span>--from<span class="w"> </span>file<span class="w"> </span>--to<span class="w"> </span>hsm<span class="w"> </span>--batch<span class="w"> </span>--webhook<span class="w"> </span>https://siem.example/ingest
-</pre></div>
-</div>
+<section id="decision">
+<h2>Decision<a class="headerlink" href="#decision" title="Link to this heading">¶</a></h2>
+<p>Adopt a three-layer API design: <code class="docutils literal notranslate"><span class="pre">suite.recipes</span></code>, <code class="docutils literal notranslate"><span class="pre">suite.core</span></code>, and <code class="docutils literal notranslate"><span class="pre">suite.experimental</span></code>, with strict boundaries between layers.</p>
 </section>
-<section id="security-guarantees">
-<h2>Security guarantees<a class="headerlink" href="#security-guarantees" title="Link to this heading">¶</a></h2>
+<section id="consequences">
+<h2>Consequences<a class="headerlink" href="#consequences" title="Link to this heading">¶</a></h2>
+<p><strong>Pros</strong></p>
 <ul class="simple">
-<li><p>Keys are never written to disk; all migrations operate on in-memory
-representations only.</p></li>
-<li><p>Every action is appended to <code class="docutils literal notranslate"><span class="pre">audit.log</span></code> using a SHA256 hash chain,
-signed with an Ed25519 key and chained by SHA256, providing
-tamper-evident auditability.</p></li>
-<li><p>Supported backends: <code class="docutils literal notranslate"><span class="pre">file</span></code>, <code class="docutils literal notranslate"><span class="pre">vault</span></code>, and <code class="docutils literal notranslate"><span class="pre">hsm</span></code>.  Classical and
-NIST post-quantum algorithms are supported for migration in both
-interactive and batch modes.</p></li>
-<li><p>Optional <code class="docutils literal notranslate"><span class="pre">--forensics-report</span></code> exports JSON evidence with a signed
-digest and public key for verification.  Log entries can also be
-forwarded to syslog or a webhook for SIEM integration.</p></li>
+<li><p>Tailored interfaces reduce accidental misuse.</p></li>
+<li><p>Clear demarcation supports audits and review.</p></li>
+<li><p>Maps to the pyca/cryptography “hazmat” mental model, easing migration.</p></li>
+</ul>
+<p><strong>Cons</strong></p>
+<ul class="simple">
+<li><p>Increases maintenance and coordination overhead.</p></li>
+<li><p>Requires separate documentation per layer.</p></li>
+<li><p>Risk of divergence between layers if boundaries erode.</p></li>
+</ul>
+</section>
+<section id="api-design-rules">
+<h2>API Design Rules<a class="headerlink" href="#api-design-rules" title="Link to this heading">¶</a></h2>
+<section id="recipes">
+<h3>recipes<a class="headerlink" href="#recipes" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Secure defaults.</p></li>
+<li><p>Minimal parameters.</p></li>
+<li><p>Explicit safe algorithms only.</p></li>
+<li><p>Stable.</p></li>
+</ul>
+</section>
+<section id="core">
+<h3>core<a class="headerlink" href="#core" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Explicit parameters.</p></li>
+<li><p>Safe defaults with documented trade-offs.</p></li>
+<li><p>Stable-ish.</p></li>
+</ul>
+</section>
+<section id="experimental">
+<h3>experimental<a class="headerlink" href="#experimental" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Behind feature flags or extras.</p></li>
+<li><p>Marked unstable.</p></li>
+<li><p>Warning banners.</p></li>
+</ul>
+</section>
+</section>
+<section id="parameter-strategy">
+<h2>Parameter Strategy<a class="headerlink" href="#parameter-strategy" title="Link to this heading">¶</a></h2>
+<section id="key-derivation-functions">
+<h3>Key Derivation Functions<a class="headerlink" href="#key-derivation-functions" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Allowed Range</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Algorithm</p></td>
+<td><p>Argon2id</p></td>
+<td><p>Argon2id, scrypt, PBKDF2</p></td>
+</tr>
+<tr class="row-odd"><td><p>Memory cost</p></td>
+<td><p>64 MiB</p></td>
+<td><p>32–1024 MiB</p></td>
+</tr>
+<tr class="row-even"><td><p>Time cost</p></td>
+<td><p>3</p></td>
+<td><p>1–10</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="padding">
+<h3>Padding<a class="headerlink" href="#padding" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Allowed Range</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Scheme</p></td>
+<td><p>PKCS7</p></td>
+<td><p>PKCS7, none</p></td>
+</tr>
+<tr class="row-odd"><td><p>Block size</p></td>
+<td><p>128-bit</p></td>
+<td><p>64–256-bit</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="nonces">
+<h3>Nonces<a class="headerlink" href="#nonces" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Allowed Range</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Length</p></td>
+<td><p>96 bits</p></td>
+<td><p>64–128 bits</p></td>
+</tr>
+<tr class="row-odd"><td><p>Reuse policy</p></td>
+<td><p>Forbid</p></td>
+<td><p>N/A</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="random-number-generation">
+<h3>Random Number Generation<a class="headerlink" href="#random-number-generation" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Allowed Range</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Source</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">os.urandom</span></code> via <code class="docutils literal notranslate"><span class="pre">secrets</span></code></p></td>
+<td><p>System CSPRNG only</p></td>
+</tr>
+<tr class="row-odd"><td><p>Reseed</p></td>
+<td><p>None</p></td>
+<td><p>None</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="key-sizes">
+<h3>Key Sizes<a class="headerlink" href="#key-sizes" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Key Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Allowed Range</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>AES</p></td>
+<td><p>256 bits</p></td>
+<td><p>128, 192, 256</p></td>
+</tr>
+<tr class="row-odd"><td><p>RSA</p></td>
+<td><p>2048 bits</p></td>
+<td><p>2048–4096</p></td>
+</tr>
+<tr class="row-even"><td><p>ECC</p></td>
+<td><p>P-256</p></td>
+<td><p>P-256, P-384, P-521</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<section id="error-model">
+<h2>Error Model<a class="headerlink" href="#error-model" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Base <code class="docutils literal notranslate"><span class="pre">SuiteError</span></code> for all package errors.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ParameterError</span></code> for invalid sizes or ranges.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MisuseError</span></code> for nonce reuse or unsafe options.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">UnsupportedAlgorithmError</span></code> for unavailable primitives.
+All errors provide actionable messages.</p></li>
+</ul>
+</section>
+<section id="versioning">
+<h2>Versioning<a class="headerlink" href="#versioning" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Semantic Versioning.</p></li>
+<li><p>Deprecations announced and removed after two minor releases.</p></li>
+<li><p>Stability notes:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">recipes</span></code>: stable.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">core</span></code>: stable with minor optional parameters.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">experimental</span></code>: unstable; breaking changes permitted at any time.</p></li>
+</ul>
+</li>
 </ul>
 </section>
 </section>
@@ -322,10 +478,26 @@ forwarded to syslog or a webhook for SIEM integration.</p></li>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">migrate-keys command</a><ul>
-<li><a class="reference internal" href="#interactive-wizard">Interactive wizard</a></li>
-<li><a class="reference internal" href="#batch-mode">Batch mode</a></li>
-<li><a class="reference internal" href="#security-guarantees">Security guarantees</a></li>
+<li><a class="reference internal" href="#">RFC-0001: Layered Architecture</a><ul>
+<li><a class="reference internal" href="#context">Context</a></li>
+<li><a class="reference internal" href="#decision">Decision</a></li>
+<li><a class="reference internal" href="#consequences">Consequences</a></li>
+<li><a class="reference internal" href="#api-design-rules">API Design Rules</a><ul>
+<li><a class="reference internal" href="#recipes">recipes</a></li>
+<li><a class="reference internal" href="#core">core</a></li>
+<li><a class="reference internal" href="#experimental">experimental</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#parameter-strategy">Parameter Strategy</a><ul>
+<li><a class="reference internal" href="#key-derivation-functions">Key Derivation Functions</a></li>
+<li><a class="reference internal" href="#padding">Padding</a></li>
+<li><a class="reference internal" href="#nonces">Nonces</a></li>
+<li><a class="reference internal" href="#random-number-generation">Random Number Generation</a></li>
+<li><a class="reference internal" href="#key-sizes">Key Sizes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#error-model">Error Model</a></li>
+<li><a class="reference internal" href="#versioning">Versioning</a></li>
 </ul>
 </li>
 </ul>
@@ -337,9 +509,9 @@ forwarded to syslog or a webhook for SIEM integration.</p></li>
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=acc74ff5"></script>
-    <script src="_static/doctools.js?v=9bcbadda"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="_static/scripts/furo.js?v=46bd48cc"></script>
+</div><script src="../_static/documentation_options.js?v=acc74ff5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
     </body>
 </html>

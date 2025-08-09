@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Package Architecture" href="architecture.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
         <title>cryptography-suite 3.0.0 documentation</title>
@@ -197,37 +197,7 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="architecture.html">Package Architecture</a></li>
-<li class="toctree-l1"><a class="reference internal" href="protocols.html">Protocol Notes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pipeline.html">Pipeline API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pipeline_coverage.html">Pipeline API Coverage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="keystore.html">Keystore Migration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="keystore_plugins.html">KeyStore Plugin Development</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pkcs11.html">Using Hardware HSM (PKCS#11)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="formal.html">Formal Verification Support</a></li>
-<li class="toctree-l1"><a class="reference internal" href="fuzzing.html">Fuzzing and Property Testing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="mypy_plugin.html">Misuse-Resistant Checking</a></li>
-<li class="toctree-l1"><a class="reference internal" href="release_process.html">Release Process</a></li>
-<li class="toctree-l1"><a class="reference internal" href="release_checklist.html">Release Checklist</a></li>
-<li class="toctree-l1"><a class="reference internal" href="migration_3.0.html">Migrating to Cryptography Suite 3.0.0</a></li>
-<li class="toctree-l1"><a class="reference internal" href="migration_4.0.html">Migration Guide to Cryptography Suite 4.0.0</a></li>
-<li class="toctree-l1"><a class="reference internal" href="migration_pipeline_api.html">Migration to Pipeline API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="threat_model.html">Supply Chain Threat Model</a></li>
-<li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="backend_consistency.html">Backend Consistency</a></li>
-<li class="toctree-l1"><a class="reference internal" href="feature_maturity.html">Feature Maturity</a></li>
-<li class="toctree-l1"><a class="reference internal" href="roadmap.html">Experimental Feature Roadmap</a></li>
-<li class="toctree-l1"><a class="reference internal" href="zeroization_faq.html">Zeroization in Python FAQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="security.html">Security Notes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api/modules.html">API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api/pipeline.html">Pipeline DSL</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api/public_api_table.html">Public API Inventory</a></li>
-</ul>
-
+  
 </div>
 </div>
 
@@ -246,7 +216,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="_sources/index.rst.txt" title="View this page">
+  <a class="muted-link" href="_sources/index.md.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -266,148 +236,18 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="cryptography-suite-documentation">
-<h1>cryptography-suite documentation<a class="headerlink" href="#cryptography-suite-documentation" title="Link to this heading">¶</a></h1>
-<p>Welcome to the <strong>Cryptography Suite</strong> documentation. The API reference is
-generated from the package’s docstrings.
-See the <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html">reStructuredText</a>
-documentation for details.</p>
-<section id="what-s-new-in-3-0-0">
-<h2>What’s new in 3.0.0<a class="headerlink" href="#what-s-new-in-3-0-0" title="Link to this heading">¶</a></h2>
-<p>Cryptography Suite 3.0.0 introduces a fully modular design and a focus on
-formally verified, misuse-resistant workflows.</p>
+          <section id="cryptography-suite">
+<h1>Cryptography Suite<a class="headerlink" href="#cryptography-suite" title="Link to this heading">¶</a></h1>
+<p>A full, safe-by-default Python cryptography stack.</p>
+<section id="getting-started">
+<h2>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>Backend-Agnostic Core (Crypto Abstraction Layer)</p></li>
-<li><p>Pipeline DSL for Crypto Workflows</p></li>
-<li><p>Misuse-Resistant API (mypy plugin)</p></li>
-<li><p>Zeroization &amp; Constant-Time Guarantees</p></li>
-<li><p>Formal Verification Export (ProVerif/Tamarin)</p></li>
-<li><p>Auto-Stub Generator for App Skeletons</p></li>
-<li><p>Rich Logging &amp; Jupyter Widgets for Visualization</p></li>
-<li><p>HSM, YubiKey, PKCS#11, Cloud KMS Plugin Architecture</p></li>
-<li><p>Fuzzing Harness &amp; Property-Based Testing</p></li>
-<li><p>Supply-Chain Attestation, SLSA, and Reproducible Builds</p></li>
-<li><p>Signal Protocol components (X3DH + Double Ratchet) for demo use (<em>experimental, not production-ready</em>)</p></li>
-<li><p>Post-Quantum primitives: Kyber KEM, Dilithium signatures, and <em>experimental</em> SPHINCS+ (requires <cite>pip install “cryptography-suite[pqc]”</cite>)</p></li>
-<li><p>Homomorphic encryption helpers via Pyfhel (<em>experimental</em>)</p></li>
-<li><p>Zero-knowledge proof demos (Bulletproofs, zk-SNARK) (<em>experimental</em>)</p></li>
+<li><p><a class="reference internal" href="vision.html"><span class="std std-doc">Vision</span></a></p></li>
+<li><p><a class="reference internal" href="threat-model.html"><span class="std std-doc">Threat Model</span></a></p></li>
+<li><p><a class="reference internal" href="rfc/RFC-0001-layered-architecture.html"><span class="std std-doc">Layered Architecture RFC</span></a></p></li>
+<li><p><a class="reference internal" href="migration-from-pyca.html"><span class="std std-doc">Migration Guide</span></a></p></li>
+<li><p><a class="reference internal" href="cheatsheets/recipes.html"><span class="std std-doc">Recipes Cheat Sheet</span></a></p></li>
 </ul>
-<div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="architecture.html">Package Architecture</a></li>
-<li class="toctree-l1"><a class="reference internal" href="protocols.html">Protocol Notes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pipeline.html">Pipeline API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="pipeline.html#pipeline-dsl">Pipeline DSL</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline.html#extending-the-pipeline-dsl">Extending the Pipeline DSL</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="pipeline_coverage.html">Pipeline API Coverage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="cli.html#file-encryption">File Encryption</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cli.html#other-commands">Other Commands</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cli.html#keystore-command">Keystore Command</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="keystore.html">Keystore Migration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="keystore_plugins.html">KeyStore Plugin Development</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="keystore_plugins.html#writing-a-plugin">Writing a Plugin</a></li>
-<li class="toctree-l2"><a class="reference internal" href="keystore_plugins.html#aws-kms-example">AWS KMS Example</a></li>
-<li class="toctree-l2"><a class="reference internal" href="keystore_plugins.html#pkcs-11-skeleton">PKCS#11 Skeleton</a></li>
-<li class="toctree-l2"><a class="reference internal" href="keystore_plugins.html#third-party-plugin-troubleshooting">Third-party plugin troubleshooting</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="pkcs11.html">Using Hardware HSM (PKCS#11)</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="pkcs11.html#softhsm-quickstart">SoftHSM Quickstart</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pkcs11.html#security-caveats">Security Caveats</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="formal.html">Formal Verification Support</a></li>
-<li class="toctree-l1"><a class="reference internal" href="fuzzing.html">Fuzzing and Property Testing</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="fuzzing.html#local-usage">Local Usage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fuzzing.html#continuous-integration">Continuous Integration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fuzzing.html#limitations">Limitations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fuzzing.html#test-coverage-matrix">Test Coverage Matrix</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fuzzing.html#contribution-requirements">Contribution Requirements</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="testing.html#quick-start">Quick start</a></li>
-<li class="toctree-l2"><a class="reference internal" href="testing.html#extending-the-fuzz-harness">Extending the fuzz harness</a></li>
-<li class="toctree-l2"><a class="reference internal" href="testing.html#ci-matrix-overview">CI matrix overview</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="mypy_plugin.html">Misuse-Resistant Checking</a></li>
-<li class="toctree-l1"><a class="reference internal" href="release_process.html">Release Process</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="release_process.html#steps">Steps</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="release_checklist.html">Release Checklist</a></li>
-<li class="toctree-l1"><a class="reference internal" href="migration_3.0.html">Migrating to Cryptography Suite 3.0.0</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="migration_3.0.html#breaking-changes">Breaking Changes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="migration_3.0.html#typical-upgrade-steps">Typical Upgrade Steps</a></li>
-<li class="toctree-l2"><a class="reference internal" href="migration_3.0.html#example">Example</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="migration_4.0.html">Migration Guide to Cryptography Suite 4.0.0</a></li>
-<li class="toctree-l1"><a class="reference internal" href="migration_pipeline_api.html">Migration to Pipeline API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="migration_pipeline_api.html#replacing-aes-helpers">Replacing AES helpers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="migration_pipeline_api.html#replacing-rsa-helpers">Replacing RSA helpers</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="threat_model.html">Supply Chain Threat Model</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="threat_model.html#mitigations">Mitigations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="threat_model.html#attack-vectors">Attack Vectors</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="backend_consistency.html">Backend Consistency</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="backend_consistency.html#philosophy">Philosophy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="backend_consistency.html#backend-matrix">Backend Matrix</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="feature_maturity.html">Feature Maturity</a></li>
-<li class="toctree-l1"><a class="reference internal" href="roadmap.html">Experimental Feature Roadmap</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="roadmap.html#signal-protocol">Signal Protocol</a></li>
-<li class="toctree-l2"><a class="reference internal" href="roadmap.html#homomorphic-encryption">Homomorphic Encryption</a></li>
-<li class="toctree-l2"><a class="reference internal" href="roadmap.html#zero-knowledge-proofs">Zero-Knowledge Proofs</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="zeroization_faq.html">Zeroization in Python FAQ</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="zeroization_faq.html#can-python-securely-erase-secrets-from-memory">Can Python securely erase secrets from memory?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="zeroization_faq.html#what-should-i-use-for-private-keys-or-session-secrets">What should I use for private keys or session secrets?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="zeroization_faq.html#do-native-backends-handle-zeroization">Do native backends handle zeroization?</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="security.html">Security Notes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api/modules.html">API Reference</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#module-cryptography_suite">Core API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#experimental-api">Experimental API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#module-cryptography_suite.legacy">Legacy API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/modules.html#selecting-a-backend">Selecting a backend</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="api/pipeline.html">Pipeline DSL</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="api/pipeline.html#cryptography_suite.pipeline.AESGCMDecrypt"><code class="docutils literal notranslate"><span class="pre">AESGCMDecrypt</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/pipeline.html#cryptography_suite.pipeline.AESGCMEncrypt"><code class="docutils literal notranslate"><span class="pre">AESGCMEncrypt</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/pipeline.html#cryptography_suite.pipeline.CryptoModule"><code class="docutils literal notranslate"><span class="pre">CryptoModule</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/pipeline.html#cryptography_suite.pipeline.ECIESX25519Decrypt"><code class="docutils literal notranslate"><span class="pre">ECIESX25519Decrypt</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/pipeline.html#cryptography_suite.pipeline.ECIESX25519Encrypt"><code class="docutils literal notranslate"><span class="pre">ECIESX25519Encrypt</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/pipeline.html#cryptography_suite.pipeline.HybridDecrypt"><code class="docutils literal notranslate"><span class="pre">HybridDecrypt</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/pipeline.html#cryptography_suite.pipeline.HybridEncrypt"><code class="docutils literal notranslate"><span class="pre">HybridEncrypt</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/pipeline.html#cryptography_suite.pipeline.KyberDecrypt"><code class="docutils literal notranslate"><span class="pre">KyberDecrypt</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/pipeline.html#cryptography_suite.pipeline.KyberEncrypt"><code class="docutils literal notranslate"><span class="pre">KyberEncrypt</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/pipeline.html#cryptography_suite.pipeline.Pipeline"><code class="docutils literal notranslate"><span class="pre">Pipeline</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/pipeline.html#cryptography_suite.pipeline.PipelineVisualizer"><code class="docutils literal notranslate"><span class="pre">PipelineVisualizer</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/pipeline.html#cryptography_suite.pipeline.RSADecrypt"><code class="docutils literal notranslate"><span class="pre">RSADecrypt</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/pipeline.html#cryptography_suite.pipeline.RSAEncrypt"><code class="docutils literal notranslate"><span class="pre">RSAEncrypt</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/pipeline.html#cryptography_suite.pipeline.list_modules"><code class="docutils literal notranslate"><span class="pre">list_modules()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/pipeline.html#cryptography_suite.pipeline.register_module"><code class="docutils literal notranslate"><span class="pre">register_module()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="api/public_api_table.html">Public API Inventory</a></li>
-</ul>
-</div>
 </section>
 </section>
 
@@ -416,15 +256,7 @@ formally verified, misuse-resistant workflows.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="architecture.html">
-              <div class="page-info">
-                <div class="context">
-                  <span>Next</span>
-                </div>
-                <div class="title">Package Architecture</div>
-              </div>
-              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
-            </a>
+          
           
         </div>
         <div class="bottom-of-page">
@@ -456,8 +288,8 @@ formally verified, misuse-resistant workflows.</p>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">cryptography-suite documentation</a><ul>
-<li><a class="reference internal" href="#what-s-new-in-3-0-0">What’s new in 3.0.0</a></li>
+<li><a class="reference internal" href="#">Cryptography Suite</a><ul>
+<li><a class="reference internal" href="#getting-started">Getting Started</a></li>
 </ul>
 </li>
 </ul>

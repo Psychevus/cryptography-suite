@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
-        <title>migrate-keys command - cryptography-suite 3.0.0 documentation</title>
+        <title>API Stability Policy - cryptography-suite 3.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -216,7 +216,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="_sources/usage.md.txt" title="View this page">
+  <a class="muted-link" href="_sources/api-stability.md.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -236,52 +236,53 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="migrate-keys-command">
-<h1>migrate-keys command<a class="headerlink" href="#migrate-keys-command" title="Link to this heading">¶</a></h1>
-<p>The <code class="docutils literal notranslate"><span class="pre">migrate-keys</span></code> CLI moves private keys between in-memory backends.
-It supports an interactive wizard and a non-interactive batch mode.</p>
-<section id="interactive-wizard">
-<h2>Interactive wizard<a class="headerlink" href="#interactive-wizard" title="Link to this heading">¶</a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cryptography-suite<span class="w"> </span>migrate-keys<span class="w"> </span>--from<span class="w"> </span>file<span class="w"> </span>--to<span class="w"> </span>vault
-</pre></div>
-</div>
-<p>Each key’s algorithm family, security level, and SHA256 fingerprint are shown.
-The wizard accepts <code class="docutils literal notranslate"><span class="pre">y</span></code>, <code class="docutils literal notranslate"><span class="pre">n</span></code>, <code class="docutils literal notranslate"><span class="pre">all</span></code>, or <code class="docutils literal notranslate"><span class="pre">skip</span></code> for each key.  RSA keys below
-2048 bits are highlighted with a warning.  Post-quantum keys (e.g.,
-CRYSTALS-Kyber, Dilithium) are detected automatically and a warning is emitted
-if they operate in hybrid or legacy mode.</p>
-</section>
-<section id="batch-mode">
-<h2>Batch mode<a class="headerlink" href="#batch-mode" title="Link to this heading">¶</a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cryptography-suite<span class="w"> </span>migrate-keys<span class="w"> </span>--from<span class="w"> </span>file<span class="w"> </span>--to<span class="w"> </span>hsm<span class="w"> </span>--batch<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span><span class="o">[</span>--ignore-errors<span class="o">]</span><span class="w"> </span><span class="o">[</span>--dry-run<span class="o">]</span>
-</pre></div>
-</div>
-<p>Runs without prompts.  Stops on the first failure unless
-<code class="docutils literal notranslate"><span class="pre">--ignore-errors</span></code> is supplied.  <code class="docutils literal notranslate"><span class="pre">--dry-run</span></code> logs actions without
-writing any keys to the target.</p>
-<p>To export a signed forensics report or mirror logs to a SIEM:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cryptography-suite<span class="w"> </span>migrate-keys<span class="w"> </span>--from<span class="w"> </span>file<span class="w"> </span>--to<span class="w"> </span>hsm<span class="w"> </span>--batch<span class="w"> </span>--forensics-report<span class="w"> </span>report.json<span class="w"> </span>--syslog
-<span class="c1"># or</span>
-cryptography-suite<span class="w"> </span>migrate-keys<span class="w"> </span>--from<span class="w"> </span>file<span class="w"> </span>--to<span class="w"> </span>hsm<span class="w"> </span>--batch<span class="w"> </span>--webhook<span class="w"> </span>https://siem.example/ingest
-</pre></div>
+          <section id="api-stability-policy">
+<h1>API Stability Policy<a class="headerlink" href="#api-stability-policy" title="Link to this heading">¶</a></h1>
+<section id="stability-levels">
+<h2>Stability Levels<a class="headerlink" href="#stability-levels" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Module</p></th>
+<th class="head"><p>Stability</p></th>
+<th class="head"><p>Guarantee</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">suite.recipes</span></code></p></td>
+<td><p>Stable</p></td>
+<td><p>Backward-compatible within a major release. Breaking changes only with a new major version.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">suite.core</span></code></p></td>
+<td><p>Stable-with-deprecations</p></td>
+<td><p>Follows semver; features may be deprecated but remain functional for <strong>two minor releases</strong> before removal.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">suite.experimental</span></code></p></td>
+<td><p>Unstable</p></td>
+<td><p>May change or be removed at any time without notice.</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 </section>
-<section id="security-guarantees">
-<h2>Security guarantees<a class="headerlink" href="#security-guarantees" title="Link to this heading">¶</a></h2>
+<section id="deprecation-policy">
+<h2>Deprecation Policy<a class="headerlink" href="#deprecation-policy" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>Keys are never written to disk; all migrations operate on in-memory
-representations only.</p></li>
-<li><p>Every action is appended to <code class="docutils literal notranslate"><span class="pre">audit.log</span></code> using a SHA256 hash chain,
-signed with an Ed25519 key and chained by SHA256, providing
-tamper-evident auditability.</p></li>
-<li><p>Supported backends: <code class="docutils literal notranslate"><span class="pre">file</span></code>, <code class="docutils literal notranslate"><span class="pre">vault</span></code>, and <code class="docutils literal notranslate"><span class="pre">hsm</span></code>.  Classical and
-NIST post-quantum algorithms are supported for migration in both
-interactive and batch modes.</p></li>
-<li><p>Optional <code class="docutils literal notranslate"><span class="pre">--forensics-report</span></code> exports JSON evidence with a signed
-digest and public key for verification.  Log entries can also be
-forwarded to syslog or a webhook for SIEM integration.</p></li>
+<li><p>Announce deprecations in the changelog with a <code class="docutils literal notranslate"><span class="pre">Deprecated</span></code> section.</p></li>
+<li><p>Emit <code class="docutils literal notranslate"><span class="pre">DeprecationWarning</span></code> at runtime.</p></li>
+<li><p>Removal occurs after <strong>two minor releases</strong>.</p></li>
+<li><p>Provide migration notes in <code class="docutils literal notranslate"><span class="pre">docs/migration_*.md</span></code> as applicable.</p></li>
 </ul>
+</section>
+<section id="naming-and-parameter-conventions">
+<h2>Naming and Parameter Conventions<a class="headerlink" href="#naming-and-parameter-conventions" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Functions use verb phrases (<code class="docutils literal notranslate"><span class="pre">encrypt_message</span></code>); classes use nouns.</p></li>
+<li><p>Binary data accepts <code class="docutils literal notranslate"><span class="pre">bytes</span></code>. Textual parameters accept <code class="docutils literal notranslate"><span class="pre">str</span></code> with explicit encoding arguments.</p></li>
+<li><p>Time values are in seconds; size values are in bytes.</p></li>
+<li><p>Parameter names must state units (<code class="docutils literal notranslate"><span class="pre">timeout_s</span></code>, <code class="docutils literal notranslate"><span class="pre">length_bytes</span></code>).</p></li>
+</ul>
+<p>This policy clarifies compatibility expectations for consumers of cryptography-suite.</p>
 </section>
 </section>
 
@@ -322,10 +323,10 @@ forwarded to syslog or a webhook for SIEM integration.</p></li>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">migrate-keys command</a><ul>
-<li><a class="reference internal" href="#interactive-wizard">Interactive wizard</a></li>
-<li><a class="reference internal" href="#batch-mode">Batch mode</a></li>
-<li><a class="reference internal" href="#security-guarantees">Security guarantees</a></li>
+<li><a class="reference internal" href="#">API Stability Policy</a><ul>
+<li><a class="reference internal" href="#stability-levels">Stability Levels</a></li>
+<li><a class="reference internal" href="#deprecation-policy">Deprecation Policy</a></li>
+<li><a class="reference internal" href="#naming-and-parameter-conventions">Naming and Parameter Conventions</a></li>
 </ul>
 </li>
 </ul>

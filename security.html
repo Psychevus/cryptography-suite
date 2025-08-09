@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="API Reference" href="api/modules.html" /><link rel="prev" title="Zeroization in Python FAQ" href="zeroization_faq.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2025.07.19 -->
-        <title>Security Notes - cryptography-suite 3.0.0 documentation</title>
+        <title>Security Policy - cryptography-suite 3.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -178,7 +178,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -197,37 +197,7 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="architecture.html">Package Architecture</a></li>
-<li class="toctree-l1"><a class="reference internal" href="protocols.html">Protocol Notes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pipeline.html">Pipeline API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pipeline_coverage.html">Pipeline API Coverage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="keystore.html">Keystore Migration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="keystore_plugins.html">KeyStore Plugin Development</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pkcs11.html">Using Hardware HSM (PKCS#11)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="formal.html">Formal Verification Support</a></li>
-<li class="toctree-l1"><a class="reference internal" href="fuzzing.html">Fuzzing and Property Testing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="mypy_plugin.html">Misuse-Resistant Checking</a></li>
-<li class="toctree-l1"><a class="reference internal" href="release_process.html">Release Process</a></li>
-<li class="toctree-l1"><a class="reference internal" href="release_checklist.html">Release Checklist</a></li>
-<li class="toctree-l1"><a class="reference internal" href="migration_3.0.html">Migrating to Cryptography Suite 3.0.0</a></li>
-<li class="toctree-l1"><a class="reference internal" href="migration_4.0.html">Migration Guide to Cryptography Suite 4.0.0</a></li>
-<li class="toctree-l1"><a class="reference internal" href="migration_pipeline_api.html">Migration to Pipeline API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="threat_model.html">Supply Chain Threat Model</a></li>
-<li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="backend_consistency.html">Backend Consistency</a></li>
-<li class="toctree-l1"><a class="reference internal" href="feature_maturity.html">Feature Maturity</a></li>
-<li class="toctree-l1"><a class="reference internal" href="roadmap.html">Experimental Feature Roadmap</a></li>
-<li class="toctree-l1"><a class="reference internal" href="zeroization_faq.html">Zeroization in Python FAQ</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Security Notes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api/modules.html">API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api/pipeline.html">Pipeline DSL</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api/public_api_table.html">Public API Inventory</a></li>
-</ul>
-
+  
 </div>
 </div>
 
@@ -260,34 +230,85 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="security-notes">
-<h1>Security Notes<a class="headerlink" href="#security-notes" title="Link to this heading">¶</a></h1>
-<p>This project aims to carefully handle sensitive data in memory. Key features:</p>
+          <section id="security-policy">
+<h1>Security Policy<a class="headerlink" href="#security-policy" title="Link to this heading">¶</a></h1>
+<section id="scope">
+<h2>Scope<a class="headerlink" href="#scope" title="Link to this heading">¶</a></h2>
+<p>Production security guarantees apply to <code class="docutils literal notranslate"><span class="pre">suite.recipes</span></code> and <code class="docutils literal notranslate"><span class="pre">suite.core</span></code> only. The <code class="docutils literal notranslate"><span class="pre">suite.experimental</span></code> package is research-only and excluded from support. Importing any experimental module prints an explicit runtime warning.</p>
+</section>
+<section id="responsible-disclosure">
+<h2>Responsible disclosure<a class="headerlink" href="#responsible-disclosure" title="Link to this heading">¶</a></h2>
+<p>Please report suspected vulnerabilities to <a class="reference external" href="mailto:security&#37;&#52;&#48;example&#46;com">security<span>&#64;</span>example<span>&#46;</span>com</a>. Encrypt reports using PGP key <code class="docutils literal notranslate"><span class="pre">0xDEADBEEF</span></code> (placeholder). We aim to coordinate disclosure within 90 days.</p>
+</section>
+<section id="risk-acceptance-limitations">
+<h2>Risk acceptance &amp; limitations<a class="headerlink" href="#risk-acceptance-limitations" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">KeyVault</span></code> now cleans up secrets not only on context exit but also when the
-object is garbage collected.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">secure_zero</span></code> utilises <code class="docutils literal notranslate"><span class="pre">memset_s</span></code> from the system C library when available to
-erase memory. A fallback to <code class="docutils literal notranslate"><span class="pre">ctypes.memset</span></code> is used otherwise.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">constant_time_compare</span></code> provides a timing-attack resistant equality check.</p></li>
+<li><p>No side-channel hardening claims are made unless explicitly stated.</p></li>
+<li><p>Constant-time implementations for critical paths are planned but not yet complete.</p></li>
+<li><p>The library requires platforms to provide cryptographically secure randomness; deployments must ensure adequate entropy.</p></li>
 </ul>
-<p>While these mechanisms help reduce residual secrets in memory, absolute
-zeroization cannot be guaranteed on all operating systems and Python
-implementations.</p>
+</section>
+<section id="version-support">
+<h2>Version support<a class="headerlink" href="#version-support" title="Link to this heading">¶</a></h2>
+<p>Only the latest minor releases within the most recent major version receive security fixes.</p>
+<p>See <a class="reference internal" href="#CONTRIBUTING.md"><span class="xref myst">CONTRIBUTING.md</span></a> for requirements on submitting security fixes and <a class="reference internal" href="#docs/api-stability.md"><span class="xref myst">API stability</span></a> for module support levels.</p>
+</section>
+<section id="threat-scenarios">
+<h2>Threat scenarios<a class="headerlink" href="#threat-scenarios" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Scenario</p></th>
+<th class="head"><p>Risk</p></th>
+<th class="head"><p>Mitigation in library</p></th>
+<th class="head"><p>User responsibilities</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Misuse of KDF parameters</p></td>
+<td><p>Deriving weak keys</p></td>
+<td><p>Recipes enforce safe defaults; core documents tunable ranges</p></td>
+<td><p>Choose strong passwords and tune parameters for target hardware</p></td>
+</tr>
+<tr class="row-odd"><td><p>Nonce reuse</p></td>
+<td><p>Loss of confidentiality or integrity</p></td>
+<td><p>AEAD APIs auto-generate nonces and reject repeats</p></td>
+<td><p>Persist nonces or delegate management to the library</p></td>
+</tr>
+<tr class="row-even"><td><p>Weak padding</p></td>
+<td><p>Padding oracle attacks</p></td>
+<td><p>Recipes use authenticated modes without padding; core offers safe padding helpers</p></td>
+<td><p>Avoid custom padding and verify data lengths</p></td>
+</tr>
+<tr class="row-odd"><td><p>Password-only encryption with low entropy</p></td>
+<td><p>Offline brute-force</p></td>
+<td><p>High default iteration counts; warnings for low-entropy inputs</p></td>
+<td><p>Provide high-entropy secrets or combine with additional factors</p></td>
+</tr>
+<tr class="row-even"><td><p>Supply-chain tampering</p></td>
+<td><p>Malicious code insertion</p></td>
+<td><p>Signed, reproducible releases</p></td>
+<td><p>Verify signatures and hashes before deployment</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="out-of-scope">
+<h2>Out of scope<a class="headerlink" href="#out-of-scope" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>Private keys should always be stored encrypted, either with a strong password or
-in a hardware-backed keystore (HSM, KMS, etc.). Unencrypted PEMs are only
-acceptable for testing or inside protected containers. By default the library
-emits a warning when encountering such files. Set the environment variable
-<code class="docutils literal notranslate"><span class="pre">CRYPTOSUITE_STRICT_KEYS=error</span></code> to refuse loading or saving unencrypted keys.
-To disable this protection entirely – which carries significant risk – set
-<code class="docutils literal notranslate"><span class="pre">CRYPTOSUITE_STRICT_KEYS=0</span></code> or <code class="docutils literal notranslate"><span class="pre">CRYPTOSUITE_STRICT_KEYS=false</span></code>.</p></li>
+<li><p>TLS termination</p></li>
+<li><p>Network protocols</p></li>
+<li><p>HSM drivers</p></li>
+<li><p>FIPS validation</p></li>
 </ul>
+</section>
 </section>
 
         </article>
@@ -295,26 +316,8 @@ To disable this protection entirely – which carries significant risk – set
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="api/modules.html">
-              <div class="page-info">
-                <div class="context">
-                  <span>Next</span>
-                </div>
-                <div class="title">API Reference</div>
-              </div>
-              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
-            </a>
-          <a class="prev-page" href="zeroization_faq.html">
-              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
-              <div class="page-info">
-                <div class="context">
-                  <span>Previous</span>
-                </div>
-                
-                <div class="title">Zeroization in Python FAQ</div>
-                
-              </div>
-            </a>
+          
+          
         </div>
         <div class="bottom-of-page">
           <div class="left-details">
@@ -333,8 +336,32 @@ To disable this protection entirely – which carries significant risk – set
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Security Policy</a><ul>
+<li><a class="reference internal" href="#scope">Scope</a></li>
+<li><a class="reference internal" href="#responsible-disclosure">Responsible disclosure</a></li>
+<li><a class="reference internal" href="#risk-acceptance-limitations">Risk acceptance &amp; limitations</a></li>
+<li><a class="reference internal" href="#version-support">Version support</a></li>
+<li><a class="reference internal" href="#threat-scenarios">Threat scenarios</a></li>
+<li><a class="reference internal" href="#out-of-scope">Out of scope</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
