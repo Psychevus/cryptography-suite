@@ -2,7 +2,7 @@
 
 ## Scope
 
-Production security guarantees apply to `suite.recipes` and `suite.core` only. The `suite.experimental` package is research-only and excluded from support.
+Production security guarantees apply to `suite.recipes` and `suite.core` only. The `suite.experimental` package is research-only and excluded from support. Importing any experimental module prints an explicit runtime warning.
 
 ## Responsible disclosure
 

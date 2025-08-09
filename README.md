@@ -25,6 +25,7 @@ Goal: Become a full, safe-by-default Python crypto suite that can replace pyca/c
 - `suite.recipes`: beginner-safe, opinionated, secure defaults, minimal knobs.
 - `suite.core`: professional-grade primitives with explicit parameters and documented trade-offs.
 - `suite.experimental`: research-only features (PQC/ZK/FHE/Signal demo) with hard warnings.
+  Importing any module from this layer prints a prominent runtime banner.
 
 | Tier | Do | Don't |
 | --- | --- | --- |
