@@ -42,6 +42,9 @@ See [Vision details](docs/vision.md) for expansion.
 
 👉 [View Full Documentation](https://psychevus.github.io/cryptography-suite/)
 
+- [Migration from pyca/cryptography](docs/migration-from-pyca.md)
+- [Recipes cheat sheet](docs/cheatsheets/recipes.md)
+
 ---
 
 ## 🔑 Key Features
