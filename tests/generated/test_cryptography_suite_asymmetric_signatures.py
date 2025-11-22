@@ -19,7 +19,9 @@ def _call(obj):
         elif p.kind is p.KEYWORD_ONLY:
             if p.default is inspect._empty:
                 kwargs[p.name] = None
-    obj(*args, **kwargs)
+    result = obj(*args, **kwargs)
+    if inspect.iscoroutine(result):
+        result.close()
 
 def test_smoke():
     for name in ['generate_ed25519_keypair', 'sign_message', 'verify_signature', 'generate_ed448_keypair', 'sign_message_ed448', 'verify_signature_ed448', 'serialize_ed25519_private_key', 'serialize_ed25519_public_key', 'load_ed25519_private_key', 'load_ed25519_public_key', 'generate_ecdsa_keypair', 'sign_message_ecdsa', 'verify_signature_ecdsa', 'sign_message_rsa', 'verify_signature_rsa', 'serialize_ecdsa_private_key', 'serialize_ecdsa_public_key', 'load_ecdsa_private_key', 'load_ecdsa_public_key']:

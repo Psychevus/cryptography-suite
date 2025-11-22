@@ -19,7 +19,9 @@ def _call(obj):
         elif p.kind is p.KEYWORD_ONLY:
             if p.default is inspect._empty:
                 kwargs[p.name] = None
-    obj(*args, **kwargs)
+    result = obj(*args, **kwargs)
+    if inspect.iscoroutine(result):
+        result.close()
 
 def test_smoke():
     for name in ['CryptoModule', 'Pipeline', 'PipelineVisualizer', 'register_module', 'list_modules', 'AESGCMEncrypt', 'AESGCMDecrypt', 'RSAEncrypt', 'RSADecrypt', 'ECIESX25519Encrypt', 'ECIESX25519Decrypt', 'HybridEncrypt', 'HybridDecrypt', 'KyberEncrypt', 'KyberDecrypt']:

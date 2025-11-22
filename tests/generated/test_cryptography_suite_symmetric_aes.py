@@ -19,7 +19,9 @@ def _call(obj):
         elif p.kind is p.KEYWORD_ONLY:
             if p.default is inspect._empty:
                 kwargs[p.name] = None
-    obj(*args, **kwargs)
+    result = obj(*args, **kwargs)
+    if inspect.iscoroutine(result):
+        result.close()
 
 def test_smoke():
     for name in ['encrypt_file', 'decrypt_file', 'encrypt_file_async', 'decrypt_file_async', 'scrypt_encrypt', 'scrypt_decrypt', 'pbkdf2_encrypt', 'pbkdf2_decrypt', 'argon2_encrypt', 'argon2_decrypt']:

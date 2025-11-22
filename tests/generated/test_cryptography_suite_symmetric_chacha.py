@@ -19,7 +19,9 @@ def _call(obj):
         elif p.kind is p.KEYWORD_ONLY:
             if p.default is inspect._empty:
                 kwargs[p.name] = None
-    obj(*args, **kwargs)
+    result = obj(*args, **kwargs)
+    if inspect.iscoroutine(result):
+        result.close()
 
 def test_smoke():
     for name in ['chacha20_encrypt', 'chacha20_decrypt', 'xchacha_encrypt', 'xchacha_decrypt']:

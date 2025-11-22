@@ -19,7 +19,9 @@ def _call(obj):
         elif p.kind is p.KEYWORD_ONLY:
             if p.default is inspect._empty:
                 kwargs[p.name] = None
-    obj(*args, **kwargs)
+    result = obj(*args, **kwargs)
+    if inspect.iscoroutine(result):
+        result.close()
 
 def test_smoke():
     for name in ['bulletproof_cli', 'zksnark_cli', 'file_cli', 'keygen_cli', 'hash_cli', 'otp_cli', 'backends_cli', 'keystore_cli', 'export_cli', 'gen_cli', 'fuzz_cli', 'main']:

@@ -19,7 +19,9 @@ def _call(obj):
         elif p.kind is p.KEYWORD_ONLY:
             if p.default is inspect._empty:
                 kwargs[p.name] = None
-    obj(*args, **kwargs)
+    result = obj(*args, **kwargs)
+    if inspect.iscoroutine(result):
+        result.close()
 
 def test_smoke():
     for name in ['sha256_hash', 'sha384_hash', 'sha512_hash', 'sha3_256_hash', 'sha3_512_hash', 'blake2b_hash', 'blake3_hash', 'blake3_hash_v2']:

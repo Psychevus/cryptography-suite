@@ -19,7 +19,9 @@ def _call(obj):
         elif p.kind is p.KEYWORD_ONLY:
             if p.default is inspect._empty:
                 kwargs[p.name] = None
-    obj(*args, **kwargs)
+    result = obj(*args, **kwargs)
+    if inspect.iscoroutine(result):
+        result.close()
 
 def test_smoke():
     for name in ['base62_encode', 'base62_decode', 'secure_zero', 'constant_time_compare', 'deprecated', 'generate_secure_random_string', 'KeyVault', 'to_pem', 'from_pem', 'is_encrypted_pem', 'pem_to_json', 'encode_encrypted_message', 'decode_encrypted_message']:
