@@ -4,8 +4,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 import importlib
+import importlib.util
 import os
 from pathlib import Path
+import pkgutil
+import sys
 
 # Ensure the package can locate implementation modules that live alongside this
 # thin src wrapper.
@@ -15,6 +18,27 @@ if _package_root.is_dir():
     for _path in (str(_package_root),):
         if _path not in __path__:
             __path__.append(_path)
+
+# Allow access to the lightweight crypto_suite implementation (used by some
+# protocol demos/tests) through the main package namespace.
+_crypto_suite_root = Path(__file__).resolve().parents[1] / "crypto_suite"
+if _crypto_suite_root.is_dir():
+    _crypto_suite_parent = str(_crypto_suite_root.parent)
+    if _crypto_suite_parent not in sys.path:
+        sys.path.append(_crypto_suite_parent)
+
+_crypto_suite_spec = importlib.util.find_spec("crypto_suite")
+if _crypto_suite_spec is not None:
+    _crypto_suite = importlib.import_module("crypto_suite")
+    _crypto_prefix = _crypto_suite.__name__
+    for _module_info in pkgutil.walk_packages(
+        _crypto_suite.__path__, prefix=f"{_crypto_prefix}."
+    ):
+        _module = importlib.import_module(_module_info.name)
+        _alias = f"{__name__}{_module_info.name[len(_crypto_prefix):]}"
+        sys.modules.setdefault(_alias, _module)
+        if _alias.count(".") == 1:
+            setattr(sys.modules[__name__], _alias.split(".")[-1], _module)
 
 from .errors import (
     CryptographySuiteError,
