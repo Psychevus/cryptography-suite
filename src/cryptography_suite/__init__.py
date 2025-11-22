@@ -1,4 +1,5 @@
 """Cryptography Suite Package Initialization (src wrapper)."""
+# flake8: noqa: E402
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
