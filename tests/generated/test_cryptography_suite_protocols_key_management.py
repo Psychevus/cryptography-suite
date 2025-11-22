@@ -19,7 +19,9 @@ def _call(obj):
         elif p.kind is p.KEYWORD_ONLY:
             if p.default is inspect._empty:
                 kwargs[p.name] = None
-    obj(*args, **kwargs)
+    result = obj(*args, **kwargs)
+    if inspect.iscoroutine(result):
+        result.close()
 
 def test_smoke():
     for name in ['generate_aes_key', 'rotate_aes_key', 'generate_random_password', 'secure_save_key_to_file', 'load_private_key_from_file', 'load_public_key_from_file', 'key_exists', 'generate_rsa_keypair_and_save', 'generate_ec_keypair_and_save', 'KeyManager']:

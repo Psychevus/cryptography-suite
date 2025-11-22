@@ -19,7 +19,9 @@ def _call(obj):
         elif p.kind is p.KEYWORD_ONLY:
             if p.default is inspect._empty:
                 kwargs[p.name] = None
-    obj(*args, **kwargs)
+    result = obj(*args, **kwargs)
+    if inspect.iscoroutine(result):
+        result.close()
 
 def test_smoke():
     for name in ['generate_rsa_keypair', 'generate_rsa_keypair_async', 'rsa_encrypt', 'rsa_decrypt', 'serialize_private_key', 'serialize_public_key', 'load_private_key', 'load_public_key', 'generate_x25519_keypair', 'derive_x25519_shared_key', 'generate_x448_keypair', 'derive_x448_shared_key', 'generate_ec_keypair', 'ec_encrypt', 'ec_decrypt']:

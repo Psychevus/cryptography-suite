@@ -19,7 +19,9 @@ def _call(obj):
         elif p.kind is p.KEYWORD_ONLY:
             if p.default is inspect._empty:
                 kwargs[p.name] = None
-    obj(*args, **kwargs)
+    result = obj(*args, **kwargs)
+    if inspect.iscoroutine(result):
+        result.close()
 
 def test_smoke():
     for name in ['AES_KEY_SIZE', 'CHACHA20_KEY_SIZE', 'SALT_SIZE', 'NONCE_SIZE', 'DEFAULT_KDF', 'derive_key_scrypt', 'verify_derived_key_scrypt', 'derive_key_pbkdf2', 'verify_derived_key_pbkdf2', 'derive_key_argon2', 'derive_hkdf', 'kdf_pbkdf2', 'select_kdf', 'generate_salt']:
