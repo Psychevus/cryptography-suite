@@ -14,7 +14,7 @@ This project enforces a SemVer-based release workflow with reproducible builds.
 
 1. Validate tag format (`vX.Y.Z`).
 2. Verify `CHANGELOG.md` includes a matching version header.
-3. Re-run quality gate checks: formatter checks on Python files changed since the previous tag, plus repository-wide lint, typing, security, dependency audit, and tests with branch coverage.
+3. Re-run quality gate checks: formatter and lint checks on Python files changed since the previous tag, plus repository-wide typing, security, dependency audit, and tests with branch coverage.
 4. Install pinned release dependencies from `requirements-release.txt`.
 5. Build reproducible wheel/sdist artifacts.
 6. Generate SBOM.

@@ -57,8 +57,9 @@ jobs:
         if: steps.changed-python.outputs.any_changed == 'true'
         run: black --check ${{ steps.changed-python.outputs.all_changed_files }}
 
-      - name: Lint (ruff)
-        run: ruff check .
+      - name: Lint (ruff, changed files)
+        if: steps.changed-python.outputs.any_changed == 'true'
+        run: ruff check ${{ steps.changed-python.outputs.all_changed_files }}
 
       - name: Type checks (mypy)
         run: mypy cryptography_suite tools

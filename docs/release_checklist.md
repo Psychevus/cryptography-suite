@@ -6,7 +6,7 @@
 - [ ] Confirm version follows SemVer and planned scope (`MAJOR`, `MINOR`, `PATCH`).
 - [ ] Run local quality checks:
   - `pre-commit run` (formatting/lint/type/security on changed files)
-  - `ruff check .`
+  - `ruff check <changed-python-files>`
   - `mypy cryptography_suite tools`
   - `bandit -q -r cryptography_suite -x tests,docs,examples`
   - `pip-audit -r requirements.txt --strict`
