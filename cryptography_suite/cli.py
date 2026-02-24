@@ -6,8 +6,10 @@ from . import __version__
 
 import argparse
 import hashlib
-import subprocess
+import logging
 import sys
+from pathlib import Path
+
 from .errors import MissingDependencyError, DecryptionError
 from .protocols import generate_totp
 from typing import cast
@@ -29,6 +31,12 @@ from .zk.bulletproof import (
     BULLETPROOF_AVAILABLE,
 )
 from .crypto_backends import available_backends
+from .core.logging import configure_structured_logging, get_structured_logger, log_event
+from .core.operations import (
+    METRICS,
+    install_signal_handlers,
+    run_command,
+)
 
 try:
     from .experimental import zksnark
@@ -119,6 +127,9 @@ def file_cli(argv: list[str] | None = None) -> None:
     from .symmetric import encrypt_file, decrypt_file
 
     try:
+        # Keep CLI path checks lightweight for compatibility with test doubles.
+        # The underlying crypto/file helpers enforce concrete filesystem semantics.
+        _validate_output_parent(args.output_file)
         if args.command == "encrypt":
             encrypt_file(args.input_file, args.output_file, args.password)
             print(f"Encrypted file written to {args.output_file}")
@@ -138,6 +149,18 @@ def _handle_cli_error(exc: Exception) -> None:
         print("Password is incorrect or file corrupted.")
     else:
         print(f"Error: {exc}")
+
+
+def _validate_regular_file(path_str: str, label: str) -> None:
+    path = Path(path_str)
+    if not path.exists() or not path.is_file():
+        raise ValueError(f"{label} does not exist or is not a regular file: {path}")
+
+
+def _validate_output_parent(path_str: str) -> None:
+    parent = Path(path_str).resolve().parent
+    if not parent.exists() or not parent.is_dir():
+        raise ValueError(f"Output directory does not exist: {parent}")
 
 
 def keygen_cli(argv: list[str] | None = None) -> None:
@@ -186,6 +209,8 @@ def hash_cli(argv: list[str] | None = None) -> None:
         default="sha3-256",
     )
     args = parser.parse_args(argv)
+
+    _validate_regular_file(args.file, "file")
 
     if args.algorithm == "sha3-256":
         hasher = hashlib.sha3_256()
@@ -244,7 +269,6 @@ def backends_cli(argv: list[str] | None = None) -> None:
 def keystore_cli(argv: list[str] | None = None) -> None:
     """Manage registered keystores."""
 
-    from pathlib import Path
     from .keystores import (
         load_plugins,
         list_keystores,
@@ -265,6 +289,7 @@ def keystore_cli(argv: list[str] | None = None) -> None:
     mig.add_argument("--to", dest="dst", required=True)
     mig.add_argument("--key", dest="key")
     mig.add_argument("--dry-run", action="store_true")
+    mig.add_argument("--apply", action="store_true")
     args = parser.parse_args(argv)
 
     load_plugins()
@@ -318,6 +343,11 @@ def keystore_cli(argv: list[str] | None = None) -> None:
     elif args.action == "migrate":
         import hashlib
 
+        if not args.dry_run and not getattr(args, "apply", False):
+            raise ValueError(
+                "Refusing live key migration without --apply. Use --dry-run to preview changes."
+            )
+
         try:
             Src = get_keystore(args.src)
             Dst = get_keystore(args.dst)
@@ -359,6 +389,7 @@ def export_cli(argv: list[str] | None = None) -> None:
         "--track", action="append", default=[], help="Secret names to monitor"
     )
     args = parser.parse_args(argv)
+    _validate_regular_file(args.pipeline, "pipeline")
 
     import yaml  # type: ignore
     from typing import Any
@@ -400,6 +431,9 @@ def gen_cli(argv: list[str] | None = None) -> None:
     parser.add_argument("--pipeline", required=True, help="Pipeline YAML file")
     parser.add_argument("--output", help="Output directory")
     args = parser.parse_args(argv)
+    _validate_regular_file(args.pipeline, "pipeline")
+    if args.output:
+        _validate_output_parent(args.output)
 
     from .codegen import generate
 
@@ -412,18 +446,27 @@ def fuzz_cli(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description=fuzz_cli.__doc__)
     parser.add_argument("--pipeline", help="Pipeline config YAML")
     parser.add_argument("--runs", type=int, default=1000)
+    parser.add_argument("--timeout", type=float, default=60.0, help="Subprocess timeout seconds")
     args = parser.parse_args(argv)
+
+    if args.runs < 1 or args.runs > 1_000_000:
+        raise ValueError("--runs must be between 1 and 1000000")
+    if args.pipeline:
+        _validate_regular_file(args.pipeline, "pipeline")
 
     script = "fuzz/fuzz_aes.py" if not args.pipeline else "fuzz/fuzz_pipeline.py"
     cmd = [sys.executable, script, f"-runs={args.runs}"]
     if args.pipeline:
         cmd.append(args.pipeline)
-    subprocess.run(cmd, check=False)
+    run_command(cmd, timeout_s=args.timeout, operation_name="fuzz_runner")
 
 
 def main(argv: list[str] | None = None) -> None:
     """Unified command line interface for the cryptography suite."""
 
+    install_signal_handlers()
+    configure_structured_logging()
+    logger = get_structured_logger("cryptography_suite.cli")
     parser = argparse.ArgumentParser(description=main.__doc__)
     parser.add_argument(
         "--version",
@@ -436,6 +479,16 @@ def main(argv: list[str] | None = None) -> None:
         choices=["gcm-sst"],
         default=[],
         help="Enable preview features",
+    )
+    parser.add_argument(
+        "--log-level",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR"],
+        default="INFO",
+    )
+    parser.add_argument(
+        "--show-metrics",
+        action="store_true",
+        help="Print operation metrics after command execution",
     )
     sub = parser.add_subparsers(dest="cmd", required=True)
 
@@ -501,6 +554,7 @@ def main(argv: list[str] | None = None) -> None:
     )
     fuzz_parser.add_argument("--pipeline")
     fuzz_parser.add_argument("--runs", type=int, default=1000)
+    fuzz_parser.add_argument("--timeout", type=float, default=60.0)
 
     ks_parser = sub.add_parser(
         "keystore", help="Manage keystores", description=keystore_cli.__doc__
@@ -510,6 +564,7 @@ def main(argv: list[str] | None = None) -> None:
     ks_parser.add_argument("--to", dest="dst")
     ks_parser.add_argument("--key", dest="key")
     ks_parser.add_argument("--dry-run", action="store_true")
+    ks_parser.add_argument("--apply", action="store_true")
 
     migrate_parser = sub.add_parser(
         "migrate-keys",
@@ -571,6 +626,8 @@ def main(argv: list[str] | None = None) -> None:
     dec_alias.add_argument("--password", required=True)
 
     args = parser.parse_args(argv)
+    configure_structured_logging(getattr(logging, args.log_level))
+    log_event(logger, "cli_invocation", command=args.cmd)
 
     if "gcm-sst" in args.experimental:
         # Lazy import to avoid importing experimental modules unless requested
@@ -609,6 +666,8 @@ def main(argv: list[str] | None = None) -> None:
             argv2.extend(["--key", args.key])
         if getattr(args, "dry_run", False):
             argv2.append("--dry-run")
+        if getattr(args, "apply", False):
+            argv2.append("--apply")
         keystore_cli(argv2)
     elif args.cmd == "migrate-keys":
         from importlib import util
@@ -661,6 +720,7 @@ def main(argv: list[str] | None = None) -> None:
         if args.pipeline:
             argv2.extend(["--pipeline", args.pipeline])
         argv2.extend(["--runs", str(args.runs)])
+        argv2.extend(["--timeout", str(args.timeout)])
         fuzz_cli(argv2)
     else:
         otp_cli(
@@ -671,3 +731,5 @@ def main(argv: list[str] | None = None) -> None:
                 f"--algorithm={args.algorithm}",
             ]
         )
+    if args.show_metrics:
+        print(METRICS.snapshot())
