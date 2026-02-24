@@ -76,7 +76,7 @@ jobs:
           coverage run --rcfile=.coveragerc -m pytest
           coverage xml
       - name: Upload Coverage to Coveralls
-        uses: coverallsapp/github-action@v2.2.0
+        if: matrix.os == 'ubuntu-latest'
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           file: coverage.xml
