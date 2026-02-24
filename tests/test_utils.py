@@ -102,7 +102,7 @@ class TestUtils(unittest.TestCase):
 
     def test_from_pem_rejects_non_string(self):
         with self.assertRaises(TypeError):
-            from_pem(b"-----BEGIN PRIVATE KEY-----")  # type: ignore[arg-type]
+            from_pem(b"-----BEGIN PRIVATE KEY-----")
 
     def test_is_encrypted_pem_false_for_invalid_pem(self):
         temp_path = Path("tests") / "_tmp_invalid.pem"
