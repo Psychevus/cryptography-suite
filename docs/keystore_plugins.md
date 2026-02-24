@@ -45,6 +45,14 @@ class MyKeyStore:
 Third party plugins can also be discovered through entry points using the
 ``cryptosuite.keystores`` group.
 
+For security, loading ad-hoc plugins from ``./keystores`` in the current
+working directory is disabled by default. This avoids accidental imports from
+untrusted paths. To opt in for local development or test workflows, set:
+
+```bash
+export CRYPTOSUITE_LOAD_LOCAL_KEYSTORE_PLUGINS=1
+```
+
 ## AWS KMS Example
 
 ```python
