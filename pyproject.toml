@@ -118,6 +118,7 @@ python_version = "3.10"
 strict = true
 warn_unused_configs = true
 exclude = ["^tests/"]
+plugins = ["tools.mypy_crypto_checker"]
 
 
 [tool.pytest.ini_options]
