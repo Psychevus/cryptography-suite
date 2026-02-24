@@ -722,12 +722,16 @@ def main(argv: list[str] | None = None) -> None:
     f_enc.add_argument("--in", dest="input_file", required=True)
     f_enc.add_argument("--out", dest="output_file", required=True)
     f_enc.add_argument("--password", required=True)
-    f_enc.add_argument("--kdf", choices=["argon2", "scrypt", "pbkdf2"], default=DEFAULT_KDF)
+    f_enc.add_argument(
+        "--kdf", choices=["argon2", "scrypt", "pbkdf2"], default=DEFAULT_KDF
+    )
     f_dec = file_sub.add_parser("decrypt", help="Decrypt a file")
     f_dec.add_argument("--in", dest="input_file", required=True)
     f_dec.add_argument("--out", dest="output_file", required=True)
     f_dec.add_argument("--password", required=True)
-    f_dec.add_argument("--kdf", choices=["argon2", "scrypt", "pbkdf2"], default=DEFAULT_KDF)
+    f_dec.add_argument(
+        "--kdf", choices=["argon2", "scrypt", "pbkdf2"], default=DEFAULT_KDF
+    )
 
     # Backward compatibility aliases
     enc_alias = sub.add_parser(
@@ -738,7 +742,9 @@ def main(argv: list[str] | None = None) -> None:
     enc_alias.add_argument("--in", dest="input_file", required=True)
     enc_alias.add_argument("--out", dest="output_file", required=True)
     enc_alias.add_argument("--password", required=True)
-    enc_alias.add_argument("--kdf", choices=["argon2", "scrypt", "pbkdf2"], default=DEFAULT_KDF)
+    enc_alias.add_argument(
+        "--kdf", choices=["argon2", "scrypt", "pbkdf2"], default=DEFAULT_KDF
+    )
     dec_alias = sub.add_parser(
         "decrypt",
         help=argparse.SUPPRESS,
@@ -747,7 +753,9 @@ def main(argv: list[str] | None = None) -> None:
     dec_alias.add_argument("--in", dest="input_file", required=True)
     dec_alias.add_argument("--out", dest="output_file", required=True)
     dec_alias.add_argument("--password", required=True)
-    dec_alias.add_argument("--kdf", choices=["argon2", "scrypt", "pbkdf2"], default=DEFAULT_KDF)
+    dec_alias.add_argument(
+        "--kdf", choices=["argon2", "scrypt", "pbkdf2"], default=DEFAULT_KDF
+    )
 
     args = parser.parse_args(argv)
     if args.json:

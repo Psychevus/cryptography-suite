@@ -237,7 +237,8 @@ def decrypt_file(
                 rest = f_in.read(HEADER_FIXED_SIZE - len(FORMAT_MAGIC))
                 if len(rest) != HEADER_FIXED_SIZE - len(FORMAT_MAGIC):
                     raise DecryptionError("Invalid encrypted file.")
-                version, kdf_id, salt_len, nonce_len, chunk_size = struct.unpack(">BBBBI", rest
+                version, kdf_id, salt_len, nonce_len, chunk_size = struct.unpack(
+                    ">BBBBI", rest
                 )
                 if version != FORMAT_VERSION:
                     raise DecryptionError("Unsupported encrypted file version.")
@@ -272,7 +273,9 @@ def decrypt_file(
 
             try:
                 with open(output_file_path, "wb") as f_out:
-                    decryptor = Cipher(algorithms.AES(key), modes.GCM(nonce)).decryptor()
+                    decryptor = Cipher(
+                        algorithms.AES(key), modes.GCM(nonce)
+                    ).decryptor()
                     remaining = ciphertext_len
                     while remaining > 0:
                         read_len = min(stream_chunk_size, remaining)

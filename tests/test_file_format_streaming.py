@@ -17,7 +17,9 @@ from cryptography_suite.symmetric.aes import (
 from cryptography_suite.symmetric.kdf import select_kdf
 
 
-def test_small_file_roundtrip_and_header(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_small_file_roundtrip_and_header(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     vals = [b"\\x11" * SALT_SIZE, b"\\x22" * NONCE_SIZE]
 
     def fake_urandom(size: int) -> bytes:
@@ -68,7 +70,9 @@ def test_wrong_password_detected(tmp_path: Path) -> None:
         decrypt_file(str(enc), str(out), "wrong")
 
 
-def test_encrypt_streams_in_chunks(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_encrypt_streams_in_chunks(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     plain = tmp_path / "big.bin"
     enc = tmp_path / "big.enc"
     plain.write_bytes(b"Z" * (CHUNK_SIZE * 3 + 123))
