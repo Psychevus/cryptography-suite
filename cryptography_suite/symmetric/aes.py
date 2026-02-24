@@ -52,7 +52,7 @@ def _import_aiofiles() -> Any:
         ) from exc
 
 
-@deprecated("aes_encrypt is deprecated; use the AESGCMEncrypt pipeline module")  # type: ignore[untyped-decorator]
+@deprecated("aes_encrypt is deprecated; use the AESGCMEncrypt pipeline module")
 def aes_encrypt(
     plaintext: str,
     password: str,
@@ -97,7 +97,7 @@ def aes_encrypt(
     return base64.b64encode(data).decode()
 
 
-@deprecated("aes_decrypt is deprecated; use the AESGCMDecrypt pipeline module")  # type: ignore[untyped-decorator]
+@deprecated("aes_decrypt is deprecated; use the AESGCMDecrypt pipeline module")
 def aes_decrypt(
     encrypted_data: bytes | str,
     password: str,
