@@ -469,7 +469,7 @@ def export_cli(argv: list[str] | None = None) -> None:
 
     from typing import Any
 
-    import yaml  # type: ignore[import-untyped]
+    yaml = __import__("yaml")
 
     from .pipeline import CryptoModule, Pipeline
 
