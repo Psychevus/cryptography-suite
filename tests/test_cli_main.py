@@ -1,5 +1,5 @@
-import importlib
 import hashlib
+import importlib
 
 import pytest
 from blake3 import blake3

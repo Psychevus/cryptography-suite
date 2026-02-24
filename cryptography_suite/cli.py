@@ -2,43 +2,47 @@
 
 from __future__ import annotations
 
-from . import __version__
-
 import argparse
 import hashlib
 import json
 import logging
 import sys
 from pathlib import Path
-
-from .errors import MissingDependencyError, DecryptionError
-from .protocols import generate_totp
 from typing import cast
-from blake3 import blake3
-from .pqc import (
-    generate_kyber_keypair,
-    generate_dilithium_keypair,
-    generate_sphincs_keypair,
-    PQCRYPTO_AVAILABLE,
-    SPHINCS_AVAILABLE,
-)
-from .protocols.key_management import KeyManager
-from .utils import KeyVault
 
-from .zk.bulletproof import (
-    prove as bp_prove,
-    verify as bp_verify,
-    setup as bp_setup,
-    BULLETPROOF_AVAILABLE,
-)
-from .crypto_backends import available_backends
+from blake3 import blake3
+
+from . import __version__
 from .core.logging import configure_structured_logging, get_structured_logger, log_event
 from .core.operations import (
     METRICS,
     install_signal_handlers,
     run_command,
 )
-
+from .crypto_backends import available_backends
+from .errors import DecryptionError, MissingDependencyError
+from .pqc import (
+    PQCRYPTO_AVAILABLE,
+    SPHINCS_AVAILABLE,
+    generate_dilithium_keypair,
+    generate_kyber_keypair,
+    generate_sphincs_keypair,
+)
+from .protocols import generate_totp
+from .protocols.key_management import KeyManager
+from .utils import KeyVault
+from .zk.bulletproof import (
+    BULLETPROOF_AVAILABLE,
+)
+from .zk.bulletproof import (
+    prove as bp_prove,
+)
+from .zk.bulletproof import (
+    setup as bp_setup,
+)
+from .zk.bulletproof import (
+    verify as bp_verify,
+)
 
 _OUTPUT_FORMAT = "text"
 
@@ -75,7 +79,8 @@ def bulletproof_cli(argv: list[str] | None = None) -> None:
     try:
         if not BULLETPROOF_AVAILABLE:
             raise MissingDependencyError(
-                "Bulletproof ZKP requires 'petlib'. Install it with: pip install cryptography-suite[zkp]"
+                "Bulletproof ZKP requires 'petlib'. Install it with: "
+                "pip install cryptography-suite[zkp]"
             )
         bp_setup()
         proof, commitment, nonce = bp_prove(args.value)
@@ -145,7 +150,7 @@ def file_cli(argv: list[str] | None = None) -> None:
 
     args = parser.parse_args(argv)
 
-    from .symmetric import encrypt_file, decrypt_file
+    from .symmetric import decrypt_file, encrypt_file
 
     try:
         # Keep CLI path checks lightweight for compatibility with test doubles.
@@ -333,10 +338,10 @@ def keystore_cli(argv: list[str] | None = None) -> None:
     """Manage registered keystores."""
 
     from .keystores import (
-        load_plugins,
-        list_keystores,
-        get_keystore,
         failed_plugins,
+        get_keystore,
+        list_keystores,
+        load_plugins,
     )
 
     parser = argparse.ArgumentParser(description="Keystore management")
@@ -408,7 +413,8 @@ def keystore_cli(argv: list[str] | None = None) -> None:
 
         if not args.dry_run and not getattr(args, "apply", False):
             raise ValueError(
-                "Refusing live key migration without --apply. Use --dry-run to preview changes."
+                "Refusing live key migration without --apply. "
+                "Use --dry-run to preview changes."
             )
 
         try:
@@ -454,9 +460,11 @@ def export_cli(argv: list[str] | None = None) -> None:
     args = parser.parse_args(argv)
     _validate_regular_file(args.pipeline, "pipeline")
 
-    import yaml  # type: ignore
     from typing import Any
-    from .pipeline import Pipeline, CryptoModule
+
+    import yaml  # type: ignore
+
+    from .pipeline import CryptoModule, Pipeline
 
     class Stub:
         def __init__(self, name: str) -> None:
@@ -471,7 +479,7 @@ def export_cli(argv: list[str] | None = None) -> None:
         def to_tamarin(self) -> str:
             return f"# {self._name}"
 
-    with open(args.pipeline, "r", encoding="utf-8") as f:
+    with open(args.pipeline, encoding="utf-8") as f:
         config = yaml.safe_load(f) or []
 
     modules: list[CryptoModule[Any, Any]] = [
