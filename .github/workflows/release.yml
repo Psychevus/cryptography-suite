@@ -116,6 +116,98 @@ jobs:
       - name: Generate SBOM
         run: python tools/generate_sbom.py
 
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3.7.0
+
+      - name: Sign release artifacts with Sigstore keyless
+        env:
+          COSIGN_YES: "true"
+        run: |
+          set -euo pipefail
+          for artifact in dist/*.whl dist/*.tar.gz; do
+            cosign sign-blob \
+              --output-signature "${artifact}.sig" \
+              --output-certificate "${artifact}.cert" \
+              "$artifact"
+          done
+
+      - name: Generate SLSA-style provenance attestations
+        env:
+          GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_WORKFLOW_REF: ${{ github.workflow_ref }}
+        run: |
+          set -euo pipefail
+          : > dist/provenance.intoto.jsonl
+          for artifact in dist/*.whl dist/*.tar.gz; do
+            digest=$(sha256sum "$artifact" | awk '{print $1}')
+            predicate_file=$(mktemp)
+            cat > "$predicate_file" <<EOF
+          {
+            "_type": "https://slsa.dev/provenance/v1",
+            "subject": [
+              {
+                "name": "$(basename "$artifact")",
+                "digest": {"sha256": "$digest"}
+              }
+            ],
+            "predicateType": "https://slsa.dev/provenance/v1",
+            "predicate": {
+              "buildDefinition": {
+                "buildType": "https://github.com/Attestations/GitHubActionsWorkflow@v1",
+                "externalParameters": {
+                  "workflow": "$GITHUB_WORKFLOW_REF"
+                },
+                "internalParameters": {
+                  "runId": "$GITHUB_RUN_ID",
+                  "runAttempt": "$GITHUB_RUN_ATTEMPT"
+                },
+                "resolvedDependencies": [
+                  {
+                    "uri": "git+https://github.com/${{ github.repository }}@${GITHUB_SHA}",
+                    "digest": {"sha1": "$GITHUB_SHA"}
+                  }
+                ]
+              },
+              "runDetails": {
+                "builder": {
+                  "id": "https://github.com/${{ github.repository }}/.github/workflows/release.yml"
+                },
+                "metadata": {
+                  "invocationId": "https://github.com/${{ github.repository }}/actions/runs/${GITHUB_RUN_ID}/attempts/${GITHUB_RUN_ATTEMPT}"
+                }
+              }
+            }
+          }
+          EOF
+            cosign attest-blob \
+              --type slsaprovenance \
+              --predicate "$predicate_file" \
+              --output-attestation "${artifact}.intoto.jsonl" \
+              "$artifact"
+            cat "${artifact}.intoto.jsonl" >> dist/provenance.intoto.jsonl
+            rm -f "$predicate_file"
+          done
+
+      - name: Sign provenance bundle
+        env:
+          COSIGN_YES: "true"
+        run: |
+          cosign sign-blob \
+            --output-signature dist/provenance.intoto.jsonl.sig \
+            --output-certificate dist/provenance.intoto.jsonl.cert \
+            dist/provenance.intoto.jsonl
+
+      - name: Sign SBOM
+        env:
+          COSIGN_YES: "true"
+        run: |
+          cosign sign-blob \
+            --output-signature dist/sbom.json.sig \
+            --output-certificate dist/sbom.json.cert \
+            dist/sbom.json
+
       - name: Lint release artifacts
         run: python tools/release_lint.py
 
