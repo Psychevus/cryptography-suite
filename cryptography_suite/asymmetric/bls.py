@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 """BLS signature primitives using BLS12-381.
 
 This module provides helper functions for generating keys, signing messages,
@@ -8,18 +6,21 @@ and verifying signatures using the Basic scheme defined in the
 the ``py_ecc`` library which offers a well-vetted pairing implementation.
 """
 
-from os import urandom
-from typing import Iterable, List, Sequence, Tuple, Union
+from __future__ import annotations
+
 import base64
+from collections.abc import Iterable, Sequence
+from os import urandom
 
 from py_ecc.bls import G2Basic
+
 from ..errors import KeyDerivationError, SignatureVerificationError
 from ..utils import KeyVault
 
 
 def generate_bls_keypair(
     seed: bytes | None = None, *, sensitive: bool = True
-) -> Tuple[Union[int, KeyVault], bytes]:
+) -> tuple[int | KeyVault, bytes]:
     """Generate a BLS12-381 key pair.
 
     Parameters
@@ -51,7 +52,10 @@ def generate_bls_keypair(
 
 
 def bls_sign(
-    message: bytes, private_key: Union[int, bytes, bytearray, KeyVault], *, raw_output: bool = False
+    message: bytes,
+    private_key: int | bytes | bytearray | KeyVault,
+    *,
+    raw_output: bool = False,
 ) -> str | bytes:
     """Sign a message using the BLS signature scheme.
 
@@ -72,7 +76,7 @@ def bls_sign(
         raise SignatureVerificationError("Message cannot be empty.")
     if isinstance(private_key, KeyVault):
         private_key = int.from_bytes(bytes(private_key), "big")
-    elif isinstance(private_key, (bytes, bytearray)):
+    elif isinstance(private_key, bytes | bytearray):
         private_key = int.from_bytes(private_key, "big")
     if not isinstance(private_key, int):
         raise TypeError("Private key must be an int or bytes.")
@@ -103,7 +107,7 @@ def bls_verify(message: bytes, signature: bytes | str, public_key: bytes) -> boo
         raise SignatureVerificationError("Message cannot be empty.")
     if not signature:
         raise SignatureVerificationError("Signature cannot be empty.")
-    if not isinstance(public_key, (bytes, bytearray)):
+    if not isinstance(public_key, bytes | bytearray):
         raise TypeError("Public key must be bytes.")
     if isinstance(signature, str):
         try:
@@ -128,13 +132,13 @@ def bls_aggregate(
     bytes
         Aggregated signature value.
     """
-    sig_list: List[bytes] = []
+    sig_list: list[bytes] = []
     for sig in signatures:
         if isinstance(sig, str):
             try:
                 sig = base64.b64decode(sig)
-            except Exception:
-                raise SignatureVerificationError("Invalid signature")
+            except Exception as exc:
+                raise SignatureVerificationError("Invalid signature") from exc
         sig_list.append(sig)
     if not sig_list:
         raise SignatureVerificationError("No signatures provided for aggregation.")

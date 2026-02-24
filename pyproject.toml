@@ -106,8 +106,19 @@ exclude = ["tests*", "docs*", "examples*", "demo*"]
 line-length = 88
 target-version = ['py310']
 
-[tool.isort]
-profile = "black"
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+warn_unused_configs = true
+exclude = ["^tests/"]
+plugins = ["tools.mypy_crypto_checker"]
 
 
 [tool.pytest.ini_options]

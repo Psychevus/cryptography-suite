@@ -1,29 +1,32 @@
-from typing import Tuple, Callable, Optional
-from concurrent.futures import Future, ThreadPoolExecutor
-from ..errors import EncryptionError, DecryptionError
-from ..utils import deprecated
 import base64
+from collections.abc import Callable
+from concurrent.futures import Future, ThreadPoolExecutor
+from os import urandom
 
-from cryptography.hazmat.primitives import serialization, hashes, constant_time
+from cryptography.hazmat.primitives import constant_time, hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import (
-    rsa,
-    padding,
     ec,
     ed25519,
-    x25519,
+    padding,
+    rsa,
     x448,
+    x25519,
 )
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
-from os import urandom
+
+from ..errors import DecryptionError, EncryptionError
+from ..utils import deprecated
+
+EC_DEFAULT_CURVE: ec.EllipticCurve = ec.SECP256R1()
 
 # Constants
 DEFAULT_RSA_KEY_SIZE = 4096  # 4096 bits for enhanced security
 
 
 def generate_rsa_keypair(
-        key_size: int = DEFAULT_RSA_KEY_SIZE,
-) -> Tuple[rsa.RSAPrivateKey, rsa.RSAPublicKey]:
+    key_size: int = DEFAULT_RSA_KEY_SIZE,
+) -> tuple[rsa.RSAPrivateKey, rsa.RSAPublicKey]:
     """
     Generates an RSA private and public key pair.
     """
@@ -39,8 +42,8 @@ def generate_rsa_keypair(
 def generate_rsa_keypair_async(
     key_size: int = DEFAULT_RSA_KEY_SIZE,
     *,
-    executor: Optional[ThreadPoolExecutor] = None,
-    callback: Optional[Callable[[rsa.RSAPrivateKey, rsa.RSAPublicKey], None]] = None,
+    executor: ThreadPoolExecutor | None = None,
+    callback: Callable[[rsa.RSAPrivateKey, rsa.RSAPublicKey], None] | None = None,
 ) -> Future:
     """Generate an RSA key pair in a background thread.
 
@@ -56,14 +59,18 @@ def generate_rsa_keypair_async(
     fut = executor.submit(generate_rsa_keypair, key_size=key_size)
 
     if callback is not None:
+
         def _cb(f: Future) -> None:
             priv, pub = f.result()
             callback(priv, pub)
+
         fut.add_done_callback(_cb)
 
     if own_exec:
+
         def _shutdown(f: Future) -> None:
             executor.shutdown(wait=False)
+
         fut.add_done_callback(_shutdown)
 
     return fut
@@ -132,7 +139,7 @@ def rsa_decrypt(ciphertext: bytes | str, private_key: rsa.RSAPrivateKey) -> byte
         )
         return plaintext
     except Exception as e:
-        raise DecryptionError(f"Decryption failed: {e}")
+        raise DecryptionError(f"Decryption failed: {e}") from e
 
 
 def serialize_private_key(private_key, password: str) -> bytes:
@@ -141,16 +148,14 @@ def serialize_private_key(private_key, password: str) -> bytes:
     """
     if not password:
         raise EncryptionError("Password cannot be empty.")
-    if not isinstance(
-        private_key,
-        (
-            rsa.RSAPrivateKey,
-            ec.EllipticCurvePrivateKey,
-            ed25519.Ed25519PrivateKey,
-            x25519.X25519PrivateKey,
-            x448.X448PrivateKey,
-        ),
-    ):
+    private_key_types = (
+        rsa.RSAPrivateKey
+        | ec.EllipticCurvePrivateKey
+        | ed25519.Ed25519PrivateKey
+        | x25519.X25519PrivateKey
+        | x448.X448PrivateKey
+    )
+    if not isinstance(private_key, private_key_types):
         raise TypeError("Invalid private key type.")
 
     encryption_algorithm = serialization.BestAvailableEncryption(password.encode())
@@ -166,16 +171,14 @@ def serialize_public_key(public_key) -> bytes:
     """
     Serializes a public key to PEM format.
     """
-    if not isinstance(
-        public_key,
-        (
-            rsa.RSAPublicKey,
-            ec.EllipticCurvePublicKey,
-            ed25519.Ed25519PublicKey,
-            x25519.X25519PublicKey,
-            x448.X448PublicKey,
-        ),
-    ):
+    public_key_types = (
+        rsa.RSAPublicKey
+        | ec.EllipticCurvePublicKey
+        | ed25519.Ed25519PublicKey
+        | x25519.X25519PublicKey
+        | x448.X448PublicKey
+    )
+    if not isinstance(public_key, public_key_types):
         raise TypeError("Invalid public key type.")
 
     return public_key.public_bytes(
@@ -197,7 +200,7 @@ def load_private_key(pem_data: bytes, password: str):
         )
         return private_key
     except Exception as e:
-        raise DecryptionError(f"Failed to load private key: {e}")
+        raise DecryptionError(f"Failed to load private key: {e}") from e
 
 
 def load_public_key(pem_data: bytes):
@@ -208,10 +211,10 @@ def load_public_key(pem_data: bytes):
         public_key = serialization.load_pem_public_key(pem_data)
         return public_key
     except Exception as e:
-        raise DecryptionError(f"Failed to load public key: {e}")
+        raise DecryptionError(f"Failed to load public key: {e}") from e
 
 
-def generate_x25519_keypair() -> Tuple[x25519.X25519PrivateKey, x25519.X25519PublicKey]:
+def generate_x25519_keypair() -> tuple[x25519.X25519PrivateKey, x25519.X25519PublicKey]:
     """
     Generates an X25519 private and public key pair.
     """
@@ -232,7 +235,7 @@ def derive_x25519_shared_key(private_key, peer_public_key) -> bytes:
     return shared_key
 
 
-def generate_x448_keypair() -> Tuple[x448.X448PrivateKey, x448.X448PublicKey]:
+def generate_x448_keypair() -> tuple[x448.X448PrivateKey, x448.X448PublicKey]:
     """Generates an X448 private and public key pair."""
     private_key = x448.X448PrivateKey.generate()
     public_key = private_key.public_key()
@@ -248,7 +251,9 @@ def derive_x448_shared_key(private_key, peer_public_key) -> bytes:
     return private_key.exchange(peer_public_key)
 
 
-def generate_ec_keypair(curve=ec.SECP256R1()) -> Tuple[ec.EllipticCurvePrivateKey, ec.EllipticCurvePublicKey]:
+def generate_ec_keypair(
+    curve: ec.EllipticCurve = EC_DEFAULT_CURVE,
+) -> tuple[ec.EllipticCurvePrivateKey, ec.EllipticCurvePublicKey]:
     """
     Generates an Elliptic Curve key pair.
     """

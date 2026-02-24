@@ -1,48 +1,60 @@
 # Contributing
 
-We welcome improvements to *cryptography-suite*. This guide outlines what we expect when submitting changes.
+Thanks for helping improve `cryptography-suite`.
 
-## Code of Conduct
+## Branching and pull requests
 
-Please adhere to our [Code of Conduct](CODE_OF_CONDUCT.md) (placeholder).
+- Branch from `main` and keep each PR focused.
+- Open PRs against `main`.
+- Use [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `docs:`, `test:`, `chore:`).
 
-## Branching and Pull Requests
-
-- Branch from `main` and keep changes focused on a single topic.
-- Open pull requests against `main`.
-- Include a clear description, checklist of work, and reference relevant issues.
-- Small, frequent pull requests are preferred over large ones.
-
-## Reporting Issues
-
-Use the [bug report template](.github/ISSUE_TEMPLATE/bug_report.md) for defects and the [security report template](.github/ISSUE_TEMPLATE/security_report.md) for potential vulnerabilities.
-For security disclosures, follow the process outlined in our [SECURITY policy](SECURITY.md).
-
-## Commit Messages
-
-Use [Conventional Commits](https://www.conventionalcommits.org/) such as `feat:`, `fix:`, `docs:`, `test:`, or `chore:`.
-
-## Signed Commits
-
-All commits **must be GPG-signed**.
+## Local setup
 
 ```bash
-# one-time setup
-gpg --full-generate-key
-git config --global user.signingkey <key-id>
-git config --global commit.gpgsign true
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip==24.2
+pip install -r requirements-dev.txt
+pip install -e .
+pre-commit install
 ```
 
-Verify signatures with `git log --show-signature`.
+## Quality gate (must match CI)
 
-## Testing Requirements
+CI enforces formatting, lint, and type checks on changed Python files and enforces security/tests gates repository-wide.
 
-- Unit tests: `tox` or `pytest -q` must pass.
-- Property-based tests: use [Hypothesis](https://hypothesis.readthedocs.io/) for new cryptographic logic.
-- Coverage: maintain **≥95%** line coverage (`pytest --cov`).
+Run all checks locally before pushing:
 
-## Security Considerations
+```bash
+pre-commit run
+ruff check <changed-python-files>
+mypy --follow-imports=skip --ignore-missing-imports --disable-error-code=no-any-return --disable-error-code=no-untyped-def --disable-error-code=misc --disable-error-code=type-arg <changed-python-files>
+bandit -q -r cryptography_suite -x tests,docs,examples -s B101,B110,B301,B311,B403,B404,B413,B603,B701
+pip-audit -r requirements.txt --strict
+pytest --cov=cryptography_suite --cov-branch --cov-report=term-missing --cov-fail-under=95
+```
 
-Pull requests touching security-sensitive code **must include a `Threat Considerations` section** describing potential misuses and mitigations.
+If you need to format your branch before commit:
 
-Thank you for helping make cryptography-suite safer.
+```bash
+pre-commit run --all-files
+```
+
+CI runs on every push and pull request. Any failure blocks merges.
+
+## Release policy and process
+
+- Versioning follows **Semantic Versioning (SemVer)**.
+- Release tags must match `vMAJOR.MINOR.PATCH` (example: `v3.1.0`).
+- Update `CHANGELOG.md` under the matching version header before tagging.
+- Release workflow validates the tag format, verifies changelog entry, reruns quality checks, then builds and publishes artifacts.
+- Build tooling is pinned in `requirements-release.txt` for reproducible release builds.
+
+See:
+
+- `docs/release_checklist.md`
+- `docs/release_process.md`
+
+## Security-sensitive changes
+
+PRs that touch cryptographic logic or key handling must include a **Threat Considerations** section describing misuse risks and mitigations.

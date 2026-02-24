@@ -5,26 +5,29 @@ Ed25519, Ed448, ECDSA, and RSA operations in this project rely exclusively on
 not used and should be avoided in production code.
 """
 
-from cryptography.hazmat.primitives.asymmetric import (
-    ed25519,
-    ed448,
-    ec,
-    rsa,
-    padding,
-)
-from cryptography.hazmat.primitives import serialization, hashes
 import base64
+
 from cryptography.exceptions import InvalidSignature
-from typing import Tuple
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import (
+    ec,
+    ed448,
+    ed25519,
+    padding,
+    rsa,
+)
+
 from ..errors import (
-    EncryptionError,
     DecryptionError,
+    EncryptionError,
     SignatureVerificationError,
 )
 
+ECDSA_DEFAULT_CURVE: ec.EllipticCurve = ec.SECP256R1()
+
 
 def generate_ed25519_keypair() -> (
-    Tuple[ed25519.Ed25519PrivateKey, ed25519.Ed25519PublicKey]
+    tuple[ed25519.Ed25519PrivateKey, ed25519.Ed25519PublicKey]
 ):
     """
     Generates an Ed25519 private and public key pair.
@@ -79,7 +82,7 @@ def verify_signature(
         return False
 
 
-def generate_ed448_keypair() -> Tuple[ed448.Ed448PrivateKey, ed448.Ed448PublicKey]:
+def generate_ed448_keypair() -> tuple[ed448.Ed448PrivateKey, ed448.Ed448PublicKey]:
     """Generates an Ed448 private and public key pair."""
     private_key = ed448.Ed448PrivateKey.generate()
     public_key = private_key.public_key()
@@ -188,8 +191,8 @@ def load_ed25519_public_key(pem_data: bytes) -> ed25519.Ed25519PublicKey:
 
 
 def generate_ecdsa_keypair(
-    curve: ec.EllipticCurve = ec.SECP256R1(),
-) -> Tuple[ec.EllipticCurvePrivateKey, ec.EllipticCurvePublicKey]:
+    curve: ec.EllipticCurve = ECDSA_DEFAULT_CURVE,
+) -> tuple[ec.EllipticCurvePrivateKey, ec.EllipticCurvePublicKey]:
     """
     Generates an ECDSA private and public key pair.
     """

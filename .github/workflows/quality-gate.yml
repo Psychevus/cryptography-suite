@@ -1,0 +1,81 @@
+name: Quality Gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quality-gate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Formatting, Lint, Type, Security, Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: |
+            requirements-dev.txt
+            requirements.txt
+            pyproject.toml
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip==24.2
+          pip install -r requirements-dev.txt
+          pip install -e .
+
+      - name: Detect changed Python files
+        id: changed-python
+        uses: tj-actions/changed-files@v45
+        with:
+          files: |
+            **/*.py
+            **/*.pyi
+
+      - name: Validate formatting (ruff, changed files)
+        if: steps.changed-python.outputs.any_changed == 'true'
+        run: ruff format --check ${{ steps.changed-python.outputs.all_changed_files }}
+
+      - name: Validate formatting (black, changed files)
+        if: steps.changed-python.outputs.any_changed == 'true'
+        run: black --check ${{ steps.changed-python.outputs.all_changed_files }}
+
+      - name: Lint (ruff, changed files)
+        if: steps.changed-python.outputs.any_changed == 'true'
+        run: ruff check ${{ steps.changed-python.outputs.all_changed_files }}
+
+      - name: Type checks (mypy, changed files)
+        if: steps.changed-python.outputs.any_changed == 'true'
+        run: mypy --follow-imports=skip --ignore-missing-imports --disable-error-code=no-any-return --disable-error-code=no-untyped-def --disable-error-code=misc --disable-error-code=type-arg ${{ steps.changed-python.outputs.all_changed_files }}
+
+      - name: Security scan (bandit)
+        run: bandit -q -r cryptography_suite -x tests,docs,examples -s B101,B110,B301,B311,B403,B404,B413,B603,B701
+
+      - name: Dependency vulnerabilities (pip-audit)
+        run: pip-audit -r requirements.txt --strict
+
+      - name: Tests with branch coverage gate
+        run: pytest --cov=cryptography_suite --cov-branch --cov-report=xml --cov-report=term-missing --cov-fail-under=95
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.xml
