@@ -42,7 +42,9 @@ class LocalKeyStore:
     def test_connection(self) -> bool:
         return True
 
-    def _load_key(self, key_id: str) -> Tuple[PrivateKey, str]:
+    def _load_key(
+        self, key_id: str, password: str | None = None
+    ) -> Tuple[PrivateKey, str]:
         key_path = self.dir / f"{key_id}.pem"
         if not key_path.exists():
             raise FileNotFoundError(key_path)
@@ -53,22 +55,36 @@ class LocalKeyStore:
                 raise StrictKeyPolicyError(msg)
             warnings.warn(msg, UserWarning)
         meta_path = key_path.with_suffix(".json")
-        password = None
+        encrypted = False
         if meta_path.exists():
             try:
                 meta = json.loads(meta_path.read_text())
                 algo = meta.get("type")
-                password = meta.get("password")
+                encrypted = bool(meta.get("encrypted", False))
+                if "password" in meta:
+                    warnings.warn(
+                        f"Ignoring legacy persisted password metadata for key: {key_id}",
+                        UserWarning,
+                    )
             except Exception:
                 algo = None
-                password = None
+                encrypted = False
         else:
             algo = None
+        if encrypted and password is None:
+            raise ValueError(f"Password required to load encrypted key: {key_id}")
         with open(key_path, "rb") as f:
             pem = f.read()
-            key = serialization.load_pem_private_key(
-                pem, password=password.encode() if isinstance(password, str) else None
-            )
+            try:
+                key = serialization.load_pem_private_key(
+                    pem, password=password.encode() if isinstance(password, str) else None
+                )
+            except TypeError as exc:
+                if "encrypted" in str(exc).lower() and password is None:
+                    raise ValueError(
+                        f"Password required to load encrypted key: {key_id}"
+                    ) from exc
+                raise
 
         if algo is None:
             if isinstance(key, ed25519.Ed25519PrivateKey):
@@ -79,13 +95,13 @@ class LocalKeyStore:
                 algo = "rsa"
             else:
                 raise ValueError("Unsupported key type")
-            meta_path.write_text(json.dumps({"type": algo}))
+            meta_path.write_text(json.dumps({"type": algo, "encrypted": encrypted}))
 
         return cast(PrivateKey, key), cast(str, algo)
 
     @audit_log
-    def sign(self, key_id: str, data: bytes) -> bytes:
-        key, algo = self._load_key(key_id)
+    def sign(self, key_id: str, data: bytes, password: str | None = None) -> bytes:
+        key, algo = self._load_key(key_id, password=password)
         if algo == "ed25519":
             signature = cast(
                 bytes,
@@ -110,21 +126,23 @@ class LocalKeyStore:
         return signature
 
     @audit_log
-    def decrypt(self, key_id: str, data: bytes) -> bytes:
-        key, algo = self._load_key(key_id)
+    def decrypt(self, key_id: str, data: bytes, password: str | None = None) -> bytes:
+        key, algo = self._load_key(key_id, password=password)
         if algo != "rsa":
             raise ValueError("Key type not suitable for decryption")
         return rsa_decrypt(data, cast(rsa.RSAPrivateKey, key))
 
     @audit_log
-    def unwrap(self, key_id: str, wrapped_key: bytes) -> bytes:
-        return self.decrypt(key_id, wrapped_key)
+    def unwrap(
+        self, key_id: str, wrapped_key: bytes, password: str | None = None
+    ) -> bytes:
+        return self.decrypt(key_id, wrapped_key, password=password)
 
     @audit_log
-    def export_key(self, key_id: str) -> Tuple[bytes, dict]:
+    def export_key(self, key_id: str, password: str | None = None) -> Tuple[bytes, dict]:
         key_path = self.dir / f"{key_id}.pem"
         raw = key_path.read_bytes()
-        _, algo = self._load_key(key_id)
+        _, algo = self._load_key(key_id, password=password)
         return raw, {"id": key_id, "type": algo}
 
     def _fingerprint(self, key: PrivateKey) -> str:
@@ -174,9 +192,8 @@ class LocalKeyStore:
             "type": algo,
             "created": dt.datetime.now(dt.timezone.utc).isoformat(),
             "fingerprint": fingerprint,
+            "encrypted": bool(password),
         }
-        if password:
-            meta["password"] = password
         key_path.with_suffix(".json").write_text(json.dumps(meta))
         return key_id
 
@@ -187,6 +204,7 @@ class LocalKeyStore:
         if isinstance(name_or_meta, dict):
             meta = name_or_meta
             key_id = cast(str, meta.get("id", "imported"))
+            encrypted = bool(meta.get("encrypted", False))
             policy = config.STRICT_KEYS
             if policy in {"warn", "error"}:
                 try:
@@ -208,7 +226,7 @@ class LocalKeyStore:
                 key_path = self.dir / f"{key_id}.pem"
             key_path.write_bytes(raw)
             (key_path.with_suffix(".json")).write_text(
-                json.dumps({"type": meta.get("type")})
+                json.dumps({"type": meta.get("type"), "encrypted": encrypted})
             )
             return key_id
         name = cast(str, name_or_meta)
