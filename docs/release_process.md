@@ -1,49 +1,31 @@
 # Release Process
 
-This project aims for fully reproducible builds and signed artifacts. Releases are created via GitHub Actions.
+This project enforces a SemVer-based release workflow with reproducible builds.
 
-## Steps
+## Versioning policy
 
-1. A fresh virtual environment installs pinned build tools via
-   `pip install -r requirements-release.txt`.
-2. `tools/reproducible_build.py` builds the wheel and sdist with
-   `SOURCE_DATE_EPOCH` set to ensure determinism.
-3. `tools/generate_sbom.py` creates a CycloneDX SBOM in `dist/sbom.json`.
-4. `slsa-framework/slsa-github-generator` produces a
-   `provenance.intoto.jsonl` attestation.
-5. `cosign sign-blob` signs every artifact (wheel, sdist, SBOM, provenance).
-6. `reprotest` verifies the build in varying environments for reproducibility.
-7. `tools/release_lint.py` checks that SBOM, provenance and signatures are
-   present before publishing.
-8. Release notes are extracted from `CHANGELOG.md` and the artifacts,
-   signatures and attestations are uploaded to PyPI and GitHub Releases.
+- We follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+- Tags **must** use the form `vMAJOR.MINOR.PATCH`.
+- `CHANGELOG.md` is maintained using Keep a Changelog format.
 
-Users can verify a downloaded wheel and related artifacts:
+## Automated release pipeline
 
-1. Verify the wheel's signature:
+`Release` workflow (`.github/workflows/release.yml`) is triggered only by SemVer tags.
 
-   ```bash
-   cosign verify --certificate-identity "https://github.com/Psychevus/cryptography-suite/.github/workflows/release.yml@refs/tags/v3.0.0" <wheel>.sig <wheel>
-   ```
+1. Validate tag format (`vX.Y.Z`).
+2. Verify `CHANGELOG.md` includes a matching version header.
+3. Re-run the complete quality gate (formatting, lint, typing, security, dependency audit, tests with branch coverage).
+4. Install pinned release dependencies from `requirements-release.txt`.
+5. Build reproducible wheel/sdist artifacts.
+6. Generate SBOM.
+7. Validate release artifacts (`tools/release_lint.py`).
+8. Publish to PyPI.
+9. Create GitHub Release and attach artifacts.
 
-2. Validate the checksums:
+Release notes are generated directly from the matching changelog section.
 
-   ```bash
-   sha256sum -c checksums.txt
-   ```
+## Reproducibility requirements
 
-3. Inspect the SLSA provenance:
-
-   ```bash
-   jq '.subject | .name' provenance.intoto.jsonl
-   ```
-
-The SBOM (`sbom.json`) can be inspected with tools such as
-`cyclonedx-bom`:
-
-```bash
-cyclonedx-bom --input-file sbom.json --summary
-```
-
-Expected SHA256 hashes are published alongside each release for
-additional manual verification.
+- CI tooling for checks is pinned in `requirements-dev.txt`.
+- Release build tooling is pinned in `requirements-release.txt`.
+- Build job runs from a clean environment and generates deterministic artifacts.

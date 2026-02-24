@@ -1,11 +1,31 @@
 # Release Checklist
 
-- [ ] Run tests and linting.
-- [ ] Install pinned build tools: `pip install -r requirements-release.txt`.
-- [ ] Build wheel and sdist: `python tools/reproducible_build.py`.
-- [ ] Generate SBOM: `python tools/generate_sbom.py`.
-- [ ] Generate provenance attestation: `slsa-framework/slsa-github-generator`.
-- [ ] Sign artifacts with `cosign sign-blob`.
-- [ ] Verify reproducibility using `reprotest`.
-- [ ] Lint release artifacts: `python tools/release_lint.py`.
-- [ ] Publish to PyPI and create GitHub Release with SBOM, provenance and signatures.
+## Before tagging
+
+- [ ] Ensure `CHANGELOG.md` has a `## [X.Y.Z] - YYYY-MM-DD` section for the release.
+- [ ] Confirm version follows SemVer and planned scope (`MAJOR`, `MINOR`, `PATCH`).
+- [ ] Run the full local quality gate:
+  - `ruff format --check .`
+  - `black --check .`
+  - `ruff check .`
+  - `mypy cryptography_suite tools`
+  - `bandit -q -r cryptography_suite -x tests,docs,examples`
+  - `pip-audit -r requirements.txt --strict`
+  - `pytest --cov=cryptography_suite --cov-branch --cov-fail-under=95`
+
+## Tag and release
+
+- [ ] Create a signed SemVer tag: `git tag -s vX.Y.Z -m "Release vX.Y.Z"`.
+- [ ] Push the tag: `git push origin vX.Y.Z`.
+- [ ] Confirm GitHub Actions `Release` workflow passed:
+  - SemVer tag validation
+  - Changelog entry validation
+  - Full quality gate rerun
+  - Reproducible build + SBOM generation
+  - Artifact linting + PyPI publish + GitHub Release upload
+
+## Post-release
+
+- [ ] Verify release artifacts exist on GitHub Releases and PyPI.
+- [ ] Verify release notes were populated from `CHANGELOG.md`.
+- [ ] Announce release and link migration notes when relevant.
