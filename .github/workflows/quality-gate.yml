@@ -61,8 +61,9 @@ jobs:
         if: steps.changed-python.outputs.any_changed == 'true'
         run: ruff check ${{ steps.changed-python.outputs.all_changed_files }}
 
-      - name: Type checks (mypy)
-        run: mypy cryptography_suite tools
+      - name: Type checks (mypy, changed files)
+        if: steps.changed-python.outputs.any_changed == 'true'
+        run: mypy ${{ steps.changed-python.outputs.all_changed_files }}
 
       - name: Security scan (bandit)
         run: bandit -q -r cryptography_suite -x tests,docs,examples

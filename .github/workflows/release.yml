@@ -78,8 +78,8 @@ jobs:
         run: |
           if [ "${{ steps.changed-python.outputs.any_changed }}" = "true" ]; then
             echo "${{ steps.changed-python.outputs.files }}" | xargs -r ruff check
+            echo "${{ steps.changed-python.outputs.files }}" | xargs -r mypy
           fi
-          mypy cryptography_suite tools
           bandit -q -r cryptography_suite -x tests,docs,examples
           pip-audit -r requirements.txt --strict
           pytest --cov=cryptography_suite --cov-branch --cov-fail-under=95

@@ -21,14 +21,14 @@ pre-commit install
 
 ## Quality gate (must match CI)
 
-CI enforces formatting and lint checks on changed Python files and enforces type/security/tests gates repository-wide.
+CI enforces formatting, lint, and type checks on changed Python files and enforces security/tests gates repository-wide.
 
 Run all checks locally before pushing:
 
 ```bash
 pre-commit run
 ruff check <changed-python-files>
-mypy cryptography_suite tools
+mypy <changed-python-files>
 bandit -q -r cryptography_suite -x tests,docs,examples
 pip-audit -r requirements.txt --strict
 pytest --cov=cryptography_suite --cov-branch --cov-report=term-missing --cov-fail-under=95
