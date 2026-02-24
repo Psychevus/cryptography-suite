@@ -3,6 +3,7 @@ from __future__ import annotations
 import importlib
 import importlib.util
 import logging
+import os
 import pkgutil
 import pathlib
 from importlib import metadata
@@ -50,23 +51,27 @@ def load_plugins(directory: str | None = None) -> None:
             _FAILED_PLUGINS.append(modname)
 
     # external plugins from path
-    if directory is None:
-        directory = str(pathlib.Path.cwd() / "keystores")
-    dpath = pathlib.Path(directory)
-    if dpath.is_dir():
-        for file in dpath.glob("*.py"):
-            spec = importlib.util.spec_from_file_location(
-                f"ext_keystore_{file.stem}", file
-            )
-            if spec and spec.loader:
-                try:
-                    module = importlib.util.module_from_spec(spec)
-                    spec.loader.exec_module(module)
-                except Exception as exc:  # pragma: no cover - defensive
-                    log.error(
-                        "Failed to load keystore plugin %s: %s", file.stem, exc
-                    )
-                    _FAILED_PLUGINS.append(file.stem)
+    local_plugin_opt_in = (
+        os.environ.get("CRYPTOSUITE_LOAD_LOCAL_KEYSTORE_PLUGINS") == "1"
+    )
+    if directory is not None or local_plugin_opt_in:
+        if directory is None:
+            directory = str(pathlib.Path.cwd() / "keystores")
+        dpath = pathlib.Path(directory)
+        if dpath.is_dir():
+            for file in dpath.glob("*.py"):
+                spec = importlib.util.spec_from_file_location(
+                    f"ext_keystore_{file.stem}", file
+                )
+                if spec and spec.loader:
+                    try:
+                        module = importlib.util.module_from_spec(spec)
+                        spec.loader.exec_module(module)
+                    except Exception as exc:  # pragma: no cover - defensive
+                        log.error(
+                            "Failed to load keystore plugin %s: %s", file.stem, exc
+                        )
+                        _FAILED_PLUGINS.append(file.stem)
 
     # entry points
     try:

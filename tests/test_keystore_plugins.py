@@ -129,10 +129,73 @@ def test_plugin_failure_isolated(tmp_path: Path, capsys):
     cwd = os.getcwd()
     os.chdir(tmp_path)
     try:
+        os.environ["CRYPTOSUITE_LOAD_LOCAL_KEYSTORE_PLUGINS"] = "1"
         with pytest.raises(SystemExit) as exc:
             keystore_cli(["list"])
         assert exc.value.code != 0
         out = capsys.readouterr().out
         assert "broken (broken)" in out
     finally:
+        os.environ.pop("CRYPTOSUITE_LOAD_LOCAL_KEYSTORE_PLUGINS", None)
         os.chdir(cwd)
+
+
+def test_load_plugins_does_not_import_cwd_plugins_without_opt_in(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    local_dir = tmp_path / "keystores"
+    local_dir.mkdir()
+    (local_dir / "evil_plugin.py").write_text(
+        """
+from pathlib import Path
+Path('pwned.txt').write_text('owned')
+"""
+    )
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.delenv("CRYPTOSUITE_LOAD_LOCAL_KEYSTORE_PLUGINS", raising=False)
+
+    load_plugins()
+
+    assert not (tmp_path / "pwned.txt").exists()
+
+
+def test_load_plugins_imports_cwd_plugins_with_opt_in(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    local_dir = tmp_path / "keystores"
+    local_dir.mkdir()
+    (local_dir / "opt_in_plugin.py").write_text(
+        """
+from pathlib import Path
+from cryptography_suite.keystores import register_keystore
+
+Path('opted_in.txt').write_text('loaded')
+
+@register_keystore('opt-in')
+class OptInKS:
+    name = 'opt-in'
+    status = 'testing'
+
+    def list_keys(self):
+        return []
+
+    def test_connection(self):
+        return True
+
+    def sign(self, key_id, data):
+        return b''
+
+    def decrypt(self, key_id, data):
+        return b''
+
+    def unwrap(self, key_id, wrapped_key):
+        return b''
+"""
+    )
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("CRYPTOSUITE_LOAD_LOCAL_KEYSTORE_PLUGINS", "1")
+
+    load_plugins()
+
+    assert (tmp_path / "opted_in.txt").exists()
+    assert "opt-in" in list_keystores()
