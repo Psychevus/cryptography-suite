@@ -18,15 +18,17 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -e .[dev]
-      - name: Run tests
-        run: coverage run -m pytest -p no:cov cryptography_suite tests
+      - name: Run tests with branch coverage
+        run: coverage run --rcfile=.coveragerc -m pytest -p no:cov cryptography_suite tests
       - name: Coverage gate
         run: |
           coverage xml --fail-under=0
+          coverage json
+          python tools/check_coverage_thresholds.py
           python - <<'PY'
           import xml.etree.ElementTree as ET, sys
           rate = float(ET.parse('coverage.xml').getroot().attrib['line-rate'])
-          sys.exit(0 if rate >= 0.99 else 1)
+          sys.exit(0 if rate >= 0.95 else 1)
           PY
       - name: Generate HTML coverage report
         run: coverage html
