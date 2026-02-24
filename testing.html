@@ -229,61 +229,58 @@
         <article role="main" id="furo-main-content">
           <section id="testing-guide">
 <h1>Testing Guide<a class="headerlink" href="#testing-guide" title="Link to this heading">¶</a></h1>
-<p>This guide explains how to run the project’s tests locally and how they map to the continuous integration (CI) matrix.</p>
+<p>This guide explains how to run tests locally and how local checks map to CI workflows.</p>
 <section id="quick-start">
 <h2>Quick start<a class="headerlink" href="#quick-start" title="Link to this heading">¶</a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="o">[</span>dev,fuzz<span class="o">]</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="o">[</span>dev<span class="o">]</span>
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>atheris
+pytest
 pytest<span class="w"> </span>-m<span class="w"> </span>property
-python<span class="w"> </span>-m<span class="w"> </span>atheris<span class="w"> </span>fuzz/fuzz_aes.py
+python<span class="w"> </span>fuzz/fuzz_aes.py<span class="w"> </span>-runs<span class="o">=</span><span class="m">1000</span>
 </pre></div>
 </div>
-<p>The commands above install the development and fuzzing dependencies, execute property-based tests, and run a sample Atheris fuzz harness.</p>
+<p>The commands above install development dependencies, add Atheris for fuzzing harnesses, run the main test suite, execute property-based tests, and run a sample fuzz target.</p>
 </section>
-<section id="extending-the-fuzz-harness">
-<h2>Extending the fuzz harness<a class="headerlink" href="#extending-the-fuzz-harness" title="Link to this heading">¶</a></h2>
+<section id="extending-fuzz-harnesses">
+<h2>Extending fuzz harnesses<a class="headerlink" href="#extending-fuzz-harnesses" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
-<li><p><strong>Create a new harness</strong> in the <code class="docutils literal notranslate"><span class="pre">fuzz/</span></code> directory, using <code class="docutils literal notranslate"><span class="pre">fuzz/fuzz_aes.py</span></code> as a template.</p></li>
-<li><p><strong>Import the target functions</strong> and set up <code class="docutils literal notranslate"><span class="pre">atheris.instrument_all()</span></code> to cover relevant inputs.</p></li>
-<li><p><strong>Register the entry point</strong> via <code class="docutils literal notranslate"><span class="pre">atheris.Setup</span></code> and call <code class="docutils literal notranslate"><span class="pre">atheris.Fuzz()</span></code>.</p></li>
-<li><p>Optionally, update <code class="docutils literal notranslate"><span class="pre">.github/workflows/fuzz.yml</span></code> to schedule the harness in CI.</p></li>
+<li><p>Create a new harness in <code class="docutils literal notranslate"><span class="pre">fuzz/</span></code> (use <code class="docutils literal notranslate"><span class="pre">fuzz/fuzz_aes.py</span></code> as a template).</p></li>
+<li><p>Import target functions and instrument inputs with Atheris.</p></li>
+<li><p>Register the entry point via <code class="docutils literal notranslate"><span class="pre">atheris.Setup</span></code> and call <code class="docutils literal notranslate"><span class="pre">atheris.Fuzz()</span></code>.</p></li>
+<li><p>Update <code class="docutils literal notranslate"><span class="pre">.github/workflows/fuzz.yml</span></code> if the harness should run in CI.</p></li>
 </ol>
 </section>
-<section id="ci-matrix-overview">
-<h2>CI matrix overview<a class="headerlink" href="#ci-matrix-overview" title="Link to this heading">¶</a></h2>
+<section id="ci-workflow-mapping">
+<h2>CI workflow mapping<a class="headerlink" href="#ci-workflow-mapping" title="Link to this heading">¶</a></h2>
 <div class="table-wrapper colwidths-auto docutils container">
 <table class="docutils align-default">
 <thead>
-<tr class="row-odd"><th class="head"><p>Job</p></th>
-<th class="head"><p>Python versions</p></th>
-<th class="head"><p>Operating systems</p></th>
+<tr class="row-odd"><th class="head"><p>Workflow</p></th>
+<th class="head"><p>File</p></th>
+<th class="head"><p>Trigger</p></th>
 <th class="head"><p>Purpose</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">lint</span></code></p></td>
-<td><p>3.10, 3.11</p></td>
-<td><p>Ubuntu, macOS, Windows</p></td>
-<td><p>Static analysis (flake8, mypy, pylint, bandit, vulture)</p></td>
+<tr class="row-even"><td><p>Quality Gate</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">.github/workflows/quality-gate.yml</span></code></p></td>
+<td><p>push/PR to <code class="docutils literal notranslate"><span class="pre">main</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ruff</span> <span class="pre">format</span> <span class="pre">--check</span></code>, <code class="docutils literal notranslate"><span class="pre">black</span> <span class="pre">--check</span></code>, <code class="docutils literal notranslate"><span class="pre">ruff</span> <span class="pre">check</span></code>, <code class="docutils literal notranslate"><span class="pre">mypy</span></code>, <code class="docutils literal notranslate"><span class="pre">bandit</span></code>, <code class="docutils literal notranslate"><span class="pre">pip-audit</span></code>, pytest with branch coverage gate, docs-drift script</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">tests</span></code></p></td>
-<td><p>3.10–3.12</p></td>
-<td><p>Ubuntu, macOS, Windows</p></td>
-<td><p>Unit tests with coverage</p></td>
+<tr class="row-odd"><td><p>Build</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">.github/workflows/build.yml</span></code></p></td>
+<td><p>push to <code class="docutils literal notranslate"><span class="pre">main</span></code>, PR</p></td>
+<td><p>wheel builds + <code class="docutils literal notranslate"><span class="pre">pip-audit</span></code> + <code class="docutils literal notranslate"><span class="pre">trivy</span></code> filesystem scan</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">tests-extras</span></code></p></td>
-<td><p>3.11</p></td>
-<td><p>Ubuntu</p></td>
-<td><p>Tests with optional dependencies</p></td>
+<tr class="row-even"><td><p>Fuzzing</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">.github/workflows/fuzz.yml</span></code></p></td>
+<td><p>weekly schedule + manual dispatch</p></td>
+<td><p>Atheris fuzz run (<code class="docutils literal notranslate"><span class="pre">fuzz/fuzz_aes.py</span></code>) on Python 3.11/3.12</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">pkcs11-tests</span></code></p></td>
-<td><p>3.11</p></td>
-<td><p>Ubuntu</p></td>
-<td><p>SoftHSM-backed PKCS#11 tests</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">fuzz</span></code></p></td>
-<td><p>3.11, 3.12</p></td>
-<td><p>Ubuntu</p></td>
-<td><p>Weekly Atheris fuzzing</p></td>
+<tr class="row-odd"><td><p>Release</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">.github/workflows/release.yml</span></code></p></td>
+<td><p>SemVer tags</p></td>
+<td><p>release validation + quality checks + publish</p></td>
 </tr>
 </tbody>
 </table>
@@ -294,7 +291,7 @@ python<span class="w"> </span>-m<span class="w"> </span>atheris<span class="w"> 
 <ul class="simple">
 <li><p>Test plan matrix: <code class="docutils literal notranslate"><span class="pre">docs/testing_plan_matrix.md</span></code></p></li>
 <li><p>Contributor playbook: <code class="docutils literal notranslate"><span class="pre">docs/testing_playbook.md</span></code></p></li>
-<li><p>Coverage thresholds script: <code class="docutils literal notranslate"><span class="pre">tools/check_coverage_thresholds.py</span></code></p></li>
+<li><p>Coverage threshold helper: <code class="docutils literal notranslate"><span class="pre">tools/check_coverage_thresholds.py</span></code></p></li>
 </ul>
 </section>
 </section>
@@ -338,8 +335,8 @@ python<span class="w"> </span>-m<span class="w"> </span>atheris<span class="w"> 
             <ul>
 <li><a class="reference internal" href="#">Testing Guide</a><ul>
 <li><a class="reference internal" href="#quick-start">Quick start</a></li>
-<li><a class="reference internal" href="#extending-the-fuzz-harness">Extending the fuzz harness</a></li>
-<li><a class="reference internal" href="#ci-matrix-overview">CI matrix overview</a></li>
+<li><a class="reference internal" href="#extending-fuzz-harnesses">Extending fuzz harnesses</a></li>
+<li><a class="reference internal" href="#ci-workflow-mapping">CI workflow mapping</a></li>
 <li><a class="reference internal" href="#operational-reliability-artifacts">Operational reliability artifacts</a></li>
 </ul>
 </li>

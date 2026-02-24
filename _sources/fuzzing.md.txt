@@ -1,13 +1,17 @@
 # Fuzzing and Property Testing
 
-This project includes fuzzing harnesses powered by [Google Atheris](https://github.com/google/atheris) and property-based tests built with [Hypothesis](https://hypothesis.readthedocs.io/).
+This project uses [Google Atheris](https://github.com/google/atheris) fuzz harnesses and [Hypothesis](https://hypothesis.readthedocs.io/) property tests.
 
-Atheris primarily helps surface memory corruption and input-parsing issues by exercising functions with large volumes of malformed data. Hypothesis targets semantic properties and invariants such as round-trip encryption and correct error handling. Neither technique can prove cryptographic soundness; they only increase confidence by exploring a wide range of behaviours.
+- **Atheris** stresses parsing and edge-case execution paths to find crashes and unexpected exceptions.
+- **Hypothesis** validates invariants such as encrypt/decrypt round-trips and error behavior across broad input spaces.
 
-## Local Usage
+Neither approach proves cryptographic soundness, but together they reduce implementation risk.
+
+## Local usage
 
 ```bash
 pip install -e .[dev]
+python -m pip install atheris
 cryptosuite-fuzz --runs 500
 ```
 
@@ -15,26 +19,24 @@ Use `--pipeline pipeline.yaml` to fuzz a custom pipeline.
 
 ## Continuous Integration
 
-GitHub Actions runs the fuzzing harness weekly and on demand. Crashes are stored as workflow artifacts for regression checking.
+GitHub Actions workflow `.github/workflows/fuzz.yml` runs weekly and on manual dispatch.
 
-Coverage from fuzzing is merged with the standard coverage report when possible.
+- Python versions: 3.11 and 3.12
+- Current CI harness execution: `python fuzz/fuzz_aes.py -runs=1000`
+- Crash artifacts are uploaded for triage/regression
 
 ## Limitations
 
-- Atheris focuses on finding crashes and unexpected exceptions. It does not reason about protocol correctness or key strength.
-- Hypothesis checks logical properties but cannot exhaust the entire input space.
-- No fuzzing strategy can guarantee cryptographic security.
-- Argon2-based functionality is skipped when the underlying cryptography backend does not provide Argon2.
+- Atheris prioritizes crash discovery, not protocol proofs.
+- Hypothesis checks representative properties, not exhaustive state space.
+- No fuzzing strategy alone guarantees cryptographic security.
+- Argon2 functionality is skipped when backend support is unavailable.
 
-## Test Coverage Matrix
+## Coverage matrix
 
-| Primitive        | Unit Tests                     | Fuzz Harness           | Property Tests                |
-|------------------|--------------------------------|------------------------|-------------------------------|
-| AES-GCM          | `tests/test_encryption.py`     | `fuzz/fuzz_aes.py`     | `tests/test_aes_property.py`  |
-| RSA              | `tests/test_asymmetric.py`     | `fuzz/fuzz_rsa.py`     | `tests/test_rsa_property.py`  |
-| ECIES            | `tests/test_asymmetric.py`     | `fuzz/fuzz_ecies.py`   | `tests/test_ecies_property.py`|
-| Pipeline modules | `tests/test_pipeline.py`       | `fuzz/fuzz_pipeline.py`| `tests/test_pipeline_property.py` |
-
-## Contribution Requirements
-
-New cryptographic primitives or backend implementations must include unit tests, an Atheris fuzzing harness, and Hypothesis property tests before they can be merged.
+| Primitive | Unit tests | Fuzz harness | Property tests |
+|---|---|---|---|
+| AES-GCM | `tests/test_encryption.py` | `fuzz/fuzz_aes.py` | `tests/test_aes_property.py` |
+| RSA | `tests/test_asymmetric.py` | `fuzz/fuzz_rsa.py` | `tests/test_rsa_property.py` |
+| ECIES | `tests/test_asymmetric.py` | `fuzz/fuzz_ecies.py` | `tests/test_ecies_property.py` |
+| Pipeline modules | `tests/test_pipeline.py` | `fuzz/fuzz_pipeline.py` | `tests/test_pipeline_property.py` |
