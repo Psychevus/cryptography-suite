@@ -46,7 +46,10 @@ def test_error_codes_are_stable_and_specific():
     assert EncryptionError("encrypt").code == ErrorCode.ENCRYPTION_FAILED
     assert DecryptionError("decrypt").code == ErrorCode.DECRYPTION_FAILED
     assert KeyDerivationError("kdf").code == ErrorCode.KEY_DERIVATION_FAILED
-    assert SignatureVerificationError("sig").code == ErrorCode.SIGNATURE_VERIFICATION_FAILED
+    assert (
+        SignatureVerificationError("sig").code
+        == ErrorCode.SIGNATURE_VERIFICATION_FAILED
+    )
     assert MissingDependencyError("dep").code == ErrorCode.MISSING_DEPENDENCY
     assert UnsupportedAlgorithm("algo").code == ErrorCode.UNSUPPORTED_ALGORITHM
     assert SecurityError("sec").code == ErrorCode.SECURITY_POLICY_VIOLATION
