@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import os
+from collections.abc import Callable
 from datetime import datetime
-from typing import Callable, Protocol
+from functools import wraps
+from typing import ParamSpec, Protocol, TypeVar, cast
 
 from cryptography.fernet import Fernet
 
@@ -10,8 +12,7 @@ from cryptography.fernet import Fernet
 class AuditLogger(Protocol):
     """Protocol for audit loggers."""
 
-    def log(self, operation: str, status: str) -> None:
-        ...
+    def log(self, operation: str, status: str) -> None: ...
 
 
 class InMemoryAuditLogger:
@@ -93,10 +94,15 @@ def _set_default_logger() -> None:
         _AUDIT_LOGGER = InMemoryAuditLogger()
 
 
-def audit_log(func: Callable) -> Callable:
+P = ParamSpec("P")
+R = TypeVar("R")
+
+
+def audit_log(func: Callable[P, R]) -> Callable[P, R]:
     """Decorator to log cryptographic operations."""
 
-    def wrapper(*args, **kwargs):
+    @wraps(func)
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
         logger = _get_audit_logger()
         try:
             result = func(*args, **kwargs)
@@ -108,4 +114,4 @@ def audit_log(func: Callable) -> Callable:
                 logger.log(func.__name__, "failure")
             raise
 
-    return wrapper
+    return cast(Callable[P, R], wrapper)

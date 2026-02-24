@@ -11,18 +11,18 @@ import threading
 try:
     import tomllib  # Python 3.11+
 except Exception:  # pragma: no cover - fallback for older Python
-    tomllib = None  # type: ignore
+    tomllib = None
 
 try:  # optional dependency
-    import pkcs11  # type: ignore[import-not-found, import-untyped]
-    from pkcs11 import (  # type: ignore[import-not-found, import-untyped]
+    import pkcs11
+    from pkcs11 import (
         Attribute,
         KeyType,
         Mechanism,
         ObjectClass,
     )
 except Exception:  # pragma: no cover - dependency missing
-    pkcs11 = None  # type: ignore
+    pkcs11 = None
 
 from ..audit import audit_log
 from . import register_keystore
@@ -117,13 +117,13 @@ class PKCS11KeyStore:
     def _get_key(self, session, label: str):
         try:
             priv = session.get_key(object_class=ObjectClass.PRIVATE_KEY, label=label)
-        except pkcs11.NoSuchKey as exc:  # type: ignore[attr-defined]
+        except pkcs11.NoSuchKey as exc:
             raise FileNotFoundError(label) from exc
 
         try:
             pub = session.get_key(object_class=ObjectClass.PUBLIC_KEY, label=label)
-            priv.public_key = pub  # type: ignore[attr-defined]
-        except pkcs11.NoSuchKey:  # type: ignore[attr-defined]
+            priv.public_key = pub
+        except pkcs11.NoSuchKey:
             pass
         return priv
 

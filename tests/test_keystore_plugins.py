@@ -2,6 +2,7 @@ import os
 import sys
 import types
 from pathlib import Path
+from typing import cast
 from unittest.mock import MagicMock
 
 import pytest
@@ -12,6 +13,7 @@ from cryptography_suite.asymmetric import rsa_encrypt
 from cryptography_suite.audit import InMemoryAuditLogger, set_audit_logger
 from cryptography_suite.cli import keystore_cli
 from cryptography_suite.keystores import get_keystore, list_keystores, load_plugins
+from cryptography_suite.keystores.local import LocalKeyStore
 
 
 def test_keystore_loader():
@@ -64,7 +66,8 @@ def test_local_keystore_key_types(tmp_path: Path):
     write(tmp_path / "ec.pem", ec_key)
     write(tmp_path / "rsa.pem", rsa_key)
 
-    ks = get_keystore("local")(directory=str(tmp_path))
+    local_cls = cast(type[LocalKeyStore], get_keystore("local"))
+    ks = local_cls(directory=str(tmp_path))
     assert isinstance(ks.sign("ed", b"msg"), bytes)
     assert isinstance(ks.sign("ec", b"msg"), bytes)
 

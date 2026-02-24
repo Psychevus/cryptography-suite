@@ -1,12 +1,14 @@
 import sys
 import types
 from pathlib import Path
+from typing import cast
 
 import pytest
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ed25519
 
 from cryptography_suite.keystores import get_keystore, load_plugins
+from cryptography_suite.keystores.local import LocalKeyStore
 
 
 def test_roundtrip_local_mock(tmp_path: Path):
@@ -20,14 +22,16 @@ def test_roundtrip_local_mock(tmp_path: Path):
     src_dir = tmp_path / "src"
     src_dir.mkdir()
     (src_dir / "k1.pem").write_bytes(pem)
-    src = get_keystore("local")(directory=str(src_dir))
+    src_cls = cast(type[LocalKeyStore], get_keystore("local"))
+    src = src_cls(directory=str(src_dir))
     dst = get_keystore("mock_hsm")()
     raw, meta = src.export_key("k1")
     new_id = dst.import_key(raw, meta)
     raw2, meta2 = dst.export_key(new_id)
     dst_dir = tmp_path / "dst"
     dst_dir.mkdir()
-    local2 = get_keystore("local")(directory=str(dst_dir))
+    local2_cls = cast(type[LocalKeyStore], get_keystore("local"))
+    local2 = local2_cls(directory=str(dst_dir))
     new_id2 = local2.import_key(raw2, meta2)
     raw3, meta3 = local2.export_key(new_id2)
     assert raw == raw3

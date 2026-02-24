@@ -5,7 +5,7 @@ import hashlib
 import json
 import warnings
 from pathlib import Path
-from typing import cast
+from typing import TypeAlias, cast
 
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ec, ed25519, rsa
@@ -23,7 +23,9 @@ from ..utils import is_encrypted_pem
 from . import register_keystore
 from .base import KeyStoreCapability
 
-PrivateKey = ed25519.Ed25519PrivateKey | ec.EllipticCurvePrivateKey | rsa.RSAPrivateKey
+PrivateKey: TypeAlias = (
+    ed25519.Ed25519PrivateKey | ec.EllipticCurvePrivateKey | rsa.RSAPrivateKey
+)
 
 
 @register_keystore("local")
@@ -246,7 +248,7 @@ class LocalKeyStore:
                 json.dumps({"type": meta.get("type"), "encrypted": encrypted})
             )
             return key_id
-        name = cast(str, name_or_meta)
+        name = name_or_meta
         key = serialization.load_pem_private_key(
             raw, password=password.encode() if password else None
         )

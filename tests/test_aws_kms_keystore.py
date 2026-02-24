@@ -8,7 +8,7 @@ class StubKMSClient:
     def __init__(self, key_spec: str, signing_algorithms: list[str]):
         self.key_spec = key_spec
         self.signing_algorithms = signing_algorithms
-        self.sign_calls = []
+        self.sign_calls: list[dict[str, object]] = []
 
     def get_paginator(self, _name):
         return types.SimpleNamespace(paginate=lambda: [{"Keys": []}])
