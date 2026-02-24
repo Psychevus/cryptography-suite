@@ -388,16 +388,20 @@ additional dependencies.
 
 ### File Encryption
 
-Stream files of any size with AES-GCM. The functions read and write in
-chunks, so even large files can be processed efficiently.
+Stream files of any size with AES-GCM in bounded memory. The current file
+format is versioned and self-describing with metadata for magic bytes,
+version, KDF identifier, salt, nonce, chunk size, and trailing GCM tag.
 
 ```python
 from cryptography_suite.symmetric import encrypt_file, decrypt_file
 
 password: str = "file_password"
-encrypt_file("secret.txt", "secret.enc", password)
+encrypt_file("secret.txt", "secret.enc", password, kdf="argon2")
 decrypt_file("secret.enc", "secret.out", password)
 ```
+
+`decrypt_file` remains backward-compatible with the legacy format
+(`salt || nonce || ciphertext+tag`) for existing encrypted files.
 
 For asynchronous applications install `aiofiles` and use the async variants:
 
@@ -771,7 +775,7 @@ Run each command with `-h` for detailed help.
 File encryption and decryption are available via the main CLI:
 
 ```bash
-cryptography-suite file encrypt --in secret.txt --out secret.enc --password mypass
+cryptography-suite file encrypt --in secret.txt --out secret.enc --password mypass --kdf argon2
 cryptography-suite file decrypt --in secret.enc --out decrypted.txt --password mypass
 ```
 
