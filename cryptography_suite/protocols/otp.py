@@ -74,9 +74,12 @@ def verify_hotp(
     SHA-256 or higher if your authenticator supports it.
     """
     for offset in range(-window, window + 1):
+        candidate_counter = counter + offset
+        if candidate_counter < 0:
+            continue
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", UserWarning)
-            calculated_code = generate_hotp(secret, counter + offset, digits, algorithm)
+            calculated_code = generate_hotp(secret, candidate_counter, digits, algorithm)
         if hmac.compare_digest(calculated_code, code):
             return True
     return False
