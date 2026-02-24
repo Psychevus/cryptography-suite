@@ -8,7 +8,7 @@ import json
 import logging
 import sys
 from pathlib import Path
-from typing import cast
+from typing import Protocol, cast
 
 from blake3 import blake3
 
@@ -47,6 +47,12 @@ from .zk.bulletproof import (
 _OUTPUT_FORMAT = "text"
 
 
+class _HasherLike(Protocol):
+    def update(self, data: bytes) -> object: ...
+
+    def hexdigest(self) -> str: ...
+
+
 def _set_output_format(fmt: str) -> None:
     """Configure global CLI output format."""
 
@@ -68,7 +74,7 @@ try:
 
     ZKSNARK_AVAILABLE = getattr(zksnark, "ZKSNARK_AVAILABLE", False)
 except Exception:
-    zksnark = None  # type: ignore[assignment]
+    zksnark = None
     ZKSNARK_AVAILABLE = False
 
 
@@ -261,6 +267,7 @@ def hash_cli(argv: list[str] | None = None) -> None:
 
     _validate_regular_file(args.file, "file")
 
+    hasher: _HasherLike
     if args.algorithm == "sha3-256":
         hasher = hashlib.sha3_256()
     elif args.algorithm == "sha3-512":

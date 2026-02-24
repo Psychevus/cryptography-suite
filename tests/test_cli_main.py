@@ -1,5 +1,6 @@
 import hashlib
 import importlib
+from types import ModuleType
 
 import pytest
 from blake3 import blake3
@@ -7,7 +8,7 @@ from blake3 import blake3
 import cryptography_suite.cli as cli
 
 
-def reload_cli():
+def reload_cli() -> ModuleType:
     importlib.reload(cli)
     return cli
 
