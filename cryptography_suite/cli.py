@@ -58,6 +58,7 @@ def _emit(text: str, payload: dict[str, object] | None = None) -> None:
     else:
         print(text)
 
+
 try:
     from .experimental import zksnark
 
@@ -508,7 +509,9 @@ def fuzz_cli(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description=fuzz_cli.__doc__)
     parser.add_argument("--pipeline", help="Pipeline config YAML")
     parser.add_argument("--runs", type=int, default=1000)
-    parser.add_argument("--timeout", type=float, default=60.0, help="Subprocess timeout seconds")
+    parser.add_argument(
+        "--timeout", type=float, default=60.0, help="Subprocess timeout seconds"
+    )
     args = parser.parse_args(argv)
 
     if args.runs < 1 or args.runs > 1_000_000:
