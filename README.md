@@ -46,6 +46,9 @@ See [Vision details](docs/vision.md) for expansion.
 - [Migration from pyca/cryptography](docs/migration-from-pyca.md)
 - [Recipes cheat sheet](docs/cheatsheets/recipes.md)
 - [Security policy](SECURITY.md)
+- [No Surprises standardization guide](docs/no_surprises.md)
+- [API/CLI Contract](API_CLI_CONTRACT.md)
+- [Maintainer style guide](STYLEGUIDE.md)
 
 ______________________________________________________________________
 

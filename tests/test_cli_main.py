@@ -72,3 +72,23 @@ def test_main_otp(monkeypatch, capsys):
     monkeypatch.setattr(cli, "generate_totp", lambda *a, **k: "123")
     cli.main(["otp", "--secret", "abcd"])
     assert capsys.readouterr().out.strip() == "123"
+
+
+def test_main_hash_json_output(tmp_path, capsys):
+    cli = reload_cli()
+    file = tmp_path / "f.txt"
+    file.write_text("hello")
+    cli.main(["--output-format", "json", "hash", str(file), "--algorithm", "blake3"])
+    out = capsys.readouterr().out.strip()
+    assert '"algorithm": "blake3"' in out
+    assert '"digest"' in out
+
+
+def test_main_json_alias_deprecation(tmp_path, capsys):
+    cli = reload_cli()
+    file = tmp_path / "f.txt"
+    file.write_text("hello")
+    cli.main(["--json", "hash", str(file), "--algorithm", "blake3"])
+    out_lines = [line for line in capsys.readouterr().out.splitlines() if line.strip()]
+    assert "deprecated" in out_lines[0].lower()
+    assert '"digest"' in out_lines[-1]

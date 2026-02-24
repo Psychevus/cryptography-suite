@@ -5,6 +5,7 @@ nav:
   - Threat Model: threat-model.md
   - RFCs: rfc/README.md
   - API Stability: api-stability.md
+  - No Surprises: no_surprises.md
   - Migration: migration-from-pyca.md
   - Cheatsheets: cheatsheets/recipes.md
   - Security: security.md
