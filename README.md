@@ -956,3 +956,39 @@ Special thanks to all contributors and users who have helped improve this projec
 ______________________________________________________________________
 
 *Empower your applications with secure and reliable cryptographic functions using Cryptography Suite.*
+
+## Operational Profiles and Configuration
+
+The suite now uses typed settings loaded from environment variables:
+
+- `CRYPTOSUITE_ENV`: `dev|test|prod` (default: `dev`)
+- `CRYPTOSUITE_STRICT_KEYS`: `warn|error|true|false|1|0` (default: `warn`)
+- `CRYPTOSUITE_LOG_LEVEL`: logging level (default: `INFO`)
+
+### Run locally
+
+```bash
+python -m pip install -e .[dev]
+pytest
+```
+
+### Run in CI
+
+```bash
+black --check .
+isort --check-only .
+flake8
+mypy cryptography_suite
+pytest
+```
+
+### Run in production
+
+```bash
+export CRYPTOSUITE_ENV=prod
+export CRYPTOSUITE_STRICT_KEYS=error
+export CRYPTOSUITE_LOG_LEVEL=INFO
+python -c "import cryptography_suite as cs; print(cs.__version__)"
+```
+
+For architecture details and migration plan, see [docs/architecture.md](docs/architecture.md).

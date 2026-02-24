@@ -23,12 +23,18 @@ jobs:
       - name: Install Lint Tools
         run: |
           python -m pip install --upgrade pip
-          pip install flake8 mypy pylint bandit vulture
+          pip install flake8 mypy pylint bandit vulture black isort
           pip install -e .[dev]
+      - name: Run black
+        run: black --check .
+      - name: Run isort
+        run: isort --check-only .
       - name: Run flake8
         run: flake8
       - name: Run mypy
         run: mypy cryptography_suite
+      - name: Run strict mypy for core architecture
+        run: mypy --strict --follow-imports=skip cryptography_suite/core cryptography_suite/config.py cryptography_suite/errors.py
       - name: Run pylint
         run: pylint --errors-only cryptography_suite || true
       - name: Run bandit
