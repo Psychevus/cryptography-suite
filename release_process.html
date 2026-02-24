@@ -259,9 +259,33 @@
 <li><p>Install pinned release dependencies from <code class="docutils literal notranslate"><span class="pre">requirements-release.txt</span></code>.</p></li>
 <li><p>Build deterministic wheel/sdist artifacts (<code class="docutils literal notranslate"><span class="pre">tools/reproducible_build.py</span></code>).</p></li>
 <li><p>Generate SBOM (<code class="docutils literal notranslate"><span class="pre">tools/generate_sbom.py</span></code>).</p></li>
+<li><p>Install <code class="docutils literal notranslate"><span class="pre">cosign</span></code> and sign all distributable artifacts with keyless Sigstore.</p></li>
+<li><p>Generate SLSA-style in-toto provenance (<code class="docutils literal notranslate"><span class="pre">dist/provenance.intoto.jsonl</span></code>) and sign it.</p></li>
 <li><p>Validate artifacts (<code class="docutils literal notranslate"><span class="pre">tools/release_lint.py</span></code>).</p></li>
 <li><p>Publish to PyPI and create a GitHub Release.</p></li>
 </ol>
+<p>Release artifacts include:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">dist/*.whl</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dist/*.tar.gz</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dist/sbom.json</span></code> (CycloneDX)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dist/provenance.intoto.jsonl</span></code> (in-toto attestations)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">*.sig</span></code> and <code class="docutils literal notranslate"><span class="pre">*.cert</span></code> for each artifact above.</p></li>
+</ul>
+</section>
+<section id="local-verification-with-cosign">
+<h2>Local verification with cosign<a class="headerlink" href="#local-verification-with-cosign" title="Link to this heading">¶</a></h2>
+<p>Use the certificate identity for the exact release tag you downloaded.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">CERT_IDENTITY</span><span class="o">=</span><span class="s2">&quot;https://github.com/Psychevus/cryptography-suite/.github/workflows/release.yml@refs/tags/vX.Y.Z&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">CERT_ISSUER</span><span class="o">=</span><span class="s2">&quot;https://token.actions.githubusercontent.com&quot;</span>
+
+cosign<span class="w"> </span>verify-blob<span class="w"> </span>--certificate-identity<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$CERT_IDENTITY</span><span class="s2">&quot;</span><span class="w"> </span>--certificate-oidc-issuer<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$CERT_ISSUER</span><span class="s2">&quot;</span><span class="w"> </span>--signature<span class="w"> </span>dist/&lt;artifact&gt;.sig<span class="w"> </span>--certificate<span class="w"> </span>dist/&lt;artifact&gt;.cert<span class="w"> </span>dist/&lt;artifact&gt;
+</pre></div>
+</div>
+<p>To inspect provenance subjects:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>jq<span class="w"> </span>-r<span class="w"> </span><span class="s1">&#39;.payload&#39;</span><span class="w"> </span>dist/provenance.intoto.jsonl<span class="w"> </span><span class="p">|</span><span class="w"> </span>base64<span class="w"> </span>-d<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">&#39;.statement.subject&#39;</span>
+</pre></div>
+</div>
 </section>
 <section id="reproducibility-requirements">
 <h2>Reproducibility requirements<a class="headerlink" href="#reproducibility-requirements" title="Link to this heading">¶</a></h2>
@@ -313,6 +337,7 @@
 <li><a class="reference internal" href="#">Release Process</a><ul>
 <li><a class="reference internal" href="#versioning-policy">Versioning policy</a></li>
 <li><a class="reference internal" href="#automated-release-pipeline">Automated release pipeline</a></li>
+<li><a class="reference internal" href="#local-verification-with-cosign">Local verification with cosign</a></li>
 <li><a class="reference internal" href="#reproducibility-requirements">Reproducibility requirements</a></li>
 </ul>
 </li>

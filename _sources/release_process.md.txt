@@ -26,8 +26,35 @@ This project uses a SemVer release workflow with reproducible builds.
 5. Install pinned release dependencies from `requirements-release.txt`.
 6. Build deterministic wheel/sdist artifacts (`tools/reproducible_build.py`).
 7. Generate SBOM (`tools/generate_sbom.py`).
-8. Validate artifacts (`tools/release_lint.py`).
-9. Publish to PyPI and create a GitHub Release.
+8. Install `cosign` and sign all distributable artifacts with keyless Sigstore.
+9. Generate SLSA-style in-toto provenance (`dist/provenance.intoto.jsonl`) and sign it.
+10. Validate artifacts (`tools/release_lint.py`).
+11. Publish to PyPI and create a GitHub Release.
+
+Release artifacts include:
+
+- `dist/*.whl`
+- `dist/*.tar.gz`
+- `dist/sbom.json` (CycloneDX)
+- `dist/provenance.intoto.jsonl` (in-toto attestations)
+- `*.sig` and `*.cert` for each artifact above.
+
+## Local verification with cosign
+
+Use the certificate identity for the exact release tag you downloaded.
+
+```bash
+export CERT_IDENTITY="https://github.com/Psychevus/cryptography-suite/.github/workflows/release.yml@refs/tags/vX.Y.Z"
+export CERT_ISSUER="https://token.actions.githubusercontent.com"
+
+cosign verify-blob --certificate-identity "$CERT_IDENTITY" --certificate-oidc-issuer "$CERT_ISSUER" --signature dist/<artifact>.sig --certificate dist/<artifact>.cert dist/<artifact>
+```
+
+To inspect provenance subjects:
+
+```bash
+jq -r '.payload' dist/provenance.intoto.jsonl | base64 -d | jq '.statement.subject'
+```
 
 ## Reproducibility requirements
 
