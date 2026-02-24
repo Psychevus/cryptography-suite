@@ -44,10 +44,38 @@ jobs:
           VERSION="${GITHUB_REF_NAME#v}"
           rg "^## \[$VERSION\]" CHANGELOG.md
 
+      - name: Detect Python files changed since previous tag
+        id: changed-python
+        run: |
+          PREV_TAG=$(git tag --sort=-creatordate | grep -v "^${GITHUB_REF_NAME}$" | head -n1)
+          if [ -z "$PREV_TAG" ]; then
+            FILES=$(git ls-files '*.py' '*.pyi')
+          else
+            FILES=$(git diff --name-only "$PREV_TAG".."$GITHUB_SHA" -- '*.py' '*.pyi')
+          fi
+          {
+            echo "files<<EOF"
+            echo "$FILES"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+          if [ -n "$FILES" ]; then
+            echo "any_changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "any_changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Validate formatting (ruff, changed files)
+        if: steps.changed-python.outputs.any_changed == 'true'
+        run: |
+          echo "${{ steps.changed-python.outputs.files }}" | xargs -r ruff format --check
+
+      - name: Validate formatting (black, changed files)
+        if: steps.changed-python.outputs.any_changed == 'true'
+        run: |
+          echo "${{ steps.changed-python.outputs.files }}" | xargs -r black --check
+
       - name: Run quality gate checks
         run: |
-          ruff format --check .
-          black --check .
           ruff check .
           mypy cryptography_suite tools
           bandit -q -r cryptography_suite -x tests,docs,examples

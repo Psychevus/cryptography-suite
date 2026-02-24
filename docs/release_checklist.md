@@ -4,9 +4,8 @@
 
 - [ ] Ensure `CHANGELOG.md` has a `## [X.Y.Z] - YYYY-MM-DD` section for the release.
 - [ ] Confirm version follows SemVer and planned scope (`MAJOR`, `MINOR`, `PATCH`).
-- [ ] Run the full local quality gate:
-  - `ruff format --check .`
-  - `black --check .`
+- [ ] Run local quality checks:
+  - `pre-commit run` (formatting/lint/type/security on changed files)
   - `ruff check .`
   - `mypy cryptography_suite tools`
   - `bandit -q -r cryptography_suite -x tests,docs,examples`

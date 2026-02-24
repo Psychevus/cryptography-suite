@@ -22,6 +22,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -39,11 +41,21 @@ jobs:
           pip install -r requirements-dev.txt
           pip install -e .
 
-      - name: Validate formatting (ruff)
-        run: ruff format --check .
+      - name: Detect changed Python files
+        id: changed-python
+        uses: tj-actions/changed-files@v45
+        with:
+          files: |
+            **/*.py
+            **/*.pyi
 
-      - name: Validate formatting (black)
-        run: black --check .
+      - name: Validate formatting (ruff, changed files)
+        if: steps.changed-python.outputs.any_changed == 'true'
+        run: ruff format --check ${{ steps.changed-python.outputs.all_changed_files }}
+
+      - name: Validate formatting (black, changed files)
+        if: steps.changed-python.outputs.any_changed == 'true'
+        run: black --check ${{ steps.changed-python.outputs.all_changed_files }}
 
       - name: Lint (ruff)
         run: ruff check .

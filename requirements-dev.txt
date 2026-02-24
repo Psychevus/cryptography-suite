@@ -11,3 +11,4 @@ types-PyYAML==6.0.12.20240917
 pre-commit==3.8.0
 build==1.2.2.post1
 twine==5.1.1
+freezegun==1.5.1

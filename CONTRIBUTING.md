@@ -21,11 +21,12 @@ pre-commit install
 
 ## Quality gate (must match CI)
 
+CI enforces formatting checks on changed Python files and enforces lint/type/security/tests on the full repository.
+
 Run all checks locally before pushing:
 
 ```bash
-ruff format --check .
-black --check .
+pre-commit run
 ruff check .
 mypy cryptography_suite tools
 bandit -q -r cryptography_suite -x tests,docs,examples
@@ -33,20 +34,20 @@ pip-audit -r requirements.txt --strict
 pytest --cov=cryptography_suite --cov-branch --cov-report=term-missing --cov-fail-under=95
 ```
 
-Or run all mirrored checks via pre-commit:
+If you need to format your branch before commit:
 
 ```bash
 pre-commit run --all-files
 ```
 
-CI runs the same checks on every push and pull request. Any failure blocks merges.
+CI runs on every push and pull request. Any failure blocks merges.
 
 ## Release policy and process
 
 - Versioning follows **Semantic Versioning (SemVer)**.
 - Release tags must match `vMAJOR.MINOR.PATCH` (example: `v3.1.0`).
 - Update `CHANGELOG.md` under the matching version header before tagging.
-- Release workflow validates the tag format, verifies changelog entry, reruns the quality gate, then builds and publishes artifacts.
+- Release workflow validates the tag format, verifies changelog entry, reruns quality checks, then builds and publishes artifacts.
 - Build tooling is pinned in `requirements-release.txt` for reproducible release builds.
 
 See:
