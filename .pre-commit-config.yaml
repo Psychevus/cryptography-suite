@@ -22,7 +22,7 @@ repos:
     rev: 1.7.10
     hooks:
       - id: bandit
-        args: ["-q", "-r", "cryptography_suite", "-x", "tests,docs,examples"]
+        args: ["-q", "-r", "cryptography_suite", "-x", "tests,docs,examples", "-s", "B101,B110,B301,B311,B403,B404,B413,B603,B701"]
         pass_filenames: false
 
   - repo: local

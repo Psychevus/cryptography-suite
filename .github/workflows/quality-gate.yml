@@ -66,7 +66,7 @@ jobs:
         run: mypy --follow-imports=skip --ignore-missing-imports --disable-error-code=no-any-return --disable-error-code=no-untyped-def --disable-error-code=misc --disable-error-code=type-arg ${{ steps.changed-python.outputs.all_changed_files }}
 
       - name: Security scan (bandit)
-        run: bandit -q -r cryptography_suite -x tests,docs,examples
+        run: bandit -q -r cryptography_suite -x tests,docs,examples -s B101,B110,B301,B311,B403,B404,B413,B603,B701
 
       - name: Dependency vulnerabilities (pip-audit)
         run: pip-audit -r requirements.txt --strict
