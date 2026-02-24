@@ -31,4 +31,11 @@ class SuiteError(Exception):
     details: Mapping[str, str] = field(default_factory=dict)
 
     def __str__(self) -> str:
+        # Backward-compatible exception text expected by public API/tests.
+        # Error codes remain available on the typed ``code`` attribute.
+        return self.message
+
+    def format_with_code(self) -> str:
+        """Return a verbose representation suitable for logs/debugging."""
+
         return f"[{self.code}] {self.message}"
