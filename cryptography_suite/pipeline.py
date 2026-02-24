@@ -17,6 +17,34 @@ from .symmetric.kdf import DEFAULT_KDF
 
 Input = TypeVar("Input", contravariant=True)
 Output = TypeVar("Output", covariant=True)
+SENSITIVE_KEY_SUBSTRINGS = ("password", "secret", "key", "private", "token")
+REDACTED_VALUE = "***REDACTED***"
+
+
+def _is_sensitive_key(key: str) -> bool:
+    key_lower = key.lower()
+    return any(part in key_lower for part in SENSITIVE_KEY_SUBSTRINGS)
+
+
+def _redact_sensitive_values(value: Any, key_name: str | None = None) -> Any:
+    if key_name is not None and _is_sensitive_key(key_name):
+        return REDACTED_VALUE
+    if isinstance(value, dict):
+        return {
+            k: _redact_sensitive_values(v, k if isinstance(k, str) else None)
+            for k, v in value.items()
+        }
+    if isinstance(value, list):
+        return [_redact_sensitive_values(item) for item in value]
+    if isinstance(value, tuple):
+        return tuple(_redact_sensitive_values(item) for item in value)
+    if hasattr(value, "__dict__"):
+        return {
+            k: _redact_sensitive_values(v, k)
+            for k, v in vars(value).items()
+            if not k.startswith("_")
+        }
+    return value
 
 
 class CryptoModule(Protocol[Input, Output]):
@@ -80,12 +108,14 @@ class Pipeline(Generic[Input, Output]):
                 "module": mod.__class__.__name__,
             }
             if hasattr(mod, "__dict__"):
-                info["params"] = {
+                info["params"] = _redact_sensitive_values({
                     k: v for k, v in vars(mod).items() if not k.startswith("_")
-                }
+                })
             desc.append(info)
         if self.tracked_secrets:
-            desc.append({"tracked_secrets": list(self.tracked_secrets)})
+            desc.append(
+                _redact_sensitive_values({"tracked_secrets": list(self.tracked_secrets)})
+            )
         return desc
 
     def track_secret(self, name: str) -> None:
