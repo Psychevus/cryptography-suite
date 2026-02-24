@@ -12,8 +12,10 @@ operations without writing to the destination.
 
 Only the following migrations are currently supported:
 
-- LocalKeyStore → AWSKMS
 - LocalKeyStore ↔ MockHSM
+
+`aws-kms` is intentionally excluded from raw key migration because this backend
+does not support raw private-key import/export.
 
 > ⚠️ Migrating between different algorithms is not supported.  Keys retain
 their original algorithm and may fail to import on incompatible backends.

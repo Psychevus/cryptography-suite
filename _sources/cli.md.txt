@@ -40,7 +40,7 @@ as hidden aliases for backward compatibility.
 The ``keystore`` group exposes pluggable key storage backends.  Available
 backends are classified by stability:
 
-``local`` (testing), ``mock_hsm`` (testing), ``aws-kms`` (production,
+``local`` (testing), ``mock_hsm`` (testing), ``aws-kms`` (limited,
 requires ``pip install cryptography-suite[aws]``)
 
 Use ``cryptography-suite keystore list`` to display the available backends
@@ -51,6 +51,6 @@ connectivity.  Keys can be moved between backends with ``keystore migrate``:
 cryptography-suite keystore migrate --from local --to mock_hsm --dry-run
 ```
 
-Omit ``--key`` to migrate all keys.  Only migrations from ``local`` to
-``aws-kms`` and ``local`` to/from ``mock_hsm`` are supported.  Cross-algorithm
-imports are rejected.
+Omit ``--key`` to migrate all keys.  Only migrations between backends that both advertise raw private-key
+export/import support are permitted. ``aws-kms`` fails closed because AWS KMS
+does not accept arbitrary private key bytes via this interface.

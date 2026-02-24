@@ -5,7 +5,7 @@ management systems.  Built-in backends include:
 
 - ``local`` – file based storage for demos and tests
 - ``mock_hsm`` – in-memory mock for tests
-- ``aws-kms`` – AWS KMS backed, production ready
+- ``aws-kms`` – AWS KMS backed, limited (sign/decrypt only; no raw key import/export)
   (install with ``pip install cryptography-suite[aws]``)
 
 ## Writing a Plugin
@@ -59,7 +59,7 @@ export CRYPTOSUITE_LOAD_LOCAL_KEYSTORE_PLUGINS=1
 @register_keystore("aws-kms")
 class AWSKMSKeyStore:
     name = "aws-kms"
-    status = "production"
+    status = "limited"
     ...  # see cryptography_suite.keystores.aws_kms
 ```
 

@@ -265,7 +265,7 @@ as hidden aliases for backward compatibility.</p>
 <h2>Keystore Command<a class="headerlink" href="#keystore-command" title="Link to this heading">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">keystore</span></code> group exposes pluggable key storage backends.  Available
 backends are classified by stability:</p>
-<p><code class="docutils literal notranslate"><span class="pre">local</span></code> (testing), <code class="docutils literal notranslate"><span class="pre">mock_hsm</span></code> (testing), <code class="docutils literal notranslate"><span class="pre">aws-kms</span></code> (production,
+<p><code class="docutils literal notranslate"><span class="pre">local</span></code> (testing), <code class="docutils literal notranslate"><span class="pre">mock_hsm</span></code> (testing), <code class="docutils literal notranslate"><span class="pre">aws-kms</span></code> (limited,
 requires <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">cryptography-suite[aws]</span></code>)</p>
 <p>Use <code class="docutils literal notranslate"><span class="pre">cryptography-suite</span> <span class="pre">keystore</span> <span class="pre">list</span></code> to display the available backends
 with their status and <code class="docutils literal notranslate"><span class="pre">cryptography-suite</span> <span class="pre">keystore</span> <span class="pre">test</span></code> to verify
@@ -273,9 +273,9 @@ connectivity.  Keys can be moved between backends with <code class="docutils lit
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cryptography-suite<span class="w"> </span>keystore<span class="w"> </span>migrate<span class="w"> </span>--from<span class="w"> </span><span class="nb">local</span><span class="w"> </span>--to<span class="w"> </span>mock_hsm<span class="w"> </span>--dry-run
 </pre></div>
 </div>
-<p>Omit <code class="docutils literal notranslate"><span class="pre">--key</span></code> to migrate all keys.  Only migrations from <code class="docutils literal notranslate"><span class="pre">local</span></code> to
-<code class="docutils literal notranslate"><span class="pre">aws-kms</span></code> and <code class="docutils literal notranslate"><span class="pre">local</span></code> to/from <code class="docutils literal notranslate"><span class="pre">mock_hsm</span></code> are supported.  Cross-algorithm
-imports are rejected.</p>
+<p>Omit <code class="docutils literal notranslate"><span class="pre">--key</span></code> to migrate all keys.  Only migrations between backends that both advertise raw private-key
+export/import support are permitted. <code class="docutils literal notranslate"><span class="pre">aws-kms</span></code> fails closed because AWS KMS
+does not accept arbitrary private key bytes via this interface.</p>
 </section>
 </section>
 
