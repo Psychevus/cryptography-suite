@@ -661,13 +661,15 @@ types and lengths of a and b–but not their values.</p>
 <code class="docutils literal notranslate"><span class="pre">kdf='pbkdf2'</span></code> if the file was encrypted using one of those KDFs or when
 Argon2 support is missing.</p>
 <p>Data is streamed in chunks, verifying the authentication tag at the end.
-The output file is removed if decryption fails.</p>
+Supports both the current versioned format and the legacy
+<code class="docutils literal notranslate"><span class="pre">salt</span> <span class="pre">||</span> <span class="pre">nonce</span> <span class="pre">||</span> <span class="pre">ciphertext_and_tag</span></code> format.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cryptography_suite.decrypt_file_async">
 <span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cryptography_suite.</span></span><span class="sig-name descname"><span class="pre">decrypt_file_async</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encrypted_file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kdf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'argon2'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#cryptography_suite.decrypt_file_async" title="Link to this definition">¶</a></dt>
-<dd><p>Asynchronously decrypt a file encrypted with AES-GCM using a password-derived key.</p>
+<dd><p>Asynchronously decrypt a file encrypted with AES-GCM.</p>
+<p>Uses a password-derived key.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -745,8 +747,9 @@ ciphertext concatenated together.</p>
 <code class="docutils literal notranslate"><span class="pre">kdf='pbkdf2'</span></code> to maintain compatibility with existing files or when
 Argon2 support is missing.</p>
 <p>The file is processed in chunks to avoid loading the entire file into
-memory. The output file begins with the salt and nonce and ends with the
-authentication tag.</p>
+memory. The output is a versioned format:
+magic, version, KDF id, salt/nonce lengths, chunk size, salt, nonce,
+ciphertext, and trailing authentication tag.</p>
 </dd></dl>
 
 <dl class="py function">
