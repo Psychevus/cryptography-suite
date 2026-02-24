@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html">
 
     <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
-        <title>Testing Guide - cryptography-suite 3.0.0 documentation</title>
+        <title>Testing Playbook - cryptography-suite 3.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -209,7 +209,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="_sources/testing.md.txt" title="View this page">
+  <a class="muted-link" href="_sources/testing_playbook.md.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -227,75 +227,62 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="testing-guide">
-<h1>Testing Guide<a class="headerlink" href="#testing-guide" title="Link to this heading">¶</a></h1>
-<p>This guide explains how to run the project’s tests locally and how they map to the continuous integration (CI) matrix.</p>
-<section id="quick-start">
-<h2>Quick start<a class="headerlink" href="#quick-start" title="Link to this heading">¶</a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="o">[</span>dev,fuzz<span class="o">]</span>
-pytest<span class="w"> </span>-m<span class="w"> </span>property
-python<span class="w"> </span>-m<span class="w"> </span>atheris<span class="w"> </span>fuzz/fuzz_aes.py
-</pre></div>
-</div>
-<p>The commands above install the development and fuzzing dependencies, execute property-based tests, and run a sample Atheris fuzz harness.</p>
+          <section id="testing-playbook">
+<h1>Testing Playbook<a class="headerlink" href="#testing-playbook" title="Link to this heading">¶</a></h1>
+<section id="goals">
+<h2>Goals<a class="headerlink" href="#goals" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Keep tests deterministic, fast, and meaningful.</p></li>
+<li><p>Treat coverage as branch/path confidence, not a vanity line metric.</p></li>
+<li><p>Validate boundaries (CLI, subprocess, filesystem, optional HTTP) with contract tests.</p></li>
+</ul>
 </section>
-<section id="extending-the-fuzz-harness">
-<h2>Extending the fuzz harness<a class="headerlink" href="#extending-the-fuzz-harness" title="Link to this heading">¶</a></h2>
+<section id="layered-strategy">
+<h2>Layered strategy<a class="headerlink" href="#layered-strategy" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>Unit:</strong> pure functions, validators, parsing, typed errors.</p></li>
+<li><p><strong>Integration:</strong> cross-module flows (e.g., config facade + settings loader).</p></li>
+<li><p><strong>Contract:</strong> boundary behavior that external callers depend on (CLI output, exit codes, file formats).</p></li>
+<li><p><strong>E2E:</strong> only for critical user journeys; keep sparse and high-value.</p></li>
+</ul>
+</section>
+<section id="required-checks-for-new-public-apis">
+<h2>Required checks for new public APIs<a class="headerlink" href="#required-checks-for-new-public-apis" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
-<li><p><strong>Create a new harness</strong> in the <code class="docutils literal notranslate"><span class="pre">fuzz/</span></code> directory, using <code class="docutils literal notranslate"><span class="pre">fuzz/fuzz_aes.py</span></code> as a template.</p></li>
-<li><p><strong>Import the target functions</strong> and set up <code class="docutils literal notranslate"><span class="pre">atheris.instrument_all()</span></code> to cover relevant inputs.</p></li>
-<li><p><strong>Register the entry point</strong> via <code class="docutils literal notranslate"><span class="pre">atheris.Setup</span></code> and call <code class="docutils literal notranslate"><span class="pre">atheris.Fuzz()</span></code>.</p></li>
-<li><p>Optionally, update <code class="docutils literal notranslate"><span class="pre">.github/workflows/fuzz.yml</span></code> to schedule the harness in CI.</p></li>
+<li><p>Happy path behavior.</p></li>
+<li><p>Edge cases (empty values, casing, whitespace, min/max inputs).</p></li>
+<li><p>Invalid inputs and exception assertions (including error codes).</p></li>
+<li><p>Timeout/retry coverage when retries are implemented.</p></li>
+<li><p>Concurrency behavior when shared state/caches are involved.</p></li>
 </ol>
 </section>
-<section id="ci-matrix-overview">
-<h2>CI matrix overview<a class="headerlink" href="#ci-matrix-overview" title="Link to this heading">¶</a></h2>
-<div class="table-wrapper colwidths-auto docutils container">
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>Job</p></th>
-<th class="head"><p>Python versions</p></th>
-<th class="head"><p>Operating systems</p></th>
-<th class="head"><p>Purpose</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">lint</span></code></p></td>
-<td><p>3.10, 3.11</p></td>
-<td><p>Ubuntu, macOS, Windows</p></td>
-<td><p>Static analysis (flake8, mypy, pylint, bandit, vulture)</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">tests</span></code></p></td>
-<td><p>3.10–3.12</p></td>
-<td><p>Ubuntu, macOS, Windows</p></td>
-<td><p>Unit tests with coverage</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">tests-extras</span></code></p></td>
-<td><p>3.11</p></td>
-<td><p>Ubuntu</p></td>
-<td><p>Tests with optional dependencies</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">pkcs11-tests</span></code></p></td>
-<td><p>3.11</p></td>
-<td><p>Ubuntu</p></td>
-<td><p>SoftHSM-backed PKCS#11 tests</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">fuzz</span></code></p></td>
-<td><p>3.11, 3.12</p></td>
-<td><p>Ubuntu</p></td>
-<td><p>Weekly Atheris fuzzing</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</section>
-<section id="operational-reliability-artifacts">
-<h2>Operational reliability artifacts<a class="headerlink" href="#operational-reliability-artifacts" title="Link to this heading">¶</a></h2>
+<section id="determinism-rules">
+<h2>Determinism rules<a class="headerlink" href="#determinism-rules" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>Test plan matrix: <code class="docutils literal notranslate"><span class="pre">docs/testing_plan_matrix.md</span></code></p></li>
-<li><p>Contributor playbook: <code class="docutils literal notranslate"><span class="pre">docs/testing_playbook.md</span></code></p></li>
-<li><p>Coverage thresholds script: <code class="docutils literal notranslate"><span class="pre">tools/check_coverage_thresholds.py</span></code></p></li>
+<li><p>Use deterministic test data and explicit assertions.</p></li>
+<li><p>Control time with <code class="docutils literal notranslate"><span class="pre">freezegun</span></code> for timestamp/expiry behavior.</p></li>
+<li><p>Use Hypothesis for parser/validator/transform invariants.</p></li>
+<li><p>Keep I/O hermetic via <code class="docutils literal notranslate"><span class="pre">tmp_path</span></code> and subprocess-local environments.</p></li>
 </ul>
+</section>
+<section id="coverage-policy">
+<h2>Coverage policy<a class="headerlink" href="#coverage-policy" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Run coverage with branch tracking enabled.</p></li>
+<li><p>Global floor remains high (99% line rate).</p></li>
+<li><p>Guard critical modules with per-module line+branch thresholds via <code class="docutils literal notranslate"><span class="pre">tools/check_coverage_thresholds.py</span></code>.</p></li>
+<li><p>Exclude generated/template code and thin wrappers listed in <code class="docutils literal notranslate"><span class="pre">.coveragerc</span></code>.</p></li>
+</ul>
+</section>
+<section id="local-workflow">
+<h2>Local workflow<a class="headerlink" href="#local-workflow" title="Link to this heading">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="o">[</span>dev<span class="o">]</span>
+coverage<span class="w"> </span>run<span class="w"> </span>--rcfile<span class="o">=</span>.coveragerc<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>-p<span class="w"> </span>no:cov<span class="w"> </span>cryptography_suite<span class="w"> </span>tests
+coverage<span class="w"> </span>xml<span class="w"> </span>--fail-under<span class="o">=</span><span class="m">0</span>
+coverage<span class="w"> </span>json
+python<span class="w"> </span>tools/check_coverage_thresholds.py
+</pre></div>
+</div>
 </section>
 </section>
 
@@ -336,11 +323,13 @@ python<span class="w"> </span>-m<span class="w"> </span>atheris<span class="w"> 
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Testing Guide</a><ul>
-<li><a class="reference internal" href="#quick-start">Quick start</a></li>
-<li><a class="reference internal" href="#extending-the-fuzz-harness">Extending the fuzz harness</a></li>
-<li><a class="reference internal" href="#ci-matrix-overview">CI matrix overview</a></li>
-<li><a class="reference internal" href="#operational-reliability-artifacts">Operational reliability artifacts</a></li>
+<li><a class="reference internal" href="#">Testing Playbook</a><ul>
+<li><a class="reference internal" href="#goals">Goals</a></li>
+<li><a class="reference internal" href="#layered-strategy">Layered strategy</a></li>
+<li><a class="reference internal" href="#required-checks-for-new-public-apis">Required checks for new public APIs</a></li>
+<li><a class="reference internal" href="#determinism-rules">Determinism rules</a></li>
+<li><a class="reference internal" href="#coverage-policy">Coverage policy</a></li>
+<li><a class="reference internal" href="#local-workflow">Local workflow</a></li>
 </ul>
 </li>
 </ul>

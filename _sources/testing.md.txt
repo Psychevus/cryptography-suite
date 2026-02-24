@@ -29,3 +29,9 @@ The commands above install the development and fuzzing dependencies, execute pro
 | `pkcs11-tests` | 3.11 | Ubuntu | SoftHSM-backed PKCS#11 tests |
 | `fuzz` | 3.11, 3.12 | Ubuntu | Weekly Atheris fuzzing |
 
+
+## Operational reliability artifacts
+
+- Test plan matrix: `docs/testing_plan_matrix.md`
+- Contributor playbook: `docs/testing_playbook.md`
+- Coverage thresholds script: `tools/check_coverage_thresholds.py`

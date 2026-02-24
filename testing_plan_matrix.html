@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html">
 
     <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
-        <title>Testing Guide - cryptography-suite 3.0.0 documentation</title>
+        <title>Test Plan Matrix - cryptography-suite 3.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -172,7 +172,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -209,7 +209,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="_sources/testing.md.txt" title="View this page">
+  <a class="muted-link" href="_sources/testing_plan_matrix.md.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -222,81 +222,74 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="testing-guide">
-<h1>Testing Guide<a class="headerlink" href="#testing-guide" title="Link to this heading">¶</a></h1>
-<p>This guide explains how to run the project’s tests locally and how they map to the continuous integration (CI) matrix.</p>
-<section id="quick-start">
-<h2>Quick start<a class="headerlink" href="#quick-start" title="Link to this heading">¶</a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="o">[</span>dev,fuzz<span class="o">]</span>
-pytest<span class="w"> </span>-m<span class="w"> </span>property
-python<span class="w"> </span>-m<span class="w"> </span>atheris<span class="w"> </span>fuzz/fuzz_aes.py
-</pre></div>
-</div>
-<p>The commands above install the development and fuzzing dependencies, execute property-based tests, and run a sample Atheris fuzz harness.</p>
-</section>
-<section id="extending-the-fuzz-harness">
-<h2>Extending the fuzz harness<a class="headerlink" href="#extending-the-fuzz-harness" title="Link to this heading">¶</a></h2>
-<ol class="arabic simple">
-<li><p><strong>Create a new harness</strong> in the <code class="docutils literal notranslate"><span class="pre">fuzz/</span></code> directory, using <code class="docutils literal notranslate"><span class="pre">fuzz/fuzz_aes.py</span></code> as a template.</p></li>
-<li><p><strong>Import the target functions</strong> and set up <code class="docutils literal notranslate"><span class="pre">atheris.instrument_all()</span></code> to cover relevant inputs.</p></li>
-<li><p><strong>Register the entry point</strong> via <code class="docutils literal notranslate"><span class="pre">atheris.Setup</span></code> and call <code class="docutils literal notranslate"><span class="pre">atheris.Fuzz()</span></code>.</p></li>
-<li><p>Optionally, update <code class="docutils literal notranslate"><span class="pre">.github/workflows/fuzz.yml</span></code> to schedule the harness in CI.</p></li>
-</ol>
-</section>
-<section id="ci-matrix-overview">
-<h2>CI matrix overview<a class="headerlink" href="#ci-matrix-overview" title="Link to this heading">¶</a></h2>
+          <section id="test-plan-matrix">
+<h1>Test Plan Matrix<a class="headerlink" href="#test-plan-matrix" title="Link to this heading">¶</a></h1>
 <div class="table-wrapper colwidths-auto docutils container">
 <table class="docutils align-default">
 <thead>
-<tr class="row-odd"><th class="head"><p>Job</p></th>
-<th class="head"><p>Python versions</p></th>
-<th class="head"><p>Operating systems</p></th>
-<th class="head"><p>Purpose</p></th>
+<tr class="row-odd"><th class="head"><p>Module</p></th>
+<th class="head"><p>Primary risks</p></th>
+<th class="head"><p>Unit</p></th>
+<th class="head"><p>Integration</p></th>
+<th class="head"><p>Contract</p></th>
+<th class="head"><p>Negative/edge</p></th>
+<th class="head"><p>Property-based</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">lint</span></code></p></td>
-<td><p>3.10, 3.11</p></td>
-<td><p>Ubuntu, macOS, Windows</p></td>
-<td><p>Static analysis (flake8, mypy, pylint, bandit, vulture)</p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">cryptography_suite/core/settings.py</span></code></p></td>
+<td><p>Invalid env parsing, wrong defaults, cache behavior drift, concurrent access</p></td>
+<td><p>✅ normalization/parsing</p></td>
+<td><p>✅ <code class="docutils literal notranslate"><span class="pre">config</span></code> facade reload</p></td>
+<td><p>✅ subprocess env boundary</p></td>
+<td><p>✅ invalid env/strict key values</p></td>
+<td><p>✅ Hypothesis for accepted values</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">tests</span></code></p></td>
-<td><p>3.10–3.12</p></td>
-<td><p>Ubuntu, macOS, Windows</p></td>
-<td><p>Unit tests with coverage</p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">cryptography_suite/core/errors.py</span></code></p></td>
+<td><p>Typed error semantics regressions</p></td>
+<td><p>✅ <code class="docutils literal notranslate"><span class="pre">SuiteError.__str__</span></code>, <code class="docutils literal notranslate"><span class="pre">format_with_code</span></code></p></td>
+<td><p>✅ used by settings failures</p></td>
+<td><p>N/A</p></td>
+<td><p>✅ error code assertions</p></td>
+<td><p>N/A</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">tests-extras</span></code></p></td>
-<td><p>3.11</p></td>
-<td><p>Ubuntu</p></td>
-<td><p>Tests with optional dependencies</p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">cryptography_suite/audit.py</span></code></p></td>
+<td><p>Timestamp format drift, encrypted log format breakage, logger wiring</p></td>
+<td><p>✅ in-memory and file logger behavior</p></td>
+<td><p>✅ decorator with configured logger</p></td>
+<td><p>✅ encrypted file line format (`timestamp</p></td>
+<td><p>operation</p></td>
+<td><p>status`)</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">pkcs11-tests</span></code></p></td>
-<td><p>3.11</p></td>
-<td><p>Ubuntu</p></td>
-<td><p>SoftHSM-backed PKCS#11 tests</p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">cryptography_suite/cli.py</span></code></p></td>
+<td><p>CLI UX regressions, argument parsing contract breaks</p></td>
+<td><p>✅ command option paths</p></td>
+<td><p>✅ end-to-end <code class="docutils literal notranslate"><span class="pre">script_runner</span></code> tests</p></td>
+<td><p>✅ subprocess return code/output</p></td>
+<td><p>✅ invalid args and file errors</p></td>
+<td><p>N/A</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">fuzz</span></code></p></td>
-<td><p>3.11, 3.12</p></td>
-<td><p>Ubuntu</p></td>
-<td><p>Weekly Atheris fuzzing</p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">cryptography_suite/keystores/local.py</span></code></p></td>
+<td><p>key persistence corruption, insecure key handling</p></td>
+<td><p>✅ serialization routines</p></td>
+<td><p>✅ migrate/import flows</p></td>
+<td><p>✅ filesystem paths and metadata files</p></td>
+<td><p>✅ malformed input / missing key IDs</p></td>
+<td><p>N/A</p></td>
 </tr>
 </tbody>
 </table>
 </div>
-</section>
-<section id="operational-reliability-artifacts">
-<h2>Operational reliability artifacts<a class="headerlink" href="#operational-reliability-artifacts" title="Link to this heading">¶</a></h2>
+<p><strong>Notes</strong></p>
 <ul class="simple">
-<li><p>Test plan matrix: <code class="docutils literal notranslate"><span class="pre">docs/testing_plan_matrix.md</span></code></p></li>
-<li><p>Contributor playbook: <code class="docutils literal notranslate"><span class="pre">docs/testing_playbook.md</span></code></p></li>
-<li><p>Coverage thresholds script: <code class="docutils literal notranslate"><span class="pre">tools/check_coverage_thresholds.py</span></code></p></li>
+<li><p>Timeout/retry scenarios are validated in modules that implement retries; they are not applicable to pure parsing/config primitives.</p></li>
+<li><p>Concurrency coverage is explicitly included for settings cache access.</p></li>
 </ul>
-</section>
 </section>
 
         </article>
@@ -324,30 +317,8 @@ python<span class="w"> </span>-m<span class="w"> </span>atheris<span class="w"> 
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">Testing Guide</a><ul>
-<li><a class="reference internal" href="#quick-start">Quick start</a></li>
-<li><a class="reference internal" href="#extending-the-fuzz-harness">Extending the fuzz harness</a></li>
-<li><a class="reference internal" href="#ci-matrix-overview">CI matrix overview</a></li>
-<li><a class="reference internal" href="#operational-reliability-artifacts">Operational reliability artifacts</a></li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>
