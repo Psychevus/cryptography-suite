@@ -13,13 +13,15 @@ class MockHSMKeyStore:
 
     name = "mock_hsm"
     status = "testing"
-    capabilities = frozenset({
-        KeyStoreCapability.SIGN,
-        KeyStoreCapability.DECRYPT,
-        KeyStoreCapability.UNWRAP,
-        KeyStoreCapability.EXPORT_PRIVATE_KEY,
-        KeyStoreCapability.IMPORT_PRIVATE_KEY,
-    })
+    capabilities = frozenset(
+        {
+            KeyStoreCapability.SIGN,
+            KeyStoreCapability.DECRYPT,
+            KeyStoreCapability.UNWRAP,
+            KeyStoreCapability.EXPORT_PRIVATE_KEY,
+            KeyStoreCapability.IMPORT_PRIVATE_KEY,
+        }
+    )
 
     def __init__(self) -> None:
         self._keys: dict[str, bytes] = {"test": b"secret"}

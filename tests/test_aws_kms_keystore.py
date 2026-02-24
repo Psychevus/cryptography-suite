@@ -33,7 +33,11 @@ class StubKMSClient:
 @pytest.mark.parametrize(
     ("key_spec", "supported", "expected"),
     [
-        ("RSA_2048", ["RSASSA_PKCS1_V1_5_SHA_256", "RSASSA_PSS_SHA_256"], "RSASSA_PSS_SHA_256"),
+        (
+            "RSA_2048",
+            ["RSASSA_PKCS1_V1_5_SHA_256", "RSASSA_PSS_SHA_256"],
+            "RSASSA_PSS_SHA_256",
+        ),
         ("ECC_NIST_P384", ["ECDSA_SHA_384"], "ECDSA_SHA_384"),
         ("ED25519", ["EDDSA"], "EDDSA"),
     ],
@@ -51,7 +55,9 @@ def test_aws_kms_sign_algorithm_selection(monkeypatch, key_spec, supported, expe
 
 
 def test_aws_kms_sign_algorithm_falls_back_to_supported(monkeypatch):
-    fake_client = StubKMSClient(key_spec="RSA_2048", signing_algorithms=["RSASSA_PKCS1_V1_5_SHA_384"])
+    fake_client = StubKMSClient(
+        key_spec="RSA_2048", signing_algorithms=["RSASSA_PKCS1_V1_5_SHA_384"]
+    )
     boto3_mod = types.SimpleNamespace(client=lambda *a, **k: fake_client)
     monkeypatch.setitem(sys.modules, "boto3", boto3_mod)
 
@@ -63,7 +69,9 @@ def test_aws_kms_sign_algorithm_falls_back_to_supported(monkeypatch):
 
 
 def test_aws_kms_import_key_not_implemented(monkeypatch):
-    fake_client = StubKMSClient(key_spec="RSA_2048", signing_algorithms=["RSASSA_PSS_SHA_256"])
+    fake_client = StubKMSClient(
+        key_spec="RSA_2048", signing_algorithms=["RSASSA_PSS_SHA_256"]
+    )
     boto3_mod = types.SimpleNamespace(client=lambda *a, **k: fake_client)
     monkeypatch.setitem(sys.modules, "boto3", boto3_mod)
 

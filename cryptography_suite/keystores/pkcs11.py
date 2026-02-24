@@ -43,20 +43,22 @@ class PKCS11KeyStore:
 
     name = "pkcs11"
     status = "production"
-    capabilities = frozenset({
-        KeyStoreCapability.SIGN,
-        KeyStoreCapability.DECRYPT,
-        KeyStoreCapability.UNWRAP,
-    })
+    capabilities = frozenset(
+        {
+            KeyStoreCapability.SIGN,
+            KeyStoreCapability.DECRYPT,
+            KeyStoreCapability.UNWRAP,
+        }
+    )
 
-    def __init__(self,
-                 library_path: str | None = None,
-                 token_label: str | None = None,
-                 pin: str | None = None) -> None:
+    def __init__(
+        self,
+        library_path: str | None = None,
+        token_label: str | None = None,
+        pin: str | None = None,
+    ) -> None:
         if pkcs11 is None:  # pragma: no cover - dependency missing
-            raise ImportError(
-                "python-pkcs11>=0.8.1 is required for PKCS11KeyStore"
-            )
+            raise ImportError("python-pkcs11>=0.8.1 is required for PKCS11KeyStore")
 
         library_path, token_label, pin = self._load_config(
             library_path, token_label, pin
@@ -115,16 +117,12 @@ class PKCS11KeyStore:
 
     def _get_key(self, session, label: str):
         try:
-            priv = session.get_key(
-                object_class=ObjectClass.PRIVATE_KEY, label=label
-            )
+            priv = session.get_key(object_class=ObjectClass.PRIVATE_KEY, label=label)
         except pkcs11.NoSuchKey:  # type: ignore[attr-defined]
             raise FileNotFoundError(label)
 
         try:
-            pub = session.get_key(
-                object_class=ObjectClass.PUBLIC_KEY, label=label
-            )
+            pub = session.get_key(object_class=ObjectClass.PUBLIC_KEY, label=label)
             priv.public_key = pub  # type: ignore[attr-defined]
         except pkcs11.NoSuchKey:  # type: ignore[attr-defined]
             pass

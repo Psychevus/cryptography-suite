@@ -32,13 +32,15 @@ class LocalKeyStore:
 
     name = "local"
     status = "testing"
-    capabilities = frozenset({
-        KeyStoreCapability.SIGN,
-        KeyStoreCapability.DECRYPT,
-        KeyStoreCapability.UNWRAP,
-        KeyStoreCapability.EXPORT_PRIVATE_KEY,
-        KeyStoreCapability.IMPORT_PRIVATE_KEY,
-    })
+    capabilities = frozenset(
+        {
+            KeyStoreCapability.SIGN,
+            KeyStoreCapability.DECRYPT,
+            KeyStoreCapability.UNWRAP,
+            KeyStoreCapability.EXPORT_PRIVATE_KEY,
+            KeyStoreCapability.IMPORT_PRIVATE_KEY,
+        }
+    )
 
     def __init__(self, directory: str = "keys") -> None:
         self.dir = Path(directory)
@@ -85,7 +87,8 @@ class LocalKeyStore:
             pem = f.read()
             try:
                 key = serialization.load_pem_private_key(
-                    pem, password=password.encode() if isinstance(password, str) else None
+                    pem,
+                    password=password.encode() if isinstance(password, str) else None,
                 )
             except TypeError as exc:
                 if "encrypted" in str(exc).lower() and password is None:
@@ -147,7 +150,9 @@ class LocalKeyStore:
         return self.decrypt(key_id, wrapped_key, password=password)
 
     @audit_log
-    def export_key(self, key_id: str, password: str | None = None) -> Tuple[bytes, dict]:
+    def export_key(
+        self, key_id: str, password: str | None = None
+    ) -> Tuple[bytes, dict]:
         key_path = self.dir / f"{key_id}.pem"
         raw = key_path.read_bytes()
         _, algo = self._load_key(key_id, password=password)

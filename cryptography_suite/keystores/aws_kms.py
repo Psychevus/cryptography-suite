@@ -35,8 +35,17 @@ class AWSKMSKeyStore:
 
     _SIGNING_PREFERENCES: Dict[str, List[str]] = {
         "RSA_2048": ["RSASSA_PSS_SHA_256", "RSASSA_PKCS1_V1_5_SHA_256"],
-        "RSA_3072": ["RSASSA_PSS_SHA_384", "RSASSA_PSS_SHA_256", "RSASSA_PKCS1_V1_5_SHA_384"],
-        "RSA_4096": ["RSASSA_PSS_SHA_512", "RSASSA_PSS_SHA_384", "RSASSA_PSS_SHA_256", "RSASSA_PKCS1_V1_5_SHA_512"],
+        "RSA_3072": [
+            "RSASSA_PSS_SHA_384",
+            "RSASSA_PSS_SHA_256",
+            "RSASSA_PKCS1_V1_5_SHA_384",
+        ],
+        "RSA_4096": [
+            "RSASSA_PSS_SHA_512",
+            "RSASSA_PSS_SHA_384",
+            "RSASSA_PSS_SHA_256",
+            "RSASSA_PKCS1_V1_5_SHA_512",
+        ],
         "ECC_NIST_P256": ["ECDSA_SHA_256"],
         "ECC_SECG_P256K1": ["ECDSA_SHA_256"],
         "ECC_NIST_P384": ["ECDSA_SHA_384"],
@@ -51,7 +60,9 @@ class AWSKMSKeyStore:
             raise RuntimeError("boto3 is required for AWSKMSKeyStore") from exc
         self.client = boto3_mod.client("kms", region_name=region_name)
         self._logger_name = "cryptography_suite.keystores.aws_kms"
-        self._retry = RetryPolicy(max_attempts=4, base_delay_s=0.25, max_delay_s=2.0, jitter_s=0.2)
+        self._retry = RetryPolicy(
+            max_attempts=4, base_delay_s=0.25, max_delay_s=2.0, jitter_s=0.2
+        )
         self._algorithm_cache: Dict[str, str] = {}
         get_structured_logger(self._logger_name)
 

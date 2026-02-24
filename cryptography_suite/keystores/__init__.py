@@ -42,7 +42,7 @@ def load_plugins(directory: str | None = None) -> None:
     # built-in plugins in this package
     pkg = __name__
     for _, modname, _ in pkgutil.iter_modules(__path__):
-        if modname.startswith('_') or modname in {"base"}:
+        if modname.startswith("_") or modname in {"base"}:
             continue
         try:
             importlib.import_module(f"{pkg}.{modname}")

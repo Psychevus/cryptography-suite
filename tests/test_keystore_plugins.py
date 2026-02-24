@@ -80,7 +80,10 @@ def test_aws_kms_plugin_operations(monkeypatch):
     fake_client.list_keys.return_value = {"Keys": []}
     fake_client.sign.return_value = {"Signature": b"sig"}
     fake_client.decrypt.return_value = {"Plaintext": b"plain"}
-    fake_client.get_public_key.return_value = {"KeySpec": "RSA_2048", "SigningAlgorithms": ["RSASSA_PSS_SHA_256"]}
+    fake_client.get_public_key.return_value = {
+        "KeySpec": "RSA_2048",
+        "SigningAlgorithms": ["RSASSA_PSS_SHA_256"],
+    }
 
     boto3_mod = types.SimpleNamespace(client=lambda *args, **kwargs: fake_client)
     monkeypatch.setitem(sys.modules, "boto3", boto3_mod)
