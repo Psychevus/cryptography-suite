@@ -13,7 +13,7 @@ import logging
 import os
 import struct
 from os import urandom
-from typing import cast
+from typing import Any, cast
 
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
@@ -41,7 +41,18 @@ _KDF_TO_ID = {"scrypt": 1, "pbkdf2": 2, "argon2": 3}
 _ID_TO_KDF = {v: k for k, v in _KDF_TO_ID.items()}
 
 
-@deprecated("aes_encrypt is deprecated; use the AESGCMEncrypt pipeline module")
+def _import_aiofiles() -> Any:
+    try:  # pragma: no cover - optional dependency
+        import aiofiles  # type: ignore[import-untyped]
+
+        return aiofiles
+    except Exception as exc:  # pragma: no cover - fallback when aiofiles missing
+        raise MissingDependencyError(
+            "aiofiles is required for async operations"
+        ) from exc
+
+
+@deprecated("aes_encrypt is deprecated; use the AESGCMEncrypt pipeline module")  # type: ignore[untyped-decorator]
 def aes_encrypt(
     plaintext: str,
     password: str,
@@ -86,7 +97,7 @@ def aes_encrypt(
     return base64.b64encode(data).decode()
 
 
-@deprecated("aes_decrypt is deprecated; use the AESGCMDecrypt pipeline module")
+@deprecated("aes_decrypt is deprecated; use the AESGCMDecrypt pipeline module")  # type: ignore[untyped-decorator]
 def aes_decrypt(
     encrypted_data: bytes | str,
     password: str,
@@ -315,12 +326,7 @@ async def encrypt_file_async(
     if not password:
         raise EncryptionError("Password cannot be empty.")
 
-    try:  # pragma: no cover - optional dependency
-        import aiofiles
-    except Exception as exc:  # pragma: no cover - fallback when aiofiles missing
-        raise MissingDependencyError(
-            "aiofiles is required for async operations"
-        ) from exc
+    aiofiles = _import_aiofiles()
 
     salt = urandom(SALT_SIZE)
     try:
@@ -367,12 +373,7 @@ async def decrypt_file_async(
     if not password:
         raise EncryptionError("Password cannot be empty.")
 
-    try:  # pragma: no cover - optional dependency
-        import aiofiles
-    except Exception as exc:  # pragma: no cover - fallback when aiofiles missing
-        raise MissingDependencyError(
-            "aiofiles is required for async operations"
-        ) from exc
+    aiofiles = _import_aiofiles()
 
     try:
         file_size = os.path.getsize(encrypted_file_path)

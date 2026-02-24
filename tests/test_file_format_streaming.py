@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import IO, Any
 
 import pytest
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
@@ -80,21 +81,21 @@ def test_encrypt_streams_in_chunks(
     read_sizes: list[int] = []
 
     class ReaderProxy:
-        def __init__(self, wrapped):
+        def __init__(self, wrapped: IO[bytes]) -> None:
             self._wrapped = wrapped
 
-        def read(self, n: int = -1):
+        def read(self, n: int = -1) -> bytes:
             read_sizes.append(n)
             return self._wrapped.read(n)
 
-        def __getattr__(self, item):
+        def __getattr__(self, item: str) -> Any:
             return getattr(self._wrapped, item)
 
-        def __enter__(self):
+        def __enter__(self) -> ReaderProxy:
             self._wrapped.__enter__()
             return self
 
-        def __exit__(self, exc_type, exc, tb):
+        def __exit__(self, exc_type: Any, exc: Any, tb: Any) -> bool | None:
             return self._wrapped.__exit__(exc_type, exc, tb)
 
     import builtins
