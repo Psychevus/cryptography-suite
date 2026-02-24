@@ -6,12 +6,12 @@ from unittest.mock import MagicMock
 
 import pytest
 from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric import ed25519, ec, rsa
+from cryptography.hazmat.primitives.asymmetric import ec, ed25519, rsa
 
-from cryptography_suite.keystores import load_plugins, list_keystores, get_keystore
-from cryptography_suite.cli import keystore_cli
-from cryptography_suite.audit import InMemoryAuditLogger, set_audit_logger
 from cryptography_suite.asymmetric import rsa_encrypt
+from cryptography_suite.audit import InMemoryAuditLogger, set_audit_logger
+from cryptography_suite.cli import keystore_cli
+from cryptography_suite.keystores import get_keystore, list_keystores, load_plugins
 
 
 def test_keystore_loader():

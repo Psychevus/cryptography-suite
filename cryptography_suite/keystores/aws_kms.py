@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 from importlib import import_module
-from typing import TYPE_CHECKING, Dict, List
+from typing import TYPE_CHECKING
 
-from . import register_keystore
-from .base import KeyStoreCapability
 from ..audit import audit_log
 from ..core.logging import get_structured_logger
 from ..core.operations import RetryPolicy, retry_with_backoff
+from . import register_keystore
+from .base import KeyStoreCapability
 
 if TYPE_CHECKING:  # pragma: no cover - used only for typing
     import boto3  # type: ignore[import]  # noqa: F401
@@ -33,7 +33,7 @@ class AWSKMSKeyStore:
         }
     )
 
-    _SIGNING_PREFERENCES: Dict[str, List[str]] = {
+    _SIGNING_PREFERENCES: dict[str, list[str]] = {
         "RSA_2048": ["RSASSA_PSS_SHA_256", "RSASSA_PKCS1_V1_5_SHA_256"],
         "RSA_3072": [
             "RSASSA_PSS_SHA_384",
@@ -63,11 +63,11 @@ class AWSKMSKeyStore:
         self._retry = RetryPolicy(
             max_attempts=4, base_delay_s=0.25, max_delay_s=2.0, jitter_s=0.2
         )
-        self._algorithm_cache: Dict[str, str] = {}
+        self._algorithm_cache: dict[str, str] = {}
         get_structured_logger(self._logger_name)
 
-    def list_keys(self) -> List[str]:
-        keys: List[str] = []
+    def list_keys(self) -> list[str]:
+        keys: list[str] = []
         paginator = retry_with_backoff(
             lambda: self.client.get_paginator("list_keys"),
             policy=self._retry,
@@ -120,7 +120,8 @@ class AWSKMSKeyStore:
             return selected
 
         raise ValueError(
-            f"No supported KMS signing algorithm found for key '{key_id}' (KeySpec={key_spec!r})"
+            f"No supported KMS signing algorithm found for key '{key_id}' "
+            f"(KeySpec={key_spec!r})"
         )
 
     @audit_log

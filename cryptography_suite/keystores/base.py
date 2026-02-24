@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Any, Dict, FrozenSet, Protocol, Tuple, runtime_checkable
+from typing import Any, Protocol, runtime_checkable
 
 
 class KeyStoreCapability(str, Enum):
@@ -20,7 +20,7 @@ class KeyStore(Protocol):
 
     name: str
     status: str
-    capabilities: FrozenSet[KeyStoreCapability]
+    capabilities: frozenset[KeyStoreCapability]
 
     def list_keys(self) -> list[str]:
         """Return available key identifiers."""
@@ -37,10 +37,10 @@ class KeyStore(Protocol):
     def unwrap(self, key_id: str, wrapped_key: bytes) -> bytes:
         """Unwrap ``wrapped_key`` using ``key_id``."""
 
-    def export_key(self, key_id: str) -> Tuple[bytes, Dict[str, Any]]:
+    def export_key(self, key_id: str) -> tuple[bytes, dict[str, Any]]:
         """Return raw key material and associated metadata."""
 
-    def import_key(self, raw: bytes, meta: Dict[str, Any]) -> str:
+    def import_key(self, raw: bytes, meta: dict[str, Any]) -> str:
         """Import ``raw`` with ``meta`` and return the new key identifier."""
 
 

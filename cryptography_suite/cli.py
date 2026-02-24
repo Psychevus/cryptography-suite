@@ -439,12 +439,14 @@ def keystore_cli(argv: list[str] | None = None) -> None:
         if not supports_capability(src, KeyStoreCapability.EXPORT_PRIVATE_KEY):
             raise ValueError(
                 f"Source keystore '{args.src}' does not support raw key export. "
-                "Choose a source backend that supports export, or use a provider-native migration path."
+                "Choose a source backend that supports export, or use a "
+                "provider-native migration path."
             )
         if not supports_capability(dst, KeyStoreCapability.IMPORT_PRIVATE_KEY):
             raise ValueError(
                 f"Destination keystore '{args.dst}' does not support raw key import. "
-                "Choose a destination backend that supports import, or create keys natively on the destination backend."
+                "Choose a destination backend that supports import, or create keys "
+                "natively on the destination backend."
             )
 
         ids = [args.key] if args.key else src.list_keys()

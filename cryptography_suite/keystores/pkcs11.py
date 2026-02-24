@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
-import os
-import threading
-import pathlib
 import contextlib
 import hashlib
-from typing import List
+import os
+import pathlib
+import threading
 
 try:
     import tomllib  # Python 3.11+
@@ -18,16 +17,16 @@ try:  # optional dependency
     import pkcs11  # type: ignore[import-not-found, import-untyped]
     from pkcs11 import (  # type: ignore[import-not-found, import-untyped]
         Attribute,
-        ObjectClass,
         KeyType,
         Mechanism,
+        ObjectClass,
     )
 except Exception:  # pragma: no cover - dependency missing
     pkcs11 = None  # type: ignore
 
+from ..audit import audit_log
 from . import register_keystore
 from .base import KeyStoreCapability
-from ..audit import audit_log
 
 
 @register_keystore("pkcs11")
@@ -118,8 +117,8 @@ class PKCS11KeyStore:
     def _get_key(self, session, label: str):
         try:
             priv = session.get_key(object_class=ObjectClass.PRIVATE_KEY, label=label)
-        except pkcs11.NoSuchKey:  # type: ignore[attr-defined]
-            raise FileNotFoundError(label)
+        except pkcs11.NoSuchKey as exc:  # type: ignore[attr-defined]
+            raise FileNotFoundError(label) from exc
 
         try:
             pub = session.get_key(object_class=ObjectClass.PUBLIC_KEY, label=label)
@@ -129,7 +128,7 @@ class PKCS11KeyStore:
         return priv
 
     # ------------------------------------------------------------------
-    def list_keys(self) -> List[str]:
+    def list_keys(self) -> list[str]:
         with self._session() as session:
             keys = []
             for obj in session.get_objects({Attribute.CLASS: ObjectClass.PRIVATE_KEY}):
@@ -162,7 +161,7 @@ class PKCS11KeyStore:
                     return key.sign(digest, mechanism=Mechanism.ECDSA)
                 return key.sign(data, mechanism=mech)
             elif getattr(KeyType, "EC_EDWARDS", None) and ktype == KeyType.EC_EDWARDS:
-                mech = getattr(Mechanism, "EDDSA")
+                mech = Mechanism.EDDSA
                 return key.sign(data, mechanism=mech)
             raise ValueError("Unsupported key type")
 
