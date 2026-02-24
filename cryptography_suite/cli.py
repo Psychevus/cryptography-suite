@@ -2,48 +2,79 @@
 
 from __future__ import annotations
 
-from . import __version__
-
 import argparse
 import hashlib
+import json
 import logging
 import sys
 from pathlib import Path
+from typing import Protocol, cast
 
-from .errors import MissingDependencyError, DecryptionError
-from .protocols import generate_totp
-from typing import cast
 from blake3 import blake3
-from .pqc import (
-    generate_kyber_keypair,
-    generate_dilithium_keypair,
-    generate_sphincs_keypair,
-    PQCRYPTO_AVAILABLE,
-    SPHINCS_AVAILABLE,
-)
-from .protocols.key_management import KeyManager
-from .utils import KeyVault
 
-from .zk.bulletproof import (
-    prove as bp_prove,
-    verify as bp_verify,
-    setup as bp_setup,
-    BULLETPROOF_AVAILABLE,
-)
-from .crypto_backends import available_backends
+from . import __version__
 from .core.logging import configure_structured_logging, get_structured_logger, log_event
 from .core.operations import (
     METRICS,
     install_signal_handlers,
     run_command,
 )
+from .crypto_backends import available_backends
+from .errors import DecryptionError, MissingDependencyError
+from .pqc import (
+    PQCRYPTO_AVAILABLE,
+    SPHINCS_AVAILABLE,
+    generate_dilithium_keypair,
+    generate_kyber_keypair,
+    generate_sphincs_keypair,
+)
+from .protocols import generate_totp
+from .protocols.key_management import KeyManager
+from .utils import KeyVault
+from .zk.bulletproof import (
+    BULLETPROOF_AVAILABLE,
+)
+from .zk.bulletproof import (
+    prove as bp_prove,
+)
+from .zk.bulletproof import (
+    setup as bp_setup,
+)
+from .zk.bulletproof import (
+    verify as bp_verify,
+)
+
+_OUTPUT_FORMAT = "text"
+
+
+class _HasherLike(Protocol):
+    def update(self, data: bytes) -> object: ...
+
+    def hexdigest(self) -> str: ...
+
+
+def _set_output_format(fmt: str) -> None:
+    """Configure global CLI output format."""
+
+    global _OUTPUT_FORMAT
+    _OUTPUT_FORMAT = fmt
+
+
+def _emit(text: str, payload: dict[str, object] | None = None) -> None:
+    """Emit command output in text (default) or JSON format."""
+
+    if _OUTPUT_FORMAT == "json" and payload is not None:
+        print(json.dumps(payload, sort_keys=True))
+    else:
+        print(text)
+
 
 try:
     from .experimental import zksnark
 
     ZKSNARK_AVAILABLE = getattr(zksnark, "ZKSNARK_AVAILABLE", False)
 except Exception:
-    zksnark = None  # type: ignore[assignment]
+    zksnark = None
     ZKSNARK_AVAILABLE = False
 
 
@@ -54,7 +85,8 @@ def bulletproof_cli(argv: list[str] | None = None) -> None:
     try:
         if not BULLETPROOF_AVAILABLE:
             raise MissingDependencyError(
-                "Bulletproof ZKP requires 'petlib'. Install it with: pip install cryptography-suite[zkp]"
+                "Bulletproof ZKP requires 'petlib'. Install it with: "
+                "pip install cryptography-suite[zkp]"
             )
         bp_setup()
         proof, commitment, nonce = bp_prove(args.value)
@@ -124,7 +156,7 @@ def file_cli(argv: list[str] | None = None) -> None:
 
     args = parser.parse_args(argv)
 
-    from .symmetric import encrypt_file, decrypt_file
+    from .symmetric import decrypt_file, encrypt_file
 
     try:
         # Keep CLI path checks lightweight for compatibility with test doubles.
@@ -132,10 +164,24 @@ def file_cli(argv: list[str] | None = None) -> None:
         _validate_output_parent(args.output_file)
         if args.command == "encrypt":
             encrypt_file(args.input_file, args.output_file, args.password)
-            print(f"Encrypted file written to {args.output_file}")
+            _emit(
+                f"Encrypted file written to {args.output_file}",
+                {
+                    "command": "file encrypt",
+                    "output_file": args.output_file,
+                    "status": "ok",
+                },
+            )
         else:
             decrypt_file(args.input_file, args.output_file, args.password)
-            print(f"Decrypted file written to {args.output_file}")
+            _emit(
+                f"Decrypted file written to {args.output_file}",
+                {
+                    "command": "file decrypt",
+                    "output_file": args.output_file,
+                    "status": "ok",
+                },
+            )
     except Exception as exc:  # pragma: no cover - high-level error reporting
         _handle_cli_error(exc)
 
@@ -144,11 +190,20 @@ def _handle_cli_error(exc: Exception) -> None:
     """Display user-friendly CLI error messages."""
 
     if isinstance(exc, MissingDependencyError):
-        print(exc)
+        _emit(str(exc), {"error": str(exc), "error_type": "missing_dependency"})
     elif isinstance(exc, DecryptionError):
-        print("Password is incorrect or file corrupted.")
+        _emit(
+            "Password is incorrect or file corrupted.",
+            {
+                "error": "Password is incorrect or file corrupted.",
+                "error_type": "decryption_error",
+            },
+        )
     else:
-        print(f"Error: {exc}")
+        _emit(
+            f"Error: {exc}",
+            {"error": str(exc), "error_type": exc.__class__.__name__},
+        )
 
 
 def _validate_regular_file(path_str: str, label: str) -> None:
@@ -212,6 +267,7 @@ def hash_cli(argv: list[str] | None = None) -> None:
 
     _validate_regular_file(args.file, "file")
 
+    hasher: _HasherLike
     if args.algorithm == "sha3-256":
         hasher = hashlib.sha3_256()
     elif args.algorithm == "sha3-512":
@@ -227,7 +283,14 @@ def hash_cli(argv: list[str] | None = None) -> None:
 
     digest = hasher.hexdigest()
 
-    print(digest)
+    _emit(
+        digest,
+        {
+            "algorithm": args.algorithm,
+            "digest": digest,
+            "file": str(Path(args.file)),
+        },
+    )
 
 
 def otp_cli(argv: list[str] | None = None) -> None:
@@ -250,7 +313,15 @@ def otp_cli(argv: list[str] | None = None) -> None:
         digits=args.digits,
         algorithm=args.algorithm,
     )
-    print(code)
+    _emit(
+        code,
+        {
+            "algorithm": args.algorithm,
+            "code": code,
+            "digits": args.digits,
+            "interval": args.interval,
+        },
+    )
 
 
 def backends_cli(argv: list[str] | None = None) -> None:
@@ -262,18 +333,22 @@ def backends_cli(argv: list[str] | None = None) -> None:
     args = parser.parse_args(argv)
 
     if args.action == "list":
-        for name in available_backends():
-            print(name)
+        names = sorted(available_backends())
+        if _OUTPUT_FORMAT == "json":
+            _emit("", {"action": "list", "backends": names})
+        else:
+            for name in names:
+                print(name)
 
 
 def keystore_cli(argv: list[str] | None = None) -> None:
     """Manage registered keystores."""
 
     from .keystores import (
-        load_plugins,
-        list_keystores,
-        get_keystore,
         failed_plugins,
+        get_keystore,
+        list_keystores,
+        load_plugins,
     )
 
     parser = argparse.ArgumentParser(description="Keystore management")
@@ -345,7 +420,8 @@ def keystore_cli(argv: list[str] | None = None) -> None:
 
         if not args.dry_run and not getattr(args, "apply", False):
             raise ValueError(
-                "Refusing live key migration without --apply. Use --dry-run to preview changes."
+                "Refusing live key migration without --apply. "
+                "Use --dry-run to preview changes."
             )
 
         try:
@@ -391,9 +467,11 @@ def export_cli(argv: list[str] | None = None) -> None:
     args = parser.parse_args(argv)
     _validate_regular_file(args.pipeline, "pipeline")
 
-    import yaml  # type: ignore
     from typing import Any
-    from .pipeline import Pipeline, CryptoModule
+
+    yaml = __import__("yaml")
+
+    from .pipeline import CryptoModule, Pipeline
 
     class Stub:
         def __init__(self, name: str) -> None:
@@ -408,7 +486,7 @@ def export_cli(argv: list[str] | None = None) -> None:
         def to_tamarin(self) -> str:
             return f"# {self._name}"
 
-    with open(args.pipeline, "r", encoding="utf-8") as f:
+    with open(args.pipeline, encoding="utf-8") as f:
         config = yaml.safe_load(f) or []
 
     modules: list[CryptoModule[Any, Any]] = [
@@ -446,7 +524,9 @@ def fuzz_cli(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description=fuzz_cli.__doc__)
     parser.add_argument("--pipeline", help="Pipeline config YAML")
     parser.add_argument("--runs", type=int, default=1000)
-    parser.add_argument("--timeout", type=float, default=60.0, help="Subprocess timeout seconds")
+    parser.add_argument(
+        "--timeout", type=float, default=60.0, help="Subprocess timeout seconds"
+    )
     args = parser.parse_args(argv)
 
     if args.runs < 1 or args.runs > 1_000_000:
@@ -489,6 +569,17 @@ def main(argv: list[str] | None = None) -> None:
         "--show-metrics",
         action="store_true",
         help="Print operation metrics after command execution",
+    )
+    parser.add_argument(
+        "--output-format",
+        choices=["text", "json"],
+        default="text",
+        help="Output format for command responses",
+    )
+    parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Deprecated alias for --output-format json",
     )
     sub = parser.add_subparsers(dest="cmd", required=True)
 
@@ -626,6 +717,15 @@ def main(argv: list[str] | None = None) -> None:
     dec_alias.add_argument("--password", required=True)
 
     args = parser.parse_args(argv)
+    if args.json:
+        _emit(
+            "Warning: --json is deprecated, use --output-format json.",
+            {
+                "warning": "--json is deprecated, use --output-format json",
+                "warning_type": "deprecation",
+            },
+        )
+    _set_output_format("json" if args.json else args.output_format)
     configure_structured_logging(getattr(logging, args.log_level))
     log_event(logger, "cli_invocation", command=args.cmd)
 
