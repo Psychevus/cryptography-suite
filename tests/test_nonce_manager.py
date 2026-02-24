@@ -1,11 +1,12 @@
 import timeit
 
 import pytest
-from hypothesis import given, strategies as st
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+from hypothesis import given
+from hypothesis import strategies as st
 
-from cryptography_suite.nonce import KeyRotationRequired, NonceManager, NonceReuseError
 from cryptography_suite.aead import AESGCMContext
+from cryptography_suite.nonce import KeyRotationRequired, NonceManager, NonceReuseError
 
 
 @given(st.binary(min_size=12, max_size=12))
