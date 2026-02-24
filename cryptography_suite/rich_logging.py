@@ -8,11 +8,14 @@ from logging import Logger
 from rich.logging import RichHandler
 from rich.progress import BarColumn, Progress, SpinnerColumn, TextColumn
 
+from .core.logging import configure_structured_logging
+
 
 def get_rich_logger(
     name: str = "cryptography-suite", level: int = logging.INFO
 ) -> Logger:
     """Return a configured Rich logger."""
+    configure_structured_logging(level)
     logger = logging.getLogger(name)
     if not any(isinstance(h, RichHandler) for h in logger.handlers):
         handler = RichHandler(rich_tracebacks=True, show_path=False)

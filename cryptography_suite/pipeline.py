@@ -7,11 +7,12 @@ pipeline steps.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import Any, Callable, Generic, Iterable, Protocol, TypeVar, cast
 import json
 import logging
+from dataclasses import dataclass, field
+from typing import Any, Callable, Generic, Iterable, Protocol, TypeVar, cast
 
+from .core.logging import get_correlation_id, log_event
 from .rich_logging import PipelineProgress, get_rich_logger
 from .symmetric.kdf import DEFAULT_KDF
 
@@ -86,16 +87,19 @@ class Pipeline(Generic[Input, Output]):
             result = mod.run(result)
         return result
 
-    def run_with_logging(
-        self, data: Any, logger: logging.Logger | None = None
-    ) -> Any:
+    def run_with_logging(self, data: Any, logger: logging.Logger | None = None) -> Any:
         """Run modules with Rich progress logging."""
 
         logger = logger or get_rich_logger(__name__)
         result = data
         with PipelineProgress(len(self.modules)) as prog:
             for mod in self.modules:
-                logger.info("Running %s", mod.__class__.__name__)
+                log_event(
+                    logger,
+                    "pipeline.module.run",
+                    module=mod.__class__.__name__,
+                    correlation_id=get_correlation_id(),
+                )
                 result = mod.run(result)
                 prog.step()
         return result
@@ -108,13 +112,15 @@ class Pipeline(Generic[Input, Output]):
                 "module": mod.__class__.__name__,
             }
             if hasattr(mod, "__dict__"):
-                info["params"] = _redact_sensitive_values({
-                    k: v for k, v in vars(mod).items() if not k.startswith("_")
-                })
+                info["params"] = _redact_sensitive_values(
+                    {k: v for k, v in vars(mod).items() if not k.startswith("_")}
+                )
             desc.append(info)
         if self.tracked_secrets:
             desc.append(
-                _redact_sensitive_values({"tracked_secrets": list(self.tracked_secrets)})
+                _redact_sensitive_values(
+                    {"tracked_secrets": list(self.tracked_secrets)}
+                )
             )
         return desc
 
@@ -194,8 +200,13 @@ def register_module(cls: type[CryptoModule[Any, Any]]) -> type[CryptoModule[Any,
     importable from :mod:`cryptography_suite.pipeline`.
     """
 
-    MODULE_REGISTRY[cls.__name__] = cls
-    return cls
+    existing = MODULE_REGISTRY.get(cls.__name__)
+    if existing is None:
+        MODULE_REGISTRY[cls.__name__] = cls
+        return cls
+    if existing is cls:
+        return cls
+    raise ValueError(f"Module name {cls.__name__!r} already registered")
 
 
 def list_modules() -> list[str]:
@@ -235,13 +246,16 @@ class AESGCMEncrypt(CryptoModule[str, str]):
     backend: str | None = None
 
     def run(self, data: str) -> str:
-        from .symmetric import aes as _aes_mod
-        import warnings
         import contextlib
+        import warnings
+
         from .crypto_backends import use_backend
+        from .symmetric import aes as _aes_mod
 
         cm = (
-            use_backend(self.backend) if self.backend is not None else contextlib.nullcontext()
+            use_backend(self.backend)
+            if self.backend is not None
+            else contextlib.nullcontext()
         )
         with cm:
             # aes_encrypt returns ``str`` when ``raw_output`` is ``False`` (default)
@@ -289,13 +303,16 @@ class AESGCMDecrypt(CryptoModule[str, str]):
     backend: str | None = None
 
     def run(self, data: str) -> str:
-        from .symmetric import aes as _aes_mod
-        import warnings
         import contextlib
+        import warnings
+
         from .crypto_backends import use_backend
+        from .symmetric import aes as _aes_mod
 
         cm = (
-            use_backend(self.backend) if self.backend is not None else contextlib.nullcontext()
+            use_backend(self.backend)
+            if self.backend is not None
+            else contextlib.nullcontext()
         )
         with cm:
             with warnings.catch_warnings():
@@ -327,8 +344,9 @@ class RSAEncrypt(CryptoModule[bytes, str | bytes]):
     raw_output: bool = False
 
     def run(self, data: bytes) -> str | bytes:
-        from .asymmetric import rsa_encrypt
         import warnings
+
+        from .asymmetric import rsa_encrypt
 
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -356,8 +374,9 @@ class RSADecrypt(CryptoModule[str | bytes, bytes]):
     private_key: Any
 
     def run(self, data: str | bytes) -> bytes:
-        from .asymmetric import rsa_decrypt
         import warnings
+
+        from .asymmetric import rsa_decrypt
 
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -379,8 +398,9 @@ class ECIESX25519Encrypt(CryptoModule[bytes, str | bytes]):
     raw_output: bool = False
 
     def run(self, data: bytes) -> str | bytes:
-        from .asymmetric import ec_encrypt
         import warnings
+
+        from .asymmetric import ec_encrypt
 
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -401,8 +421,9 @@ class ECIESX25519Decrypt(CryptoModule[str | bytes, bytes]):
     private_key: Any
 
     def run(self, data: str | bytes) -> bytes:
-        from .asymmetric import ec_decrypt
         import warnings
+
+        from .asymmetric import ec_decrypt
 
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -424,8 +445,9 @@ class HybridEncrypt(CryptoModule[bytes, Any]):
     raw_output: bool = False
 
     def run(self, data: bytes) -> Any:
-        from .hybrid import hybrid_encrypt
         import warnings
+
+        from .hybrid import hybrid_encrypt
 
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -446,8 +468,9 @@ class HybridDecrypt(CryptoModule[Any, bytes]):
     private_key: Any
 
     def run(self, data: Any) -> bytes:
-        from .hybrid import hybrid_decrypt
         import warnings
+
+        from .hybrid import hybrid_decrypt
 
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -470,8 +493,9 @@ class KyberEncrypt(CryptoModule[bytes, tuple[str | bytes, str | bytes]]):
     raw_output: bool = False
 
     def run(self, data: bytes) -> tuple[str | bytes, str | bytes]:
-        from .pqc import kyber_encrypt
         import warnings
+
+        from .pqc import kyber_encrypt
 
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -495,8 +519,9 @@ class KyberDecrypt(CryptoModule[tuple[str | bytes, str | bytes], bytes]):
     level: int = 512
 
     def run(self, data: tuple[str | bytes, str | bytes]) -> bytes:
-        from .pqc import kyber_decrypt
         import warnings
+
+        from .pqc import kyber_decrypt
 
         ct, ss = data
         with warnings.catch_warnings():
