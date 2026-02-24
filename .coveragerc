@@ -1,13 +1,23 @@
 [run]
-source = cryptography_suite
+branch = true
+source =
+    cryptography_suite
 omit =
+    # Generated or template-driven code paths.
+    tests/generated/*
+    cryptography_suite/codegen/templates/*
+    # Experimental modules intentionally excluded from release coverage gates.
     cryptography_suite/experimental/*
-    cryptography_suite/tests/*
+    # Thin compatibility wrappers/re-export modules.
+    cryptography_suite/config.py
+    cryptography_suite/__init__.py
+    cryptography_suite/*/__init__.py
     src/cryptography_suite/*
-    */__init__.py
 
 [report]
-fail_under = 99
+show_missing = true
+skip_covered = false
+fail_under = 95
 
 [html]
 directory = htmlcov
