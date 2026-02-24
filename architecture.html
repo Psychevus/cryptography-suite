@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html">
 
     <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
-        <title>Package Architecture - cryptography-suite 3.0.0 documentation</title>
+        <title>Architecture (Production Hardening Plan) - cryptography-suite 3.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -172,7 +172,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -222,31 +222,81 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="package-architecture">
-<h1>Package Architecture<a class="headerlink" href="#package-architecture" title="Link to this heading">¶</a></h1>
-<div class="highlight-mermaid notranslate"><div class="highlight"><pre><span></span>graph TD
-    CS[cryptography_suite]
-    CS --&gt; asymmetric
-    CS --&gt; symmetric
-    CS --&gt; hashing
-    CS --&gt; pqc
-    CS --&gt; protocols
-    CS --&gt; zk
-    CS --&gt; utils
-    CS --&gt; x509
-    CS --&gt; hybrid
-    protocols --&gt; key_management
-    protocols --&gt; otp
-    protocols --&gt; pake
-    protocols --&gt; secret_sharing
-    protocols --&gt; signal
+          <section id="architecture-production-hardening-plan">
+<h1>Architecture (Production Hardening Plan)<a class="headerlink" href="#architecture-production-hardening-plan" title="Link to this heading">¶</a></h1>
+<section id="target-structure">
+<h2>Target Structure<a class="headerlink" href="#target-structure" title="Link to this heading">¶</a></h2>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>cryptography_suite/
+  core/                    # Pure domain primitives (errors, settings, structured logging)
+  application/             # Service orchestration, use-cases, workflows
+  crypto_backends/         # Backend adapters (pyca, HSM, cloud KMS)
+  asymmetric/              # Interface-facing crypto modules
+  symmetric/
+  protocols/
+  keystores/
+  cli.py                   # CLI interface layer
+  __init__.py              # Public API facade only
 </pre></div>
 </div>
+<section id="boundary-rules">
+<h3>Boundary Rules<a class="headerlink" href="#boundary-rules" title="Link to this heading">¶</a></h3>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">core</span></code> has no dependency on adapters (<code class="docutils literal notranslate"><span class="pre">crypto_backends</span></code>, <code class="docutils literal notranslate"><span class="pre">keystores</span></code>) or interface code (<code class="docutils literal notranslate"><span class="pre">cli</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">application</span></code> may depend on <code class="docutils literal notranslate"><span class="pre">core</span></code> and domain modules, but not vice versa.</p></li>
+<li><p>Interface and adapter layers (<code class="docutils literal notranslate"><span class="pre">cli</span></code>, <code class="docutils literal notranslate"><span class="pre">crypto_backends</span></code>, <code class="docutils literal notranslate"><span class="pre">keystores</span></code>) can depend inward only.</p></li>
+<li><p>Public facade (<code class="docutils literal notranslate"><span class="pre">__init__.py</span></code>) should re-export symbols without operational side effects.</p></li>
+</ol>
+</section>
+</section>
+<section id="implemented-in-this-refactor">
+<h2>Implemented in this refactor<a class="headerlink" href="#implemented-in-this-refactor" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Added typed runtime settings in <code class="docutils literal notranslate"><span class="pre">cryptography_suite.core.settings</span></code> with explicit <code class="docutils literal notranslate"><span class="pre">dev/test/prod</span></code> separation.</p></li>
+<li><p>Added typed error codes in <code class="docutils literal notranslate"><span class="pre">cryptography_suite.core.errors</span></code> and connected public exceptions.</p></li>
+<li><p>Added structured logging + correlation IDs in <code class="docutils literal notranslate"><span class="pre">cryptography_suite.core.logging</span></code>.</p></li>
+<li><p>Hardened pipeline module registration to be idempotent and deterministic.</p></li>
+</ul>
+</section>
+<section id="safe-incremental-refactor-plan-commit-sized">
+<h2>Safe Incremental Refactor Plan (commit-sized)<a class="headerlink" href="#safe-incremental-refactor-plan-commit-sized" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p><strong>Create core primitives</strong>: settings, error code model, structured logging.</p></li>
+<li><p><strong>Compatibility bridge</strong>: keep <code class="docutils literal notranslate"><span class="pre">cryptography_suite.config</span></code> and <code class="docutils literal notranslate"><span class="pre">cryptography_suite.errors</span></code> API stable.</p></li>
+<li><p><strong>Migrate hot paths</strong>: switch pipeline logging and registry semantics.</p></li>
+<li><p><strong>Enforce in CI</strong>: formatting, lint, typing, tests on push/PR.</p></li>
+<li><p><strong>Continue migration</strong>: move orchestration code into <code class="docutils literal notranslate"><span class="pre">application/</span></code> without changing public API.</p></li>
+</ol>
+</section>
+<section id="runtime-profiles">
+<h2>Runtime Profiles<a class="headerlink" href="#runtime-profiles" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">CRYPTOSUITE_ENV=dev</span></code>: local defaults, verbose diagnostics.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CRYPTOSUITE_ENV=test</span></code>: deterministic test profile.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CRYPTOSUITE_ENV=prod</span></code>: production profile with strict validation and stable structured logs.</p></li>
+</ul>
+</section>
+<section id="error-handling-standard">
+<h2>Error Handling Standard<a class="headerlink" href="#error-handling-standard" title="Link to this heading">¶</a></h2>
+<p>All new operational errors should inherit from <code class="docutils literal notranslate"><span class="pre">SuiteError</span></code> with:</p>
+<ul class="simple">
+<li><p>Stable <code class="docutils literal notranslate"><span class="pre">ErrorCode</span></code> enum values.</p></li>
+<li><p>Human-readable message.</p></li>
+<li><p>Optional structured <code class="docutils literal notranslate"><span class="pre">details</span></code> map for diagnostics.</p></li>
+</ul>
+</section>
+<section id="logging-standard">
+<h2>Logging Standard<a class="headerlink" href="#logging-standard" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Correlation ID attached to each log record (context local).</p></li>
+<li><p>Action-oriented event names (e.g., <code class="docutils literal notranslate"><span class="pre">pipeline.module.run</span></code>).</p></li>
+<li><p>Structured key/value payloads for machine parsing.</p></li>
+</ul>
+</section>
 </section>
 
         </article>
@@ -274,8 +324,35 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Architecture (Production Hardening Plan)</a><ul>
+<li><a class="reference internal" href="#target-structure">Target Structure</a><ul>
+<li><a class="reference internal" href="#boundary-rules">Boundary Rules</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implemented-in-this-refactor">Implemented in this refactor</a></li>
+<li><a class="reference internal" href="#safe-incremental-refactor-plan-commit-sized">Safe Incremental Refactor Plan (commit-sized)</a></li>
+<li><a class="reference internal" href="#runtime-profiles">Runtime Profiles</a></li>
+<li><a class="reference internal" href="#error-handling-standard">Error Handling Standard</a></li>
+<li><a class="reference internal" href="#logging-standard">Logging Standard</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
