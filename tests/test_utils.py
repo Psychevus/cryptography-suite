@@ -1,4 +1,6 @@
 import unittest
+from pathlib import Path
+from unittest import mock
 
 from cryptography.hazmat.primitives.asymmetric import rsa
 
@@ -14,6 +16,7 @@ from cryptography_suite.utils import (
     encode_encrypted_message,
     from_pem,
     generate_secure_random_string,
+    is_encrypted_pem,
     pem_to_json,
     secure_zero,
     to_pem,
@@ -38,10 +41,20 @@ class TestUtils(unittest.TestCase):
         decoded = base62_decode("")
         self.assertEqual(decoded, b"")
 
+    def test_base62_decode_invalid_character_raises(self):
+        with self.assertRaises(ValueError):
+            base62_decode("%")
+
     def test_secure_zero(self):
         """Test secure_zero function."""
         data = bytearray(b"Sensitive data")
         secure_zero(data)
+        self.assertTrue(all(b == 0 for b in data))
+
+    def test_secure_zero_falls_back_when_libc_unavailable(self):
+        data = bytearray(b"Sensitive data")
+        with mock.patch("ctypes.util.find_library", return_value=None):
+            secure_zero(data)
         self.assertTrue(all(b == 0 for b in data))
 
     def test_generate_secure_random_string(self):
@@ -87,6 +100,28 @@ class TestUtils(unittest.TestCase):
         with self.assertRaises(DecryptionError):
             from_pem("NOT A VALID PEM")
 
+    def test_from_pem_rejects_non_string(self):
+        with self.assertRaises(TypeError):
+            from_pem(b"-----BEGIN PRIVATE KEY-----")
+
+    def test_is_encrypted_pem_false_for_invalid_pem(self):
+        temp_path = Path("tests") / "_tmp_invalid.pem"
+        self.addCleanup(lambda: temp_path.unlink(missing_ok=True))
+        temp_path.write_text("not a pem", encoding="utf-8")
+        self.assertFalse(is_encrypted_pem(temp_path))
+
+    def test_is_encrypted_pem_reraises_unrelated_type_error(self):
+        temp_path = Path("tests") / "_tmp_type_error.pem"
+        self.addCleanup(lambda: temp_path.unlink(missing_ok=True))
+        temp_path.write_text("irrelevant", encoding="utf-8")
+
+        with mock.patch(
+            "cryptography.hazmat.primitives.serialization.load_pem_private_key",
+            side_effect=TypeError("bad argument type"),
+        ):
+            with self.assertRaises(TypeError):
+                is_encrypted_pem(temp_path)
+
     def test_pem_to_json_and_decode_message(self):
         _, pub = generate_rsa_keypair()
         json_blob = pem_to_json(pub)
@@ -96,6 +131,12 @@ class TestUtils(unittest.TestCase):
         encoded = encode_encrypted_message(msg)
         decoded = decode_encrypted_message(encoded)
         self.assertEqual(decoded["ciphertext"], b"a")
+
+    def test_encode_decode_message_preserves_non_bytes_fields(self):
+        msg = {"ciphertext": b"a", "nonce": b"b", "counter": 3}
+        encoded = encode_encrypted_message(msg)
+        decoded = decode_encrypted_message(encoded)
+        self.assertEqual(decoded["counter"], 3)
 
     def test_encode_decode_hybrid_dataclass(self):
         msg = EncryptedHybridMessage(

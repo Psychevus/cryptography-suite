@@ -1,19 +1,18 @@
 import timeit
 
 import pytest
-from hypothesis import given, strategies as st
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
-from cryptography_suite.nonce import KeyRotationRequired, NonceManager, NonceReuseError
 from cryptography_suite.aead import AESGCMContext
+from cryptography_suite.nonce import KeyRotationRequired, NonceManager, NonceReuseError
 
 
-@given(st.binary(min_size=12, max_size=12))
-def test_nonce_reuse_detection(nonce: bytes) -> None:
-    nm = NonceManager()
-    nm.remember(nonce)
-    with pytest.raises(NonceReuseError):
+def test_nonce_reuse_detection() -> None:
+    for nonce in (bytes([0]) * 12, bytes(range(12)), b"n" * 12):
+        nm = NonceManager()
         nm.remember(nonce)
+        with pytest.raises(NonceReuseError):
+            nm.remember(nonce)
 
 
 def test_encrypt_after_limit_raises_key_rotation() -> None:
@@ -42,13 +41,13 @@ def test_nonce_manager_overhead() -> None:
     assert duration < 0.2
 
 
-@given(st.integers(min_value=1, max_value=10))
-def test_nonce_limit_triggers_rotation(limit: int) -> None:
-    nm = NonceManager(limit=limit)
-    for _ in range(limit):
-        nm.next()
-    with pytest.raises(KeyRotationRequired):
-        nm.next()
+def test_nonce_limit_triggers_rotation() -> None:
+    for limit in range(1, 11):
+        nm = NonceManager(limit=limit)
+        for _ in range(limit):
+            nm.next()
+        with pytest.raises(KeyRotationRequired):
+            nm.next()
 
 
 def test_nonce_manager_invalid_parameters() -> None:
@@ -62,3 +61,13 @@ def test_nonce_manager_rejects_bad_length() -> None:
     nm = NonceManager()
     with pytest.raises(ValueError):
         nm.remember(b"short")
+
+
+def test_nonce_manager_start_value_is_encoded_big_endian() -> None:
+    nm = NonceManager(start=255, limit=300)
+    assert nm.next() == (255).to_bytes(12, "big")
+
+
+def test_nonce_manager_limit_must_exceed_start() -> None:
+    with pytest.raises(ValueError):
+        NonceManager(start=9, limit=8)
