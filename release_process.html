@@ -229,49 +229,38 @@
         <article role="main" id="furo-main-content">
           <section id="release-process">
 <h1>Release Process<a class="headerlink" href="#release-process" title="Link to this heading">¶</a></h1>
-<p>This project aims for fully reproducible builds and signed artifacts. Releases are created via GitHub Actions.</p>
-<section id="steps">
-<h2>Steps<a class="headerlink" href="#steps" title="Link to this heading">¶</a></h2>
+<p>This project enforces a SemVer-based release workflow with reproducible builds.</p>
+<section id="versioning-policy">
+<h2>Versioning policy<a class="headerlink" href="#versioning-policy" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>We follow <a class="reference external" href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p></li>
+<li><p>Tags <strong>must</strong> use the form <code class="docutils literal notranslate"><span class="pre">vMAJOR.MINOR.PATCH</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CHANGELOG.md</span></code> is maintained using Keep a Changelog format.</p></li>
+</ul>
+</section>
+<section id="automated-release-pipeline">
+<h2>Automated release pipeline<a class="headerlink" href="#automated-release-pipeline" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">Release</span></code> workflow (<code class="docutils literal notranslate"><span class="pre">.github/workflows/release.yml</span></code>) is triggered only by SemVer tags.</p>
 <ol class="arabic simple">
-<li><p>A fresh virtual environment installs pinned build tools via
-<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-r</span> <span class="pre">requirements-release.txt</span></code>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">tools/reproducible_build.py</span></code> builds the wheel and sdist with
-<code class="docutils literal notranslate"><span class="pre">SOURCE_DATE_EPOCH</span></code> set to ensure determinism.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">tools/generate_sbom.py</span></code> creates a CycloneDX SBOM in <code class="docutils literal notranslate"><span class="pre">dist/sbom.json</span></code>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">slsa-framework/slsa-github-generator</span></code> produces a
-<code class="docutils literal notranslate"><span class="pre">provenance.intoto.jsonl</span></code> attestation.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">cosign</span> <span class="pre">sign-blob</span></code> signs every artifact (wheel, sdist, SBOM, provenance).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">reprotest</span></code> verifies the build in varying environments for reproducibility.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">tools/release_lint.py</span></code> checks that SBOM, provenance and signatures are
-present before publishing.</p></li>
-<li><p>Release notes are extracted from <code class="docutils literal notranslate"><span class="pre">CHANGELOG.md</span></code> and the artifacts,
-signatures and attestations are uploaded to PyPI and GitHub Releases.</p></li>
+<li><p>Validate tag format (<code class="docutils literal notranslate"><span class="pre">vX.Y.Z</span></code>).</p></li>
+<li><p>Verify <code class="docutils literal notranslate"><span class="pre">CHANGELOG.md</span></code> includes a matching version header.</p></li>
+<li><p>Re-run quality gate checks: formatter and lint checks on Python files changed since the previous tag, plus repository-wide security, dependency audit, and tests with branch coverage.</p></li>
+<li><p>Install pinned release dependencies from <code class="docutils literal notranslate"><span class="pre">requirements-release.txt</span></code>.</p></li>
+<li><p>Build reproducible wheel/sdist artifacts.</p></li>
+<li><p>Generate SBOM.</p></li>
+<li><p>Validate release artifacts (<code class="docutils literal notranslate"><span class="pre">tools/release_lint.py</span></code>).</p></li>
+<li><p>Publish to PyPI.</p></li>
+<li><p>Create GitHub Release and attach artifacts.</p></li>
 </ol>
-<p>Users can verify a downloaded wheel and related artifacts:</p>
-<ol class="arabic">
-<li><p>Verify the wheel’s signature:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cosign<span class="w"> </span>verify<span class="w"> </span>--certificate-identity<span class="w"> </span><span class="s2">&quot;https://github.com/Psychevus/cryptography-suite/.github/workflows/release.yml@refs/tags/v3.0.0&quot;</span><span class="w"> </span>&lt;wheel&gt;.sig<span class="w"> </span>&lt;wheel&gt;
-</pre></div>
-</div>
-</li>
-<li><p>Validate the checksums:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sha256sum<span class="w"> </span>-c<span class="w"> </span>checksums.txt
-</pre></div>
-</div>
-</li>
-<li><p>Inspect the SLSA provenance:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>jq<span class="w"> </span><span class="s1">&#39;.subject | .name&#39;</span><span class="w"> </span>provenance.intoto.jsonl
-</pre></div>
-</div>
-</li>
-</ol>
-<p>The SBOM (<code class="docutils literal notranslate"><span class="pre">sbom.json</span></code>) can be inspected with tools such as
-<code class="docutils literal notranslate"><span class="pre">cyclonedx-bom</span></code>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cyclonedx-bom<span class="w"> </span>--input-file<span class="w"> </span>sbom.json<span class="w"> </span>--summary
-</pre></div>
-</div>
-<p>Expected SHA256 hashes are published alongside each release for
-additional manual verification.</p>
+<p>Release notes are generated directly from the matching changelog section.</p>
+</section>
+<section id="reproducibility-requirements">
+<h2>Reproducibility requirements<a class="headerlink" href="#reproducibility-requirements" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>CI tooling for checks is pinned in <code class="docutils literal notranslate"><span class="pre">requirements-dev.txt</span></code>.</p></li>
+<li><p>Release build tooling is pinned in <code class="docutils literal notranslate"><span class="pre">requirements-release.txt</span></code>.</p></li>
+<li><p>Build job runs from a clean environment and generates deterministic artifacts.</p></li>
+</ul>
 </section>
 </section>
 
@@ -313,7 +302,9 @@ additional manual verification.</p>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Release Process</a><ul>
-<li><a class="reference internal" href="#steps">Steps</a></li>
+<li><a class="reference internal" href="#versioning-policy">Versioning policy</a></li>
+<li><a class="reference internal" href="#automated-release-pipeline">Automated release pipeline</a></li>
+<li><a class="reference internal" href="#reproducibility-requirements">Reproducibility requirements</a></li>
 </ul>
 </li>
 </ul>
