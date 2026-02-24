@@ -2,31 +2,31 @@
 
 from __future__ import annotations
 
-import os
-import threading
-import pathlib
 import contextlib
 import hashlib
-from typing import List
+import os
+import pathlib
+import threading
 
 try:
     import tomllib  # Python 3.11+
 except Exception:  # pragma: no cover - fallback for older Python
-    tomllib = None  # type: ignore
+    tomllib = None
 
 try:  # optional dependency
-    import pkcs11  # type: ignore[import-not-found, import-untyped]
-    from pkcs11 import (  # type: ignore[import-not-found, import-untyped]
+    import pkcs11
+    from pkcs11 import (
         Attribute,
-        ObjectClass,
         KeyType,
         Mechanism,
+        ObjectClass,
     )
 except Exception:  # pragma: no cover - dependency missing
-    pkcs11 = None  # type: ignore
+    pkcs11 = None
 
-from . import register_keystore
 from ..audit import audit_log
+from . import register_keystore
+from .base import KeyStoreCapability
 
 
 @register_keystore("pkcs11")
@@ -42,15 +42,22 @@ class PKCS11KeyStore:
 
     name = "pkcs11"
     status = "production"
+    capabilities = frozenset(
+        {
+            KeyStoreCapability.SIGN,
+            KeyStoreCapability.DECRYPT,
+            KeyStoreCapability.UNWRAP,
+        }
+    )
 
-    def __init__(self,
-                 library_path: str | None = None,
-                 token_label: str | None = None,
-                 pin: str | None = None) -> None:
+    def __init__(
+        self,
+        library_path: str | None = None,
+        token_label: str | None = None,
+        pin: str | None = None,
+    ) -> None:
         if pkcs11 is None:  # pragma: no cover - dependency missing
-            raise ImportError(
-                "python-pkcs11>=0.8.1 is required for PKCS11KeyStore"
-            )
+            raise ImportError("python-pkcs11>=0.8.1 is required for PKCS11KeyStore")
 
         library_path, token_label, pin = self._load_config(
             library_path, token_label, pin
@@ -109,23 +116,19 @@ class PKCS11KeyStore:
 
     def _get_key(self, session, label: str):
         try:
-            priv = session.get_key(
-                object_class=ObjectClass.PRIVATE_KEY, label=label
-            )
-        except pkcs11.NoSuchKey:  # type: ignore[attr-defined]
-            raise FileNotFoundError(label)
+            priv = session.get_key(object_class=ObjectClass.PRIVATE_KEY, label=label)
+        except pkcs11.NoSuchKey as exc:
+            raise FileNotFoundError(label) from exc
 
         try:
-            pub = session.get_key(
-                object_class=ObjectClass.PUBLIC_KEY, label=label
-            )
-            priv.public_key = pub  # type: ignore[attr-defined]
-        except pkcs11.NoSuchKey:  # type: ignore[attr-defined]
+            pub = session.get_key(object_class=ObjectClass.PUBLIC_KEY, label=label)
+            priv.public_key = pub
+        except pkcs11.NoSuchKey:
             pass
         return priv
 
     # ------------------------------------------------------------------
-    def list_keys(self) -> List[str]:
+    def list_keys(self) -> list[str]:
         with self._session() as session:
             keys = []
             for obj in session.get_objects({Attribute.CLASS: ObjectClass.PRIVATE_KEY}):
@@ -158,7 +161,7 @@ class PKCS11KeyStore:
                     return key.sign(digest, mechanism=Mechanism.ECDSA)
                 return key.sign(data, mechanism=mech)
             elif getattr(KeyType, "EC_EDWARDS", None) and ktype == KeyType.EC_EDWARDS:
-                mech = getattr(Mechanism, "EDDSA")
+                mech = Mechanism.EDDSA
                 return key.sign(data, mechanism=mech)
             raise ValueError("Unsupported key type")
 

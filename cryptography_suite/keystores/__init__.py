@@ -4,14 +4,13 @@ import importlib
 import importlib.util
 import logging
 import os
-import pkgutil
 import pathlib
+import pkgutil
 from importlib import metadata
-from typing import Dict, Type
 
-from .base import KeyStore
+from .base import KeyStore, KeyStoreCapability, supports_capability
 
-_REGISTRY: Dict[str, Type[KeyStore]] = {}
+_REGISTRY: dict[str, type[KeyStore]] = {}
 _FAILED_PLUGINS: list[str] = []
 log = logging.getLogger(__name__)
 
@@ -19,7 +18,7 @@ log = logging.getLogger(__name__)
 def register_keystore(name: str):
     """Class decorator to register keystore implementations."""
 
-    def decorator(cls: Type[KeyStore]) -> Type[KeyStore]:
+    def decorator(cls: type[KeyStore]) -> type[KeyStore]:
         _REGISTRY[name] = cls
         return cls
 
@@ -30,7 +29,7 @@ def list_keystores() -> list[str]:
     return list(_REGISTRY.keys())
 
 
-def get_keystore(name: str) -> Type[KeyStore]:
+def get_keystore(name: str) -> type[KeyStore]:
     return _REGISTRY[name]
 
 
@@ -42,7 +41,7 @@ def load_plugins(directory: str | None = None) -> None:
     # built-in plugins in this package
     pkg = __name__
     for _, modname, _ in pkgutil.iter_modules(__path__):
-        if modname.startswith('_') or modname in {"base"}:
+        if modname.startswith("_") or modname in {"base"}:
             continue
         try:
             importlib.import_module(f"{pkg}.{modname}")
@@ -91,6 +90,8 @@ def failed_plugins() -> list[str]:
 
 __all__ = [
     "KeyStore",
+    "KeyStoreCapability",
+    "supports_capability",
     "register_keystore",
     "list_keystores",
     "get_keystore",

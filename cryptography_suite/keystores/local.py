@@ -1,28 +1,31 @@
 from __future__ import annotations
 
+import datetime as dt
+import hashlib
 import json
 import warnings
-import hashlib
-import datetime as dt
 from pathlib import Path
-from typing import List, Tuple, cast
+from typing import TypeAlias, cast
 
 from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric import ed25519, rsa, ec
+from cryptography.hazmat.primitives.asymmetric import ec, ed25519, rsa
 
-from . import register_keystore
-from ..audit import audit_log
+from .. import config
 from ..asymmetric import rsa_decrypt
 from ..asymmetric.signatures import (
     sign_message,
     sign_message_ecdsa,
     sign_message_rsa,
 )
+from ..audit import audit_log
 from ..errors import StrictKeyPolicyError
 from ..utils import is_encrypted_pem
-from .. import config
+from . import register_keystore
+from .base import KeyStoreCapability
 
-PrivateKey = ed25519.Ed25519PrivateKey | ec.EllipticCurvePrivateKey | rsa.RSAPrivateKey
+PrivateKey: TypeAlias = (
+    ed25519.Ed25519PrivateKey | ec.EllipticCurvePrivateKey | rsa.RSAPrivateKey
+)
 
 
 @register_keystore("local")
@@ -31,12 +34,21 @@ class LocalKeyStore:
 
     name = "local"
     status = "testing"
+    capabilities = frozenset(
+        {
+            KeyStoreCapability.SIGN,
+            KeyStoreCapability.DECRYPT,
+            KeyStoreCapability.UNWRAP,
+            KeyStoreCapability.EXPORT_PRIVATE_KEY,
+            KeyStoreCapability.IMPORT_PRIVATE_KEY,
+        }
+    )
 
     def __init__(self, directory: str = "keys") -> None:
         self.dir = Path(directory)
         self.dir.mkdir(exist_ok=True)
 
-    def list_keys(self) -> List[str]:
+    def list_keys(self) -> list[str]:
         return [p.stem for p in self.dir.glob("*.pem")]
 
     def test_connection(self) -> bool:
@@ -44,7 +56,7 @@ class LocalKeyStore:
 
     def _load_key(
         self, key_id: str, password: str | None = None
-    ) -> Tuple[PrivateKey, str]:
+    ) -> tuple[PrivateKey, str]:
         key_path = self.dir / f"{key_id}.pem"
         if not key_path.exists():
             raise FileNotFoundError(key_path)
@@ -53,7 +65,7 @@ class LocalKeyStore:
             msg = f"Unencrypted private key: {key_path}"
             if policy == "error":
                 raise StrictKeyPolicyError(msg)
-            warnings.warn(msg, UserWarning)
+            warnings.warn(msg, UserWarning, stacklevel=2)
         meta_path = key_path.with_suffix(".json")
         encrypted = False
         if meta_path.exists():
@@ -63,8 +75,12 @@ class LocalKeyStore:
                 encrypted = bool(meta.get("encrypted", False))
                 if "password" in meta:
                     warnings.warn(
-                        f"Ignoring legacy persisted password metadata for key: {key_id}",
+                        (
+                            "Ignoring legacy persisted password metadata for key: "
+                            f"{key_id}"
+                        ),
                         UserWarning,
+                        stacklevel=2,
                     )
             except Exception:
                 algo = None
@@ -77,7 +93,8 @@ class LocalKeyStore:
             pem = f.read()
             try:
                 key = serialization.load_pem_private_key(
-                    pem, password=password.encode() if isinstance(password, str) else None
+                    pem,
+                    password=password.encode() if isinstance(password, str) else None,
                 )
             except TypeError as exc:
                 if "encrypted" in str(exc).lower() and password is None:
@@ -139,7 +156,9 @@ class LocalKeyStore:
         return self.decrypt(key_id, wrapped_key, password=password)
 
     @audit_log
-    def export_key(self, key_id: str, password: str | None = None) -> Tuple[bytes, dict]:
+    def export_key(
+        self, key_id: str, password: str | None = None
+    ) -> tuple[bytes, dict]:
         key_path = self.dir / f"{key_id}.pem"
         raw = key_path.read_bytes()
         _, algo = self._load_key(key_id, password=password)
@@ -175,7 +194,7 @@ class LocalKeyStore:
             if policy == "error":
                 raise StrictKeyPolicyError(msg)
             if policy == "warn":
-                warnings.warn(msg, UserWarning)
+                warnings.warn(msg, UserWarning, stacklevel=2)
             encryption: serialization.KeySerializationEncryption = (
                 serialization.NoEncryption()
             )
@@ -216,7 +235,7 @@ class LocalKeyStore:
                     msg = "Importing unencrypted private key"
                     if policy == "error":
                         raise StrictKeyPolicyError(msg)
-                    warnings.warn(msg, UserWarning)
+                    warnings.warn(msg, UserWarning, stacklevel=2)
             key_path = self.dir / f"{key_id}.pem"
             if key_path.exists():
                 i = 1
@@ -229,7 +248,7 @@ class LocalKeyStore:
                 json.dumps({"type": meta.get("type"), "encrypted": encrypted})
             )
             return key_id
-        name = cast(str, name_or_meta)
+        name = name_or_meta
         key = serialization.load_pem_private_key(
             raw, password=password.encode() if password else None
         )

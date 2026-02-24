@@ -2,16 +2,18 @@ import os
 import sys
 import types
 from pathlib import Path
+from typing import cast
 from unittest.mock import MagicMock
 
 import pytest
 from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric import ed25519, ec, rsa
+from cryptography.hazmat.primitives.asymmetric import ec, ed25519, rsa
 
-from cryptography_suite.keystores import load_plugins, list_keystores, get_keystore
-from cryptography_suite.cli import keystore_cli
-from cryptography_suite.audit import InMemoryAuditLogger, set_audit_logger
 from cryptography_suite.asymmetric import rsa_encrypt
+from cryptography_suite.audit import InMemoryAuditLogger, set_audit_logger
+from cryptography_suite.cli import keystore_cli
+from cryptography_suite.keystores import get_keystore, list_keystores, load_plugins
+from cryptography_suite.keystores.local import LocalKeyStore
 
 
 def test_keystore_loader():
@@ -30,7 +32,7 @@ def test_keystore_cli_list(capsys):
     out = capsys.readouterr().out
     assert "local (testing)" in out
     assert "mock_hsm (testing)" in out
-    assert "aws-kms (production)" in out
+    assert "aws-kms (limited)" in out
 
 
 def test_mock_hsm_audit():
@@ -64,7 +66,8 @@ def test_local_keystore_key_types(tmp_path: Path):
     write(tmp_path / "ec.pem", ec_key)
     write(tmp_path / "rsa.pem", rsa_key)
 
-    ks = get_keystore("local")(directory=str(tmp_path))
+    local_cls = cast(type[LocalKeyStore], get_keystore("local"))
+    ks = local_cls(directory=str(tmp_path))
     assert isinstance(ks.sign("ed", b"msg"), bytes)
     assert isinstance(ks.sign("ec", b"msg"), bytes)
 
@@ -80,6 +83,10 @@ def test_aws_kms_plugin_operations(monkeypatch):
     fake_client.list_keys.return_value = {"Keys": []}
     fake_client.sign.return_value = {"Signature": b"sig"}
     fake_client.decrypt.return_value = {"Plaintext": b"plain"}
+    fake_client.get_public_key.return_value = {
+        "KeySpec": "RSA_2048",
+        "SigningAlgorithms": ["RSASSA_PSS_SHA_256"],
+    }
 
     boto3_mod = types.SimpleNamespace(client=lambda *args, **kwargs: fake_client)
     monkeypatch.setitem(sys.modules, "boto3", boto3_mod)

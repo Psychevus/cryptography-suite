@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-from typing import List
-
-from . import register_keystore
 from ..audit import audit_log
+from . import register_keystore
+from .base import KeyStoreCapability
 
 
 @register_keystore("mock_hsm")
@@ -12,12 +11,21 @@ class MockHSMKeyStore:
 
     name = "mock_hsm"
     status = "testing"
+    capabilities = frozenset(
+        {
+            KeyStoreCapability.SIGN,
+            KeyStoreCapability.DECRYPT,
+            KeyStoreCapability.UNWRAP,
+            KeyStoreCapability.EXPORT_PRIVATE_KEY,
+            KeyStoreCapability.IMPORT_PRIVATE_KEY,
+        }
+    )
 
     def __init__(self) -> None:
         self._keys: dict[str, bytes] = {"test": b"secret"}
         self._meta: dict[str, dict] = {"test": {"type": "raw"}}
 
-    def list_keys(self) -> List[str]:
+    def list_keys(self) -> list[str]:
         return list(self._keys.keys())
 
     def test_connection(self) -> bool:
