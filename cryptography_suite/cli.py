@@ -31,6 +31,7 @@ from .pqc import (
 from .protocols import generate_totp
 from .protocols.key_management import KeyManager
 from .utils import KeyVault
+from .symmetric.kdf import DEFAULT_KDF
 from .zk.bulletproof import (
     BULLETPROOF_AVAILABLE,
 )
@@ -134,6 +135,12 @@ def file_cli(argv: list[str] | None = None) -> None:
         required=True,
         help="Password to derive encryption key",
     )
+    enc_parser.add_argument(
+        "--kdf",
+        choices=["argon2", "scrypt", "pbkdf2"],
+        default=DEFAULT_KDF,
+        help="KDF for key derivation (stored in new-format file headers)",
+    )
 
     dec_parser = subparsers.add_parser("decrypt", help="Decrypt a file")
     dec_parser.add_argument(
@@ -153,6 +160,12 @@ def file_cli(argv: list[str] | None = None) -> None:
         required=True,
         help="Password used during encryption",
     )
+    dec_parser.add_argument(
+        "--kdf",
+        choices=["argon2", "scrypt", "pbkdf2"],
+        default=DEFAULT_KDF,
+        help="Legacy fallback KDF (ignored for new-format files)",
+    )
 
     args = parser.parse_args(argv)
 
@@ -163,7 +176,7 @@ def file_cli(argv: list[str] | None = None) -> None:
         # The underlying crypto/file helpers enforce concrete filesystem semantics.
         _validate_output_parent(args.output_file)
         if args.command == "encrypt":
-            encrypt_file(args.input_file, args.output_file, args.password)
+            encrypt_file(args.input_file, args.output_file, args.password, kdf=args.kdf)
             _emit(
                 f"Encrypted file written to {args.output_file}",
                 {
@@ -173,7 +186,7 @@ def file_cli(argv: list[str] | None = None) -> None:
                 },
             )
         else:
-            decrypt_file(args.input_file, args.output_file, args.password)
+            decrypt_file(args.input_file, args.output_file, args.password, kdf=args.kdf)
             _emit(
                 f"Decrypted file written to {args.output_file}",
                 {
@@ -709,10 +722,12 @@ def main(argv: list[str] | None = None) -> None:
     f_enc.add_argument("--in", dest="input_file", required=True)
     f_enc.add_argument("--out", dest="output_file", required=True)
     f_enc.add_argument("--password", required=True)
+    f_enc.add_argument("--kdf", choices=["argon2", "scrypt", "pbkdf2"], default=DEFAULT_KDF)
     f_dec = file_sub.add_parser("decrypt", help="Decrypt a file")
     f_dec.add_argument("--in", dest="input_file", required=True)
     f_dec.add_argument("--out", dest="output_file", required=True)
     f_dec.add_argument("--password", required=True)
+    f_dec.add_argument("--kdf", choices=["argon2", "scrypt", "pbkdf2"], default=DEFAULT_KDF)
 
     # Backward compatibility aliases
     enc_alias = sub.add_parser(
@@ -723,6 +738,7 @@ def main(argv: list[str] | None = None) -> None:
     enc_alias.add_argument("--in", dest="input_file", required=True)
     enc_alias.add_argument("--out", dest="output_file", required=True)
     enc_alias.add_argument("--password", required=True)
+    enc_alias.add_argument("--kdf", choices=["argon2", "scrypt", "pbkdf2"], default=DEFAULT_KDF)
     dec_alias = sub.add_parser(
         "decrypt",
         help=argparse.SUPPRESS,
@@ -731,6 +747,7 @@ def main(argv: list[str] | None = None) -> None:
     dec_alias.add_argument("--in", dest="input_file", required=True)
     dec_alias.add_argument("--out", dest="output_file", required=True)
     dec_alias.add_argument("--password", required=True)
+    dec_alias.add_argument("--kdf", choices=["argon2", "scrypt", "pbkdf2"], default=DEFAULT_KDF)
 
     args = parser.parse_args(argv)
     if args.json:
@@ -824,6 +841,8 @@ def main(argv: list[str] | None = None) -> None:
             args.output_file,
             "--password",
             args.password,
+            "--kdf",
+            args.kdf,
         ]
         file_cli(argv2)
     elif args.cmd == "backends":

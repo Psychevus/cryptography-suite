@@ -1,0 +1,125 @@
+from __future__ import annotations
+
+from pathlib import Path
+
+import pytest
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+
+from cryptography_suite.constants import NONCE_SIZE, SALT_SIZE
+from cryptography_suite.errors import DecryptionError
+from cryptography_suite.symmetric.aes import (
+    CHUNK_SIZE,
+    FORMAT_MAGIC,
+    FORMAT_VERSION,
+    decrypt_file,
+    encrypt_file,
+)
+from cryptography_suite.symmetric.kdf import select_kdf
+
+
+def test_small_file_roundtrip_and_header(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    vals = [b"\\x11" * SALT_SIZE, b"\\x22" * NONCE_SIZE]
+
+    def fake_urandom(size: int) -> bytes:
+        return vals.pop(0)
+
+    monkeypatch.setattr("cryptography_suite.symmetric.aes.urandom", fake_urandom)
+
+    plain = tmp_path / "plain.txt"
+    enc = tmp_path / "plain.enc"
+    out = tmp_path / "plain.out"
+    plain.write_bytes(b"hello streaming format")
+
+    encrypt_file(str(plain), str(enc), "pw", kdf="scrypt")
+    data = enc.read_bytes()
+
+    assert data[:4] == FORMAT_MAGIC
+    assert data[4] == FORMAT_VERSION
+    assert data[5] == 1  # scrypt id
+
+    decrypt_file(str(enc), str(out), "pw")
+    assert out.read_bytes() == b"hello streaming format"
+
+
+def test_corruption_detected(tmp_path: Path) -> None:
+    plain = tmp_path / "plain.bin"
+    enc = tmp_path / "plain.enc"
+    out = tmp_path / "plain.out"
+    plain.write_bytes(b"A" * 5000)
+
+    encrypt_file(str(plain), str(enc), "pw")
+    tampered = bytearray(enc.read_bytes())
+    tampered[-20] ^= 0xFF
+    enc.write_bytes(bytes(tampered))
+
+    with pytest.raises(DecryptionError, match="Invalid password or corrupted file"):
+        decrypt_file(str(enc), str(out), "pw")
+
+
+def test_wrong_password_detected(tmp_path: Path) -> None:
+    plain = tmp_path / "plain.bin"
+    enc = tmp_path / "plain.enc"
+    out = tmp_path / "plain.out"
+    plain.write_bytes(b"B" * 200)
+
+    encrypt_file(str(plain), str(enc), "pw")
+
+    with pytest.raises(DecryptionError, match="Invalid password or corrupted file"):
+        decrypt_file(str(enc), str(out), "wrong")
+
+
+def test_encrypt_streams_in_chunks(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    plain = tmp_path / "big.bin"
+    enc = tmp_path / "big.enc"
+    plain.write_bytes(b"Z" * (CHUNK_SIZE * 3 + 123))
+
+    read_sizes: list[int] = []
+
+    class ReaderProxy:
+        def __init__(self, wrapped):
+            self._wrapped = wrapped
+
+        def read(self, n: int = -1):
+            read_sizes.append(n)
+            return self._wrapped.read(n)
+
+        def __getattr__(self, item):
+            return getattr(self._wrapped, item)
+
+        def __enter__(self):
+            self._wrapped.__enter__()
+            return self
+
+        def __exit__(self, exc_type, exc, tb):
+            return self._wrapped.__exit__(exc_type, exc, tb)
+
+    import builtins
+
+    real_open = builtins.open
+
+    def wrapped_open(file, mode="r", *args, **kwargs):
+        handle = real_open(file, mode, *args, **kwargs)
+        if str(file) == str(plain) and "rb" in mode:
+            return ReaderProxy(handle)
+        return handle
+
+    monkeypatch.setattr("builtins.open", wrapped_open)
+
+    encrypt_file(str(plain), str(enc), "pw")
+
+    assert read_sizes.count(CHUNK_SIZE) >= 3
+
+
+def test_legacy_format_decrypt_still_supported(tmp_path: Path) -> None:
+    plain = b"legacy bytes"
+    salt = bytes([0x33]) * SALT_SIZE
+    nonce = bytes([0x44]) * NONCE_SIZE
+    key = select_kdf("pw", salt, "scrypt")
+    ciphertext = AESGCM(key).encrypt(nonce, plain, None)
+
+    legacy = tmp_path / "legacy.enc"
+    out = tmp_path / "legacy.out"
+    legacy.write_bytes(salt + nonce + ciphertext)
+
+    decrypt_file(str(legacy), str(out), "pw", kdf="scrypt")
+    assert out.read_bytes() == plain

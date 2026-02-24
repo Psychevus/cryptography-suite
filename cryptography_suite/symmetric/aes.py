@@ -11,9 +11,11 @@ import base64
 import binascii
 import logging
 import os
+import struct
 from os import urandom
 
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from typing import cast
 from ..errors import (
     EncryptionError,
@@ -31,8 +33,13 @@ from .kdf import select_kdf, DEFAULT_KDF
 logger = logging.getLogger(__name__)
 
 # Constants for streaming file encryption
-CHUNK_SIZE = 4096
+CHUNK_SIZE = 64 * 1024
 TAG_SIZE = 16  # AES-GCM authentication tag size
+FORMAT_MAGIC = b"CSF!"
+FORMAT_VERSION = 1
+HEADER_FIXED_SIZE = 12
+_KDF_TO_ID = {"scrypt": 1, "pbkdf2": 2, "argon2": 3}
+_ID_TO_KDF = {v: k for k, v in _KDF_TO_ID.items()}
 
 
 @deprecated("aes_encrypt is deprecated; use the AESGCMEncrypt pipeline module")
@@ -144,8 +151,9 @@ def encrypt_file(
     Argon2 support is missing.
 
     The file is processed in chunks to avoid loading the entire file into
-    memory. The output file begins with the salt and nonce and ends with the
-    authentication tag.
+    memory. The output is a versioned format:
+    magic, version, KDF id, salt/nonce lengths, chunk size, salt, nonce,
+    ciphertext, and trailing authentication tag.
     """
     if not password:
         raise EncryptionError("Password cannot be empty.")
@@ -161,17 +169,33 @@ def encrypt_file(
     nonce = urandom(NONCE_SIZE)
     verbose_print(f"Nonce: {nonce.hex()}")
     verbose_print("Mode: AES-GCM")
-    aesgcm = AESGCM(key)
+    kdf_id = _KDF_TO_ID.get(kdf)
+    if kdf_id is None:
+        raise EncryptionError("Unsupported KDF specified.")
 
     try:
         with open(input_file_path, "rb") as f_in, open(output_file_path, "wb") as f_out:
-            data = f_in.read()
-            ct = aesgcm.encrypt(nonce, data, None)
+            header = (
+                FORMAT_MAGIC
+                + bytes([FORMAT_VERSION, kdf_id, len(salt), len(nonce)])
+                + struct.pack(">I", CHUNK_SIZE)
+                + salt
+                + nonce
+            )
+            f_out.write(header)
+
+            encryptor = Cipher(algorithms.AES(key), modes.GCM(nonce)).encryptor()
+            while True:
+                chunk = f_in.read(CHUNK_SIZE)
+                if not chunk:
+                    break
+                f_out.write(encryptor.update(chunk))
+            f_out.write(encryptor.finalize())
+            f_out.write(encryptor.tag)
             if VERBOSE:
                 if logger.level > logging.DEBUG:
                     raise RuntimeError("Verbose mode requires DEBUG level")
-                logger.debug("ciphertext=%s", binascii.hexlify(ct)[:32])
-            f_out.write(salt + nonce + ct)
+                logger.debug("tag=%s", binascii.hexlify(encryptor.tag))
     except Exception as exc:
         # Remove potentially partial output on error
         if os.path.exists(output_file_path):
@@ -192,10 +216,13 @@ def decrypt_file(
     Argon2 support is missing.
 
     Data is streamed in chunks, verifying the authentication tag at the end.
-    The output file is removed if decryption fails.
+    Supports both the current versioned format and the legacy
+    ``salt || nonce || ciphertext_and_tag`` format.
     """
     if not password:
         raise EncryptionError("Password cannot be empty.")
+    if kdf not in _KDF_TO_ID:
+        raise DecryptionError("Unsupported KDF specified.")
 
     try:
         file_size = os.path.getsize(encrypted_file_path)
@@ -203,12 +230,39 @@ def decrypt_file(
             if file_size < SALT_SIZE + NONCE_SIZE + TAG_SIZE:
                 raise DecryptionError("Invalid encrypted file.")
 
-            salt = f_in.read(SALT_SIZE)
-            nonce = f_in.read(NONCE_SIZE)
-            ciphertext_len = file_size - SALT_SIZE - NONCE_SIZE - TAG_SIZE
+            magic = f_in.read(len(FORMAT_MAGIC))
+            is_versioned = magic == FORMAT_MAGIC
+
+            if is_versioned:
+                rest = f_in.read(HEADER_FIXED_SIZE - len(FORMAT_MAGIC))
+                if len(rest) != HEADER_FIXED_SIZE - len(FORMAT_MAGIC):
+                    raise DecryptionError("Invalid encrypted file.")
+                version, kdf_id, salt_len, nonce_len, chunk_size = struct.unpack(">BBBBI", rest
+                )
+                if version != FORMAT_VERSION:
+                    raise DecryptionError("Unsupported encrypted file version.")
+                format_kdf = _ID_TO_KDF.get(kdf_id)
+                if format_kdf is None:
+                    raise DecryptionError("Invalid encrypted file.")
+                salt = f_in.read(salt_len)
+                nonce = f_in.read(nonce_len)
+                if len(salt) != salt_len or len(nonce) != nonce_len:
+                    raise DecryptionError("Invalid encrypted file.")
+                stream_chunk_size = max(1024, chunk_size)
+            else:
+                f_in.seek(0)
+                salt = f_in.read(SALT_SIZE)
+                nonce = f_in.read(NONCE_SIZE)
+                format_kdf = kdf
+                stream_chunk_size = CHUNK_SIZE
+
+            ciphertext_start = f_in.tell()
+            ciphertext_len = file_size - ciphertext_start - TAG_SIZE
+            if ciphertext_len < 0:
+                raise DecryptionError("Invalid encrypted file.")
 
             try:
-                key = select_kdf(password, salt, kdf)
+                key = select_kdf(password, salt, format_kdf)
             except KeyDerivationError as exc:
                 raise DecryptionError(str(exc)) from exc
 
@@ -216,13 +270,22 @@ def decrypt_file(
             verbose_print(f"Nonce: {nonce.hex()}")
             verbose_print("Mode: AES-GCM")
 
-            aesgcm = AESGCM(key)
-
             try:
                 with open(output_file_path, "wb") as f_out:
-                    ciphertext = f_in.read(ciphertext_len + TAG_SIZE)
-                    data = aesgcm.decrypt(nonce, ciphertext, None)
-                    f_out.write(data)
+                    decryptor = Cipher(algorithms.AES(key), modes.GCM(nonce)).decryptor()
+                    remaining = ciphertext_len
+                    while remaining > 0:
+                        read_len = min(stream_chunk_size, remaining)
+                        chunk = f_in.read(read_len)
+                        if not chunk:
+                            raise DecryptionError("Invalid encrypted file.")
+                        remaining -= len(chunk)
+                        f_out.write(decryptor.update(chunk))
+
+                    tag = f_in.read(TAG_SIZE)
+                    if len(tag) != TAG_SIZE:
+                        raise DecryptionError("Invalid encrypted file.")
+                    f_out.write(decryptor.finalize_with_tag(tag))
             except Exception as exc:  # pragma: no cover - high-level error handling
                 if os.path.exists(output_file_path):
                     os.remove(output_file_path)
