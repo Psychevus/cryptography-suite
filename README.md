@@ -832,22 +832,31 @@ attestation and `cosign` signatures.
 1. Verify the wheel's signature:
 
    ```bash
-   cosign verify --certificate-identity "https://github.com/Psychevus/cryptography-suite/.github/workflows/release.yml@refs/tags/v3.0.0" <wheel>.sig <wheel>
+   export CERT_IDENTITY="https://github.com/Psychevus/cryptography-suite/.github/workflows/release.yml@refs/tags/v3.0.0"
+   export CERT_ISSUER="https://token.actions.githubusercontent.com"
+   cosign verify-blob \
+     --certificate-identity "$CERT_IDENTITY" \
+     --certificate-oidc-issuer "$CERT_ISSUER" \
+     --signature dist/<wheel>.sig \
+     --certificate dist/<wheel>.cert \
+     dist/<wheel>
    ```
 
-1. Validate the checksums:
+1. Verify the source distribution, SBOM, and provenance signatures:
 
    ```bash
-   sha256sum -c checksums.txt
+   cosign verify-blob --certificate-identity "$CERT_IDENTITY" --certificate-oidc-issuer "$CERT_ISSUER" --signature dist/<sdist>.sig --certificate dist/<sdist>.cert dist/<sdist>
+   cosign verify-blob --certificate-identity "$CERT_IDENTITY" --certificate-oidc-issuer "$CERT_ISSUER" --signature dist/sbom.json.sig --certificate dist/sbom.json.cert dist/sbom.json
+   cosign verify-blob --certificate-identity "$CERT_IDENTITY" --certificate-oidc-issuer "$CERT_ISSUER" --signature dist/provenance.intoto.jsonl.sig --certificate dist/provenance.intoto.jsonl.cert dist/provenance.intoto.jsonl
    ```
 
 1. Inspect the SLSA provenance:
 
    ```bash
-   jq '.subject | .name' provenance.intoto.jsonl
+   jq -r '.payload' dist/provenance.intoto.jsonl | base64 -d | jq '.statement.subject[] | .name'
    ```
 
-The SBOM (`sbom.json`) can be inspected via `cyclonedx-bom` or `pip sbom`.
+The SBOM (`dist/sbom.json`) can be inspected via `cyclonedx-bom` or `pip sbom`.
 Reproducibility is tested in CI via `reproducibility.yml`. See
 [release process documentation](docs/release_process.md) for details on
 verifying artifacts and SBOM contents.
