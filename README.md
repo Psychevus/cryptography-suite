@@ -5,7 +5,7 @@
 [![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-informational)](<>)
 [![Version](https://img.shields.io/badge/version-3.0.0-blue)](https://github.com/Psychevus/cryptography-suite/releases/tag/v3.0.0)
 [![PyPI Version](https://img.shields.io/pypi/v/cryptography-suite)](https://pypi.org/project/cryptography-suite/)
-[![Build Status](https://github.com/Psychevus/cryptography-suite/actions/workflows/python-app.yml/badge.svg)](https://github.com/Psychevus/cryptography-suite/actions)
+[![Build Status](https://github.com/Psychevus/cryptography-suite/actions/workflows/quality-gate.yml/badge.svg)](https://github.com/Psychevus/cryptography-suite/actions)
 [![Coverage](https://img.shields.io/badge/Coverage-99%25-brightgreen)](docs/testing.md)
 [![Provenance](https://img.shields.io/badge/provenance-signed-blue)](docs/release_process.md)
 [![Signed Releases](https://img.shields.io/badge/releases-signed-brightgreen)](docs/release_process.md)
@@ -978,11 +978,13 @@ pytest
 ### Run in CI
 
 ```bash
+ruff format --check .
 black --check .
-isort --check-only .
-flake8
-mypy cryptography_suite
-pytest
+ruff check .
+mypy --follow-imports=skip --ignore-missing-imports cryptography_suite
+bandit -q -r cryptography_suite -x tests,docs,examples -s B101,B110,B301,B311,B403,B404,B413,B603,B701
+pip-audit -r requirements.txt --strict
+pytest --cov=cryptography_suite --cov-branch --cov-fail-under=95
 ```
 
 ### Run in production

@@ -1,31 +1,36 @@
 # Release Process
 
-This project enforces a SemVer-based release workflow with reproducible builds.
+This project uses a SemVer release workflow with reproducible builds.
 
 ## Versioning policy
 
 - We follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-- Tags **must** use the form `vMAJOR.MINOR.PATCH`.
-- `CHANGELOG.md` is maintained using Keep a Changelog format.
+- Tags must use `vMAJOR.MINOR.PATCH`.
+- `CHANGELOG.md` follows Keep a Changelog conventions.
 
 ## Automated release pipeline
 
-`Release` workflow (`.github/workflows/release.yml`) is triggered only by SemVer tags.
+`Release` workflow (`.github/workflows/release.yml`) is triggered by SemVer tags only.
 
 1. Validate tag format (`vX.Y.Z`).
-2. Verify `CHANGELOG.md` includes a matching version header.
-3. Re-run quality gate checks: formatter and lint checks on Python files changed since the previous tag, plus repository-wide security, dependency audit, and tests with branch coverage.
-4. Install pinned release dependencies from `requirements-release.txt`.
-5. Build reproducible wheel/sdist artifacts.
-6. Generate SBOM.
-7. Validate release artifacts (`tools/release_lint.py`).
-8. Publish to PyPI.
-9. Create GitHub Release and attach artifacts.
-
-Release notes are generated directly from the matching changelog section.
+2. Verify `CHANGELOG.md` has a matching version header.
+3. Install pinned dev dependencies from `requirements-dev.txt`.
+4. Run quality checks equivalent to CI gates:
+   - `ruff format --check` (changed Python files)
+   - `black --check` (changed Python files)
+   - `ruff check` (changed Python files)
+   - `mypy` (changed Python files)
+   - `bandit` repository scan
+   - `pip-audit -r requirements.txt --strict`
+   - `pytest --cov=cryptography_suite --cov-branch --cov-fail-under=95`
+5. Install pinned release dependencies from `requirements-release.txt`.
+6. Build deterministic wheel/sdist artifacts (`tools/reproducible_build.py`).
+7. Generate SBOM (`tools/generate_sbom.py`).
+8. Validate artifacts (`tools/release_lint.py`).
+9. Publish to PyPI and create a GitHub Release.
 
 ## Reproducibility requirements
 
-- CI tooling for checks is pinned in `requirements-dev.txt`.
+- CI tooling is pinned in `requirements-dev.txt`.
 - Release build tooling is pinned in `requirements-release.txt`.
-- Build job runs from a clean environment and generates deterministic artifacts.
+- Reproducibility is verified in `.github/workflows/reproducibility.yml`.
