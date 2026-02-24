@@ -11,6 +11,7 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ed25519, rsa, ec
 
 from . import register_keystore
+from .base import KeyStoreCapability
 from ..audit import audit_log
 from ..asymmetric import rsa_decrypt
 from ..asymmetric.signatures import (
@@ -31,6 +32,13 @@ class LocalKeyStore:
 
     name = "local"
     status = "testing"
+    capabilities = frozenset({
+        KeyStoreCapability.SIGN,
+        KeyStoreCapability.DECRYPT,
+        KeyStoreCapability.UNWRAP,
+        KeyStoreCapability.EXPORT_PRIVATE_KEY,
+        KeyStoreCapability.IMPORT_PRIVATE_KEY,
+    })
 
     def __init__(self, directory: str = "keys") -> None:
         self.dir = Path(directory)

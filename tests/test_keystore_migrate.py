@@ -1,14 +1,12 @@
 import sys
 import types
 from pathlib import Path
-from unittest.mock import MagicMock
 
 import pytest
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ed25519
 
 from cryptography_suite.keystores import get_keystore, load_plugins
-from cryptography_suite.errors import UnsupportedAlgorithm
 
 
 def test_roundtrip_local_mock(tmp_path: Path):
@@ -36,15 +34,14 @@ def test_roundtrip_local_mock(tmp_path: Path):
     assert meta["type"] == meta3["type"]
 
 
-def test_aws_kms_import(monkeypatch):
+def test_aws_kms_import_is_not_supported(monkeypatch):
     load_plugins()
-    fake_client = types.SimpleNamespace(import_key=MagicMock())
+    fake_client = types.SimpleNamespace()
     boto3_mod = types.SimpleNamespace(client=lambda *a, **k: fake_client)
     monkeypatch.setitem(sys.modules, "boto3", boto3_mod)
+
     from cryptography_suite.keystores.aws_kms import AWSKMSKeyStore
 
     ks = AWSKMSKeyStore()
-    ks.import_key(b"raw", {"type": "rsa", "id": "kid"})
-    fake_client.import_key.assert_called_once()
-    with pytest.raises(UnsupportedAlgorithm):
-        ks.import_key(b"raw", {"type": "unknown"})
+    with pytest.raises(NotImplementedError, match="raw private key import"):
+        ks.import_key(b"raw", {"type": "rsa", "id": "kid"})

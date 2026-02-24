@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import List
 
 from . import register_keystore
+from .base import KeyStoreCapability
 from ..audit import audit_log
 
 
@@ -12,6 +13,13 @@ class MockHSMKeyStore:
 
     name = "mock_hsm"
     status = "testing"
+    capabilities = frozenset({
+        KeyStoreCapability.SIGN,
+        KeyStoreCapability.DECRYPT,
+        KeyStoreCapability.UNWRAP,
+        KeyStoreCapability.EXPORT_PRIVATE_KEY,
+        KeyStoreCapability.IMPORT_PRIVATE_KEY,
+    })
 
     def __init__(self) -> None:
         self._keys: dict[str, bytes] = {"test": b"secret"}

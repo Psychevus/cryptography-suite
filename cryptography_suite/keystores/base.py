@@ -1,6 +1,17 @@
 from __future__ import annotations
 
-from typing import Any, Dict, Protocol, Tuple, runtime_checkable
+from enum import Enum
+from typing import Any, Dict, FrozenSet, Protocol, Tuple, runtime_checkable
+
+
+class KeyStoreCapability(str, Enum):
+    """Capabilities that a keystore backend may expose."""
+
+    SIGN = "sign"
+    DECRYPT = "decrypt"
+    UNWRAP = "unwrap"
+    EXPORT_PRIVATE_KEY = "export_private_key"
+    IMPORT_PRIVATE_KEY = "import_private_key"
 
 
 @runtime_checkable
@@ -9,6 +20,7 @@ class KeyStore(Protocol):
 
     name: str
     status: str
+    capabilities: FrozenSet[KeyStoreCapability]
 
     def list_keys(self) -> list[str]:
         """Return available key identifiers."""
@@ -30,3 +42,9 @@ class KeyStore(Protocol):
 
     def import_key(self, raw: bytes, meta: Dict[str, Any]) -> str:
         """Import ``raw`` with ``meta`` and return the new key identifier."""
+
+
+def supports_capability(keystore: KeyStore, capability: KeyStoreCapability) -> bool:
+    """Return ``True`` when the backend advertises ``capability``."""
+
+    return capability in getattr(keystore, "capabilities", frozenset())

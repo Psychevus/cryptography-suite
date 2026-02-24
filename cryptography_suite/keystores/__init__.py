@@ -9,7 +9,7 @@ import pathlib
 from importlib import metadata
 from typing import Dict, Type
 
-from .base import KeyStore
+from .base import KeyStore, KeyStoreCapability, supports_capability
 
 _REGISTRY: Dict[str, Type[KeyStore]] = {}
 _FAILED_PLUGINS: list[str] = []
@@ -91,6 +91,8 @@ def failed_plugins() -> list[str]:
 
 __all__ = [
     "KeyStore",
+    "KeyStoreCapability",
+    "supports_capability",
     "register_keystore",
     "list_keystores",
     "get_keystore",

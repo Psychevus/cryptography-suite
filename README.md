@@ -260,10 +260,12 @@ cryptography-suite export examples/formal/pipeline.yaml --format proverif
 
 ```bash
 cryptography-suite keystore migrate --from local --to mock_hsm --dry-run
+# Note: aws-kms does not support raw private-key import/export migration in this CLI.
 ```
 
-Omit `--key` to stream all keys. Only `local` → `aws-kms` and `local` ↔ `mock_hsm`
-are supported. Migrating between different algorithms is not supported.
+Omit `--key` to stream all keys. Migration is allowed only when both backends
+advertise raw private-key export/import support (for example `local` ↔ `mock_hsm`).
+Migrating between different algorithms is not supported.
 
 ### Fuzzing
 

@@ -26,6 +26,7 @@ except Exception:  # pragma: no cover - dependency missing
     pkcs11 = None  # type: ignore
 
 from . import register_keystore
+from .base import KeyStoreCapability
 from ..audit import audit_log
 
 
@@ -42,6 +43,11 @@ class PKCS11KeyStore:
 
     name = "pkcs11"
     status = "production"
+    capabilities = frozenset({
+        KeyStoreCapability.SIGN,
+        KeyStoreCapability.DECRYPT,
+        KeyStoreCapability.UNWRAP,
+    })
 
     def __init__(self,
                  library_path: str | None = None,
