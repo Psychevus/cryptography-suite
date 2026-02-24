@@ -5,17 +5,13 @@ from __future__ import annotations
 from . import __version__
 
 import argparse
+import hashlib
 import subprocess
 import sys
 from .errors import MissingDependencyError, DecryptionError
 from .protocols import generate_totp
 from typing import cast
-from .hashing import (
-    sha3_256_hash,
-    sha3_512_hash,
-    blake2b_hash,
-    blake3_hash,
-)
+from blake3 import blake3
 from .pqc import (
     generate_kyber_keypair,
     generate_dilithium_keypair,
@@ -191,17 +187,20 @@ def hash_cli(argv: list[str] | None = None) -> None:
     )
     args = parser.parse_args(argv)
 
-    with open(args.file, "rb") as f:
-        data = f.read().decode("utf-8", errors="ignore")
-
     if args.algorithm == "sha3-256":
-        digest = sha3_256_hash(data)
+        hasher = hashlib.sha3_256()
     elif args.algorithm == "sha3-512":
-        digest = sha3_512_hash(data)
+        hasher = hashlib.sha3_512()
     elif args.algorithm == "blake2b":
-        digest = blake2b_hash(data)
+        hasher = hashlib.blake2b()
     else:
-        digest = blake3_hash(data)
+        hasher = blake3()
+
+    with open(args.file, "rb") as file_handle:
+        while chunk := file_handle.read(8192):
+            hasher.update(chunk)
+
+    digest = hasher.hexdigest()
 
     print(digest)
 

@@ -1,4 +1,9 @@
 import importlib
+import hashlib
+
+import pytest
+from blake3 import blake3
+
 import cryptography_suite.cli as cli
 
 
@@ -38,9 +43,28 @@ def test_main_hash(tmp_path, capsys):
     file.write_text("hello")
     cli.main(["hash", str(file), "--algorithm", "blake3"])
     out = capsys.readouterr().out.strip()
-    from cryptography_suite.hashing import blake3_hash
+    assert out == blake3(b"hello").hexdigest()
 
-    assert out == blake3_hash("hello")
+
+@pytest.mark.parametrize(
+    ("algorithm", "expected"),
+    [
+        ("sha3-256", lambda payload: hashlib.sha3_256(payload).hexdigest()),
+        ("sha3-512", lambda payload: hashlib.sha3_512(payload).hexdigest()),
+        ("blake2b", lambda payload: hashlib.blake2b(payload).hexdigest()),
+        ("blake3", lambda payload: blake3(payload).hexdigest()),
+    ],
+)
+def test_main_hash_binary_input(tmp_path, capsys, algorithm, expected):
+    cli = reload_cli()
+    payload = b"\x00\x01\xffhello\x00world\x10"
+    file = tmp_path / "binary.dat"
+    file.write_bytes(payload)
+
+    cli.main(["hash", str(file), "--algorithm", algorithm])
+    out = capsys.readouterr().out.strip()
+
+    assert out == expected(payload)
 
 
 def test_main_otp(monkeypatch, capsys):
