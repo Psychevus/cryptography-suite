@@ -1,37 +1,37 @@
 # Testing Guide
 
-This guide explains how to run the project's tests locally and how they map to the continuous integration (CI) matrix.
+This guide explains how to run tests locally and how local checks map to CI workflows.
 
 ## Quick start
 
 ```bash
-pip install -e .[dev,fuzz]
+pip install -e .[dev]
+python -m pip install atheris
+pytest
 pytest -m property
-python -m atheris fuzz/fuzz_aes.py
+python fuzz/fuzz_aes.py -runs=1000
 ```
 
-The commands above install the development and fuzzing dependencies, execute property-based tests, and run a sample Atheris fuzz harness.
+The commands above install development dependencies, add Atheris for fuzzing harnesses, run the main test suite, execute property-based tests, and run a sample fuzz target.
 
-## Extending the fuzz harness
+## Extending fuzz harnesses
 
-1. **Create a new harness** in the `fuzz/` directory, using `fuzz/fuzz_aes.py` as a template.
-2. **Import the target functions** and set up `atheris.instrument_all()` to cover relevant inputs.
-3. **Register the entry point** via `atheris.Setup` and call `atheris.Fuzz()`.
-4. Optionally, update `.github/workflows/fuzz.yml` to schedule the harness in CI.
+1. Create a new harness in `fuzz/` (use `fuzz/fuzz_aes.py` as a template).
+2. Import target functions and instrument inputs with Atheris.
+3. Register the entry point via `atheris.Setup` and call `atheris.Fuzz()`.
+4. Update `.github/workflows/fuzz.yml` if the harness should run in CI.
 
-## CI matrix overview
+## CI workflow mapping
 
-| Job | Python versions | Operating systems | Purpose |
+| Workflow | File | Trigger | Purpose |
 | --- | --- | --- | --- |
-| `lint` | 3.10, 3.11 | Ubuntu, macOS, Windows | Static analysis (flake8, mypy, pylint, bandit, vulture) |
-| `tests` | 3.10–3.12 | Ubuntu, macOS, Windows | Unit tests with coverage |
-| `tests-extras` | 3.11 | Ubuntu | Tests with optional dependencies |
-| `pkcs11-tests` | 3.11 | Ubuntu | SoftHSM-backed PKCS#11 tests |
-| `fuzz` | 3.11, 3.12 | Ubuntu | Weekly Atheris fuzzing |
-
+| Quality Gate | `.github/workflows/quality-gate.yml` | push/PR to `main` | `ruff format --check`, `black --check`, `ruff check`, `mypy`, `bandit`, `pip-audit`, pytest with branch coverage gate, docs-drift script |
+| Build | `.github/workflows/build.yml` | push to `main`, PR | wheel builds + `pip-audit` + `trivy` filesystem scan |
+| Fuzzing | `.github/workflows/fuzz.yml` | weekly schedule + manual dispatch | Atheris fuzz run (`fuzz/fuzz_aes.py`) on Python 3.11/3.12 |
+| Release | `.github/workflows/release.yml` | SemVer tags | release validation + quality checks + publish |
 
 ## Operational reliability artifacts
 
 - Test plan matrix: `docs/testing_plan_matrix.md`
 - Contributor playbook: `docs/testing_playbook.md`
-- Coverage thresholds script: `tools/check_coverage_thresholds.py`
+- Coverage threshold helper: `tools/check_coverage_thresholds.py`
