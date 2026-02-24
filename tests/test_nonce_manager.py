@@ -62,3 +62,13 @@ def test_nonce_manager_rejects_bad_length() -> None:
     nm = NonceManager()
     with pytest.raises(ValueError):
         nm.remember(b"short")
+
+
+def test_nonce_manager_start_value_is_encoded_big_endian() -> None:
+    nm = NonceManager(start=255, limit=300)
+    assert nm.next() == (255).to_bytes(12, "big")
+
+
+def test_nonce_manager_limit_must_exceed_start() -> None:
+    with pytest.raises(ValueError):
+        NonceManager(start=9, limit=8)
