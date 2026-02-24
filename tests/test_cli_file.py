@@ -5,6 +5,7 @@ error handling edge cases for invalid arguments or underlying failures.
 """
 
 import importlib
+
 import pytest
 
 import cryptography_suite.cli as cli
@@ -56,7 +57,7 @@ def test_file_cli_error(monkeypatch, capsys):
     cli = reload_cli()
 
     def bad(*_args):
-        raise IOError("bad")
+        raise OSError("bad")
 
     monkeypatch.setattr(symmetric, "encrypt_file", bad)
     cli.file_cli(["encrypt", "--in", "a", "--out", "b", "--password", "pw"])

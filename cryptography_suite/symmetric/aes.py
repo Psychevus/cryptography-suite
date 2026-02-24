@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 """AES helpers built on :mod:`pyca/cryptography`.
 
 ``AESGCM`` from ``pyca/cryptography`` is the authoritative backend for AES
@@ -7,28 +5,29 @@ operations in this project. Other AES libraries (e.g. PyCryptodome) should not
 be used in production code.
 """
 
+from __future__ import annotations
+
 import base64
 import binascii
 import logging
 import os
 import struct
 from os import urandom
-
-from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from typing import cast
-from ..errors import (
-    EncryptionError,
-    DecryptionError,
-    MissingDependencyError,
-    KeyDerivationError,
-)
-from ..utils import deprecated
-from ..debug import VERBOSE, verbose_print
+
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 from ..constants import NONCE_SIZE, SALT_SIZE
-from .kdf import select_kdf, DEFAULT_KDF
-
+from ..debug import VERBOSE, verbose_print
+from ..errors import (
+    DecryptionError,
+    EncryptionError,
+    KeyDerivationError,
+    MissingDependencyError,
+)
+from ..utils import deprecated
+from .kdf import DEFAULT_KDF, select_kdf
 
 logger = logging.getLogger(__name__)
 
@@ -135,7 +134,7 @@ def aes_decrypt(
         plaintext = aesgcm.decrypt(nonce, ciphertext, None)
         return plaintext.decode()
     except Exception as exc:  # pragma: no cover - high-level error handling
-        raise DecryptionError(f"Decryption failed: {exc}")
+        raise DecryptionError(f"Decryption failed: {exc}") from exc
 
 
 def encrypt_file(
@@ -200,7 +199,7 @@ def encrypt_file(
         # Remove potentially partial output on error
         if os.path.exists(output_file_path):
             os.remove(output_file_path)
-        raise IOError(f"File encryption failed: {exc}")
+        raise OSError(f"File encryption failed: {exc}") from exc
 
 
 def decrypt_file(
@@ -298,7 +297,7 @@ def decrypt_file(
     except DecryptionError:
         raise
     except Exception as exc:
-        raise IOError(f"Failed to read encrypted file: {exc}") from exc
+        raise OSError(f"Failed to read encrypted file: {exc}") from exc
 
 
 async def encrypt_file_async(
@@ -351,7 +350,7 @@ async def encrypt_file_async(
     except Exception as exc:  # pragma: no cover - high-level error handling
         if os.path.exists(output_file_path):
             os.remove(output_file_path)
-        raise IOError(f"File encryption failed: {exc}")
+        raise OSError(f"File encryption failed: {exc}") from exc
 
 
 async def decrypt_file_async(
@@ -360,7 +359,10 @@ async def decrypt_file_async(
     password: str,
     kdf: str = DEFAULT_KDF,
 ) -> None:
-    """Asynchronously decrypt a file encrypted with AES-GCM using a password-derived key."""
+    """Asynchronously decrypt a file encrypted with AES-GCM.
+
+    Uses a password-derived key.
+    """
 
     if not password:
         raise EncryptionError("Password cannot be empty.")
@@ -407,7 +409,7 @@ async def decrypt_file_async(
     except DecryptionError:
         raise
     except Exception as exc:
-        raise IOError(f"Failed to read encrypted file: {exc}") from exc
+        raise OSError(f"Failed to read encrypted file: {exc}") from exc
 
 
 # Convenience wrappers -------------------------------------------------------
