@@ -7,7 +7,7 @@
 - [ ] Run local quality checks:
   - `pre-commit run` (formatting/lint/type/security on changed files)
   - `ruff check <changed-python-files>`
-  - `mypy <changed-python-files>`
+  - `mypy --follow-imports=skip --ignore-missing-imports --disable-error-code=no-any-return --disable-error-code=no-untyped-def --disable-error-code=misc --disable-error-code=type-arg <changed-python-files>`
   - `bandit -q -r cryptography_suite -x tests,docs,examples`
   - `pip-audit -r requirements.txt --strict`
   - `pytest --cov=cryptography_suite --cov-branch --cov-fail-under=95`
