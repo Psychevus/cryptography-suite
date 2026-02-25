@@ -75,7 +75,10 @@ jobs:
         run: pip-audit -r requirements.txt --strict
 
       - name: Tests with branch coverage gate
-        run: pytest --cov=cryptography_suite --cov-branch --cov-report=xml --cov-report=term-missing --cov-fail-under=95
+        run: |
+          # v4 baseline is 95%; plan is to move to 100% after remaining
+          # deterministic edge-path tests are added for long-tail modules.
+          pytest --cov=cryptography_suite --cov-branch --cov-report=xml --cov-report=term-missing --cov-fail-under=95
 
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
