@@ -1,27 +1,22 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
-from importlib.util import find_spec
 
-_HAS_WIDGETS = find_spec("ipywidgets") is not None
-_HAS_NETWORKX = find_spec("networkx") is not None
-_HAS_IPYTHON = find_spec("IPython.display") is not None
-
-if _HAS_WIDGETS and _HAS_NETWORKX and _HAS_IPYTHON:
+try:
     import networkx as nx
     from IPython.display import display
     from ipywidgets import HTML, Output, VBox
     from networkx.readwrite import json_graph
-else:
 
-    class _BaseWidget:
+    _HAS_VIZ_DEPS = True
+except Exception:  # pragma: no cover - optional visualization dependencies
+    _HAS_VIZ_DEPS = False
+
+    class HTML:  # type: ignore[no-redef]
         def __init__(self, value: str = "") -> None:
             self.value = value
 
-    class HTML(_BaseWidget):
-        pass
-
-    class Output:
+    class Output:  # type: ignore[no-redef]
         def clear_output(self) -> None:
             return None
 
@@ -31,9 +26,35 @@ else:
         def __exit__(self, exc_type: object, exc: object, tb: object) -> None:
             return None
 
-    class VBox:
+    class VBox:  # type: ignore[no-redef]
         def __init__(self, children: list[object] | None = None) -> None:
             self.children = children or []
+
+    class _FallbackDiGraph:
+        def __init__(self) -> None:
+            self._edges: list[tuple[str, str]] = []
+
+        def add_edges_from(self, edges: Iterable[tuple[str, str]]) -> None:
+            self._edges.extend(edges)
+
+        @property
+        def nodes(self) -> list[str]:
+            nodes: set[str] = set()
+            for src, dst in self._edges:
+                nodes.add(src)
+                nodes.add(dst)
+            return sorted(nodes)
+
+    class _FallbackNX:
+        DiGraph = _FallbackDiGraph
+
+    class _FallbackJSONGraph:
+        @staticmethod
+        def tree_data(graph: _FallbackDiGraph, root: str) -> dict[str, object]:
+            return {"root": root, "nodes": graph.nodes, "edges": graph._edges}
+
+    nx = _FallbackNX()
+    json_graph = _FallbackJSONGraph()
 
     def display(_obj: object) -> None:
         return None
@@ -70,20 +91,13 @@ class KeyGraphWidget(VBox):
         self._render()
 
     def _render(self) -> None:
-        if _HAS_NETWORKX and _HAS_WIDGETS and _HAS_IPYTHON:
-            graph = nx.DiGraph()
-            graph.add_edges_from(self._edges)
-            data = (
-                json_graph.tree_data(graph, root=list(graph.nodes)[0])
-                if graph.nodes
-                else {}
-            )
-        else:
-            nodes: set[str] = set()
-            for src, dst in self._edges:
-                nodes.add(src)
-                nodes.add(dst)
-            data = {"nodes": sorted(nodes), "edges": list(self._edges)}
+        graph = nx.DiGraph()
+        graph.add_edges_from(self._edges)
+        data = (
+            json_graph.tree_data(graph, root=list(graph.nodes)[0])
+            if graph.nodes
+            else {}
+        )
 
         with self.output:
             self.output.clear_output()
