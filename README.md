@@ -130,8 +130,8 @@ ______________________________________________________________________
 Version 3.0.0 ushers in a modular design centered on formal verification and
 pipeline-driven workflows. Major enhancements include:
 
-- **Backend-Agnostic Core** – switch effortlessly between cryptographic
-  libraries or hardware modules.
+- **Backend Registry Foundation** – backend selection APIs are available for
+  future pluggable engine support.
 - **Declarative Pipeline DSL** for composing verifiable workflows.
 - **Misuse-Resistant Type System** via a dedicated mypy plugin.
 - **Zeroization Tools & Constant-Time Operations** – `KeyVault` and
@@ -166,8 +166,10 @@ with use_backend("pyca"):
     print(list_modules())  # ['AESGCMDecrypt', 'AESGCMEncrypt']
 ```
 
-Backend selection is context-local: each thread or async task maintains its
-own active backend when using :func:`use_backend` as a context manager.
+Backend selection is context-local in the registry layer: each thread or async
+task maintains its own active backend when using :func:`use_backend` as a
+context manager. Pipeline AES modules currently do not dispatch through that
+registry and ignore ``backend=...`` (with a runtime warning).
 
 *Contributors*: new pipeline modules can be exposed with the
 `@register_module` decorator in `cryptography_suite.pipeline`.
@@ -929,8 +931,9 @@ ______________________________________________________________________
 
 Version 3.0.0 introduces several breaking changes. To upgrade from 2.x:
 
-- **Backend Selection Required** via `use_backend`; the library emits a
-  runtime warning if no backend is explicitly selected.
+- **Backend Selection Is Experimental**: `use_backend` currently scopes backend
+  state in the registry layer only; pipeline AES modules do not yet dispatch
+  through selected backends.
 - **Pipeline API** replaces chained helper calls.
 - **KeyManager Interfaces Updated** for persistent key handling.
 - **Deprecated Helpers Removed** in favor of pipeline stages.

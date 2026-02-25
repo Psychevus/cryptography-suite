@@ -1,4 +1,5 @@
 import importlib
+
 import pytest
 
 import cryptography_suite.crypto_backends as backends
@@ -43,7 +44,7 @@ def test_select_backend_with_instance():
     backends.use_backend("pyca")
 
 
-def test_pipeline_backend_override():
+def test_pipeline_backend_override_is_noop_with_warning():
     class Dummy:
         pass
 
@@ -51,6 +52,25 @@ def test_pipeline_backend_override():
     backends.use_backend("pyca")
     from cryptography_suite.pipeline import AESGCMEncrypt
 
-    AESGCMEncrypt(password="pw", backend="dummy").run("hi")
-    # original backend restored
+    with pytest.warns(RuntimeWarning, match="no-op"):
+        AESGCMEncrypt(password="pw", backend="dummy").run("hi")
+
+    # selecting backend in the module constructor has no side effects
+    assert isinstance(backends.get_backend(), pyca_backend.PyCABackend)
+
+
+def test_pipeline_backend_override_is_noop_for_decrypt_with_warning():
+    class Dummy:
+        pass
+
+    backends.register_backend("dummy_dec")(Dummy)
+    backends.use_backend("pyca")
+
+    from cryptography_suite.pipeline import AESGCMDecrypt, AESGCMEncrypt
+
+    encrypted = AESGCMEncrypt(password="pw").run("hi")
+    with pytest.warns(RuntimeWarning, match="no-op"):
+        assert AESGCMDecrypt(password="pw", backend="dummy_dec").run(encrypted) == "hi"
+
+    # selecting backend in the module constructor has no side effects
     assert isinstance(backends.get_backend(), pyca_backend.PyCABackend)

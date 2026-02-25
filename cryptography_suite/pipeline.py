@@ -9,8 +9,9 @@ from __future__ import annotations
 
 import json
 import logging
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass, field
-from typing import Any, Callable, Generic, Iterable, Protocol, TypeVar, cast
+from typing import Any, Generic, Protocol, TypeVar, cast
 
 from .core.logging import get_correlation_id, log_event
 from .rich_logging import PipelineProgress, get_rich_logger
@@ -72,7 +73,7 @@ class Pipeline(Generic[Input, Output]):
     tracked_secrets: list[str] = field(default_factory=list)
 
     # operator overloads -------------------------------------------------
-    def __rshift__(self, other: CryptoModule[Any, Any] | "Pipeline") -> "Pipeline":
+    def __rshift__(self, other: CryptoModule[Any, Any] | Pipeline) -> Pipeline:
         new_modules: list[CryptoModule[Any, Any]] = list(self.modules)
         if isinstance(other, Pipeline):
             new_modules.extend(other.modules)
@@ -162,7 +163,7 @@ class Pipeline(Generic[Input, Output]):
         return json.dumps(self.describe())
 
     @classmethod
-    def from_config(cls, config: Iterable[Callable[[], CryptoModule]]) -> "Pipeline":
+    def from_config(cls, config: Iterable[Callable[[], CryptoModule]]) -> Pipeline:
         modules = [factory() for factory in config]
         return cls(list(modules))
 
@@ -227,7 +228,8 @@ class AESGCMEncrypt(CryptoModule[str, str]):
     kdf:
         Key-derivation function name (``"argon2"`` by default when available).
     backend:
-        Optional backend name to use for this operation only.
+        Deprecated and currently a no-op. Backend selection is not yet wired
+        into pipeline AES modules.
 
     Example
     -------
@@ -235,10 +237,10 @@ class AESGCMEncrypt(CryptoModule[str, str]):
     >>> AESGCMEncrypt(password="pw").run("hi")  # doctest: +SKIP
     '...'
 
-    See Also
-    --------
-    cryptography_suite.crypto_backends.use_backend
-        Selects the active backend providing the AES implementation.
+    Notes
+    -----
+    Passing ``backend=...`` emits a :class:`RuntimeWarning`. Pipeline AES
+    helpers currently use the built-in AES implementation directly.
     """
 
     password: str
@@ -246,24 +248,22 @@ class AESGCMEncrypt(CryptoModule[str, str]):
     backend: str | None = None
 
     def run(self, data: str) -> str:
-        import contextlib
         import warnings
 
-        from .crypto_backends import use_backend
         from .symmetric import aes as _aes_mod
 
-        cm = (
-            use_backend(self.backend)
-            if self.backend is not None
-            else contextlib.nullcontext()
-        )
-        with cm:
-            # aes_encrypt returns ``str`` when ``raw_output`` is ``False`` (default)
-            with warnings.catch_warnings():
-                warnings.filterwarnings("ignore", category=DeprecationWarning)
-                return cast(
-                    str, _aes_mod.aes_encrypt(data, self.password, kdf=self.kdf)
-                )
+        if self.backend is not None:
+            warnings.warn(
+                "AESGCMEncrypt(backend=...) is currently a no-op; backend dispatch "
+                "for pipeline AES modules is not implemented yet.",
+                RuntimeWarning,
+                stacklevel=2,
+            )
+
+        # aes_encrypt returns ``str`` when ``raw_output`` is ``False`` (default)
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=DeprecationWarning)
+            return cast(str, _aes_mod.aes_encrypt(data, self.password, kdf=self.kdf))
 
     def to_proverif(self) -> str:  # pragma: no cover - simple serialization
         return f"aesgcm_encrypt({self.kdf})"
@@ -284,7 +284,8 @@ class AESGCMDecrypt(CryptoModule[str, str]):
     kdf:
         Key-derivation function name (``"argon2"`` by default when available).
     backend:
-        Optional backend name to use for this operation only.
+        Deprecated and currently a no-op. Backend selection is not yet wired
+        into pipeline AES modules.
 
     Example
     -------
@@ -292,10 +293,10 @@ class AESGCMDecrypt(CryptoModule[str, str]):
     >>> AESGCMDecrypt(password="pw").run("...")  # doctest: +SKIP
     'hi'
 
-    See Also
-    --------
-    cryptography_suite.crypto_backends.use_backend
-        Selects the active backend providing the AES implementation.
+    Notes
+    -----
+    Passing ``backend=...`` emits a :class:`RuntimeWarning`. Pipeline AES
+    helpers currently use the built-in AES implementation directly.
     """
 
     password: str
@@ -303,21 +304,21 @@ class AESGCMDecrypt(CryptoModule[str, str]):
     backend: str | None = None
 
     def run(self, data: str) -> str:
-        import contextlib
         import warnings
 
-        from .crypto_backends import use_backend
         from .symmetric import aes as _aes_mod
 
-        cm = (
-            use_backend(self.backend)
-            if self.backend is not None
-            else contextlib.nullcontext()
-        )
-        with cm:
-            with warnings.catch_warnings():
-                warnings.filterwarnings("ignore", category=DeprecationWarning)
-                return _aes_mod.aes_decrypt(data, self.password, kdf=self.kdf)
+        if self.backend is not None:
+            warnings.warn(
+                "AESGCMDecrypt(backend=...) is currently a no-op; backend dispatch "
+                "for pipeline AES modules is not implemented yet.",
+                RuntimeWarning,
+                stacklevel=2,
+            )
+
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=DeprecationWarning)
+            return _aes_mod.aes_decrypt(data, self.password, kdf=self.kdf)
 
     def to_proverif(self) -> str:  # pragma: no cover - simple serialization
         return f"aesgcm_decrypt({self.kdf})"
