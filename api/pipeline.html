@@ -243,7 +243,8 @@ pipeline steps.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>password</strong> (<em>str</em>) – Password used to derive the decryption key.</p></li>
 <li><p><strong>kdf</strong> (<em>str</em>) – Key-derivation function name (<code class="docutils literal notranslate"><span class="pre">&quot;argon2&quot;</span></code> by default when available).</p></li>
-<li><p><strong>backend</strong> (<em>str</em><em> | </em><em>None</em>) – Optional backend name to use for this operation only.</p></li>
+<li><p><strong>backend</strong> (<em>str</em><em> | </em><em>None</em>) – Deprecated and currently a no-op. Backend selection is not yet wired
+into pipeline AES modules.</p></li>
 </ul>
 </dd>
 </dl>
@@ -253,13 +254,9 @@ pipeline steps.</p>
 <span class="go">&#39;hi&#39;</span>
 </pre></div>
 </div>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<dl class="simple">
-<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">cryptography_suite.crypto_backends.use_backend</span></code></dt><dd><p>Selects the active backend providing the AES implementation.</p>
-</dd>
-</dl>
-</div>
+<p class="rubric">Notes</p>
+<p>Passing <code class="docutils literal notranslate"><span class="pre">backend=...</span></code> emits a <code class="xref py py-class docutils literal notranslate"><span class="pre">RuntimeWarning</span></code>. Pipeline AES
+helpers currently use the built-in AES implementation directly.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cryptography_suite.pipeline.AESGCMDecrypt.backend">
 <span class="sig-name descname"><span class="pre">backend</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#cryptography_suite.pipeline.AESGCMDecrypt.backend" title="Link to this definition">¶</a></dt>
@@ -305,7 +302,8 @@ pipeline steps.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>password</strong> (<em>str</em>) – Password used to derive the encryption key.</p></li>
 <li><p><strong>kdf</strong> (<em>str</em>) – Key-derivation function name (<code class="docutils literal notranslate"><span class="pre">&quot;argon2&quot;</span></code> by default when available).</p></li>
-<li><p><strong>backend</strong> (<em>str</em><em> | </em><em>None</em>) – Optional backend name to use for this operation only.</p></li>
+<li><p><strong>backend</strong> (<em>str</em><em> | </em><em>None</em>) – Deprecated and currently a no-op. Backend selection is not yet wired
+into pipeline AES modules.</p></li>
 </ul>
 </dd>
 </dl>
@@ -315,13 +313,9 @@ pipeline steps.</p>
 <span class="go">&#39;...&#39;</span>
 </pre></div>
 </div>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<dl class="simple">
-<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">cryptography_suite.crypto_backends.use_backend</span></code></dt><dd><p>Selects the active backend providing the AES implementation.</p>
-</dd>
-</dl>
-</div>
+<p class="rubric">Notes</p>
+<p>Passing <code class="docutils literal notranslate"><span class="pre">backend=...</span></code> emits a <code class="xref py py-class docutils literal notranslate"><span class="pre">RuntimeWarning</span></code>. Pipeline AES
+helpers currently use the built-in AES implementation directly.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cryptography_suite.pipeline.AESGCMEncrypt.backend">
 <span class="sig-name descname"><span class="pre">backend</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#cryptography_suite.pipeline.AESGCMEncrypt.backend" title="Link to this definition">¶</a></dt>
