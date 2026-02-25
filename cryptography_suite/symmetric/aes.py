@@ -339,20 +339,37 @@ async def encrypt_file_async(
     nonce = urandom(NONCE_SIZE)
     verbose_print(f"Nonce: {nonce.hex()}")
     verbose_print("Mode: AES-GCM")
-    aesgcm = AESGCM(key)
+    kdf_id = _KDF_TO_ID.get(kdf)
+    if kdf_id is None:
+        raise EncryptionError("Unsupported KDF specified.")
 
     try:
         async with (
             aiofiles.open(input_file_path, "rb") as f_in,
             aiofiles.open(output_file_path, "wb") as f_out,
         ):
-            data = await f_in.read()
-            ct = aesgcm.encrypt(nonce, data, None)
+            header = (
+                FORMAT_MAGIC
+                + bytes([FORMAT_VERSION, kdf_id, len(salt), len(nonce)])
+                + struct.pack(">I", CHUNK_SIZE)
+                + salt
+                + nonce
+            )
+            await f_out.write(header)
+
+            encryptor = Cipher(algorithms.AES(key), modes.GCM(nonce)).encryptor()
+            while True:
+                chunk = await f_in.read(CHUNK_SIZE)
+                if not chunk:
+                    break
+                await f_out.write(encryptor.update(chunk))
+
+            await f_out.write(encryptor.finalize())
+            await f_out.write(encryptor.tag)
             if VERBOSE:
                 if logger.level > logging.DEBUG:
                     raise RuntimeError("Verbose mode requires DEBUG level")
-                logger.debug("ciphertext=%s", binascii.hexlify(ct)[:32])
-            await f_out.write(salt + nonce + ct)
+                logger.debug("tag=%s", binascii.hexlify(encryptor.tag))
     except Exception as exc:  # pragma: no cover - high-level error handling
         if os.path.exists(output_file_path):
             os.remove(output_file_path)
@@ -372,6 +389,8 @@ async def decrypt_file_async(
 
     if not password:
         raise EncryptionError("Password cannot be empty.")
+    if kdf not in _KDF_TO_ID:
+        raise DecryptionError("Unsupported KDF specified.")
 
     aiofiles = _import_aiofiles()
 
@@ -381,12 +400,40 @@ async def decrypt_file_async(
             if file_size < SALT_SIZE + NONCE_SIZE + TAG_SIZE:
                 raise DecryptionError("Invalid encrypted file.")
 
-            salt = await f_in.read(SALT_SIZE)
-            nonce = await f_in.read(NONCE_SIZE)
-            ciphertext_len = file_size - SALT_SIZE - NONCE_SIZE - TAG_SIZE
+            magic = await f_in.read(len(FORMAT_MAGIC))
+            is_versioned = magic == FORMAT_MAGIC
+
+            if is_versioned:
+                rest = await f_in.read(HEADER_FIXED_SIZE - len(FORMAT_MAGIC))
+                if len(rest) != HEADER_FIXED_SIZE - len(FORMAT_MAGIC):
+                    raise DecryptionError("Invalid encrypted file.")
+                version, kdf_id, salt_len, nonce_len, chunk_size = struct.unpack(
+                    ">BBBBI", rest
+                )
+                if version != FORMAT_VERSION:
+                    raise DecryptionError("Unsupported encrypted file version.")
+                format_kdf = _ID_TO_KDF.get(kdf_id)
+                if format_kdf is None:
+                    raise DecryptionError("Invalid encrypted file.")
+                salt = await f_in.read(salt_len)
+                nonce = await f_in.read(nonce_len)
+                if len(salt) != salt_len or len(nonce) != nonce_len:
+                    raise DecryptionError("Invalid encrypted file.")
+                stream_chunk_size = max(1024, chunk_size)
+            else:
+                await f_in.seek(0)
+                salt = await f_in.read(SALT_SIZE)
+                nonce = await f_in.read(NONCE_SIZE)
+                format_kdf = kdf
+                stream_chunk_size = CHUNK_SIZE
+
+            ciphertext_start = await f_in.tell()
+            ciphertext_len = file_size - ciphertext_start - TAG_SIZE
+            if ciphertext_len < 0:
+                raise DecryptionError("Invalid encrypted file.")
 
             try:
-                key = select_kdf(password, salt, kdf)
+                key = select_kdf(password, salt, format_kdf)
             except KeyDerivationError as exc:
                 raise DecryptionError(str(exc)) from exc
 
@@ -394,13 +441,22 @@ async def decrypt_file_async(
             verbose_print(f"Nonce: {nonce.hex()}")
             verbose_print("Mode: AES-GCM")
 
-            aesgcm = AESGCM(key)
-
             try:
                 async with aiofiles.open(output_file_path, "wb") as f_out:
-                    ciphertext = await f_in.read(ciphertext_len + TAG_SIZE)
-                    data = aesgcm.decrypt(nonce, ciphertext, None)
-                    await f_out.write(data)
+                    decryptor = Cipher(algorithms.AES(key), modes.GCM(nonce)).decryptor()
+                    remaining = ciphertext_len
+                    while remaining > 0:
+                        read_len = min(stream_chunk_size, remaining)
+                        chunk = await f_in.read(read_len)
+                        if not chunk:
+                            raise DecryptionError("Invalid encrypted file.")
+                        remaining -= len(chunk)
+                        await f_out.write(decryptor.update(chunk))
+
+                    tag = await f_in.read(TAG_SIZE)
+                    if len(tag) != TAG_SIZE:
+                        raise DecryptionError("Invalid encrypted file.")
+                    await f_out.write(decryptor.finalize_with_tag(tag))
             except Exception as exc:  # pragma: no cover - high-level error handling
                 if os.path.exists(output_file_path):
                     os.remove(output_file_path)
