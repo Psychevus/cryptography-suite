@@ -443,7 +443,9 @@ async def decrypt_file_async(
 
             try:
                 async with aiofiles.open(output_file_path, "wb") as f_out:
-                    decryptor = Cipher(algorithms.AES(key), modes.GCM(nonce)).decryptor()
+                    decryptor = Cipher(
+                        algorithms.AES(key), modes.GCM(nonce)
+                    ).decryptor()
                     remaining = ciphertext_len
                     while remaining > 0:
                         read_len = min(stream_chunk_size, remaining)
