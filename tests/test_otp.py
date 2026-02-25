@@ -3,12 +3,11 @@ import unittest
 import warnings
 
 from cryptography_suite.errors import CryptographySuiteError
-
 from cryptography_suite.protocols import (
-    generate_totp,
-    verify_totp,
     generate_hotp,
+    generate_totp,
     verify_hotp,
+    verify_totp,
 )
 
 
@@ -190,7 +189,7 @@ class TestOTP(unittest.TestCase):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", UserWarning)
             for algorithm, vector in vectors.items():
-                for timestamp, otp in zip(timestamps, vector["expected"]):
+                for timestamp, otp in zip(timestamps, vector["expected"], strict=False):
                     self.assertEqual(
                         generate_totp(
                             vector["secret"],
