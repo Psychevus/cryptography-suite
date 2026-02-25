@@ -9,10 +9,25 @@ from cryptography_suite.nonce import KeyRotationRequired, NonceManager, NonceReu
 
 def test_nonce_reuse_detection() -> None:
     for nonce in (bytes([0]) * 12, bytes(range(12)), b"n" * 12):
-        nm = NonceManager()
+        nm = NonceManager(mode="strict")
         nm.remember(nonce)
         with pytest.raises(NonceReuseError):
             nm.remember(nonce)
+
+
+def test_nonce_reuse_detection_lru_window() -> None:
+    nm = NonceManager(mode="lru", cache_size=2)
+    nonce_a = (1).to_bytes(12, "big")
+    nonce_b = (2).to_bytes(12, "big")
+    nonce_c = (3).to_bytes(12, "big")
+
+    nm.remember(nonce_a)
+    nm.remember(nonce_b)
+    with pytest.raises(NonceReuseError):
+        nm.remember(nonce_a)
+
+    nm.remember(nonce_c)  # evicts nonce_a
+    nm.remember(nonce_a)  # no longer in bounded replay cache
 
 
 def test_encrypt_after_limit_raises_key_rotation() -> None:
@@ -24,13 +39,16 @@ def test_encrypt_after_limit_raises_key_rotation() -> None:
         ctx.encrypt(nm=nm, plaintext=b"b" * 9)
 
 
-def test_encrypt_rejects_reused_nonce_with_nonce_manager() -> None:
+def test_decrypt_tracking_rejects_reused_nonce() -> None:
     key = AESGCM.generate_key(bit_length=128)
-    ctx = AESGCMContext(key)
-    nm = NonceManager()
-    nonce, ct = ctx.encrypt(nm=nm, plaintext=b"msg")
+    enc_ctx = AESGCMContext(key, nonce_tracking="encrypt")
+    dec_ctx = AESGCMContext(key, nonce_tracking="decrypt")
+    nm_enc = NonceManager(mode="strict")
+    nonce, ct = enc_ctx.encrypt(nm=nm_enc, plaintext=b"msg")
+    nm_dec = NonceManager(mode="strict")
+    assert dec_ctx.decrypt(nm=nm_dec, nonce=nonce, ciphertext=ct) == b"msg"
     with pytest.raises(NonceReuseError):
-        ctx.decrypt(nm=nm, nonce=nonce, ciphertext=ct)
+        dec_ctx.decrypt(nm=nm_dec, nonce=nonce, ciphertext=ct)
 
 
 def test_nonce_manager_overhead() -> None:
@@ -55,6 +73,10 @@ def test_nonce_manager_invalid_parameters() -> None:
         NonceManager(start=-1)
     with pytest.raises(ValueError):
         NonceManager(start=5, limit=5)
+    with pytest.raises(ValueError):
+        NonceManager(mode="unknown")
+    with pytest.raises(ValueError):
+        NonceManager(cache_size=0)
 
 
 def test_nonce_manager_rejects_bad_length() -> None:

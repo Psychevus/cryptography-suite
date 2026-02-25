@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import threading
+from typing import Literal
 
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM, ChaCha20Poly1305
 
@@ -59,13 +60,27 @@ BYTE_LIMIT = 2**54  # 2**24 GiB
 
 
 class AESGCMContext:
-    """AES-GCM wrapper with nonce management and usage limits."""
+    """AES-GCM wrapper with nonce management and usage limits.
 
-    def __init__(self, key: bytes, *, byte_limit: int = BYTE_LIMIT) -> None:
+    ``nonce_tracking="encrypt"`` records generated nonces during
+    encryption, while ``nonce_tracking="decrypt"`` records incoming
+    nonces during decryption for replay detection.
+    """
+
+    def __init__(
+        self,
+        key: bytes,
+        *,
+        byte_limit: int = BYTE_LIMIT,
+        nonce_tracking: Literal["encrypt", "decrypt"] = "decrypt",
+    ) -> None:
         if len(key) not in {16, 24, 32}:
             raise ValueError("key must be 128, 192 or 256 bits")
+        if nonce_tracking not in {"encrypt", "decrypt"}:
+            raise ValueError("nonce_tracking must be 'encrypt' or 'decrypt'")
         self._aesgcm = AESGCM(key)
         self._byte_limit = byte_limit
+        self._nonce_tracking: Literal["encrypt", "decrypt"] = nonce_tracking
         self._bytes_processed = 0
         # count of messages processed with this key
         self._msg_counter: int = 0
@@ -84,7 +99,8 @@ class AESGCMContext:
     ) -> tuple[bytes, bytes]:
         """Encrypt ``plaintext`` and return ``(nonce, ciphertext)``."""
         nonce = nm.next()
-        nm.remember(nonce)
+        if self._nonce_tracking == "encrypt":
+            nm.remember(nonce)
         with self._lock:
             if self._bytes_processed + len(plaintext) > self._byte_limit:
                 raise KeyRotationRequired("byte limit reached")
@@ -104,7 +120,8 @@ class AESGCMContext:
         aad: bytes = b"",
     ) -> bytes:
         """Decrypt ``ciphertext`` using ``nonce``."""
-        nm.remember(nonce)
+        if self._nonce_tracking == "decrypt":
+            nm.remember(nonce)
         with self._lock:
             if self._bytes_processed + len(ciphertext) > self._byte_limit:
                 raise KeyRotationRequired("byte limit reached")
