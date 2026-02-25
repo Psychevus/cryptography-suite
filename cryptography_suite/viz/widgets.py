@@ -1,11 +1,42 @@
 from __future__ import annotations
 
-from typing import Iterable
+from collections.abc import Iterable
+from importlib.util import find_spec
 
-from ipywidgets import VBox, HTML, Output
-from IPython.display import display
-import networkx as nx
-from networkx.readwrite import json_graph
+_HAS_WIDGETS = find_spec("ipywidgets") is not None
+_HAS_NETWORKX = find_spec("networkx") is not None
+_HAS_IPYTHON = find_spec("IPython.display") is not None
+
+if _HAS_WIDGETS and _HAS_NETWORKX and _HAS_IPYTHON:
+    import networkx as nx
+    from IPython.display import display
+    from ipywidgets import HTML, Output, VBox
+    from networkx.readwrite import json_graph
+else:
+
+    class _BaseWidget:
+        def __init__(self, value: str = "") -> None:
+            self.value = value
+
+    class HTML(_BaseWidget):
+        pass
+
+    class Output:
+        def clear_output(self) -> None:
+            return None
+
+        def __enter__(self) -> Output:
+            return self
+
+        def __exit__(self, exc_type: object, exc: object, tb: object) -> None:
+            return None
+
+    class VBox:
+        def __init__(self, children: list[object] | None = None) -> None:
+            self.children = children or []
+
+    def display(_obj: object) -> None:
+        return None
 
 
 class HandshakeFlowWidget(VBox):
@@ -33,24 +64,33 @@ class KeyGraphWidget(VBox):
 
     def __init__(self, edges: Iterable[tuple[str, str]] = ()):  # simple graph
         super().__init__()
-        self._graph = nx.DiGraph()
-        self._graph.add_edges_from(edges)
+        self._edges = list(edges)
         self.output = Output()
         self.children = [self.output]
         self._render()
 
     def _render(self) -> None:
-        data = (
-            json_graph.tree_data(self._graph, root=list(self._graph.nodes)[0])
-            if self._graph.nodes
-            else {}
-        )
+        if _HAS_NETWORKX and _HAS_WIDGETS and _HAS_IPYTHON:
+            graph = nx.DiGraph()
+            graph.add_edges_from(self._edges)
+            data = (
+                json_graph.tree_data(graph, root=list(graph.nodes)[0])
+                if graph.nodes
+                else {}
+            )
+        else:
+            nodes: set[str] = set()
+            for src, dst in self._edges:
+                nodes.add(src)
+                nodes.add(dst)
+            data = {"nodes": sorted(nodes), "edges": list(self._edges)}
+
         with self.output:
             self.output.clear_output()
             display(data)
 
     def add_edge(self, src: str, dst: str) -> None:
-        self._graph.add_edge(src, dst)
+        self._edges.append((src, dst))
         self._render()
 
 
