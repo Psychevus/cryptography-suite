@@ -420,6 +420,10 @@ async def main():
 asyncio.run(main())
 ```
 
+The async file APIs use the same versioned on-disk format as the synchronous
+helpers and `decrypt_file_async` also supports legacy
+`salt || nonce || ciphertext+tag` files.
+
 ### Asymmetric Encryption
 
 Generate RSA key pairs and perform encryption/decryption.
