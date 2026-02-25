@@ -1,6 +1,7 @@
 import pytest
-from hypothesis import given, strategies as st
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+from hypothesis import given
+from hypothesis import strategies as st
 
 from cryptography_suite.aead import (
     AESGCMContext,
