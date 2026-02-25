@@ -171,7 +171,9 @@ def kyber_decrypt(
         raise DecryptionError("Invalid ciphertext") from exc
 
 
-def generate_dilithium_keypair(*, sensitive: bool = True) -> Tuple[bytes, KeyVault | bytes]:
+def generate_dilithium_keypair(
+    *, sensitive: bool = True
+) -> Tuple[bytes, KeyVault | bytes]:
     """Generate a Dilithium key pair using level 2 parameters.
 
     When ``sensitive`` is ``True`` (default) the private key is wrapped in
@@ -225,7 +227,9 @@ def dilithium_verify(
         return False
 
 
-def generate_sphincs_keypair(*, sensitive: bool = True) -> Tuple[bytes, KeyVault | bytes]:
+def generate_sphincs_keypair(
+    *, sensitive: bool = True
+) -> Tuple[bytes, KeyVault | bytes]:
     """Generate a SPHINCS+ key pair using a 128-bit security level.
 
     When ``sensitive`` is ``True`` (default) the private key is wrapped in
