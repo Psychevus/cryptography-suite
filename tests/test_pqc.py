@@ -1,4 +1,5 @@
 import unittest
+from typing import cast
 
 from cryptography_suite.errors import DecryptionError
 from cryptography_suite.pqc import (
@@ -45,17 +46,18 @@ class TestPQC(unittest.TestCase):
         msg = b"nonce/tag corruption test"
         pk, sk = generate_kyber_keypair(level=512)
         ct, _ = kyber_encrypt(pk, msg, level=512, raw_output=True)
+        raw_ct = cast(bytes, ct)
 
         # Corrupt nonce byte (first byte after KEM ciphertext + salt).
-        nonce_corrupt = bytearray(ct)
-        kem_ct_size = len(ct) - (16 + 12 + len(msg) + 16)
+        nonce_corrupt = bytearray(raw_ct)
+        kem_ct_size = len(raw_ct) - (16 + 12 + len(msg) + 16)
         nonce_index = kem_ct_size + 16
         nonce_corrupt[nonce_index] ^= 0x01
         with self.assertRaises(DecryptionError):
             kyber_decrypt(sk, bytes(nonce_corrupt), level=512)
 
         # Corrupt tag byte (last byte of payload).
-        tag_corrupt = bytearray(ct)
+        tag_corrupt = bytearray(raw_ct)
         tag_corrupt[-1] ^= 0x01
         with self.assertRaises(DecryptionError):
             kyber_decrypt(sk, bytes(tag_corrupt), level=512)
