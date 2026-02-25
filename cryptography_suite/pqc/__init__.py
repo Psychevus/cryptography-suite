@@ -8,14 +8,15 @@ implementations from PQClean.
 
 from __future__ import annotations
 
-from typing import Tuple
-from ..errors import EncryptionError, DecryptionError
+import base64
+import hmac
+import os
+
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+
+from ..errors import DecryptionError, EncryptionError
 from ..symmetric.kdf import derive_hkdf
 from ..utils import KeyVault
-import os
-import hmac
-import base64
-from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 try:  # pragma: no cover - optional dependency
     from pqcrypto.kem import ml_kem_512, ml_kem_768, ml_kem_1024
@@ -54,7 +55,7 @@ _DILITHIUM_LEVEL_MAP = {2: ml_dsa_44, 3: ml_dsa_65, 5: ml_dsa_87}
 
 def generate_kyber_keypair(
     level: int = 512, *, sensitive: bool = True
-) -> Tuple[bytes, KeyVault | bytes]:
+) -> tuple[bytes, KeyVault | bytes]:
     """Generate a Kyber key pair for the given ``level``.
 
     Parameters
@@ -81,7 +82,7 @@ def kyber_encrypt(
     *,
     level: int = 512,
     raw_output: bool = False,
-) -> Tuple[str | bytes, str | bytes]:
+) -> tuple[str | bytes, str | bytes]:
     """Encrypt ``plaintext`` using Kyber and AES-GCM.
 
     ``level`` selects the ML-KEM security level (512, 768 or 1024).
@@ -143,28 +144,37 @@ def kyber_decrypt(
         except Exception as exc:  # pragma: no cover - defensive
             raise DecryptionError(f"Invalid shared secret: {exc}") from exc
 
-    if len(ciphertext) < ct_size + 12 + 16:
+    min_ct_len = ct_size + 16 + 12 + 16
+    if len(ciphertext) < min_ct_len:
         raise DecryptionError("Invalid ciphertext")
 
     kem_ct = ciphertext[:ct_size]
     salt = ciphertext[ct_size : ct_size + 16]
     enc = ciphertext[ct_size + 16 :]
     priv = bytes(private_key) if isinstance(private_key, KeyVault) else private_key
-    ss_check = alg.decrypt(priv, kem_ct)
+    try:
+        ss_check = alg.decrypt(priv, kem_ct)
+    except Exception as exc:  # pragma: no cover - defensive
+        raise DecryptionError("Invalid ciphertext") from exc
     if shared_secret is None:
         shared_secret = ss_check
     elif not hmac.compare_digest(ss_check, shared_secret):
         raise DecryptionError("Shared secret mismatch")
 
     key = derive_hkdf(shared_secret, salt, b"kyber-aes-key", 32)
-    with KeyVault(key) as key_buf:
-        aesgcm = AESGCM(bytes(key_buf))
-        nonce = enc[:12]
-        ct = enc[12:]
-        return aesgcm.decrypt(nonce, ct, None)
+    try:
+        with KeyVault(key) as key_buf:
+            aesgcm = AESGCM(bytes(key_buf))
+            nonce = enc[:12]
+            ct = enc[12:]
+            return aesgcm.decrypt(nonce, ct, None)
+    except Exception as exc:
+        raise DecryptionError("Invalid ciphertext") from exc
 
 
-def generate_dilithium_keypair(*, sensitive: bool = True) -> Tuple[bytes, KeyVault | bytes]:
+def generate_dilithium_keypair(
+    *, sensitive: bool = True
+) -> tuple[bytes, KeyVault | bytes]:
     """Generate a Dilithium key pair using level 2 parameters.
 
     When ``sensitive`` is ``True`` (default) the private key is wrapped in
@@ -218,7 +228,9 @@ def dilithium_verify(
         return False
 
 
-def generate_sphincs_keypair(*, sensitive: bool = True) -> Tuple[bytes, KeyVault | bytes]:
+def generate_sphincs_keypair(
+    *, sensitive: bool = True
+) -> tuple[bytes, KeyVault | bytes]:
     """Generate a SPHINCS+ key pair using a 128-bit security level.
 
     When ``sensitive`` is ``True`` (default) the private key is wrapped in
