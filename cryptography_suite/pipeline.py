@@ -9,8 +9,9 @@ from __future__ import annotations
 
 import json
 import logging
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass, field
-from typing import Any, Callable, Generic, Iterable, Protocol, TypeVar, cast
+from typing import Any, Generic, Protocol, TypeVar, cast
 
 from .core.logging import get_correlation_id, log_event
 from .rich_logging import PipelineProgress, get_rich_logger
@@ -72,7 +73,7 @@ class Pipeline(Generic[Input, Output]):
     tracked_secrets: list[str] = field(default_factory=list)
 
     # operator overloads -------------------------------------------------
-    def __rshift__(self, other: CryptoModule[Any, Any] | "Pipeline") -> "Pipeline":
+    def __rshift__(self, other: CryptoModule[Any, Any] | Pipeline) -> Pipeline:
         new_modules: list[CryptoModule[Any, Any]] = list(self.modules)
         if isinstance(other, Pipeline):
             new_modules.extend(other.modules)
@@ -162,7 +163,7 @@ class Pipeline(Generic[Input, Output]):
         return json.dumps(self.describe())
 
     @classmethod
-    def from_config(cls, config: Iterable[Callable[[], CryptoModule]]) -> "Pipeline":
+    def from_config(cls, config: Iterable[Callable[[], CryptoModule]]) -> Pipeline:
         modules = [factory() for factory in config]
         return cls(list(modules))
 
