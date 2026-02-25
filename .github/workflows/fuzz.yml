@@ -2,32 +2,63 @@ name: Fuzzing
 
 on:
   schedule:
-    - cron: '0 5 * * 0'
+    - cron: "0 5 * * 0"
   workflow_dispatch:
+    inputs:
+      runs:
+        description: "Atheris -runs value per harness"
+        required: false
+        default: "2000"
+      timeout_seconds:
+        description: "Timeout in seconds per harness"
+        required: false
+        default: "180"
 
 jobs:
   fuzz:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ['3.11', '3.12']
+        python-version: ["3.11", "3.12"]
+        harness:
+          - fuzz_aes
+          - fuzz_rsa
+          - fuzz_ecies
+          - fuzz_pipeline
+    env:
+      FUZZ_RUNS: ${{ github.event.inputs.runs || '2000' }}
+      FUZZ_TIMEOUT_SECONDS: ${{ github.event.inputs.timeout_seconds || '180' }}
+      FUZZ_ARTIFACT_DIR: fuzz/artifacts
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -e .[dev]
           pip install atheris
-      - name: Run fuzzing
+
+      - name: Run ${{ matrix.harness }}
+        shell: bash
         run: |
-          python fuzz/fuzz_aes.py -runs=1000
-      - name: Upload Crashers
+          set -euo pipefail
+          mkdir -p "$FUZZ_ARTIFACT_DIR/${{ matrix.harness }}"
+          pushd "$FUZZ_ARTIFACT_DIR/${{ matrix.harness }}" >/dev/null
+          timeout "$FUZZ_TIMEOUT_SECONDS"s \
+            python "$GITHUB_WORKSPACE/fuzz/${{ matrix.harness }}.py" "-runs=$FUZZ_RUNS"
+          popd >/dev/null
+
+      - name: Upload crash artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: fuzz-crashers-${{ matrix.python-version }}
-          path: | 
-            fuzz/crash* || true
+          name: fuzz-artifacts-${{ matrix.harness }}-py${{ matrix.python-version }}
+          path: |
+            ${{ env.FUZZ_ARTIFACT_DIR }}/${{ matrix.harness }}/crash-*
+            ${{ env.FUZZ_ARTIFACT_DIR }}/${{ matrix.harness }}/leak-*
+            ${{ env.FUZZ_ARTIFACT_DIR }}/${{ matrix.harness }}/timeout-*
+          if-no-files-found: ignore
