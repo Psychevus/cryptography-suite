@@ -143,25 +143,32 @@ def kyber_decrypt(
         except Exception as exc:  # pragma: no cover - defensive
             raise DecryptionError(f"Invalid shared secret: {exc}") from exc
 
-    if len(ciphertext) < ct_size + 12 + 16:
+    min_ct_len = ct_size + 16 + 12 + 16
+    if len(ciphertext) < min_ct_len:
         raise DecryptionError("Invalid ciphertext")
 
     kem_ct = ciphertext[:ct_size]
     salt = ciphertext[ct_size : ct_size + 16]
     enc = ciphertext[ct_size + 16 :]
     priv = bytes(private_key) if isinstance(private_key, KeyVault) else private_key
-    ss_check = alg.decrypt(priv, kem_ct)
+    try:
+        ss_check = alg.decrypt(priv, kem_ct)
+    except Exception as exc:  # pragma: no cover - defensive
+        raise DecryptionError("Invalid ciphertext") from exc
     if shared_secret is None:
         shared_secret = ss_check
     elif not hmac.compare_digest(ss_check, shared_secret):
         raise DecryptionError("Shared secret mismatch")
 
     key = derive_hkdf(shared_secret, salt, b"kyber-aes-key", 32)
-    with KeyVault(key) as key_buf:
-        aesgcm = AESGCM(bytes(key_buf))
-        nonce = enc[:12]
-        ct = enc[12:]
-        return aesgcm.decrypt(nonce, ct, None)
+    try:
+        with KeyVault(key) as key_buf:
+            aesgcm = AESGCM(bytes(key_buf))
+            nonce = enc[:12]
+            ct = enc[12:]
+            return aesgcm.decrypt(nonce, ct, None)
+    except Exception as exc:
+        raise DecryptionError("Invalid ciphertext") from exc
 
 
 def generate_dilithium_keypair(*, sensitive: bool = True) -> Tuple[bytes, KeyVault | bytes]:
