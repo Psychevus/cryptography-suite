@@ -177,7 +177,7 @@ def test_decrypt_enforces_minimum_stream_chunk_size(
         def __getattr__(self, item: str) -> Any:
             return getattr(self._wrapped, item)
 
-        def __enter__(self) -> "ReaderProxy":
+        def __enter__(self) -> ReaderProxy:
             self._wrapped.__enter__()
             return self
 
