@@ -4,13 +4,13 @@ from cryptography_suite.errors import DecryptionError
 from cryptography_suite.pqc import (
     PQCRYPTO_AVAILABLE,
     SPHINCS_AVAILABLE,
-    generate_kyber_keypair,
-    kyber_encrypt,
-    kyber_decrypt,
-    generate_dilithium_keypair,
     dilithium_sign,
     dilithium_verify,
+    generate_dilithium_keypair,
+    generate_kyber_keypair,
     generate_sphincs_keypair,
+    kyber_decrypt,
+    kyber_encrypt,
     sphincs_sign,
     sphincs_verify,
 )

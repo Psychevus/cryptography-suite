@@ -8,14 +8,15 @@ implementations from PQClean.
 
 from __future__ import annotations
 
-from typing import Tuple
-from ..errors import EncryptionError, DecryptionError
+import base64
+import hmac
+import os
+
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+
+from ..errors import DecryptionError, EncryptionError
 from ..symmetric.kdf import derive_hkdf
 from ..utils import KeyVault
-import os
-import hmac
-import base64
-from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 try:  # pragma: no cover - optional dependency
     from pqcrypto.kem import ml_kem_512, ml_kem_768, ml_kem_1024
@@ -54,7 +55,7 @@ _DILITHIUM_LEVEL_MAP = {2: ml_dsa_44, 3: ml_dsa_65, 5: ml_dsa_87}
 
 def generate_kyber_keypair(
     level: int = 512, *, sensitive: bool = True
-) -> Tuple[bytes, KeyVault | bytes]:
+) -> tuple[bytes, KeyVault | bytes]:
     """Generate a Kyber key pair for the given ``level``.
 
     Parameters
@@ -81,7 +82,7 @@ def kyber_encrypt(
     *,
     level: int = 512,
     raw_output: bool = False,
-) -> Tuple[str | bytes, str | bytes]:
+) -> tuple[str | bytes, str | bytes]:
     """Encrypt ``plaintext`` using Kyber and AES-GCM.
 
     ``level`` selects the ML-KEM security level (512, 768 or 1024).
@@ -173,7 +174,7 @@ def kyber_decrypt(
 
 def generate_dilithium_keypair(
     *, sensitive: bool = True
-) -> Tuple[bytes, KeyVault | bytes]:
+) -> tuple[bytes, KeyVault | bytes]:
     """Generate a Dilithium key pair using level 2 parameters.
 
     When ``sensitive`` is ``True`` (default) the private key is wrapped in
@@ -229,7 +230,7 @@ def dilithium_verify(
 
 def generate_sphincs_keypair(
     *, sensitive: bool = True
-) -> Tuple[bytes, KeyVault | bytes]:
+) -> tuple[bytes, KeyVault | bytes]:
     """Generate a SPHINCS+ key pair using a 128-bit security level.
 
     When ``sensitive`` is ``True`` (default) the private key is wrapped in
