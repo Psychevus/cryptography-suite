@@ -1,3 +1,5 @@
+from typing import Any, cast
+
 import pytest
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from hypothesis import given
@@ -8,11 +10,8 @@ from cryptography_suite.aead import (
     chacha20_decrypt_aead,
     chacha20_encrypt_aead,
 )
-from cryptography_suite.nonce import (
-    KeyRotationRequired,
-    NonceManager,
-    NonceReuseError,
-)
+from cryptography_suite.exceptions import KeyRotationRequired, NonceReuseError
+from cryptography_suite.nonce import NonceManager
 
 
 @given(st.binary())
@@ -99,7 +98,7 @@ def test_aesgcmcontext_decrypt_byte_limit() -> None:
 def test_aesgcmcontext_rejects_bad_nonce_tracking_mode() -> None:
     key = AESGCM.generate_key(bit_length=128)
     with pytest.raises(ValueError):
-        AESGCMContext(key, nonce_tracking="invalid")
+        AESGCMContext(key, nonce_tracking=cast(Any, "invalid"))
 
 
 def test_decrypt_replay_detection_bounded_by_lru_window() -> None:

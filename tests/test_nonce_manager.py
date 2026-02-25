@@ -4,7 +4,8 @@ import pytest
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 from cryptography_suite.aead import AESGCMContext
-from cryptography_suite.nonce import KeyRotationRequired, NonceManager, NonceReuseError
+from cryptography_suite.exceptions import KeyRotationRequired, NonceReuseError
+from cryptography_suite.nonce import NonceManager
 
 
 def test_nonce_reuse_detection() -> None:
@@ -74,7 +75,7 @@ def test_nonce_manager_invalid_parameters() -> None:
     with pytest.raises(ValueError):
         NonceManager(start=5, limit=5)
     with pytest.raises(ValueError):
-        NonceManager(mode="unknown")
+        NonceManager(mode="unknown")  # type: ignore[arg-type]
     with pytest.raises(ValueError):
         NonceManager(cache_size=0)
 
