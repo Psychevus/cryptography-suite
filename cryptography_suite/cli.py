@@ -87,7 +87,7 @@ def bulletproof_cli(argv: list[str] | None = None) -> None:
         if not BULLETPROOF_AVAILABLE:
             raise MissingDependencyError(
                 "Bulletproof ZKP requires 'petlib'. Install it with: "
-                "pip install cryptography-suite[zkp]"
+                "pip install cryptography-suite[zk]"
             )
         bp_setup()
         proof, commitment, nonce = bp_prove(args.value)

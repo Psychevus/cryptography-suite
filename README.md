@@ -756,7 +756,7 @@ Some tests rely on optional dependencies such as `petlib` for zero-knowledge pro
 Install extras before running them:
 
 ```bash
-pip install .[zkp]
+pip install .[zk]
 ```
 
 Our test suite achieves **99% code coverage**, guaranteeing reliability and robustness.

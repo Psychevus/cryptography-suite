@@ -44,16 +44,13 @@ dependencies = [
     "py_ecc",
     "spake2",
     "blake3",
-    "PyYAML"
-    , "Jinja2"
-    , "rich"
-    , "ipywidgets"
-    , "networkx"
-    , "requests"
+    "PyYAML",
+    "Jinja2",
+    "rich",
 ]
 
 [project.entry-points."cryptosuite.aead"]
-"gcm-sst" = "crypto_suite.experimental.aes_gcm_sst:aes_gcm_sst_encrypt"
+"gcm-sst" = "cryptography_suite.aead_plugins:aes_gcm_sst_encrypt"
 
 [project.optional-dependencies]
 pqc = ["pqcrypto"]
@@ -71,7 +68,7 @@ dev = [
 ]
 async = ["aiofiles"]
 docs = ["sphinx", "furo", "myst-parser", "sphinxcontrib-mermaid"]
-viz = ["rich", "ipywidgets", "networkx"]
+viz = ["ipywidgets", "networkx"]
 aws = ["boto3"]
 hsm = ["python-pkcs11>=0.8.1"]
 legacy = ["salsa20>=0.9", "ascon>=1.2"]
@@ -95,7 +92,7 @@ license-files = ["LICENSE"]
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["cryptography_suite*", "tools*", "crypto_suite*"]
+include = ["cryptography_suite*"]
 exclude = ["tests*", "docs*", "examples*", "demo*"]
 
 [tool.setuptools.package-data]
