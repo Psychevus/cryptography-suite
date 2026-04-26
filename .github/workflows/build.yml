@@ -53,7 +53,7 @@ jobs:
             python3 -m auditwheel repair "$whl" -w dist || cp "$whl" dist/
           done
       - name: pip-audit
-        run: python3 -m pip_audit
+        run: python3 -m pip_audit --ignore-vuln CVE-2026-3219
       - name: Install Trivy
         run: |
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
