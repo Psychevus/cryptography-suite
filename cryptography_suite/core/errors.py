@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Mapping
 
 
 class ErrorCode(str, Enum):
@@ -38,4 +38,4 @@ class SuiteError(Exception):
     def format_with_code(self) -> str:
         """Return a verbose representation suitable for logs/debugging."""
 
-        return f"[{self.code}] {self.message}"
+        return f"[{type(self.code).__name__}.{self.code.name}] {self.message}"

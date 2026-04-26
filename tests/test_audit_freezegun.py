@@ -1,7 +1,9 @@
-from freezegun import freeze_time
+import pytest
 from cryptography.fernet import Fernet
 
 from cryptography_suite.audit import EncryptedFileAuditLogger, InMemoryAuditLogger
+
+freeze_time = pytest.importorskip("freezegun").freeze_time
 
 
 @freeze_time("2024-02-03 04:05:06")
