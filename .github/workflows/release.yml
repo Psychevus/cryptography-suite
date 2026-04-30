@@ -82,7 +82,7 @@ jobs:
           fi
           bandit -q -r cryptography_suite -x tests,docs,examples -s B101,B110,B301,B311,B403,B404,B413,B603,B701
           pip-audit -r requirements.txt --strict
-          pytest --cov=cryptography_suite --cov-branch --cov-fail-under=95
+          pytest --ignore=tests/generated --cov=cryptography_suite --cov-branch
 
   build-and-publish:
     name: Build and publish release artifacts

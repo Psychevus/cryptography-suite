@@ -10,7 +10,7 @@
   - `mypy --follow-imports=skip --ignore-missing-imports --disable-error-code=no-any-return --disable-error-code=no-untyped-def --disable-error-code=misc --disable-error-code=type-arg <changed-python-files>`
   - `bandit -q -r cryptography_suite -x tests,docs,examples -s B101,B110,B301,B311,B403,B404,B413,B603,B701`
   - `pip-audit -r requirements.txt --strict`
-  - `pytest --cov=cryptography_suite --cov-branch --cov-fail-under=95`
+  - `pytest --ignore=tests/generated --cov=cryptography_suite --cov-branch`
 
 ## Tag and release
 

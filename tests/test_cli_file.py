@@ -5,6 +5,7 @@ error handling edge cases for invalid arguments or underlying failures.
 """
 
 import importlib
+import io
 from types import ModuleType
 
 import pytest
@@ -28,8 +29,9 @@ def test_file_cli_encrypt(monkeypatch, capsys):
         called["args"] = (inp, outp, pwd, kdf)
 
     monkeypatch.setattr(symmetric, "encrypt_file", stub)
+    monkeypatch.setattr("sys.stdin", io.StringIO("pw\n"))
     cli.file_cli(
-        ["encrypt", "--in", "plain.txt", "--out", "enc.bin", "--password", "pw"]
+        ["encrypt", "--in", "plain.txt", "--out", "enc.bin", "--password-stdin"]
     )
     assert called["args"] == ("plain.txt", "enc.bin", "pw", cli.DEFAULT_KDF)
     out = capsys.readouterr().out
@@ -41,12 +43,21 @@ def test_file_cli_decrypt(monkeypatch, capsys):
     cli = reload_cli()
     called: dict[str, tuple[str, str, str, str]] = {}
 
-    def stub_dec(inp: str, outp: str, pwd: str, *, kdf: str = "argon2") -> None:
+    def stub_dec(
+        inp: str,
+        outp: str,
+        pwd: str,
+        *,
+        kdf: str = "argon2",
+        allow_legacy_format: bool = False,
+    ) -> None:
+        assert allow_legacy_format is False
         called["args"] = (inp, outp, pwd, kdf)
 
     monkeypatch.setattr(symmetric, "decrypt_file", stub_dec)
+    monkeypatch.setattr("sys.stdin", io.StringIO("pw\n"))
     cli.file_cli(
-        ["decrypt", "--in", "enc.bin", "--out", "plain.txt", "--password", "pw"]
+        ["decrypt", "--in", "enc.bin", "--out", "plain.txt", "--password-stdin"]
     )
     assert called["args"] == ("enc.bin", "plain.txt", "pw", cli.DEFAULT_KDF)
     out = capsys.readouterr().out
@@ -61,7 +72,8 @@ def test_file_cli_error(monkeypatch, capsys):
         raise OSError("bad")
 
     monkeypatch.setattr(symmetric, "encrypt_file", bad)
-    cli.file_cli(["encrypt", "--in", "a", "--out", "b", "--password", "pw"])
+    monkeypatch.setattr("sys.stdin", io.StringIO("pw\n"))
+    cli.file_cli(["encrypt", "--in", "a", "--out", "b", "--password-stdin"])
     out = capsys.readouterr().out
     assert "Error:" in out
 

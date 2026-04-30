@@ -11,62 +11,62 @@ import os
 from time import sleep
 
 from cryptography_suite import (
-    # Symmetric Encryption
-    chacha20_encrypt,
-    chacha20_decrypt,
-    encrypt_file,
-    decrypt_file,
-    # Asymmetric Encryption
-    generate_rsa_keypair,
-    serialize_private_key,
-    serialize_public_key,
-    load_private_key,
-    load_public_key,
-    generate_x25519_keypair,
-    derive_x25519_shared_key,
-    # Signatures
-    generate_ed25519_keypair,
-    sign_message,
-    verify_signature,
-    # Hashing
-    sha256_hash,
-    sha512_hash,
-    blake2b_hash,
-    derive_key_scrypt,
-    derive_key_pbkdf2,
-    generate_salt,
-    # Key Management
-    generate_aes_key,
-    rotate_aes_key,
-    load_private_key_from_file,
-    load_public_key_from_file,
     KeyManager,
-    # Secret Sharing
-    create_shares,
-    reconstruct_secret,
     # PAKE
     SPAKE2Client,
     SPAKE2Server,
-    # OTP
-    generate_totp,
-    verify_totp,
-    generate_hotp,
-    verify_hotp,
+    base62_decode,
     # Utils
     base62_encode,
-    base62_decode,
+    blake2b_hash,
+    chacha20_decrypt,
+    # Symmetric Encryption
+    chacha20_encrypt,
+    # Secret Sharing
+    create_shares,
+    decrypt_file,
+    derive_key_pbkdf2,
+    derive_key_scrypt,
+    derive_x25519_shared_key,
+    encrypt_file,
+    # Key Management
+    generate_aes_key,
+    # Signatures
+    generate_ed25519_keypair,
+    generate_hotp,
+    # Asymmetric Encryption
+    generate_rsa_keypair,
+    generate_salt,
     generate_secure_random_string,
+    # OTP
+    generate_totp,
+    generate_x25519_keypair,
+    load_private_key,
+    load_private_key_from_file,
+    load_public_key,
+    load_public_key_from_file,
+    reconstruct_secret,
+    rotate_aes_key,
+    serialize_private_key,
+    serialize_public_key,
+    # Hashing
+    sha256_hash,
+    sha512_hash,
+    sign_message,
     use_backend,
+    verify_hotp,
+    verify_signature,
+    verify_totp,
 )
 from cryptography_suite.pipeline import (
-    AESGCMEncrypt,
     AESGCMDecrypt,
-    RSAEncrypt,
+    AESGCMEncrypt,
     RSADecrypt,
+    RSAEncrypt,
 )
 
 
-def main():
+def main() -> None:
     with use_backend("pyca"):
         # Symmetric Encryption Example
         print("=== Symmetric Encryption ===")
@@ -97,7 +97,7 @@ def main():
 
             encrypt_file("test.txt", "encrypted_test.enc", symmetric_password)
             decrypt_file("encrypted_test.enc", "decrypted_test.txt", symmetric_password)
-            with open("decrypted_test.txt", "r") as f:
+            with open("decrypted_test.txt") as f:
                 decrypted_content = f.read()
             print(f"Decrypted File Content: {decrypted_content}")
         finally:
@@ -119,8 +119,8 @@ def main():
         key_password = "encryption_password"
         private_pem = serialize_private_key(rsa_private_key, key_password)
         public_pem = serialize_public_key(rsa_public_key)
-        loaded_private_key = load_private_key(private_pem, key_password)
-    loaded_public_key = load_public_key(public_pem)
+        load_private_key(private_pem, key_password)
+    load_public_key(public_pem)
     print("RSA keys serialized and loaded successfully.")
 
     # X25519 Key Exchange
@@ -222,8 +222,8 @@ def main():
     km = KeyManager()
     km.generate_rsa_keypair_and_save(private_key_path, public_key_path, key_password)
     km.generate_ec_keypair_and_save(ec_private, ec_public, key_password)
-    loaded_private_key = load_private_key_from_file(private_key_path, key_password)
-    loaded_public_key = load_public_key_from_file(public_key_path)
+    load_private_key_from_file(private_key_path, key_password)
+    load_public_key_from_file(public_key_path)
     print("RSA keys generated, saved, and loaded from files successfully.")
 
     # Clean up key files
@@ -243,10 +243,10 @@ def main():
     try:
         from cryptography_suite.experimental import (
             FHE_AVAILABLE,
-            fhe_keygen,
-            fhe_encrypt,
-            fhe_decrypt,
             fhe_add,
+            fhe_decrypt,
+            fhe_encrypt,
+            fhe_keygen,
             fhe_multiply,
         )
 
@@ -257,9 +257,9 @@ def main():
             print("Decrypted Sum:", fhe_decrypt(fhe, fhe_add(fhe, c1, c2)))
             print("Decrypted Product:", fhe_decrypt(fhe, fhe_multiply(fhe, c1, c2)))
         else:
-            print("Pyfhel not installed; skipping homomorphic encryption demo.")
+            print("Pyfhel unavailable; skipping experimental FHE demo.")
     except Exception:
-        print("Pyfhel not installed; skipping homomorphic encryption demo.")
+        print("Experimental FHE disabled or Pyfhel unavailable; skipping demo.")
 
 
 if __name__ == "__main__":

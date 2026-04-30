@@ -24,6 +24,17 @@ Please do **not** open public GitHub issues for exploitable vulnerabilities befo
 - No side-channel hardening claims are made unless explicitly stated.
 - Constant-time hardening is ongoing and may vary by backend/platform.
 - Deployments must provide cryptographically secure randomness and adequate entropy.
+- CLI, verbose, debug, dry-run, and structured logging paths must not print
+  passwords, derived keys, raw/private keys, shared secrets, plaintext, nonces,
+  or ciphertext internals. Report any suspected secret disclosure as a security
+  issue.
+- Prefer prompt, stdin, or file-descriptor password input. Environment variable
+  and password-file inputs are supported for automation but require additional
+  process and filesystem controls.
+- Homomorphic encryption helpers are experimental-only under
+  `cryptography_suite.experimental.fhe`. They require explicit
+  `CRYPTOSUITE_ALLOW_EXPERIMENTAL=1` opt-in, are excluded from production
+  security guarantees, and do not use pickle for context deserialization.
 
 ## Version support
 

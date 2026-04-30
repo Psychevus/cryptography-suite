@@ -19,7 +19,21 @@ from .symmetric.kdf import DEFAULT_KDF
 
 Input = TypeVar("Input", contravariant=True)
 Output = TypeVar("Output", covariant=True)
-SENSITIVE_KEY_SUBSTRINGS = ("password", "secret", "key", "private", "token")
+SENSITIVE_KEY_SUBSTRINGS = (
+    "ciphertext",
+    "key",
+    "nonce",
+    "passphrase",
+    "password",
+    "pem",
+    "plaintext",
+    "private",
+    "seed",
+    "secret",
+    "shared",
+    "signature",
+    "token",
+)
 REDACTED_VALUE = "***REDACTED***"
 
 
@@ -169,8 +183,8 @@ class Pipeline(Generic[Input, Output]):
 
     def dry_run(self, data: Any) -> Any:
         result = data
-        for mod in self.modules:
-            print(f"{mod.__class__.__name__}: {result!r}")
+        for index, mod in enumerate(self.modules, start=1):
+            print(f"{index}. {mod.__class__.__name__}: executed")
             result = mod.run(result)
         return result
 

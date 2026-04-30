@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import argparse
+import getpass
 import hashlib
 import json
 import logging
+import os
 import sys
 from pathlib import Path
 from typing import Protocol, cast
@@ -20,6 +22,7 @@ from .core.operations import (
     run_command,
 )
 from .crypto_backends import available_backends
+from .debug import redact_message
 from .errors import DecryptionError, MissingDependencyError
 from .pqc import (
     PQCRYPTO_AVAILABLE,
@@ -31,7 +34,6 @@ from .pqc import (
 from .protocols import generate_totp
 from .protocols.key_management import KeyManager
 from .symmetric.kdf import DEFAULT_KDF
-from .utils import KeyVault
 from .zk.bulletproof import (
     BULLETPROOF_AVAILABLE,
 )
@@ -68,6 +70,80 @@ def _emit(text: str, payload: dict[str, object] | None = None) -> None:
         print(json.dumps(payload, sort_keys=True))
     else:
         print(text)
+
+
+def _add_password_source_args(parser: argparse.ArgumentParser) -> None:
+    """Add safe password input sources to a parser."""
+
+    parser.add_argument(
+        "--password-stdin",
+        action="store_true",
+        help="Read the password from the first line of standard input",
+    )
+    parser.add_argument(
+        "--password-env",
+        help=(
+            "Read the password from an environment variable; less safe than "
+            "prompt/stdin/fd"
+        ),
+    )
+    parser.add_argument(
+        "--password-file",
+        help="Read the password from a local file; protect file permissions carefully",
+    )
+    parser.add_argument(
+        "--password-fd",
+        type=int,
+        help="Read the password from an already-open file descriptor",
+    )
+
+
+def _append_password_source_args(argv: list[str], args: argparse.Namespace) -> None:
+    if getattr(args, "password_stdin", False):
+        argv.append("--password-stdin")
+    if getattr(args, "password_env", None):
+        argv.extend(["--password-env", args.password_env])
+    if getattr(args, "password_file", None):
+        argv.extend(["--password-file", args.password_file])
+    if getattr(args, "password_fd", None) is not None:
+        argv.extend(["--password-fd", str(args.password_fd)])
+
+
+def _resolve_password(
+    args: argparse.Namespace,
+    prompt: str,
+    *,
+    required: bool = True,
+) -> str | None:
+    sources = [
+        bool(getattr(args, "password_stdin", False)),
+        getattr(args, "password_env", None) is not None,
+        getattr(args, "password_file", None) is not None,
+        getattr(args, "password_fd", None) is not None,
+    ]
+    if sum(sources) > 1:
+        raise ValueError("Choose only one password input source.")
+    if getattr(args, "password_stdin", False):
+        password = sys.stdin.readline().rstrip("\r\n")
+    elif getattr(args, "password_env", None) is not None:
+        env_name = args.password_env
+        password = os.environ.get(env_name)
+        if password is None:
+            raise ValueError(f"Environment variable is not set: {env_name}")
+    elif getattr(args, "password_file", None) is not None:
+        password = Path(args.password_file).read_text(encoding="utf-8").rstrip("\r\n")
+    elif getattr(args, "password_fd", None) is not None:
+        fd = os.dup(args.password_fd)
+        with os.fdopen(fd, "r", encoding="utf-8", closefd=True) as handle:
+            password = handle.readline().rstrip("\r\n")
+    elif required:
+        password = getpass.getpass(f"{prompt}: ")
+    else:
+        return None
+
+    if not password:
+        raise ValueError(f"{prompt} cannot be empty.")
+    return password
 
 
 try:
@@ -130,11 +206,7 @@ def file_cli(argv: list[str] | None = None) -> None:
         required=True,
         help="Path for the encrypted file",
     )
-    enc_parser.add_argument(
-        "--password",
-        required=True,
-        help="Password to derive encryption key",
-    )
+    _add_password_source_args(enc_parser)
     enc_parser.add_argument(
         "--kdf",
         choices=["argon2", "scrypt", "pbkdf2"],
@@ -155,16 +227,17 @@ def file_cli(argv: list[str] | None = None) -> None:
         required=True,
         help="Destination for the decrypted file",
     )
-    dec_parser.add_argument(
-        "--password",
-        required=True,
-        help="Password used during encryption",
-    )
+    _add_password_source_args(dec_parser)
     dec_parser.add_argument(
         "--kdf",
         choices=["argon2", "scrypt", "pbkdf2"],
         default=DEFAULT_KDF,
         help="Legacy fallback KDF (ignored for new-format files)",
+    )
+    dec_parser.add_argument(
+        "--allow-legacy-format",
+        action="store_true",
+        help="Explicitly allow pre-v2 unauthenticated-header file formats",
     )
 
     args = parser.parse_args(argv)
@@ -175,8 +248,9 @@ def file_cli(argv: list[str] | None = None) -> None:
         # Keep CLI path checks lightweight for compatibility with test doubles.
         # The underlying crypto/file helpers enforce concrete filesystem semantics.
         _validate_output_parent(args.output_file)
+        password = cast(str, _resolve_password(args, "File password"))
         if args.command == "encrypt":
-            encrypt_file(args.input_file, args.output_file, args.password, kdf=args.kdf)
+            encrypt_file(args.input_file, args.output_file, password, kdf=args.kdf)
             _emit(
                 f"Encrypted file written to {args.output_file}",
                 {
@@ -186,7 +260,13 @@ def file_cli(argv: list[str] | None = None) -> None:
                 },
             )
         else:
-            decrypt_file(args.input_file, args.output_file, args.password, kdf=args.kdf)
+            decrypt_file(
+                args.input_file,
+                args.output_file,
+                password,
+                kdf=args.kdf,
+                allow_legacy_format=args.allow_legacy_format,
+            )
             _emit(
                 f"Decrypted file written to {args.output_file}",
                 {
@@ -202,8 +282,9 @@ def file_cli(argv: list[str] | None = None) -> None:
 def _handle_cli_error(exc: Exception) -> None:
     """Display user-friendly CLI error messages."""
 
+    safe_error = redact_message(str(exc))
     if isinstance(exc, MissingDependencyError):
-        _emit(str(exc), {"error": str(exc), "error_type": "missing_dependency"})
+        _emit(safe_error, {"error": safe_error, "error_type": "missing_dependency"})
     elif isinstance(exc, DecryptionError):
         _emit(
             "Password is incorrect or file corrupted.",
@@ -214,8 +295,8 @@ def _handle_cli_error(exc: Exception) -> None:
         )
     else:
         _emit(
-            f"Error: {exc}",
-            {"error": str(exc), "error_type": exc.__class__.__name__},
+            f"Error: {safe_error}",
+            {"error": safe_error, "error_type": exc.__class__.__name__},
         )
 
 
@@ -240,7 +321,7 @@ def keygen_cli(argv: list[str] | None = None) -> None:
     rsa_p = sub.add_parser("rsa", help="Generate an RSA key pair")
     rsa_p.add_argument("--private", required=True, help="Private key path")
     rsa_p.add_argument("--public", required=True, help="Public key path")
-    rsa_p.add_argument("--password", required=True, help="Password for private key")
+    _add_password_source_args(rsa_p)
 
     if PQCRYPTO_AVAILABLE:
         sub.add_parser("dilithium", help="Generate a Dilithium key pair")
@@ -252,18 +333,25 @@ def keygen_cli(argv: list[str] | None = None) -> None:
 
     if args.scheme == "rsa":
         km = KeyManager()
-        km.generate_rsa_keypair_and_save(args.private, args.public, args.password)
+        password = cast(str, _resolve_password(args, "Private key password"))
+        km.generate_rsa_keypair_and_save(args.private, args.public, password)
         print(f"RSA keys saved to {args.private} and {args.public}")
     else:
         if args.scheme == "dilithium":
-            pk, sk = generate_dilithium_keypair()
+            generate_dilithium_keypair()
         elif args.scheme == "kyber":
-            pk, sk = generate_kyber_keypair()
+            generate_kyber_keypair()
         else:
-            pk, sk = generate_sphincs_keypair()
-        print(pk.hex())
-        sk_bytes = bytes(sk) if isinstance(sk, KeyVault) else sk
-        print(sk_bytes.hex())
+            generate_sphincs_keypair()
+        _emit(
+            f"{args.scheme} key pair generated; key material was not printed.",
+            {
+                "private_key_output": "suppressed",
+                "public_key_output": "suppressed",
+                "scheme": args.scheme,
+                "status": "generated",
+            },
+        )
 
 
 def hash_cli(argv: list[str] | None = None) -> None:
@@ -373,7 +461,7 @@ def keystore_cli(argv: list[str] | None = None) -> None:
     imp = sub.add_parser("import", help="Import a PEM key into the local keystore")
     imp.add_argument("--file", required=True)
     imp.add_argument("--name", required=True)
-    imp.add_argument("--password")
+    _add_password_source_args(imp)
     mig = sub.add_parser("migrate", help="Migrate keys between keystores")
     mig.add_argument("--from", dest="src", required=True)
     mig.add_argument("--to", dest="dst", required=True)
@@ -428,11 +516,10 @@ def keystore_cli(argv: list[str] | None = None) -> None:
         ks_cls = cast(type[LocalKeyStore], get_keystore("local"))
         ks = ks_cls()
         pem = Path(args.file).read_bytes()
-        new_id = ks.import_key(pem, args.name, args.password)
+        password = _resolve_password(args, "Key import password", required=False)
+        new_id = ks.import_key(pem, args.name, password)
         print(new_id)
     elif args.action == "migrate":
-        import hashlib
-
         if not args.dry_run and not getattr(args, "apply", False):
             raise ValueError(
                 "Refusing live key migration without --apply. "
@@ -470,14 +557,13 @@ def keystore_cli(argv: list[str] | None = None) -> None:
                 new_id = key_id
                 if not args.dry_run:
                     new_id = dst.import_key(raw, meta)
-                fp = hashlib.sha256(raw).hexdigest()[:16]
-                stats.append((key_id, new_id, meta.get("type"), fp))
+                stats.append((key_id, new_id, meta.get("type"), "redacted"))
                 print(f"{key_id} -> {new_id}")
             except Exception as exc:  # pragma: no cover - user feedback
-                print(f"Error migrating {key_id}: {exc}")
+                print(f"Error migrating {key_id}: {exc.__class__.__name__}")
                 sys.exit(1)
         if stats:
-            header = ("Old ID", "New ID", "Algorithm", "Fingerprint")
+            header = ("Old ID", "New ID", "Algorithm", "Private Material")
             row = "{:<20} {:<20} {:<10} {:<32}"
             print(row.format(*header))
             for old_id, new_id, algo, fp in stats:
@@ -620,7 +706,7 @@ def main(argv: list[str] | None = None) -> None:
     )
     keygen_parser.add_argument("--private", help="Private key path")
     keygen_parser.add_argument("--public", help="Public key path")
-    keygen_parser.add_argument("--password", help="Private key password")
+    _add_password_source_args(keygen_parser)
 
     hash_parser = sub.add_parser(
         "hash", help="Hash a file", description=hash_cli.__doc__
@@ -721,17 +807,18 @@ def main(argv: list[str] | None = None) -> None:
     f_enc = file_sub.add_parser("encrypt", help="Encrypt a file")
     f_enc.add_argument("--in", dest="input_file", required=True)
     f_enc.add_argument("--out", dest="output_file", required=True)
-    f_enc.add_argument("--password", required=True)
+    _add_password_source_args(f_enc)
     f_enc.add_argument(
         "--kdf", choices=["argon2", "scrypt", "pbkdf2"], default=DEFAULT_KDF
     )
     f_dec = file_sub.add_parser("decrypt", help="Decrypt a file")
     f_dec.add_argument("--in", dest="input_file", required=True)
     f_dec.add_argument("--out", dest="output_file", required=True)
-    f_dec.add_argument("--password", required=True)
+    _add_password_source_args(f_dec)
     f_dec.add_argument(
         "--kdf", choices=["argon2", "scrypt", "pbkdf2"], default=DEFAULT_KDF
     )
+    f_dec.add_argument("--allow-legacy-format", action="store_true")
 
     # Backward compatibility aliases
     enc_alias = sub.add_parser(
@@ -741,7 +828,7 @@ def main(argv: list[str] | None = None) -> None:
     )
     enc_alias.add_argument("--in", dest="input_file", required=True)
     enc_alias.add_argument("--out", dest="output_file", required=True)
-    enc_alias.add_argument("--password", required=True)
+    _add_password_source_args(enc_alias)
     enc_alias.add_argument(
         "--kdf", choices=["argon2", "scrypt", "pbkdf2"], default=DEFAULT_KDF
     )
@@ -752,10 +839,11 @@ def main(argv: list[str] | None = None) -> None:
     )
     dec_alias.add_argument("--in", dest="input_file", required=True)
     dec_alias.add_argument("--out", dest="output_file", required=True)
-    dec_alias.add_argument("--password", required=True)
+    _add_password_source_args(dec_alias)
     dec_alias.add_argument(
         "--kdf", choices=["argon2", "scrypt", "pbkdf2"], default=DEFAULT_KDF
     )
+    dec_alias.add_argument("--allow-legacy-format", action="store_true")
 
     args = parser.parse_args(argv)
     if args.json:
@@ -782,8 +870,7 @@ def main(argv: list[str] | None = None) -> None:
             argv2.extend(["--private", args.private])
         if args.public:
             argv2.extend(["--public", args.public])
-        if args.password:
-            argv2.extend(["--password", args.password])
+        _append_password_source_args(argv2, args)
         keygen_cli(argv2)
     elif args.cmd == "hash":
         hash_cli([args.file, f"--algorithm={args.algorithm}"])
@@ -847,11 +934,12 @@ def main(argv: list[str] | None = None) -> None:
             args.input_file,
             "--out",
             args.output_file,
-            "--password",
-            args.password,
             "--kdf",
             args.kdf,
         ]
+        if mode == "decrypt" and getattr(args, "allow_legacy_format", False):
+            argv2.append("--allow-legacy-format")
+        _append_password_source_args(argv2, args)
         file_cli(argv2)
     elif args.cmd == "backends":
         action_args: list[str] = []

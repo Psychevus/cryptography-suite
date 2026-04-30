@@ -5,7 +5,8 @@
 | Risk | Impact | Mitigation Implemented |
 |---|---|---|
 | Unsafe destructive key migrations | Key loss or accidental overwrite | Keystore migrations now default to safe mode and require explicit `--apply` for live writes. |
-| Unbounded/unsafe subprocess execution | Hung processes, hidden failures, unclear diagnostics | Centralized subprocess runner with timeout, exit-code checks, stderr capture, structured logging, and explicit failures. |
+| Unbounded/unsafe subprocess execution | Hung processes, hidden failures, unclear diagnostics | Centralized subprocess runner with timeout, exit-code checks, redacted structured logging, and explicit failures. |
+| Secret leakage through logs or CLI arguments | Password/key/plaintext exposure in process lists, CI logs, or audit trails | CLI password values are read by prompt/stdin/fd/env/file sources, structured logs redact sensitive fields, and verbose/dry-run output never prints intermediate secrets. |
 | Transient network errors in AWS KMS workflows | Flaky production behavior, partial outages | Retry-with-backoff wrapper with jitter and bounded retry budget around KMS API calls. |
 | Poor observability during incidents | Slow triage and weak postmortems | Structured logs with command context, correlation IDs, and basic metrics counters/timers hooks. |
 | Abrupt termination (SIGINT/SIGTERM) | Incomplete operations and inconsistent state | Signal handlers set cancellation state, emit structured shutdown logs, and fail in-progress retries clearly. |
@@ -27,7 +28,7 @@
 
 - **`fuzz_runner failed with exit code ...`**
   - Cause: child harness failed or timed out.
-  - Action: inspect stderr in log event `subprocess_failed`; increase `--timeout` if needed.
+  - Action: reproduce locally or in CI artifacts; `subprocess_failed` records the exit code with stderr redacted. Increase `--timeout` if needed.
 
 - **`... failed after N attempts` (AWS KMS)**
   - Cause: transient or persistent KMS/API/auth/network issue.
@@ -39,11 +40,11 @@
 
 ### 3. Interpreting logs
 
-Each important action emits machine-readable fields (`operation`, `attempts`, `sleep_s`, `returncode`, `stderr`) with a correlation ID. During incidents:
+Each important action emits machine-readable fields (`operation`, `attempts`, `sleep_s`, `returncode`) with a correlation ID. Sensitive fields such as argv, stdout, stderr, passwords, keys, nonces, plaintext, and ciphertext are redacted. During incidents:
 
 1. Group all lines by `correlation_id`.
 2. Look for `retrying` / `retry_exhausted` events.
-3. For subprocess incidents, inspect `subprocess_failed` and stderr payload.
+3. For subprocess incidents, inspect `subprocess_failed`, exit status, and CI/job artifacts that are governed by the relevant retention policy.
 
 ## Security Notes
 
@@ -62,5 +63,8 @@ Each important action emits machine-readable fields (`operation`, `attempts`, `s
 
 - Always run key migration with `--dry-run` first.
 - Set explicit `--timeout` for long-running fuzzing in CI.
-- Capture stderr logs centrally to preserve actionable failure context.
+- Do not pass passwords as argv values. Prefer prompt, stdin, or file descriptor
+  input; use environment variables only for controlled automation.
+- Capture failure metadata centrally, but keep raw stdout/stderr out of
+  structured logs unless it has been reviewed and redacted.
 - Do not increase retry budgets without evaluating downstream blast radius.

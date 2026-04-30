@@ -39,7 +39,8 @@ cryptography_suite/
 
 ## Runtime Profiles
 
-- `CRYPTOSUITE_ENV=dev`: local defaults, verbose diagnostics.
+- `CRYPTOSUITE_ENV=dev`: local defaults, with verbose diagnostics still subject
+  to secret redaction.
 - `CRYPTOSUITE_ENV=test`: deterministic test profile.
 - `CRYPTOSUITE_ENV=prod`: production profile with strict validation and stable structured logs.
 
