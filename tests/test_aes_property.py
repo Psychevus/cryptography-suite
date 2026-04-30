@@ -10,6 +10,7 @@ def aes_encrypt(message, password, kdf="scrypt"):
 def aes_decrypt(ciphertext, password, kdf="scrypt"):
     return AESGCMDecrypt(password=password, kdf=kdf).run(ciphertext)
 
+
 class TestAesProperty(unittest.TestCase):
     @settings(deadline=None)
     @given(message=st.text(min_size=1), password=st.text(min_size=1))
@@ -17,6 +18,7 @@ class TestAesProperty(unittest.TestCase):
         encrypted = aes_encrypt(message, password, kdf="scrypt")
         decrypted = aes_decrypt(encrypted, password, kdf="scrypt")
         self.assertEqual(message, decrypted)
+
 
 if __name__ == "__main__":
     unittest.main()
