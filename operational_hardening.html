@@ -246,21 +246,25 @@
 </tr>
 <tr class="row-odd"><td><p>Unbounded/unsafe subprocess execution</p></td>
 <td><p>Hung processes, hidden failures, unclear diagnostics</p></td>
-<td><p>Centralized subprocess runner with timeout, exit-code checks, stderr capture, structured logging, and explicit failures.</p></td>
+<td><p>Centralized subprocess runner with timeout, exit-code checks, redacted structured logging, and explicit failures.</p></td>
 </tr>
-<tr class="row-even"><td><p>Transient network errors in AWS KMS workflows</p></td>
+<tr class="row-even"><td><p>Secret leakage through logs or CLI arguments</p></td>
+<td><p>Password/key/plaintext exposure in process lists, CI logs, or audit trails</p></td>
+<td><p>CLI password values are read by prompt/stdin/fd/env/file sources, structured logs redact sensitive fields, and verbose/dry-run output never prints intermediate secrets.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Transient network errors in AWS KMS workflows</p></td>
 <td><p>Flaky production behavior, partial outages</p></td>
 <td><p>Retry-with-backoff wrapper with jitter and bounded retry budget around KMS API calls.</p></td>
 </tr>
-<tr class="row-odd"><td><p>Poor observability during incidents</p></td>
+<tr class="row-even"><td><p>Poor observability during incidents</p></td>
 <td><p>Slow triage and weak postmortems</p></td>
 <td><p>Structured logs with command context, correlation IDs, and basic metrics counters/timers hooks.</p></td>
 </tr>
-<tr class="row-even"><td><p>Abrupt termination (SIGINT/SIGTERM)</p></td>
+<tr class="row-odd"><td><p>Abrupt termination (SIGINT/SIGTERM)</p></td>
 <td><p>Incomplete operations and inconsistent state</p></td>
 <td><p>Signal handlers set cancellation state, emit structured shutdown logs, and fail in-progress retries clearly.</p></td>
 </tr>
-<tr class="row-odd"><td><p>Invalid CLI/file inputs</p></td>
+<tr class="row-even"><td><p>Invalid CLI/file inputs</p></td>
 <td><p>Runtime crashes or unsafe behavior</p></td>
 <td><p>Added input validation for file and pipeline paths, run bounds (<code class="docutils literal notranslate"><span class="pre">--runs</span></code>), and timeout validation.</p></td>
 </tr>
@@ -290,7 +294,7 @@
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">fuzz_runner</span> <span class="pre">failed</span> <span class="pre">with</span> <span class="pre">exit</span> <span class="pre">code</span> <span class="pre">...</span></code></strong></p>
 <ul>
 <li><p>Cause: child harness failed or timed out.</p></li>
-<li><p>Action: inspect stderr in log event <code class="docutils literal notranslate"><span class="pre">subprocess_failed</span></code>; increase <code class="docutils literal notranslate"><span class="pre">--timeout</span></code> if needed.</p></li>
+<li><p>Action: reproduce locally or in CI artifacts; <code class="docutils literal notranslate"><span class="pre">subprocess_failed</span></code> records the exit code with stderr redacted. Increase <code class="docutils literal notranslate"><span class="pre">--timeout</span></code> if needed.</p></li>
 </ul>
 </li>
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">...</span> <span class="pre">failed</span> <span class="pre">after</span> <span class="pre">N</span> <span class="pre">attempts</span></code> (AWS KMS)</strong></p>
@@ -309,11 +313,11 @@
 </section>
 <section id="interpreting-logs">
 <h3>3. Interpreting logs<a class="headerlink" href="#interpreting-logs" title="Link to this heading">¶</a></h3>
-<p>Each important action emits machine-readable fields (<code class="docutils literal notranslate"><span class="pre">operation</span></code>, <code class="docutils literal notranslate"><span class="pre">attempts</span></code>, <code class="docutils literal notranslate"><span class="pre">sleep_s</span></code>, <code class="docutils literal notranslate"><span class="pre">returncode</span></code>, <code class="docutils literal notranslate"><span class="pre">stderr</span></code>) with a correlation ID. During incidents:</p>
+<p>Each important action emits machine-readable fields (<code class="docutils literal notranslate"><span class="pre">operation</span></code>, <code class="docutils literal notranslate"><span class="pre">attempts</span></code>, <code class="docutils literal notranslate"><span class="pre">sleep_s</span></code>, <code class="docutils literal notranslate"><span class="pre">returncode</span></code>) with a correlation ID. Sensitive fields such as argv, stdout, stderr, passwords, keys, nonces, plaintext, and ciphertext are redacted. During incidents:</p>
 <ol class="arabic simple">
 <li><p>Group all lines by <code class="docutils literal notranslate"><span class="pre">correlation_id</span></code>.</p></li>
 <li><p>Look for <code class="docutils literal notranslate"><span class="pre">retrying</span></code> / <code class="docutils literal notranslate"><span class="pre">retry_exhausted</span></code> events.</p></li>
-<li><p>For subprocess incidents, inspect <code class="docutils literal notranslate"><span class="pre">subprocess_failed</span></code> and stderr payload.</p></li>
+<li><p>For subprocess incidents, inspect <code class="docutils literal notranslate"><span class="pre">subprocess_failed</span></code>, exit status, and CI/job artifacts that are governed by the relevant retention policy.</p></li>
 </ol>
 </section>
 </section>
@@ -339,7 +343,10 @@
 <ul class="simple">
 <li><p>Always run key migration with <code class="docutils literal notranslate"><span class="pre">--dry-run</span></code> first.</p></li>
 <li><p>Set explicit <code class="docutils literal notranslate"><span class="pre">--timeout</span></code> for long-running fuzzing in CI.</p></li>
-<li><p>Capture stderr logs centrally to preserve actionable failure context.</p></li>
+<li><p>Do not pass passwords as argv values. Prefer prompt, stdin, or file descriptor
+input; use environment variables only for controlled automation.</p></li>
+<li><p>Capture failure metadata centrally, but keep raw stdout/stderr out of
+structured logs unless it has been reviewed and redacted.</p></li>
 <li><p>Do not increase retry budgets without evaluating downstream blast radius.</p></li>
 </ul>
 </section>

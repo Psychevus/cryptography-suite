@@ -241,8 +241,19 @@ explicitly.</p>
 <section id="file-encryption">
 <h2>File Encryption<a class="headerlink" href="#file-encryption" title="Link to this heading">¶</a></h2>
 <p>Use the <code class="docutils literal notranslate"><span class="pre">file</span></code> group to encrypt and decrypt files:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cryptography-suite<span class="w"> </span>file<span class="w"> </span>encrypt<span class="w"> </span>--in<span class="w"> </span>INPUT<span class="w"> </span>--out<span class="w"> </span>OUTPUT<span class="w"> </span>--password<span class="w"> </span>PASS
-cryptography-suite<span class="w"> </span>file<span class="w"> </span>decrypt<span class="w"> </span>--in<span class="w"> </span>INPUT<span class="w"> </span>--out<span class="w"> </span>OUTPUT<span class="w"> </span>--password<span class="w"> </span>PASS
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cryptography-suite<span class="w"> </span>file<span class="w"> </span>encrypt<span class="w"> </span>--in<span class="w"> </span>INPUT<span class="w"> </span>--out<span class="w"> </span>OUTPUT
+cryptography-suite<span class="w"> </span>file<span class="w"> </span>decrypt<span class="w"> </span>--in<span class="w"> </span>INPUT<span class="w"> </span>--out<span class="w"> </span>OUTPUT
+</pre></div>
+</div>
+<p>When no password source is provided, the CLI prompts without echoing input.
+For automation, use <code class="docutils literal notranslate"><span class="pre">--password-stdin</span></code> or <code class="docutils literal notranslate"><span class="pre">--password-fd</span></code>. <code class="docutils literal notranslate"><span class="pre">--password-env</span></code>
+and <code class="docutils literal notranslate"><span class="pre">--password-file</span></code> are available, but they are less safe because environment
+variables and files need separate process and filesystem controls.</p>
+<p>New file encryption output uses the v2 AES-GCM streaming format with
+authenticated header metadata. Decryption writes to a same-directory temporary
+file and replaces the requested output path only after authentication succeeds.
+To decrypt pre-v2 files, opt in explicitly:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cryptography-suite<span class="w"> </span>file<span class="w"> </span>decrypt<span class="w"> </span>--in<span class="w"> </span>LEGACY<span class="w"> </span>--out<span class="w"> </span>OUTPUT<span class="w"> </span>--allow-legacy-format
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">cryptography-suite</span> <span class="pre">encrypt</span></code> and <code class="docutils literal notranslate"><span class="pre">cryptography-suite</span> <span class="pre">decrypt</span></code> remain available

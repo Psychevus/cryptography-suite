@@ -237,8 +237,9 @@ that the sender’s <code class="docutils literal notranslate"><span class="pre"
 using the helper <code class="docutils literal notranslate"><span class="pre">verify_signed_prekey</span></code>. A failed verification raises
 <code class="docutils literal notranslate"><span class="pre">SignatureVerificationError</span></code>.</p>
 <p>One-time prekeys are optional. When present they are mixed into the Diffie–Hellman
-chain as <code class="docutils literal notranslate"><span class="pre">dh4</span> <span class="pre">=</span> <span class="pre">DH(IK_B,</span> <span class="pre">OPK_A)</span></code>. Each step of the chain (<code class="docutils literal notranslate"><span class="pre">dh1</span></code>, <code class="docutils literal notranslate"><span class="pre">dh2</span></code>, <code class="docutils literal notranslate"><span class="pre">dh3</span></code>, <code class="docutils literal notranslate"><span class="pre">dh4</span></code>)
-is logged with <code class="docutils literal notranslate"><span class="pre">verbose_print</span></code> when <code class="docutils literal notranslate"><span class="pre">VERBOSE_MODE</span></code> is enabled.</p>
+chain as <code class="docutils literal notranslate"><span class="pre">dh4</span> <span class="pre">=</span> <span class="pre">DH(IK_B,</span> <span class="pre">OPK_A)</span></code>. Verbose mode may log step labels for
+diagnostics, but it must never log DH outputs, shared secrets, root keys, or
+message keys.</p>
 </section>
 
         </article>

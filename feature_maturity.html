@@ -247,9 +247,9 @@ as <em>experimental</em> are <strong>not</strong> production-ready.</p>
 <td><p>Lacks multi-session support, message counters, and long-term key storage</p></td>
 </tr>
 <tr class="row-odd"><td><p>Homomorphic Encryption (Pyfhel)</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">cryptography_suite.homomorphic</span></code> via <code class="docutils literal notranslate"><span class="pre">cryptography_suite.experimental</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">cryptography_suite.experimental.fhe</span></code></p></td>
 <td><p>Experimental</p></td>
-<td><p>Thin backend; needs alternative library support and context management</p></td>
+<td><p>Opt-in only; no pickle deserialization; context serialization requires Pyfhel native byte APIs</p></td>
 </tr>
 <tr class="row-even"><td><p>Zero-Knowledge Proof Helpers</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">cryptography_suite.zk</span></code> via <code class="docutils literal notranslate"><span class="pre">cryptography_suite.experimental</span></code></p></td>

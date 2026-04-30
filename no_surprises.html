@@ -261,7 +261,9 @@ cryptography-suite<span class="w"> </span>otp<span class="w"> </span>--secret<sp
 <h3>Packaging extras<a class="headerlink" href="#packaging-extras" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">pqc</span></code>: post-quantum algorithms.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">fhe</span></code>: homomorphic helpers.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fhe</span></code>: experimental homomorphic helpers. They still require
+<code class="docutils literal notranslate"><span class="pre">CRYPTOSUITE_ALLOW_EXPERIMENTAL=1</span></code> at runtime and never use pickle for
+context deserialization.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">zk</span></code>: zero-knowledge helpers.</p></li>
 </ul>
 </section>
@@ -280,9 +282,12 @@ cryptography-suite<span class="w"> </span>otp<span class="w"> </span>--secret<sp
 <h2>Examples<a class="headerlink" href="#examples" title="Link to this heading">¶</a></h2>
 <section id="human-readable-output-default">
 <h3>1) Human-readable output (default)<a class="headerlink" href="#human-readable-output-default" title="Link to this heading">¶</a></h3>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cryptography-suite<span class="w"> </span>file<span class="w"> </span>encrypt<span class="w"> </span>--in<span class="w"> </span>plain.txt<span class="w"> </span>--out<span class="w"> </span>enc.bin<span class="w"> </span>--password<span class="w"> </span>pw
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cryptography-suite<span class="w"> </span>file<span class="w"> </span>encrypt<span class="w"> </span>--in<span class="w"> </span>plain.txt<span class="w"> </span>--out<span class="w"> </span>enc.bin
 </pre></div>
 </div>
+<p>The command prompts for the password without echoing it. Scripts should prefer
+<code class="docutils literal notranslate"><span class="pre">--password-stdin</span></code> or <code class="docutils literal notranslate"><span class="pre">--password-fd</span></code>; environment variables are supported only
+for controlled automation where process exposure is understood.</p>
 </section>
 <section id="machine-readable-output">
 <h3>2) Machine-readable output<a class="headerlink" href="#machine-readable-output" title="Link to this heading">¶</a></h3>
@@ -301,7 +306,10 @@ cryptography-suite<span class="w"> </span>otp<span class="w"> </span>--secret<sp
 </section>
 <section id="migration-deprecation-note">
 <h2>Migration / deprecation note<a class="headerlink" href="#migration-deprecation-note" title="Link to this heading">¶</a></h2>
-<p>No breaking interface removals were introduced. The only deprecation is:</p>
+<p>The file/keygen CLI no longer accepts passwords directly as command-line
+arguments. Existing scripts should switch to prompt, stdin, fd, environment, or
+file-based secret input.</p>
+<p>The only deprecation is:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">--json</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">--output-format</span> <span class="pre">json</span></code></p></li>
 </ul>

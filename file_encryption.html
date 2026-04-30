@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html">
 
     <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
-        <title>Release Checklist - cryptography-suite 3.0.0 documentation</title>
+        <title>File Encryption Format - cryptography-suite 3.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -172,7 +172,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -209,7 +209,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="_sources/release_checklist.md.txt" title="View this page">
+  <a class="muted-link" href="_sources/file_encryption.md.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -222,54 +222,30 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="release-checklist">
-<h1>Release Checklist<a class="headerlink" href="#release-checklist" title="Link to this heading">¶</a></h1>
-<section id="before-tagging">
-<h2>Before tagging<a class="headerlink" href="#before-tagging" title="Link to this heading">¶</a></h2>
-<ul class="simple">
-<li><p>[ ] Ensure <code class="docutils literal notranslate"><span class="pre">CHANGELOG.md</span></code> has a <code class="docutils literal notranslate"><span class="pre">##</span> <span class="pre">[X.Y.Z]</span> <span class="pre">-</span> <span class="pre">YYYY-MM-DD</span></code> section for the release.</p></li>
-<li><p>[ ] Confirm version follows SemVer and planned scope (<code class="docutils literal notranslate"><span class="pre">MAJOR</span></code>, <code class="docutils literal notranslate"><span class="pre">MINOR</span></code>, <code class="docutils literal notranslate"><span class="pre">PATCH</span></code>).</p></li>
-<li><p>[ ] Run local quality checks:</p>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">pre-commit</span> <span class="pre">run</span></code> (formatting/lint/type/security on changed files)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">ruff</span> <span class="pre">check</span> <span class="pre">&lt;changed-python-files&gt;</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">mypy</span> <span class="pre">--follow-imports=skip</span> <span class="pre">--ignore-missing-imports</span> <span class="pre">--disable-error-code=no-any-return</span> <span class="pre">--disable-error-code=no-untyped-def</span> <span class="pre">--disable-error-code=misc</span> <span class="pre">--disable-error-code=type-arg</span> <span class="pre">&lt;changed-python-files&gt;</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">bandit</span> <span class="pre">-q</span> <span class="pre">-r</span> <span class="pre">cryptography_suite</span> <span class="pre">-x</span> <span class="pre">tests,docs,examples</span> <span class="pre">-s</span> <span class="pre">B101,B110,B301,B311,B403,B404,B413,B603,B701</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">pip-audit</span> <span class="pre">-r</span> <span class="pre">requirements.txt</span> <span class="pre">--strict</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">pytest</span> <span class="pre">--ignore=tests/generated</span> <span class="pre">--cov=cryptography_suite</span> <span class="pre">--cov-branch</span></code></p></li>
-</ul>
-</li>
-</ul>
-</section>
-<section id="tag-and-release">
-<h2>Tag and release<a class="headerlink" href="#tag-and-release" title="Link to this heading">¶</a></h2>
-<ul class="simple">
-<li><p>[ ] Create a signed SemVer tag: <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">tag</span> <span class="pre">-s</span> <span class="pre">vX.Y.Z</span> <span class="pre">-m</span> <span class="pre">&quot;Release</span> <span class="pre">vX.Y.Z&quot;</span></code>.</p></li>
-<li><p>[ ] Push the tag: <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">push</span> <span class="pre">origin</span> <span class="pre">vX.Y.Z</span></code>.</p></li>
-<li><p>[ ] Confirm GitHub Actions <code class="docutils literal notranslate"><span class="pre">Release</span></code> workflow passed:</p>
-<ul>
-<li><p>SemVer tag validation</p></li>
-<li><p>Changelog entry validation</p></li>
-<li><p>Full quality gate rerun</p></li>
-<li><p>Reproducible build + SBOM generation</p></li>
-<li><p>Artifact linting + PyPI publish + GitHub Release upload</p></li>
-</ul>
-</li>
-</ul>
-</section>
-<section id="post-release">
-<h2>Post-release<a class="headerlink" href="#post-release" title="Link to this heading">¶</a></h2>
-<ul class="simple">
-<li><p>[ ] Verify release artifacts exist on GitHub Releases and PyPI.</p></li>
-<li><p>[ ] Verify release notes were populated from <code class="docutils literal notranslate"><span class="pre">CHANGELOG.md</span></code>.</p></li>
-<li><p>[ ] Announce release and link migration notes when relevant.</p></li>
-</ul>
-</section>
+          <section id="file-encryption-format">
+<h1>File Encryption Format<a class="headerlink" href="#file-encryption-format" title="Link to this heading">¶</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">encrypt_file</span></code> and <code class="docutils literal notranslate"><span class="pre">encrypt_file_async</span></code> write AES-GCM encrypted files in the v2
+streaming format:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>CSF! || version=2 || KDF id || salt length || nonce length || chunk size || salt || nonce || ciphertext || tag
+</pre></div>
+</div>
+<p>The full header through <code class="docutils literal notranslate"><span class="pre">nonce</span></code> is passed to AES-GCM as additional
+authenticated data. Decryption validates the magic, version, KDF id, salt
+length, nonce length, chunk size, and minimum payload size before streaming any
+plaintext.</p>
+<p>Plaintext is written only to a temporary file in the requested output
+directory. The requested output path is replaced atomically after the GCM tag
+verifies. Authentication failure, malformed headers, truncation, or wrong
+passwords leave any pre-existing output file untouched and remove only the
+temporary file created by the current operation.</p>
+<p>Legacy v1 versioned files and raw <code class="docutils literal notranslate"><span class="pre">salt</span> <span class="pre">||</span> <span class="pre">nonce</span> <span class="pre">||</span> <span class="pre">ciphertext</span> <span class="pre">||</span> <span class="pre">tag</span></code> files
+are decrypt-only compatibility formats. Callers must pass
+<code class="docutils literal notranslate"><span class="pre">allow_legacy_format=True</span></code>, or use <code class="docutils literal notranslate"><span class="pre">cryptography-suite</span> <span class="pre">file</span> <span class="pre">decrypt</span> <span class="pre">--allow-legacy-format</span></code>, to decrypt those files.</p>
 </section>
 
         </article>
@@ -297,29 +273,8 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">Release Checklist</a><ul>
-<li><a class="reference internal" href="#before-tagging">Before tagging</a></li>
-<li><a class="reference internal" href="#tag-and-release">Tag and release</a></li>
-<li><a class="reference internal" href="#post-release">Post-release</a></li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>

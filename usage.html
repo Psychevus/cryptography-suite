@@ -249,8 +249,8 @@ if they operate in hybrid or legacy mode.</p>
 </pre></div>
 </div>
 <p>Runs without prompts.  Stops on the first failure unless
-<code class="docutils literal notranslate"><span class="pre">--ignore-errors</span></code> is supplied.  <code class="docutils literal notranslate"><span class="pre">--dry-run</span></code> logs actions without
-writing any keys to the target.</p>
+<code class="docutils literal notranslate"><span class="pre">--ignore-errors</span></code> is supplied.  <code class="docutils literal notranslate"><span class="pre">--dry-run</span></code> logs only key identifiers and
+algorithm metadata; it does not print or persist private key material.</p>
 <p>To export a signed forensics report or mirror logs to a SIEM:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cryptography-suite<span class="w"> </span>migrate-keys<span class="w"> </span>--from<span class="w"> </span>file<span class="w"> </span>--to<span class="w"> </span>hsm<span class="w"> </span>--batch<span class="w"> </span>--forensics-report<span class="w"> </span>report.json<span class="w"> </span>--syslog
 <span class="c1"># or</span>

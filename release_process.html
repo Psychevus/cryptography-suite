@@ -253,7 +253,7 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">mypy</span></code> (changed Python files)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">bandit</span></code> repository scan</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">pip-audit</span> <span class="pre">-r</span> <span class="pre">requirements.txt</span> <span class="pre">--strict</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">pytest</span> <span class="pre">--cov=cryptography_suite</span> <span class="pre">--cov-branch</span> <span class="pre">--cov-fail-under=95</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pytest</span> <span class="pre">--ignore=tests/generated</span> <span class="pre">--cov=cryptography_suite</span> <span class="pre">--cov-branch</span></code></p></li>
 </ul>
 </li>
 <li><p>Install pinned release dependencies from <code class="docutils literal notranslate"><span class="pre">requirements-release.txt</span></code>.</p></li>

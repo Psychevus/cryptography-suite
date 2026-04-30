@@ -256,6 +256,17 @@
 <li><p>No side-channel hardening claims are made unless explicitly stated.</p></li>
 <li><p>Constant-time hardening is ongoing and may vary by backend/platform.</p></li>
 <li><p>Deployments must provide cryptographically secure randomness and adequate entropy.</p></li>
+<li><p>CLI, verbose, debug, dry-run, and structured logging paths must not print
+passwords, derived keys, raw/private keys, shared secrets, plaintext, nonces,
+or ciphertext internals. Report any suspected secret disclosure as a security
+issue.</p></li>
+<li><p>Prefer prompt, stdin, or file-descriptor password input. Environment variable
+and password-file inputs are supported for automation but require additional
+process and filesystem controls.</p></li>
+<li><p>Homomorphic encryption helpers are experimental-only under
+<code class="docutils literal notranslate"><span class="pre">cryptography_suite.experimental.fhe</span></code>. They require explicit
+<code class="docutils literal notranslate"><span class="pre">CRYPTOSUITE_ALLOW_EXPERIMENTAL=1</span></code> opt-in, are excluded from production
+security guarantees, and do not use pickle for context deserialization.</p></li>
 </ul>
 </section>
 <section id="version-support">
