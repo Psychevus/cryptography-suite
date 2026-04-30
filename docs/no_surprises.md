@@ -32,7 +32,9 @@ cryptography-suite otp --secret JBSWY3DPEHPK3PXP
 ### Packaging extras
 
 - `pqc`: post-quantum algorithms.
-- `fhe`: homomorphic helpers.
+- `fhe`: experimental homomorphic helpers. They still require
+  `CRYPTOSUITE_ALLOW_EXPERIMENTAL=1` at runtime and never use pickle for
+  context deserialization.
 - `zk`: zero-knowledge helpers.
 
 ## Architecture overview
@@ -48,8 +50,12 @@ cryptography-suite otp --secret JBSWY3DPEHPK3PXP
 ### 1) Human-readable output (default)
 
 ```bash
-cryptography-suite file encrypt --in plain.txt --out enc.bin --password pw
+cryptography-suite file encrypt --in plain.txt --out enc.bin
 ```
+
+The command prompts for the password without echoing it. Scripts should prefer
+`--password-stdin` or `--password-fd`; environment variables are supported only
+for controlled automation where process exposure is understood.
 
 ### 2) Machine-readable output
 
@@ -68,7 +74,11 @@ The command still works, but prints a deprecation warning advising
 
 ## Migration / deprecation note
 
-No breaking interface removals were introduced. The only deprecation is:
+The file/keygen CLI no longer accepts passwords directly as command-line
+arguments. Existing scripts should switch to prompt, stdin, fd, environment, or
+file-based secret input.
+
+The only deprecation is:
 
 - `--json` -> `--output-format json`
 

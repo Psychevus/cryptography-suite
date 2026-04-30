@@ -27,7 +27,8 @@ Cryptography Suite 2.0.2 introduces improvements to the X3DH key agreement.
 - **Signed Prekey Verification** ensures that session setup fails when the
   signature on the sender's prekey is invalid.
 - **Optional One-Time Prekeys** are now mixed into the shared secret when
-  provided, with each DH step logged when ``VERBOSE_MODE`` is enabled.
+  provided. Verbose diagnostics identify completed steps without logging DH
+  outputs or shared-secret material.
 
 ---
 

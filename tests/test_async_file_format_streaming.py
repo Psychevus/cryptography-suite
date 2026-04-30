@@ -106,12 +106,16 @@ def test_decrypt_async_detects_corrupted_tag(
     tampered = bytearray(enc.read_bytes())
     tampered[-1] ^= 0xAA
     enc.write_bytes(bytes(tampered))
+    out.write_bytes(b"async existing output")
 
     async def decrypt_bad() -> None:
         await decrypt_file_async(str(enc), str(out), "pw")
 
     with pytest.raises(DecryptionError, match="Invalid password or corrupted file"):
         asyncio.run(decrypt_bad())
+
+    assert out.read_bytes() == b"async existing output"
+    assert not list(tmp_path.glob(f".{out.name}.*.tmp"))
 
 
 def test_decrypt_async_supports_legacy_format(
@@ -133,7 +137,13 @@ def test_decrypt_async_supports_legacy_format(
     )
 
     async def run() -> None:
-        await decrypt_file_async(str(legacy), str(out), "pw", kdf="scrypt")
+        await decrypt_file_async(
+            str(legacy),
+            str(out),
+            "pw",
+            kdf="scrypt",
+            allow_legacy_format=True,
+        )
 
     asyncio.run(run())
 

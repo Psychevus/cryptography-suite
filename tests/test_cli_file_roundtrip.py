@@ -1,5 +1,6 @@
 """Integration test: encrypt via CLI and decrypt via library."""
 
+import io
 from pathlib import Path
 import tempfile
 
@@ -8,7 +9,7 @@ from cryptography_suite.cli import file_cli
 from cryptography_suite.symmetric import decrypt_file
 
 
-def test_cli_file_roundtrip():
+def test_cli_file_roundtrip(monkeypatch):
     """Generate RSA key, encrypt file via CLI, decrypt using library."""
     # ensure RSA key generation works
     priv, pub = generate_rsa_keypair()
@@ -20,7 +21,8 @@ def test_cli_file_roundtrip():
         enc = Path(tmpdir) / "enc.bin"
         dec = Path(tmpdir) / "out.txt"
 
-        file_cli(["encrypt", "--in", str(plain), "--out", str(enc), "--password", "pw"])
+        monkeypatch.setattr("sys.stdin", io.StringIO("pw\n"))
+        file_cli(["encrypt", "--in", str(plain), "--out", str(enc), "--password-stdin"])
         decrypt_file(str(enc), str(dec), "pw")
 
         assert dec.read_text() == "hello integration"

@@ -29,7 +29,7 @@ formally verified, misuse-resistant workflows.
 - Supply-Chain Attestation, SLSA, and Reproducible Builds
 - Signal Protocol components (X3DH + Double Ratchet) for demo use (*experimental, not production-ready*)
 - Post-Quantum primitives: Kyber KEM, Dilithium signatures, and *experimental* SPHINCS+ (requires `pip install "cryptography-suite[pqc]"`)
-- Homomorphic encryption helpers via Pyfhel (*experimental*)
+- Homomorphic encryption helpers via Pyfhel under ``cryptography_suite.experimental.fhe`` (*experimental, opt-in only, no pickle context loading*)
 - Zero-knowledge proof demos (Bulletproofs, zk-SNARK) (*experimental*)
 
 

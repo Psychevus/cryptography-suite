@@ -1,4 +1,5 @@
 import hashlib
+import io
 import importlib
 from types import ModuleType
 
@@ -22,6 +23,7 @@ def test_main_keygen_rsa(monkeypatch, capsys):
             called["args"] = (priv, pub, pwd)
 
     monkeypatch.setattr(cli, "KeyManager", lambda: KM())
+    monkeypatch.setattr("sys.stdin", io.StringIO("pw\n"))
     cli.main(
         [
             "keygen",
@@ -30,8 +32,7 @@ def test_main_keygen_rsa(monkeypatch, capsys):
             "priv.pem",
             "--public",
             "pub.pem",
-            "--password",
-            "pw",
+            "--password-stdin",
         ]
     )
     assert called["args"] == ("priv.pem", "pub.pem", "pw")

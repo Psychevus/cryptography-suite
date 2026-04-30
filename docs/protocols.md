@@ -9,5 +9,6 @@ using the helper ``verify_signed_prekey``. A failed verification raises
 ``SignatureVerificationError``.
 
 One-time prekeys are optional. When present they are mixed into the Diffie–Hellman
-chain as `dh4 = DH(IK_B, OPK_A)`. Each step of the chain (`dh1`, `dh2`, `dh3`, `dh4`)
-is logged with `verbose_print` when `VERBOSE_MODE` is enabled.
+chain as `dh4 = DH(IK_B, OPK_A)`. Verbose mode may log step labels for
+diagnostics, but it must never log DH outputs, shared secrets, root keys, or
+message keys.

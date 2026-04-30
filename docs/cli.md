@@ -17,8 +17,22 @@ cryptography-suite --help
 Use the ``file`` group to encrypt and decrypt files:
 
 ```bash
-cryptography-suite file encrypt --in INPUT --out OUTPUT --password PASS
-cryptography-suite file decrypt --in INPUT --out OUTPUT --password PASS
+cryptography-suite file encrypt --in INPUT --out OUTPUT
+cryptography-suite file decrypt --in INPUT --out OUTPUT
+```
+
+When no password source is provided, the CLI prompts without echoing input.
+For automation, use `--password-stdin` or `--password-fd`. `--password-env`
+and `--password-file` are available, but they are less safe because environment
+variables and files need separate process and filesystem controls.
+
+New file encryption output uses the v2 AES-GCM streaming format with
+authenticated header metadata. Decryption writes to a same-directory temporary
+file and replaces the requested output path only after authentication succeeds.
+To decrypt pre-v2 files, opt in explicitly:
+
+```bash
+cryptography-suite file decrypt --in LEGACY --out OUTPUT --allow-legacy-format
 ```
 
 `cryptography-suite encrypt` and `cryptography-suite decrypt` remain available

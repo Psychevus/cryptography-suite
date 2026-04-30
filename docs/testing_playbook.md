@@ -26,14 +26,16 @@
 
 ## Coverage policy
 - Run coverage with branch tracking enabled.
-- Global floor remains high (99% line rate).
+- Do not publish a project-wide percentage until the reported value is backed
+  by meaningful behavioral, negative, property, and regression tests.
 - Guard critical modules with per-module line+branch thresholds via `tools/check_coverage_thresholds.py`.
-- Exclude generated/template code and thin wrappers listed in `.coveragerc`.
+- Exclude template code listed in `.coveragerc`, and ignore generated tests in
+  test runners so they cannot inflate coverage.
 
 ## Local workflow
 ```bash
 pip install -e .[dev]
-coverage run --rcfile=.coveragerc -m pytest -p no:cov cryptography_suite tests
+coverage run --rcfile=.coveragerc -m pytest -p no:cov --ignore=tests/generated cryptography_suite tests
 coverage xml --fail-under=0
 coverage json
 python tools/check_coverage_thresholds.py

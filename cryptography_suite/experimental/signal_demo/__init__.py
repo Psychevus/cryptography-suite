@@ -13,7 +13,6 @@ from typing import TYPE_CHECKING
 import os
 
 if TYPE_CHECKING or os.getenv("CRYPTOSUITE_ALLOW_EXPERIMENTAL"):
-
     import warnings
     from dataclasses import dataclass
     from typing import Tuple
@@ -79,15 +78,15 @@ if TYPE_CHECKING or os.getenv("CRYPTOSUITE_ALLOW_EXPERIMENTAL"):
         """Perform the initiator side of the X3DH key agreement."""
 
         dh1 = id_priv.exchange(peer_prekey_pub)
-        verbose_print(f"DH1: {dh1.hex()}")
+        verbose_print("X3DH initiator DH1 computed")
         dh2 = eph_priv.exchange(peer_id_pub)
-        verbose_print(f"DH2: {dh2.hex()}")
+        verbose_print("X3DH initiator DH2 computed")
         dh3 = eph_priv.exchange(peer_prekey_pub)
-        verbose_print(f"DH3: {dh3.hex()}")
+        verbose_print("X3DH initiator DH3 computed")
         master = dh1 + dh2 + dh3
         if opk_priv is not None:
             dh4 = opk_priv.exchange(peer_id_pub)
-            verbose_print(f"DH4: {dh4.hex()}")
+            verbose_print("X3DH initiator DH4 computed")
             master += dh4
         return _hkdf(master, None, b"x3dh", 32)
 
@@ -101,15 +100,15 @@ if TYPE_CHECKING or os.getenv("CRYPTOSUITE_ALLOW_EXPERIMENTAL"):
         """Perform the responder side of the X3DH key agreement."""
 
         dh1 = prekey_priv.exchange(peer_id_pub)
-        verbose_print(f"DH1: {dh1.hex()}")
+        verbose_print("X3DH responder DH1 computed")
         dh2 = id_priv.exchange(peer_eph_pub)
-        verbose_print(f"DH2: {dh2.hex()}")
+        verbose_print("X3DH responder DH2 computed")
         dh3 = prekey_priv.exchange(peer_eph_pub)
-        verbose_print(f"DH3: {dh3.hex()}")
+        verbose_print("X3DH responder DH3 computed")
         master = dh1 + dh2 + dh3
         if peer_opk_pub is not None:
             dh4 = id_priv.exchange(peer_opk_pub)
-            verbose_print(f"DH4: {dh4.hex()}")
+            verbose_print("X3DH responder DH4 computed")
             master += dh4
         return _hkdf(master, None, b"x3dh", 32)
 
@@ -220,7 +219,9 @@ if TYPE_CHECKING or os.getenv("CRYPTOSUITE_ALLOW_EXPERIMENTAL"):
             self.identity_pub = identity_priv.public_key()
             self.ephemeral_priv = x25519.X25519PrivateKey.generate()
             self.signed_prekey_priv = x25519.X25519PrivateKey.generate()
-            self.one_time_priv = x25519.X25519PrivateKey.generate() if use_one_time_prekey else None
+            self.one_time_priv = (
+                x25519.X25519PrivateKey.generate() if use_one_time_prekey else None
+            )
             sign_key = ed25519.Ed25519PrivateKey.from_private_bytes(
                 self.identity_priv.private_bytes(
                     encoding=serialization.Encoding.Raw,
@@ -244,16 +245,22 @@ if TYPE_CHECKING or os.getenv("CRYPTOSUITE_ALLOW_EXPERIMENTAL"):
                 peer_prekey_pub,
                 self.one_time_priv,
             )
-            self.ratchet = DoubleRatchet(root, self.ephemeral_priv, peer_prekey_pub, True)
+            self.ratchet = DoubleRatchet(
+                root, self.ephemeral_priv, peer_prekey_pub, True
+            )
 
         @property
-        def handshake_public(self) -> Tuple[bytes, bytes, bytes, bytes, bytes | None, bytes]:
+        def handshake_public(
+            self,
+        ) -> Tuple[bytes, bytes, bytes, bytes, bytes | None, bytes]:
             """Return all public handshake bytes including signatures."""
 
             return self.handshake_bundle
 
         @property
-        def handshake_bundle(self) -> Tuple[bytes, bytes, bytes, bytes, bytes | None, bytes]:
+        def handshake_bundle(
+            self,
+        ) -> Tuple[bytes, bytes, bytes, bytes, bytes | None, bytes]:
             """Return all public handshake data including signatures."""
 
             opk = (
@@ -374,7 +381,9 @@ if TYPE_CHECKING or os.getenv("CRYPTOSUITE_ALLOW_EXPERIMENTAL"):
                 raise ProtocolError("Session not initialized")
             return self.ratchet.decrypt(message)
 
-    def initialize_signal_session(*, use_one_time_prekey: bool = False) -> Tuple[SignalSender, SignalReceiver]:
+    def initialize_signal_session(
+        *, use_one_time_prekey: bool = False
+    ) -> Tuple[SignalSender, SignalReceiver]:
         """Convenience function to create two parties with a shared session.
 
         WARNING: This implementation is a simplified demonstration of the Signal

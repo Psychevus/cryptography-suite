@@ -3,11 +3,32 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Mapping, Sequence
 from contextvars import ContextVar
 from typing import Any
 from uuid import uuid4
 
+from ..debug import REDACTED_VALUE, redact_message
+
 _CORRELATION_ID: ContextVar[str] = ContextVar("cryptosuite_correlation_id", default="")
+SENSITIVE_FIELD_NAMES = (
+    "argv",
+    "ciphertext",
+    "key",
+    "nonce",
+    "passphrase",
+    "password",
+    "pem",
+    "plaintext",
+    "private",
+    "seed",
+    "secret",
+    "shared",
+    "signature",
+    "stderr",
+    "stdout",
+    "token",
+)
 
 
 class CorrelationIdFilter(logging.Filter):
@@ -60,6 +81,37 @@ def get_structured_logger(name: str) -> logging.Logger:
     return logger
 
 
+def _is_sensitive_field(key: str) -> bool:
+    key_lower = key.lower()
+    return any(part in key_lower for part in SENSITIVE_FIELD_NAMES)
+
+
+def _redact_for_logging(value: Any, key_name: str | None = None) -> Any:
+    if key_name is not None and _is_sensitive_field(key_name):
+        if isinstance(value, (bytes, bytearray, memoryview)):
+            return f"<{len(value)} bytes redacted>"
+        if key_name.lower() == "argv":
+            return [REDACTED_VALUE]
+        return REDACTED_VALUE
+    if isinstance(value, str):
+        return redact_message(value)
+    if isinstance(value, (bytes, bytearray, memoryview)):
+        return f"<{len(value)} bytes>"
+    if isinstance(value, Mapping):
+        return {
+            k: _redact_for_logging(v, k if isinstance(k, str) else None)
+            for k, v in value.items()
+        }
+    if isinstance(value, tuple):
+        return tuple(_redact_for_logging(item) for item in value)
+    if isinstance(value, Sequence) and not isinstance(value, (str, bytes, bytearray)):
+        return [_redact_for_logging(item) for item in value]
+    return value
+
+
 def log_event(logger: logging.Logger, message: str, **fields: Any) -> None:
-    payload = " ".join(f"{key}={value!r}" for key, value in sorted(fields.items()))
+    payload = " ".join(
+        f"{key}={_redact_for_logging(value, key)!r}"
+        for key, value in sorted(fields.items())
+    )
     logger.info("%s %s", message, payload)

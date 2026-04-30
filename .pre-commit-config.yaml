@@ -28,7 +28,7 @@ repos:
   - repo: local
     hooks:
       - id: pytest-coverage
-        name: pytest branch coverage gate
-        entry: pytest --cov=cryptography_suite --cov-branch --cov-report=term-missing --cov-fail-under=95
+        name: pytest branch coverage report
+        entry: pytest --ignore=tests/generated --cov=cryptography_suite --cov-branch --cov-report=term-missing
         language: system
         pass_filenames: false

@@ -7,8 +7,6 @@ XChaCha20-Poly1305 in this project.
 """
 
 import base64
-import binascii
-import logging
 from os import urandom
 
 from cryptography.hazmat.primitives.ciphers.aead import ChaCha20Poly1305
@@ -18,13 +16,10 @@ try:  # pragma: no cover - optional algorithm
 except Exception:  # pragma: no cover - old cryptography versions
     XChaCha20Poly1305 = None
 from ..errors import EncryptionError, DecryptionError, MissingDependencyError
-from ..debug import VERBOSE, verbose_print
+from ..debug import verbose_print
 
 from ..constants import CHACHA20_KEY_SIZE, NONCE_SIZE, SALT_SIZE
 from .kdf import derive_key_argon2
-
-
-logger = logging.getLogger(__name__)
 
 
 def chacha20_encrypt(
@@ -41,16 +36,10 @@ def chacha20_encrypt(
 
     salt = urandom(SALT_SIZE)
     key = derive_key_argon2(password, salt, key_size=CHACHA20_KEY_SIZE)
-    verbose_print(f"Derived key: {key.hex()}")
     chacha = ChaCha20Poly1305(key)
     nonce = urandom(NONCE_SIZE)
-    verbose_print(f"Nonce: {nonce.hex()}")
     verbose_print("Mode: ChaCha20-Poly1305")
     ciphertext = chacha.encrypt(nonce, plaintext.encode(), None)
-    if VERBOSE:
-        if logger.level > logging.DEBUG:
-            raise RuntimeError("Verbose mode requires DEBUG level")
-        logger.debug("ciphertext=%s", binascii.hexlify(ciphertext)[:32])
     data = salt + nonce + ciphertext
     if raw_output:
         return data
@@ -82,9 +71,7 @@ def chacha20_decrypt(
     ciphertext = encrypted_data_bytes[SALT_SIZE + NONCE_SIZE :]
 
     key = derive_key_argon2(password, salt, key_size=CHACHA20_KEY_SIZE)
-    verbose_print(f"Derived key: {key.hex()}")
     chacha = ChaCha20Poly1305(key)
-    verbose_print(f"Nonce: {nonce.hex()}")
     verbose_print("Mode: ChaCha20-Poly1305")
     try:
         plaintext = chacha.decrypt(nonce, ciphertext, None)
@@ -113,14 +100,8 @@ def xchacha_encrypt(
         raise EncryptionError("Nonce must be 24 bytes.")
 
     cipher = XChaCha20Poly1305(bytes(key))
-    verbose_print(f"Derived key: {bytes(key).hex()}")
-    verbose_print(f"Nonce: {bytes(nonce).hex()}")
     verbose_print("Mode: XChaCha20-Poly1305")
     ciphertext = cipher.encrypt(bytes(nonce), bytes(message), None)
-    if VERBOSE:
-        if logger.level > logging.DEBUG:
-            raise RuntimeError("Verbose mode requires DEBUG level")
-        logger.debug("ciphertext=%s", binascii.hexlify(ciphertext)[:32])
     if raw_output:
         return {"nonce": bytes(nonce), "ciphertext": ciphertext}
     return {
@@ -158,8 +139,6 @@ def xchacha_decrypt(
             raise DecryptionError(f"Invalid ciphertext: {exc}") from exc
 
     cipher = XChaCha20Poly1305(bytes(key))
-    verbose_print(f"Derived key: {bytes(key).hex()}")
-    verbose_print(f"Nonce: {bytes(nonce).hex()}")
     verbose_print("Mode: XChaCha20-Poly1305")
     try:
         return cipher.decrypt(bytes(nonce), ciphertext, None)

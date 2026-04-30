@@ -23,8 +23,8 @@ cryptography-suite migrate-keys --from file --to hsm --batch \
 ```
 
 Runs without prompts.  Stops on the first failure unless
-`--ignore-errors` is supplied.  `--dry-run` logs actions without
-writing any keys to the target.
+`--ignore-errors` is supplied.  `--dry-run` logs only key identifiers and
+algorithm metadata; it does not print or persist private key material.
 
 To export a signed forensics report or mirror logs to a SIEM:
 
