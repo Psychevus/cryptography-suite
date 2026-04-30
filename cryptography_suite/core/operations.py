@@ -1,4 +1,7 @@
-"""Operational hardening helpers for retries, subprocesses, metrics, and cancellation."""
+"""Operational hardening helpers.
+
+Includes retries, subprocesses, metrics, and cancellation.
+"""
 
 from __future__ import annotations
 
@@ -8,9 +11,10 @@ import subprocess
 import threading
 import time
 from collections import Counter
+from collections.abc import Callable, Iterator, Sequence
 from contextlib import contextmanager
 from dataclasses import dataclass
-from typing import Callable, Iterator, Sequence, TypeVar
+from typing import TypeVar
 
 from .logging import get_structured_logger, log_event
 

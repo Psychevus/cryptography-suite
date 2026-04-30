@@ -1,7 +1,7 @@
 import importlib
 import logging
+
 import pytest
-import os
 
 
 def test_verbose_requires_debug(monkeypatch):

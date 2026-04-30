@@ -1,8 +1,8 @@
 """Integration test: encrypt via CLI and decrypt via library."""
 
 import io
-from pathlib import Path
 import tempfile
+from pathlib import Path
 
 from cryptography_suite.asymmetric import generate_rsa_keypair
 from cryptography_suite.cli import file_cli

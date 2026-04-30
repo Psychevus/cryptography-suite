@@ -88,14 +88,14 @@ def _is_sensitive_field(key: str) -> bool:
 
 def _redact_for_logging(value: Any, key_name: str | None = None) -> Any:
     if key_name is not None and _is_sensitive_field(key_name):
-        if isinstance(value, (bytes, bytearray, memoryview)):
+        if isinstance(value, bytes | bytearray | memoryview):
             return f"<{len(value)} bytes redacted>"
         if key_name.lower() == "argv":
             return [REDACTED_VALUE]
         return REDACTED_VALUE
     if isinstance(value, str):
         return redact_message(value)
-    if isinstance(value, (bytes, bytearray, memoryview)):
+    if isinstance(value, bytes | bytearray | memoryview):
         return f"<{len(value)} bytes>"
     if isinstance(value, Mapping):
         return {
@@ -104,7 +104,7 @@ def _redact_for_logging(value: Any, key_name: str | None = None) -> Any:
         }
     if isinstance(value, tuple):
         return tuple(_redact_for_logging(item) for item in value)
-    if isinstance(value, Sequence) and not isinstance(value, (str, bytes, bytearray)):
+    if isinstance(value, Sequence) and not isinstance(value, str | bytes | bytearray):
         return [_redact_for_logging(item) for item in value]
     return value
 

@@ -1,25 +1,19 @@
+"""ChaCha20-Poly1305 helpers built on pyca/cryptography."""
+
 from __future__ import annotations
-
-"""ChaCha20-Poly1305 helpers using :mod:`pyca/cryptography`.
-
-The ``pyca/cryptography`` backend is authoritative for ChaCha20-Poly1305 and
-XChaCha20-Poly1305 in this project.
-"""
 
 import base64
 from os import urandom
 
+from cryptography.hazmat.primitives.ciphers import aead as _aead
 from cryptography.hazmat.primitives.ciphers.aead import ChaCha20Poly1305
 
-try:  # pragma: no cover - optional algorithm
-    from cryptography.hazmat.primitives.ciphers.aead import XChaCha20Poly1305  # type: ignore[attr-defined]
-except Exception:  # pragma: no cover - old cryptography versions
-    XChaCha20Poly1305 = None
-from ..errors import EncryptionError, DecryptionError, MissingDependencyError
-from ..debug import verbose_print
-
 from ..constants import CHACHA20_KEY_SIZE, NONCE_SIZE, SALT_SIZE
+from ..debug import verbose_print
+from ..errors import DecryptionError, EncryptionError, MissingDependencyError
 from .kdf import derive_key_argon2
+
+XChaCha20Poly1305 = getattr(_aead, "XChaCha20Poly1305", None)
 
 
 def chacha20_encrypt(
@@ -77,7 +71,7 @@ def chacha20_decrypt(
         plaintext = chacha.decrypt(nonce, ciphertext, None)
         return plaintext.decode()
     except Exception as exc:
-        raise DecryptionError(f"Decryption failed: {exc}")
+        raise DecryptionError(f"Decryption failed: {exc}") from exc
 
 
 def xchacha_encrypt(
@@ -94,9 +88,9 @@ def xchacha_encrypt(
 
     if not message:
         raise EncryptionError("Message cannot be empty.")
-    if not isinstance(key, (bytes, bytearray)) or len(key) != CHACHA20_KEY_SIZE:
+    if not isinstance(key, bytes | bytearray) or len(key) != CHACHA20_KEY_SIZE:
         raise EncryptionError("Key must be 32 bytes.")
-    if not isinstance(nonce, (bytes, bytearray)) or len(nonce) != 24:
+    if not isinstance(nonce, bytes | bytearray) or len(nonce) != 24:
         raise EncryptionError("Nonce must be 24 bytes.")
 
     cipher = XChaCha20Poly1305(bytes(key))
@@ -122,14 +116,14 @@ def xchacha_decrypt(
 
     if not ciphertext:
         raise DecryptionError("Ciphertext cannot be empty.")
-    if not isinstance(key, (bytes, bytearray)) or len(key) != CHACHA20_KEY_SIZE:
+    if not isinstance(key, bytes | bytearray) or len(key) != CHACHA20_KEY_SIZE:
         raise DecryptionError("Key must be 32 bytes.")
     if isinstance(nonce, str):
         try:
             nonce = base64.b64decode(nonce)
         except Exception as exc:
             raise DecryptionError(f"Invalid nonce: {exc}") from exc
-    if not isinstance(nonce, (bytes, bytearray)) or len(nonce) != 24:
+    if not isinstance(nonce, bytes | bytearray) or len(nonce) != 24:
         raise DecryptionError("Nonce must be 24 bytes.")
 
     if isinstance(ciphertext, str):
@@ -143,7 +137,7 @@ def xchacha_decrypt(
     try:
         return cipher.decrypt(bytes(nonce), ciphertext, None)
     except Exception as exc:  # pragma: no cover - high-level error handling
-        raise DecryptionError(f"Decryption failed: {exc}")
+        raise DecryptionError(f"Decryption failed: {exc}") from exc
 
 
 __all__ = [

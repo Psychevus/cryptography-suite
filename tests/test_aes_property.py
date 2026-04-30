@@ -1,6 +1,9 @@
 import unittest
-from hypothesis import given, settings, strategies as st
-from cryptography_suite.pipeline import AESGCMEncrypt, AESGCMDecrypt
+
+from hypothesis import given, settings
+from hypothesis import strategies as st
+
+from cryptography_suite.pipeline import AESGCMDecrypt, AESGCMEncrypt
 
 
 def aes_encrypt(message, password, kdf="scrypt"):

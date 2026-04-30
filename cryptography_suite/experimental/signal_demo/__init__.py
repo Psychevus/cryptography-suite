@@ -9,23 +9,22 @@ for real secure messaging.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
 import os
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING or os.getenv("CRYPTOSUITE_ALLOW_EXPERIMENTAL"):
     import warnings
     from dataclasses import dataclass
-    from typing import Tuple
 
-    from cryptography.hazmat.primitives import hashes, hmac
-    from cryptography.hazmat.primitives.asymmetric import x25519, ed25519
-    from cryptography.hazmat.primitives import serialization
-    from ...errors import ProtocolError
-    from ...debug import verbose_print
-    from ...asymmetric.signatures import sign_message
-    from .init_session import verify_signed_prekey
+    from cryptography.hazmat.primitives import hashes, hmac, serialization
+    from cryptography.hazmat.primitives.asymmetric import ed25519, x25519
     from cryptography.hazmat.primitives.ciphers.aead import AESGCM
     from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+
+    from ...asymmetric.signatures import sign_message
+    from ...debug import verbose_print
+    from ...errors import ProtocolError
+    from .init_session import verify_signed_prekey
 
     SIGNAL_AVAILABLE = True
 
@@ -50,13 +49,13 @@ if TYPE_CHECKING or os.getenv("CRYPTOSUITE_ALLOW_EXPERIMENTAL"):
         hkdf = HKDF(algorithm=hashes.SHA256(), length=length, salt=salt, info=info)
         return hkdf.derive(ikm)
 
-    def _kdf_rk(root_key: bytes, dh_out: bytes) -> Tuple[bytes, bytes]:
+    def _kdf_rk(root_key: bytes, dh_out: bytes) -> tuple[bytes, bytes]:
         """Derive new root and chain keys from a DH output."""
 
         out = _hkdf(dh_out, root_key, b"dr_rk", 64)
         return out[:32], out[32:]
 
-    def _kdf_ck(chain_key: bytes) -> Tuple[bytes, bytes]:
+    def _kdf_ck(chain_key: bytes) -> tuple[bytes, bytes]:
         """Derive the next chain key and message key."""
 
         h = hmac.HMAC(chain_key, hashes.SHA256())
@@ -252,7 +251,7 @@ if TYPE_CHECKING or os.getenv("CRYPTOSUITE_ALLOW_EXPERIMENTAL"):
         @property
         def handshake_public(
             self,
-        ) -> Tuple[bytes, bytes, bytes, bytes, bytes | None, bytes]:
+        ) -> tuple[bytes, bytes, bytes, bytes, bytes | None, bytes]:
             """Return all public handshake bytes including signatures."""
 
             return self.handshake_bundle
@@ -260,7 +259,7 @@ if TYPE_CHECKING or os.getenv("CRYPTOSUITE_ALLOW_EXPERIMENTAL"):
         @property
         def handshake_bundle(
             self,
-        ) -> Tuple[bytes, bytes, bytes, bytes, bytes | None, bytes]:
+        ) -> tuple[bytes, bytes, bytes, bytes, bytes | None, bytes]:
             """Return all public handshake data including signatures."""
 
             opk = (
@@ -321,7 +320,7 @@ if TYPE_CHECKING or os.getenv("CRYPTOSUITE_ALLOW_EXPERIMENTAL"):
             self.ratchet: DoubleRatchet | None = None
 
         @property
-        def public_bundle(self) -> Tuple[bytes, bytes]:
+        def public_bundle(self) -> tuple[bytes, bytes]:
             """Return identity and prekey public bytes."""
 
             return (
@@ -383,7 +382,7 @@ if TYPE_CHECKING or os.getenv("CRYPTOSUITE_ALLOW_EXPERIMENTAL"):
 
     def initialize_signal_session(
         *, use_one_time_prekey: bool = False
-    ) -> Tuple[SignalSender, SignalReceiver]:
+    ) -> tuple[SignalSender, SignalReceiver]:
         """Convenience function to create two parties with a shared session.
 
         WARNING: This implementation is a simplified demonstration of the Signal

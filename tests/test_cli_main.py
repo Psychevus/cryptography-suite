@@ -1,6 +1,6 @@
 import hashlib
-import io
 import importlib
+import io
 from types import ModuleType
 
 import pytest
