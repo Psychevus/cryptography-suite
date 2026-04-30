@@ -66,7 +66,7 @@ from cryptography_suite.pipeline import (
 )
 
 
-def main():
+def main() -> None:
     with use_backend("pyca"):
         # Symmetric Encryption Example
         print("=== Symmetric Encryption ===")

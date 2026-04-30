@@ -18,8 +18,8 @@ try:  # pragma: no cover - optional dependency
 
     PYFHEL_AVAILABLE = True
 except Exception:  # pragma: no cover - allow import without Pyfhel
-    Pyfhel = None  # type: ignore[assignment]
-    PyCtxt = Any  # type: ignore[misc]
+    Pyfhel = None
+    PyCtxt = Any
     PYFHEL_AVAILABLE = False
 
 FHE_AVAILABLE = PYFHEL_AVAILABLE
@@ -100,16 +100,16 @@ class PyfhelBackend(HEBackend):
         base.update(opts)
         he.contextGen(scheme=scheme, **base)
         he.keyGen()
-        he.scheme = scheme  # type: ignore[attr-defined]
+        he.scheme = scheme
         return he
 
     def encrypt(self, he: Pyfhel, value: Number | Iterable[Number]) -> PyCtxt:
-        if he.scheme == "CKKS":  # type: ignore[attr-defined]
+        if he.scheme == "CKKS":
             return he.encryptFrac(value)
         return he.encryptInt(value)
 
     def decrypt(self, he: Pyfhel, ctxt: PyCtxt) -> Number | list[Number]:
-        if he.scheme == "CKKS":  # type: ignore[attr-defined]
+        if he.scheme == "CKKS":
             res = he.decryptFrac(ctxt)
             if isinstance(res, list) and len(res) == 1:
                 return float(res[0])

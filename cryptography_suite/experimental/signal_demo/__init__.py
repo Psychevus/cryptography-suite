@@ -139,7 +139,7 @@ if TYPE_CHECKING or os.getenv("CRYPTOSUITE_ALLOW_EXPERIMENTAL"):
                 self.root_key, self.recv_chain_key = _kdf_rk(
                     self.root_key, self.dh_priv.exchange(self.remote_dh_pub)
                 )
-                self.send_chain_key = None
+                self.send_chain_key = None  # type: ignore[assignment]
 
         def _ratchet_step(self, new_remote_pub: x25519.X25519PublicKey) -> None:
             """Derive new keys when a new DH public key is received."""
