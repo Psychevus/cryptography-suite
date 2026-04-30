@@ -405,6 +405,7 @@ if TYPE_CHECKING or os.getenv("CRYPTOSUITE_ALLOW_EXPERIMENTAL"):
         )
         receiver.initialize_session(*sender.handshake_bundle)
         return sender, receiver
+
 else:  # pragma: no cover - executed when experimental disabled
     raise ImportError(
         "Signal demo is experimental. Set CRYPTOSUITE_ALLOW_EXPERIMENTAL=1 to enable."
