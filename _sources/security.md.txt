@@ -24,6 +24,8 @@ Please do **not** open public GitHub issues for exploitable vulnerabilities befo
 - No side-channel hardening claims are made unless explicitly stated.
 - Constant-time hardening is ongoing and may vary by backend/platform.
 - Deployments must provide cryptographically secure randomness and adequate entropy.
+- Private keys should be encrypted with a strong password or kept in an HSM/KMS. Normal PEM helpers do not export plaintext private keys; `to_unencrypted_private_pem_unsafe` and LocalKeyStore plaintext import/write flags are for controlled testing or one-time migration only.
+- `LocalKeyStore` is a development/testing backend unless you add production controls around filesystem permissions, backup handling, monitoring, and secret lifecycle management. Set `CRYPTOSUITE_STRICT_KEYS=error` in production-sensitive environments.
 - CLI, verbose, debug, dry-run, and structured logging paths must not print
   passwords, derived keys, raw/private keys, shared secrets, plaintext, nonces,
   or ciphertext internals. Report any suspected secret disclosure as a security

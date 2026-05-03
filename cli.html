@@ -274,6 +274,14 @@ as hidden aliases for backward compatibility.</p>
 </section>
 <section id="keystore-command">
 <h2>Keystore Command<a class="headerlink" href="#keystore-command" title="Link to this heading">¶</a></h2>
+<p>RSA key generation writes the private key to disk encrypted with the supplied
+password. Prefer <code class="docutils literal notranslate"><span class="pre">--password-file</span></code>, <code class="docutils literal notranslate"><span class="pre">--password-env</span></code>, or <code class="docutils literal notranslate"><span class="pre">--password-stdin</span></code> over
+putting private-key passwords directly in argv:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">CRYPTOSUITE_KEY_PASSWORD</span><span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span>pass<span class="w"> </span>show<span class="w"> </span>cryptosuite/rsa-key<span class="k">)</span><span class="s2">&quot;</span>
+cryptography-suite<span class="w"> </span>keygen<span class="w"> </span>rsa<span class="w"> </span>--private<span class="w"> </span>rsa_priv.pem<span class="w"> </span>--public<span class="w"> </span>rsa_pub.pem<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--password-env<span class="w"> </span>CRYPTOSUITE_KEY_PASSWORD
+</pre></div>
+</div>
 <p>The <code class="docutils literal notranslate"><span class="pre">keystore</span></code> group exposes pluggable key storage backends.  Available
 backends are classified by stability:</p>
 <p><code class="docutils literal notranslate"><span class="pre">local</span></code> (testing), <code class="docutils literal notranslate"><span class="pre">mock_hsm</span></code> (testing), <code class="docutils literal notranslate"><span class="pre">aws-kms</span></code> (limited,
@@ -286,7 +294,11 @@ connectivity.  Keys can be moved between backends with <code class="docutils lit
 </div>
 <p>Omit <code class="docutils literal notranslate"><span class="pre">--key</span></code> to migrate all keys.  Only migrations between backends that both advertise raw private-key
 export/import support are permitted. <code class="docutils literal notranslate"><span class="pre">aws-kms</span></code> fails closed because AWS KMS
-does not accept arbitrary private key bytes via this interface.</p>
+does not accept arbitrary private key bytes via this interface.
+Plaintext private-key migration is refused unless
+<code class="docutils literal notranslate"><span class="pre">--unsafe-allow-unencrypted-private-key</span></code> is supplied for controlled
+development/testing migration. Encrypted PEMs are preserved as encrypted PEMs
+when moving through compatible raw migration backends.</p>
 </section>
 </section>
 

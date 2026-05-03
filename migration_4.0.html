@@ -172,7 +172,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -222,7 +222,7 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
@@ -254,11 +254,30 @@ existing code to use the recommended replacements.</p>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ascon.encrypt</span></code> / <code class="docutils literal notranslate"><span class="pre">ascon.decrypt</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">aead.chacha20_encrypt_aead</span></code> / <code class="docutils literal notranslate"><span class="pre">aead.chacha20_decrypt_aead</span></code> or <code class="docutils literal notranslate"><span class="pre">symmetric.aes_encrypt</span></code> / <code class="docutils literal notranslate"><span class="pre">symmetric.aes_decrypt</span></code></p></td>
 </tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">from_pem</span></code> for private keys</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">load_encrypted_private_pem(pem,</span> <span class="pre">password)</span></code></p></td>
+</tr>
 </tbody>
 </table>
 </div>
 <p>All deprecated helpers emit <code class="docutils literal notranslate"><span class="pre">DeprecationWarning</span></code> when used. Remove any remaining
 references before upgrading to v4.0.0.</p>
+<section id="private-key-pem-hardening">
+<h2>Private Key PEM Hardening<a class="headerlink" href="#private-key-pem-hardening" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">to_pem(private_key)</span></code> no longer exports plaintext private keys. Use
+<code class="docutils literal notranslate"><span class="pre">to_encrypted_private_pem(private_key,</span> <span class="pre">password)</span></code> for normal private-key PEM
+export and <code class="docutils literal notranslate"><span class="pre">load_encrypted_private_pem(pem,</span> <span class="pre">password)</span></code> to load it. Public-key
+PEM export remains available through <code class="docutils literal notranslate"><span class="pre">to_pem(public_key)</span></code> and
+<code class="docutils literal notranslate"><span class="pre">to_public_pem(public_key)</span></code>.</p>
+<p>Plaintext private-key export is intentionally noisy:
+<code class="docutils literal notranslate"><span class="pre">to_unencrypted_private_pem_unsafe(private_key)</span></code> emits a warning and should be
+limited to controlled testing or one-time migration. <code class="docutils literal notranslate"><span class="pre">pem_to_json(private_key)</span></code>
+also requires a password unless the explicitly unsafe flag is provided.</p>
+<p><code class="docutils literal notranslate"><span class="pre">KeyManager.save_private_key</span></code> and <code class="docutils literal notranslate"><span class="pre">LocalKeyStore</span></code> now require encrypted writes by
+default. Set <code class="docutils literal notranslate"><span class="pre">CRYPTOSUITE_STRICT_KEYS=error</span></code> in production-sensitive
+environments to block legacy plaintext reads/writes, and migrate existing local
+plaintext PEMs to encrypted PEM or HSM/KMS-backed storage.</p>
+</section>
 </section>
 
         </article>
@@ -286,8 +305,27 @@ references before upgrading to v4.0.0.</p>
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Migration Guide to Cryptography Suite 4.0.0</a><ul>
+<li><a class="reference internal" href="#private-key-pem-hardening">Private Key PEM Hardening</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
