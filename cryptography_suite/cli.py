@@ -6,9 +6,10 @@ import argparse
 import hashlib
 import json
 import logging
+import os
 import sys
 from pathlib import Path
-from typing import Protocol, cast
+from typing import Any, Protocol, cast
 
 from blake3 import blake3
 
@@ -31,7 +32,7 @@ from .pqc import (
 from .protocols import generate_totp
 from .protocols.key_management import KeyManager
 from .symmetric.kdf import DEFAULT_KDF
-from .utils import KeyVault
+from .utils import KeyVault, _detect_private_pem_encryption
 from .zk.bulletproof import (
     BULLETPROOF_AVAILABLE,
 )
@@ -231,6 +232,83 @@ def _validate_output_parent(path_str: str) -> None:
         raise ValueError(f"Output directory does not exist: {parent}")
 
 
+def _resolve_private_key_password(args: argparse.Namespace) -> str:
+    sources = [
+        bool(getattr(args, "password", None)),
+        bool(getattr(args, "password_file", None)),
+        bool(getattr(args, "password_env", None)),
+        bool(getattr(args, "password_stdin", False)),
+    ]
+    if sum(sources) != 1:
+        raise ValueError(
+            "Provide exactly one private key password source: --password, "
+            "--password-file, --password-env, or --password-stdin."
+        )
+    if getattr(args, "password", None):
+        return cast(str, args.password)
+    if getattr(args, "password_file", None):
+        return (
+            Path(cast(str, args.password_file))
+            .read_text(encoding="utf-8")
+            .rstrip("\r\n")
+        )
+    if getattr(args, "password_env", None):
+        env_name = cast(str, args.password_env)
+        value = os.getenv(env_name)
+        if not value:
+            raise ValueError(f"Environment variable is empty or unset: {env_name}")
+        return value
+    password = sys.stdin.readline().rstrip("\r\n")
+    if not password:
+        raise ValueError("Empty private key password from stdin.")
+    return password
+
+
+def _add_private_key_password_args(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument("--password", help="Private key password")
+    parser.add_argument("--password-file", help="Read private key password from file")
+    parser.add_argument(
+        "--password-env",
+        help="Read private key password from the named environment variable",
+    )
+    parser.add_argument(
+        "--password-stdin",
+        action="store_true",
+        help="Read private key password from stdin",
+    )
+
+
+def _raw_private_key_is_unencrypted(raw: bytes, meta: dict[str, object]) -> bool:
+    encrypted_meta = meta.get("encrypted")
+    if encrypted_meta is False:
+        return True
+    detected = _detect_private_pem_encryption(raw)
+    return detected is False
+
+
+def _keystore_import_key(
+    store: Any,
+    raw: bytes,
+    meta: dict[str, object],
+    *,
+    allow_unencrypted: bool,
+) -> str:
+    import_key = store.import_key
+    try:
+        return cast(
+            str,
+            import_key(
+                raw,
+                meta,
+                allow_unencrypted=allow_unencrypted,
+            ),
+        )
+    except TypeError as exc:
+        if "allow_unencrypted" not in str(exc):
+            raise
+        return cast(str, import_key(raw, meta))
+
+
 def keygen_cli(argv: list[str] | None = None) -> None:
     """Generate RSA or post-quantum key pairs."""
 
@@ -240,7 +318,7 @@ def keygen_cli(argv: list[str] | None = None) -> None:
     rsa_p = sub.add_parser("rsa", help="Generate an RSA key pair")
     rsa_p.add_argument("--private", required=True, help="Private key path")
     rsa_p.add_argument("--public", required=True, help="Public key path")
-    rsa_p.add_argument("--password", required=True, help="Password for private key")
+    _add_private_key_password_args(rsa_p)
 
     if PQCRYPTO_AVAILABLE:
         sub.add_parser("dilithium", help="Generate a Dilithium key pair")
@@ -252,7 +330,8 @@ def keygen_cli(argv: list[str] | None = None) -> None:
 
     if args.scheme == "rsa":
         km = KeyManager()
-        km.generate_rsa_keypair_and_save(args.private, args.public, args.password)
+        password = _resolve_private_key_password(args)
+        km.generate_rsa_keypair_and_save(args.private, args.public, password)
         print(f"RSA keys saved to {args.private} and {args.public}")
     else:
         if args.scheme == "dilithium":
@@ -262,8 +341,14 @@ def keygen_cli(argv: list[str] | None = None) -> None:
         else:
             pk, sk = generate_sphincs_keypair()
         print(pk.hex())
-        sk_bytes = bytes(sk) if isinstance(sk, KeyVault) else sk
-        print(sk_bytes.hex())
+        if isinstance(sk, KeyVault):
+            with sk:
+                pass
+        print(
+            "Private key material was generated but not printed. "
+            "Use a keystore-backed workflow for private key storage.",
+            file=sys.stderr,
+        )
 
 
 def hash_cli(argv: list[str] | None = None) -> None:
@@ -373,13 +458,23 @@ def keystore_cli(argv: list[str] | None = None) -> None:
     imp = sub.add_parser("import", help="Import a PEM key into the local keystore")
     imp.add_argument("--file", required=True)
     imp.add_argument("--name", required=True)
-    imp.add_argument("--password")
+    _add_private_key_password_args(imp)
+    imp.add_argument(
+        "--unsafe-allow-unencrypted-private-key",
+        action="store_true",
+        help="Allow plaintext private key import for controlled testing/migration",
+    )
     mig = sub.add_parser("migrate", help="Migrate keys between keystores")
     mig.add_argument("--from", dest="src", required=True)
     mig.add_argument("--to", dest="dst", required=True)
     mig.add_argument("--key", dest="key")
     mig.add_argument("--dry-run", action="store_true")
     mig.add_argument("--apply", action="store_true")
+    mig.add_argument(
+        "--unsafe-allow-unencrypted-private-key",
+        action="store_true",
+        help="Allow plaintext private key migration for controlled testing only",
+    )
     args = parser.parse_args(argv)
 
     load_plugins()
@@ -428,7 +523,22 @@ def keystore_cli(argv: list[str] | None = None) -> None:
         ks_cls = cast(type[LocalKeyStore], get_keystore("local"))
         ks = ks_cls()
         pem = Path(args.file).read_bytes()
-        new_id = ks.import_key(pem, args.name, args.password)
+        password = None
+        if any(
+            (
+                getattr(args, "password", None),
+                getattr(args, "password_file", None),
+                getattr(args, "password_env", None),
+                getattr(args, "password_stdin", False),
+            )
+        ):
+            password = _resolve_private_key_password(args)
+        new_id = ks.import_key(
+            pem,
+            args.name,
+            password,
+            allow_unencrypted=args.unsafe_allow_unencrypted_private_key,
+        )
         print(new_id)
     elif args.action == "migrate":
         import hashlib
@@ -467,9 +577,22 @@ def keystore_cli(argv: list[str] | None = None) -> None:
         for key_id in ids:
             try:
                 raw, meta = src.export_key(key_id)
+                if (
+                    _raw_private_key_is_unencrypted(raw, meta)
+                    and not args.unsafe_allow_unencrypted_private_key
+                ):
+                    raise ValueError(
+                        "Refusing to migrate unencrypted private key without "
+                        "--unsafe-allow-unencrypted-private-key."
+                    )
                 new_id = key_id
                 if not args.dry_run:
-                    new_id = dst.import_key(raw, meta)
+                    new_id = _keystore_import_key(
+                        dst,
+                        raw,
+                        meta,
+                        allow_unencrypted=args.unsafe_allow_unencrypted_private_key,
+                    )
                 fp = hashlib.sha256(raw).hexdigest()[:16]
                 stats.append((key_id, new_id, meta.get("type"), fp))
                 print(f"{key_id} -> {new_id}")
@@ -495,8 +618,6 @@ def export_cli(argv: list[str] | None = None) -> None:
     )
     args = parser.parse_args(argv)
     _validate_regular_file(args.pipeline, "pipeline")
-
-    from typing import Any
 
     yaml = __import__("yaml")
 
@@ -620,7 +741,7 @@ def main(argv: list[str] | None = None) -> None:
     )
     keygen_parser.add_argument("--private", help="Private key path")
     keygen_parser.add_argument("--public", help="Public key path")
-    keygen_parser.add_argument("--password", help="Private key password")
+    _add_private_key_password_args(keygen_parser)
 
     hash_parser = sub.add_parser(
         "hash", help="Hash a file", description=hash_cli.__doc__
@@ -679,12 +800,19 @@ def main(argv: list[str] | None = None) -> None:
     ks_parser = sub.add_parser(
         "keystore", help="Manage keystores", description=keystore_cli.__doc__
     )
-    ks_parser.add_argument("action", choices=["list", "test", "migrate"])
+    ks_parser.add_argument("action", choices=["list", "test", "import", "migrate"])
+    ks_parser.add_argument("--file")
+    ks_parser.add_argument("--name")
+    _add_private_key_password_args(ks_parser)
     ks_parser.add_argument("--from", dest="src")
     ks_parser.add_argument("--to", dest="dst")
     ks_parser.add_argument("--key", dest="key")
     ks_parser.add_argument("--dry-run", action="store_true")
     ks_parser.add_argument("--apply", action="store_true")
+    ks_parser.add_argument(
+        "--unsafe-allow-unencrypted-private-key",
+        action="store_true",
+    )
 
     migrate_parser = sub.add_parser(
         "migrate-keys",
@@ -784,6 +912,12 @@ def main(argv: list[str] | None = None) -> None:
             argv2.extend(["--public", args.public])
         if args.password:
             argv2.extend(["--password", args.password])
+        if args.password_file:
+            argv2.extend(["--password-file", args.password_file])
+        if args.password_env:
+            argv2.extend(["--password-env", args.password_env])
+        if args.password_stdin:
+            argv2.append("--password-stdin")
         keygen_cli(argv2)
     elif args.cmd == "hash":
         hash_cli([args.file, f"--algorithm={args.algorithm}"])
@@ -805,10 +939,24 @@ def main(argv: list[str] | None = None) -> None:
             argv2.extend(["--to", args.dst])
         if args.key:
             argv2.extend(["--key", args.key])
+        if args.file:
+            argv2.extend(["--file", args.file])
+        if args.name:
+            argv2.extend(["--name", args.name])
+        if args.password:
+            argv2.extend(["--password", args.password])
+        if args.password_file:
+            argv2.extend(["--password-file", args.password_file])
+        if args.password_env:
+            argv2.extend(["--password-env", args.password_env])
+        if args.password_stdin:
+            argv2.append("--password-stdin")
         if getattr(args, "dry_run", False):
             argv2.append("--dry-run")
         if getattr(args, "apply", False):
             argv2.append("--apply")
+        if getattr(args, "unsafe_allow_unencrypted_private_key", False):
+            argv2.append("--unsafe-allow-unencrypted-private-key")
         keystore_cli(argv2)
     elif args.cmd == "migrate-keys":
         from importlib import util

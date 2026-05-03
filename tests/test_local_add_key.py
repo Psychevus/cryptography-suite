@@ -1,9 +1,11 @@
 import json
 import warnings
-import pytest
-from cryptography.hazmat.primitives import serialization, hashes
-from cryptography.hazmat.primitives.asymmetric import rsa, ec, padding
 
+import pytest
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import ec, padding, rsa
+
+from cryptography_suite.errors import StrictKeyPolicyError
 from cryptography_suite.keystores.local import LocalKeyStore
 
 
@@ -30,12 +32,44 @@ def test_add_import_and_sign(tmp_path):
         serialization.PrivateFormat.PKCS8,
         serialization.NoEncryption(),
     )
-    with warnings.catch_warnings():
+    with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("ignore")
-        ec_id = ks.import_key(pem, "ec")
+        ec_id = ks.import_key(pem, "ec", allow_unencrypted=True)
     assert ec_id in ks.list_keys()
     sig2 = ks.sign(ec_id, msg)
     ec_key.public_key().verify(sig2, msg, ec.ECDSA(hashes.SHA256()))
+    assert caught == []
+
+
+def test_unencrypted_add_and_import_require_explicit_unsafe(tmp_path):
+    ks = LocalKeyStore(directory=str(tmp_path))
+    key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+    pem = key.private_bytes(
+        serialization.Encoding.PEM,
+        serialization.PrivateFormat.PKCS8,
+        serialization.NoEncryption(),
+    )
+
+    with pytest.raises(StrictKeyPolicyError, match="disabled by default"):
+        ks.add_key(key, "rsa")
+    with pytest.raises(StrictKeyPolicyError, match="disabled by default"):
+        ks.import_key(pem, "rsa")
+
+
+def test_encrypted_import_preserves_metadata(tmp_path):
+    ks = LocalKeyStore(directory=str(tmp_path))
+    key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+    pem = key.private_bytes(
+        serialization.Encoding.PEM,
+        serialization.PrivateFormat.PKCS8,
+        serialization.BestAvailableEncryption(b"pwd"),
+    )
+
+    key_id = ks.import_key(pem, {"id": "encrypted", "type": "rsa"})
+    _, meta = ks.export_key(key_id)
+
+    assert meta["encrypted"] is True
+    assert (tmp_path / f"{key_id}.pem").read_bytes() == pem
 
 
 def test_legacy_password_metadata_is_ignored(tmp_path):
@@ -54,7 +88,9 @@ def test_legacy_password_metadata_is_ignored(tmp_path):
         warnings.simplefilter("always")
         with pytest.raises(ValueError, match="Password required"):
             ks._load_key(key_id)
-    assert any("Ignoring legacy persisted password metadata" in str(w.message) for w in caught)
+    assert any(
+        "Ignoring legacy persisted password metadata" in str(w.message) for w in caught
+    )
 
     loaded, algo = ks._load_key(key_id, password="pwd")
     assert algo == "rsa"

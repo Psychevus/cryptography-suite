@@ -56,8 +56,14 @@ class MockHSMKeyStore:
         return data, {"id": key_id, **meta}
 
     @audit_log
-    def import_key(self, raw: bytes, meta: dict) -> str:
+    def import_key(
+        self,
+        raw: bytes,
+        meta: dict,
+        *,
+        allow_unencrypted: bool = False,
+    ) -> str:
         key_id = meta.get("id", f"k{len(self._keys)}")
         self._keys[key_id] = raw
-        self._meta[key_id] = {"type": meta.get("type", "raw")}
+        self._meta[key_id] = {k: v for k, v in meta.items() if k != "id"}
         return key_id

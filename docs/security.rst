@@ -10,15 +10,19 @@ Security Considerations
 - Enabling ``VERBOSE_MODE`` prints derived keys and nonces to stdout. Do **not** enable
   this in production environments.
 - Private keys should always be stored encrypted, either with a strong password or in
-  a hardware-backed keystore (HSM, KMS, etc.). Unencrypted PEMs are only acceptable for
-  testing or inside protected containers. When serializing private keys with
-  :func:`cryptography_suite.serialize_private_key` or using
-  :class:`cryptography_suite.protocols.key_management.KeyManager`, always supply a
-  password so the key material is encrypted. By default the library warns when
-  encountering unencrypted key files. Set the environment variable
-  ``CRYPTOSUITE_STRICT_KEYS=error`` to refuse loading or saving such keys. To
-  disable this protection entirely – **at your own risk** – set
-  ``CRYPTOSUITE_STRICT_KEYS=0`` or ``CRYPTOSUITE_STRICT_KEYS=false``.
+  a hardware-backed keystore (HSM, KMS, etc.). Use
+  ``to_encrypted_private_pem`` / ``load_encrypted_private_pem`` for PEM helpers,
+  or pass a password to :func:`cryptography_suite.serialize_private_key` and
+  :class:`cryptography_suite.protocols.key_management.KeyManager`. Plaintext PEM
+  export is available only through the explicitly named
+  ``to_unencrypted_private_pem_unsafe`` helper, which emits a warning and is
+  intended only for controlled testing or one-time migration.
+- ``LocalKeyStore`` is a development/testing backend unless you add production
+  filesystem, backup, monitoring, and lifecycle controls. It refuses plaintext
+  private-key writes by default and preserves encrypted PEMs during migration.
+- ``CRYPTOSUITE_STRICT_KEYS=error`` refuses loading or saving unencrypted private
+  keys. ``warn`` logs or warns on legacy plaintext reads, and ``0``/``false``
+  disables strict checks but does not remove explicit unsafe flags from write APIs.
 
 Zeroization & Memory Safety
 ---------------------------

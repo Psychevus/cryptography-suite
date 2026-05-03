@@ -1,5 +1,6 @@
 import unittest
 from pathlib import Path
+from typing import Any, cast
 from unittest import mock
 
 from cryptography.hazmat.primitives.asymmetric import rsa
@@ -17,9 +18,14 @@ from cryptography_suite.utils import (
     from_pem,
     generate_secure_random_string,
     is_encrypted_pem,
+    load_encrypted_private_pem,
+    load_public_pem,
     pem_to_json,
     secure_zero,
+    to_encrypted_private_pem,
     to_pem,
+    to_public_pem,
+    to_unencrypted_private_pem_unsafe,
 )
 
 
@@ -83,26 +89,58 @@ class TestUtils(unittest.TestCase):
         vault.__del__()
         self.assertTrue(all(b == 0 for b in buf))
 
-    def test_to_pem_and_from_pem(self):
-        """Round trip conversion to and from PEM."""
+    def test_public_pem_helpers(self):
+        """Public key export and load remain simple."""
         priv, pub = generate_rsa_keypair()
-        priv_pem = to_pem(priv)
         pub_pem = to_pem(pub)
-        self.assertIsInstance(priv_pem, str)
+        explicit_pub_pem = to_public_pem(pub)
         self.assertIsInstance(pub_pem, str)
-        loaded_priv = from_pem(priv_pem)
-        loaded_pub = from_pem(pub_pem)
-        self.assertIsInstance(loaded_priv, rsa.RSAPrivateKey)
+        self.assertEqual(pub_pem, explicit_pub_pem)
+        loaded_pub = load_public_pem(pub_pem)
         self.assertIsInstance(loaded_pub, rsa.RSAPublicKey)
+
+        with self.assertWarns(DeprecationWarning):
+            loaded_pub_compat = from_pem(pub_pem)
+        self.assertIsInstance(loaded_pub_compat, rsa.RSAPublicKey)
+
+        with self.assertRaises(ValueError):
+            to_pem(priv)
+
+    def test_encrypted_private_pem_round_trip(self):
+        priv, _ = generate_rsa_keypair()
+        pem = to_encrypted_private_pem(priv, "safe-password")
+        self.assertIn("BEGIN ENCRYPTED PRIVATE KEY", pem)
+        loaded = load_encrypted_private_pem(pem, "safe-password")
+        self.assertIsInstance(loaded, rsa.RSAPrivateKey)
+
+    def test_unsafe_private_pem_export_warns(self):
+        priv, _ = generate_rsa_keypair()
+        with self.assertWarns(UserWarning):
+            pem = to_unencrypted_private_pem_unsafe(priv)
+        self.assertIn("BEGIN PRIVATE KEY", pem)
+        self.assertNotIn("BEGIN ENCRYPTED PRIVATE KEY", pem)
+
+    def test_from_pem_rejects_private_keys(self):
+        priv, _ = generate_rsa_keypair()
+        encrypted_pem = to_encrypted_private_pem(priv, "safe-password")
+        with self.assertWarns(DeprecationWarning):
+            with self.assertRaises(ValueError):
+                from_pem(encrypted_pem)
+        with self.assertWarns(UserWarning):
+            unsafe_pem = to_unencrypted_private_pem_unsafe(priv)
+        with self.assertWarns(DeprecationWarning):
+            with self.assertRaises(ValueError):
+                from_pem(unsafe_pem)
 
     def test_from_pem_invalid(self):
         """Invalid PEM data should raise DecryptionError."""
-        with self.assertRaises(DecryptionError):
-            from_pem("NOT A VALID PEM")
+        with self.assertWarns(DeprecationWarning):
+            with self.assertRaises(DecryptionError):
+                from_pem("NOT A VALID PEM")
 
     def test_from_pem_rejects_non_string(self):
         with self.assertRaises(TypeError):
-            from_pem(b"-----BEGIN PRIVATE KEY-----")
+            from_pem(cast(Any, b"-----BEGIN PRIVATE KEY-----"))
 
     def test_is_encrypted_pem_false_for_invalid_pem(self):
         temp_path = Path("tests") / "_tmp_invalid.pem"
@@ -123,9 +161,17 @@ class TestUtils(unittest.TestCase):
                 is_encrypted_pem(temp_path)
 
     def test_pem_to_json_and_decode_message(self):
-        _, pub = generate_rsa_keypair()
+        priv, pub = generate_rsa_keypair()
         json_blob = pem_to_json(pub)
         self.assertIn("pem", json_blob)
+        self.assertNotIn("BEGIN PRIVATE KEY", json_blob)
+
+        with self.assertRaises(ValueError):
+            pem_to_json(priv)
+
+        encrypted_blob = pem_to_json(priv, password="safe-password")
+        self.assertIn("BEGIN ENCRYPTED PRIVATE KEY", encrypted_blob)
+        self.assertNotIn("BEGIN PRIVATE KEY-----", encrypted_blob)
 
         msg = {"ciphertext": b"a", "nonce": b"b"}
         encoded = encode_encrypted_message(msg)
@@ -148,7 +194,8 @@ class TestUtils(unittest.TestCase):
         encoded = encode_encrypted_message(msg)
         decoded = decode_encrypted_message(encoded)
         self.assertIsInstance(decoded, EncryptedHybridMessage)
-        self.assertEqual(decoded.nonce, b"n")
+        hybrid = cast(EncryptedHybridMessage, decoded)
+        self.assertEqual(hybrid.nonce, b"n")
 
 
 if __name__ == "__main__":

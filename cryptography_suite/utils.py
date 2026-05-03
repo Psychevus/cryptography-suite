@@ -5,10 +5,11 @@ import ctypes.util
 import secrets
 import string
 import warnings
+from collections.abc import Mapping
 from functools import wraps
-from hmac import compare_digest as ct_equal
-from typing import TYPE_CHECKING, Any, Mapping, TypeAlias, cast
+from hmac import compare_digest
 from pathlib import Path
+from typing import TYPE_CHECKING, Any, TypeAlias, cast
 
 from cryptography.hazmat.primitives.asymmetric import (
     ec,
@@ -19,11 +20,14 @@ from cryptography.hazmat.primitives.asymmetric import (
     x25519,
 )
 
+from ._key_files import atomic_write_bytes
+
 if TYPE_CHECKING:  # pragma: no cover - typing only
-    from .hybrid import EncryptedHybridMessage
     from .experimental.signal_demo import EncryptedMessage
+    from .hybrid import EncryptedHybridMessage
 
 BASE62_ALPHABET = string.digits + string.ascii_letters
+ct_equal = compare_digest
 
 
 def base62_encode(data: bytes) -> str:
@@ -128,7 +132,7 @@ class KeyVault:
     """
 
     def __init__(self, key: bytes | bytearray):
-        if not isinstance(key, (bytes, bytearray)):
+        if not isinstance(key, bytes | bytearray):
             raise TypeError("KeyVault expects key data as bytes or bytearray.")
         self._key = bytearray(key)
 
@@ -143,7 +147,7 @@ class KeyVault:
     def __bytes__(self) -> bytes:  # pragma: no cover - helper for APIs
         return bytes(self._key)
 
-    def __del__(self):  # pragma: no cover - best effort cleanup
+    def __del__(self) -> None:  # pragma: no cover - best effort cleanup
         try:
             secure_zero(self._key)
         except Exception:
@@ -159,7 +163,7 @@ class KeyVault:
             if STRICT_KEYS == "error":
                 raise SecurityError(msg)
             warnings.warn(msg, UserWarning, stacklevel=2)
-        Path(path).write_bytes(bytes(self._key))
+        atomic_write_bytes(path, bytes(self._key))
 
 
 PrivateKeyTypes: TypeAlias = (
@@ -180,95 +184,244 @@ PublicKeyTypes: TypeAlias = (
     | x448.X448PublicKey
 )
 
+PRIVATE_KEY_CLASSES: tuple[type[Any], ...] = (
+    rsa.RSAPrivateKey,
+    ec.EllipticCurvePrivateKey,
+    ed25519.Ed25519PrivateKey,
+    ed448.Ed448PrivateKey,
+    x25519.X25519PrivateKey,
+    x448.X448PrivateKey,
+)
 
-def to_pem(key: PrivateKeyTypes | PublicKeyTypes) -> str:
-    """Return a PEM-formatted string for a key."""
+PUBLIC_KEY_CLASSES: tuple[type[Any], ...] = (
+    rsa.RSAPublicKey,
+    ec.EllipticCurvePublicKey,
+    ed25519.Ed25519PublicKey,
+    ed448.Ed448PublicKey,
+    x25519.X25519PublicKey,
+    x448.X448PublicKey,
+)
+
+
+def _coerce_pem_bytes(pem: str | bytes) -> bytes:
+    if isinstance(pem, str):
+        return pem.encode()
+    if isinstance(pem, bytes):
+        return pem
+    raise TypeError("PEM data must be provided as str or bytes.")
+
+
+def _password_bytes(password: str) -> bytes:
+    if not isinstance(password, str) or not password:
+        raise ValueError("A non-empty private key password is required.")
+    return password.encode()
+
+
+def _detect_private_pem_encryption(pem: str | bytes) -> bool | None:
+    """Return private PEM encryption status, or ``None`` for non-private PEM."""
+
     from cryptography.hazmat.primitives import serialization
 
-    if isinstance(
-        key,
-        (
-            rsa.RSAPrivateKey,
-            ec.EllipticCurvePrivateKey,
-            ed25519.Ed25519PrivateKey,
-            ed448.Ed448PrivateKey,
-            x25519.X25519PrivateKey,
-            x448.X448PrivateKey,
-        ),
-    ):
-        pem_bytes = key.private_bytes(
-            encoding=serialization.Encoding.PEM,
-            format=serialization.PrivateFormat.PKCS8,
-            encryption_algorithm=serialization.NoEncryption(),
-        )
-    elif isinstance(
-        key,
-        (
-            rsa.RSAPublicKey,
-            ec.EllipticCurvePublicKey,
-            ed25519.Ed25519PublicKey,
-            ed448.Ed448PublicKey,
-            x25519.X25519PublicKey,
-            x448.X448PublicKey,
-        ),
-    ):
-        pem_bytes = key.public_bytes(
-            encoding=serialization.Encoding.PEM,
-            format=serialization.PublicFormat.SubjectPublicKeyInfo,
-        )
-    else:
-        raise TypeError("Unsupported key type for PEM conversion.")
-
-    return pem_bytes.decode()
-
-
-def from_pem(pem_str: str) -> PrivateKeyTypes | PublicKeyTypes:
-    """Load a key object from a PEM-formatted string."""
-    from cryptography.hazmat.primitives import serialization
-
-    if not isinstance(pem_str, str):
-        raise TypeError("PEM data must be provided as a string.")
-
-    pem_bytes = pem_str.encode()
-    try:
-        return cast(
-            PrivateKeyTypes | PublicKeyTypes,
-            serialization.load_pem_private_key(pem_bytes, password=None),
-        )
-    except ValueError:
-        try:
-            return cast(
-                PrivateKeyTypes | PublicKeyTypes,
-                serialization.load_pem_public_key(pem_bytes),
-            )
-        except ValueError as exc:
-            from .errors import DecryptionError
-
-            raise DecryptionError(f"Invalid PEM data: {exc}") from exc
-
-
-def is_encrypted_pem(path: str | Path) -> bool:
-    """Return ``True`` if the PEM file at ``path`` is encrypted."""
-    from cryptography.hazmat.primitives import serialization
-
-    pem_bytes = Path(path).read_bytes()
+    pem_bytes = _coerce_pem_bytes(pem)
     try:
         serialization.load_pem_private_key(pem_bytes, password=None)
         return False
     except TypeError as exc:
-        if "encrypted" in str(exc).lower():
+        message = str(exc).lower()
+        if "encrypted" in message or "password" in message:
             return True
         raise
     except ValueError:
-        return False
+        return None
 
 
-def pem_to_json(key: PrivateKeyTypes | PublicKeyTypes) -> str:
+def to_public_pem(public_key: PublicKeyTypes) -> str:
+    """Return a PEM-formatted public key string."""
+
+    from cryptography.hazmat.primitives import serialization
+
+    if not isinstance(public_key, PUBLIC_KEY_CLASSES):
+        raise TypeError("Unsupported public key type for PEM conversion.")
+    return public_key.public_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PublicFormat.SubjectPublicKeyInfo,
+    ).decode()
+
+
+def to_encrypted_private_pem(private_key: PrivateKeyTypes, password: str) -> str:
+    """Return a password-encrypted PKCS#8 private key PEM string."""
+
+    from cryptography.hazmat.primitives import serialization
+
+    if not isinstance(private_key, PRIVATE_KEY_CLASSES):
+        raise TypeError("Unsupported private key type for PEM conversion.")
+    return private_key.private_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PrivateFormat.PKCS8,
+        encryption_algorithm=serialization.BestAvailableEncryption(
+            _password_bytes(password)
+        ),
+    ).decode()
+
+
+def to_unencrypted_private_pem_unsafe(private_key: PrivateKeyTypes) -> str:
+    """Return an unencrypted private key PEM after emitting an explicit warning."""
+
+    from cryptography.hazmat.primitives import serialization
+
+    if not isinstance(private_key, PRIVATE_KEY_CLASSES):
+        raise TypeError("Unsupported private key type for PEM conversion.")
+    warnings.warn(
+        (
+            "UNSAFE: exporting unencrypted private key PEM. Use only for controlled "
+            "testing or one-time migration, never for production storage."
+        ),
+        UserWarning,
+        stacklevel=2,
+    )
+    return private_key.private_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PrivateFormat.PKCS8,
+        encryption_algorithm=serialization.NoEncryption(),
+    ).decode()
+
+
+def load_public_pem(pem: str | bytes) -> PublicKeyTypes:
+    """Load a PEM-formatted public key."""
+
+    from cryptography.hazmat.primitives import serialization
+
+    pem_bytes = _coerce_pem_bytes(pem)
+    try:
+        key = serialization.load_pem_public_key(pem_bytes)
+    except ValueError as exc:
+        from .errors import DecryptionError
+
+        raise DecryptionError(f"Invalid public PEM data: {exc}") from exc
+    if not isinstance(key, PUBLIC_KEY_CLASSES):
+        raise TypeError("Loaded PEM is not a supported public key.")
+    return cast(PublicKeyTypes, key)
+
+
+def load_encrypted_private_pem(
+    pem: str | bytes,
+    password: str,
+) -> PrivateKeyTypes:
+    """Load a password-encrypted private key PEM."""
+
+    from cryptography.hazmat.primitives import serialization
+
+    pem_bytes = _coerce_pem_bytes(pem)
+    try:
+        key = serialization.load_pem_private_key(
+            pem_bytes,
+            password=_password_bytes(password),
+        )
+    except Exception as exc:
+        from .errors import DecryptionError
+
+        raise DecryptionError(f"Failed to load encrypted private PEM: {exc}") from exc
+    if not isinstance(key, PRIVATE_KEY_CLASSES):
+        raise TypeError("Loaded PEM is not a supported private key.")
+    return cast(PrivateKeyTypes, key)
+
+
+def to_pem(key: PrivateKeyTypes | PublicKeyTypes) -> str:
+    """Return a PEM-formatted string for public keys only.
+
+    Private key export must be explicit: use ``to_encrypted_private_pem`` or
+    ``to_unencrypted_private_pem_unsafe``.
+    """
+
+    if isinstance(key, PRIVATE_KEY_CLASSES):
+        raise ValueError(
+            "to_pem(private_key) no longer exports unencrypted private keys. "
+            "Use to_encrypted_private_pem(private_key, password) for safe export "
+            "or to_unencrypted_private_pem_unsafe(private_key) only for controlled "
+            "testing or migration."
+        )
+    if isinstance(key, PUBLIC_KEY_CLASSES):
+        return to_public_pem(cast(PublicKeyTypes, key))
+    raise TypeError("Unsupported key type for PEM conversion.")
+
+
+def from_pem(pem_str: str) -> PrivateKeyTypes | PublicKeyTypes:
+    """Load a public PEM through a deprecated ambiguous compatibility shim."""
+
+    from cryptography.hazmat.primitives import serialization
+
+    from .errors import DecryptionError
+
+    if not isinstance(pem_str, str):
+        raise TypeError("PEM data must be provided as a string.")
+
+    warnings.warn(
+        (
+            "from_pem is ambiguous for private keys and is deprecated. Use "
+            "load_public_pem for public keys or load_encrypted_private_pem with "
+            "a password for private keys."
+        ),
+        DeprecationWarning,
+        stacklevel=2,
+    )
+
+    pem_bytes = pem_str.encode()
+    try:
+        return cast(PrivateKeyTypes | PublicKeyTypes, load_public_pem(pem_bytes))
+    except DecryptionError:
+        pass
+
+    try:
+        serialization.load_pem_private_key(pem_bytes, password=None)
+    except TypeError as exc:
+        message = str(exc).lower()
+        if "encrypted" in message or "password" in message:
+            raise ValueError(
+                "Encrypted private PEM requires "
+                "load_encrypted_private_pem(pem, password)."
+            ) from exc
+        raise
+    except ValueError as exc:
+        raise DecryptionError(f"Invalid PEM data: {exc}") from exc
+    raise ValueError(
+        "Unencrypted private PEM loading through from_pem is disabled. Store "
+        "private keys encrypted and load them with load_encrypted_private_pem."
+    )
+
+
+def is_encrypted_pem(path: str | Path) -> bool:
+    """Return ``True`` if the PEM file at ``path`` is an encrypted private key."""
+
+    detected = _detect_private_pem_encryption(Path(path).read_bytes())
+    return detected is True
+
+
+def pem_to_json(
+    key: PrivateKeyTypes | PublicKeyTypes,
+    password: str | None = None,
+    *,
+    unsafe_unencrypted_private_key: bool = False,
+) -> str:
     """Serialize a key to a JSON object containing a PEM string."""
+
     import json
 
-    pem = to_pem(key)
-    return json.dumps({"pem": pem})
+    if isinstance(key, PUBLIC_KEY_CLASSES):
+        pem = to_public_pem(cast(PublicKeyTypes, key))
+        return json.dumps({"pem": pem, "encrypted": False, "key_type": "public"})
+    if isinstance(key, PRIVATE_KEY_CLASSES):
+        if password:
+            pem = to_encrypted_private_pem(cast(PrivateKeyTypes, key), password)
+            return json.dumps({"pem": pem, "encrypted": True, "key_type": "private"})
+        if unsafe_unencrypted_private_key:
+            pem = to_unencrypted_private_pem_unsafe(cast(PrivateKeyTypes, key))
+            return json.dumps({"pem": pem, "encrypted": False, "key_type": "private"})
+        raise ValueError(
+            "pem_to_json(private_key) requires password=... so the private key "
+            "is encrypted, or unsafe_unencrypted_private_key=True for controlled "
+            "testing/migration only."
+        )
+    raise TypeError("Unsupported key type for JSON PEM conversion.")
 
 
 def encode_encrypted_message(
@@ -286,7 +439,7 @@ def encode_encrypted_message(
 
     enc = {}
     for k, v in data.items():
-        if isinstance(v, (bytes, bytearray)):
+        if isinstance(v, bytes | bytearray):
             enc[k] = base64.b64encode(bytes(v)).decode()
         else:
             enc[k] = v

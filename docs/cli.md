@@ -37,6 +37,16 @@ as hidden aliases for backward compatibility.
 
 ## Keystore Command
 
+RSA key generation writes the private key to disk encrypted with the supplied
+password. Prefer `--password-file`, `--password-env`, or `--password-stdin` over
+putting private-key passwords directly in argv:
+
+```bash
+CRYPTOSUITE_KEY_PASSWORD="$(pass show cryptosuite/rsa-key)"
+cryptography-suite keygen rsa --private rsa_priv.pem --public rsa_pub.pem \
+  --password-env CRYPTOSUITE_KEY_PASSWORD
+```
+
 The ``keystore`` group exposes pluggable key storage backends.  Available
 backends are classified by stability:
 
@@ -54,3 +64,7 @@ cryptography-suite keystore migrate --from local --to mock_hsm --dry-run
 Omit ``--key`` to migrate all keys.  Only migrations between backends that both advertise raw private-key
 export/import support are permitted. ``aws-kms`` fails closed because AWS KMS
 does not accept arbitrary private key bytes via this interface.
+Plaintext private-key migration is refused unless
+``--unsafe-allow-unencrypted-private-key`` is supplied for controlled
+development/testing migration. Encrypted PEMs are preserved as encrypted PEMs
+when moving through compatible raw migration backends.
