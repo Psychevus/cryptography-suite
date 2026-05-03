@@ -7,8 +7,24 @@ Security Considerations
  - Experimental/insecure primitives (e.g., ``salsa20_encrypt``, ``ascon_encrypt``) are for research/education only and will be removed in v4.0.0. They are NOT supported for production use. If you depend on them, migrate now.
 
    > pip install cryptography-suite[legacy]
-- Enabling ``VERBOSE_MODE`` prints derived keys and nonces to stdout. Do **not** enable
-  this in production environments.
+- Verbose/debug output is redacted before logging and must never include
+  derived keys, raw keys, nonces, private keys, shared secrets, plaintext, or
+  ciphertext internals. Keep ``CRYPTOSUITE_VERBOSE_MODE`` disabled in
+  production unless a specific incident response runbook requires it.
+- CLI passwords are no longer accepted as command-line argument values. Prefer
+  the interactive prompt, ``--password-stdin``, or ``--password-fd``. Use
+  ``--password-env`` or ``--password-file`` only for tightly controlled
+  automation because process environments and files can leak outside the
+  invoking process.
+- File decryption writes plaintext only to a temporary file in the destination
+  directory and atomically replaces the requested output path after AES-GCM
+  authentication succeeds. Wrong passwords, corrupted files, malformed headers,
+  and failed tags must leave any pre-existing output file untouched and remove
+  operation-owned temporary files.
+- New file-encryption output uses a v2 header authenticated as AES-GCM AAD.
+  Pre-v2 versioned files and raw ``salt || nonce || ciphertext || tag`` files
+  are decrypt-only compatibility formats and require explicit
+  ``allow_legacy_format=True`` or the CLI ``--allow-legacy-format`` flag.
 - Private keys should always be stored encrypted, either with a strong password or in
   a hardware-backed keystore (HSM, KMS, etc.). Use
   ``to_encrypted_private_pem`` / ``load_encrypted_private_pem`` for PEM helpers,

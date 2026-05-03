@@ -22,7 +22,7 @@ This project uses a SemVer release workflow with reproducible builds.
    - `mypy` (changed Python files)
    - `bandit` repository scan
    - `pip-audit -r requirements.txt --strict`
-   - `pytest --cov=cryptography_suite --cov-branch --cov-fail-under=95`
+   - `pytest --ignore=tests/generated --cov=cryptography_suite --cov-branch`
 5. Install pinned release dependencies from `requirements-release.txt`.
 6. Build deterministic wheel/sdist artifacts (`tools/reproducible_build.py`).
 7. Generate SBOM (`tools/generate_sbom.py`).

@@ -1,5 +1,6 @@
 import hashlib
 import importlib
+import io
 from types import ModuleType
 
 import pytest
@@ -22,6 +23,7 @@ def test_main_keygen_rsa(monkeypatch, capsys):
             called["args"] = (priv, pub, pwd)
 
     monkeypatch.setattr(cli, "KeyManager", lambda: KM())
+    monkeypatch.setattr("sys.stdin", io.StringIO("pw\n"))
     cli.main(
         [
             "keygen",
@@ -30,8 +32,7 @@ def test_main_keygen_rsa(monkeypatch, capsys):
             "priv.pem",
             "--public",
             "pub.pem",
-            "--password",
-            "pw",
+            "--password-stdin",
         ]
     )
     assert called["args"] == ("priv.pem", "pub.pem", "pw")
@@ -46,9 +47,10 @@ def test_keygen_pqc_does_not_print_private_key(monkeypatch, capsys):
     cli.keygen_cli(["kyber"])
 
     captured = capsys.readouterr()
-    assert "7075626c6963" in captured.out
+    assert "key material was not printed" in captured.out
+    assert "7075626c6963" not in captured.out
     assert "70726976617465" not in captured.out
-    assert "Private key material was generated but not printed" in captured.err
+    assert captured.err == ""
 
 
 def test_main_hash(tmp_path, capsys):

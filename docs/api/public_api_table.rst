@@ -409,10 +409,10 @@ Public API Inventory
      -
      - Experimental
    * - ``fhe_serialize_context``
-     -
+     - Serialize a Pyfhel context only through native safe byte APIs.
      - Experimental
    * - ``fhe_load_context``
-     -
+     - Load a Pyfhel context only through native safe byte APIs; pickle input is rejected.
      - Experimental
    * - ``BULLETPROOF_AVAILABLE``
      - bool(x) -> bool

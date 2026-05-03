@@ -1,4 +1,7 @@
-"""Operational hardening helpers for retries, subprocesses, metrics, and cancellation."""
+"""Operational hardening helpers.
+
+Includes retries, subprocesses, metrics, and cancellation.
+"""
 
 from __future__ import annotations
 
@@ -8,9 +11,10 @@ import subprocess
 import threading
 import time
 from collections import Counter
+from collections.abc import Callable, Iterator, Sequence
 from contextlib import contextmanager
 from dataclasses import dataclass
-from typing import Callable, Iterator, Sequence, TypeVar
+from typing import TypeVar
 
 from .logging import get_structured_logger, log_event
 
@@ -103,20 +107,29 @@ def retry_with_backoff(
                 result = operation()
             METRICS.increment(f"{operation_name}.success")
             if attempts > 1:
-                log_event(logger, "retry_recovered", operation=operation_name, attempts=attempts)
+                log_event(
+                    logger,
+                    "retry_recovered",
+                    operation=operation_name,
+                    attempts=attempts,
+                )
             return result
         except Exception as exc:
             METRICS.increment(f"{operation_name}.error")
-            if attempts >= policy.max_attempts or (time.monotonic() - start) >= policy.max_retry_budget_s:
+            if (
+                attempts >= policy.max_attempts
+                or (time.monotonic() - start) >= policy.max_retry_budget_s
+            ):
                 log_event(
                     logger,
                     "retry_exhausted",
                     operation=operation_name,
                     attempts=attempts,
-                    error=str(exc),
+                    error_type=exc.__class__.__name__,
                 )
                 raise RuntimeError(
-                    f"{operation_name} failed after {attempts} attempts: {exc}"
+                    f"{operation_name} failed after {attempts} attempts "
+                    f"({exc.__class__.__name__})"
                 ) from exc
             exp = min(policy.base_delay_s * (2 ** (attempts - 1)), policy.max_delay_s)
             sleep_for = exp + random.uniform(0.0, policy.jitter_s)
@@ -126,7 +139,7 @@ def retry_with_backoff(
                 operation=operation_name,
                 attempts=attempts,
                 sleep_s=round(sleep_for, 3),
-                error=str(exc),
+                error_type=exc.__class__.__name__,
             )
             time.sleep(sleep_for)
 
@@ -151,7 +164,13 @@ def run_command(
         raise ValueError("timeout_s must be positive")
 
     logger = get_structured_logger(logger_name)
-    log_event(logger, "subprocess_start", operation=operation_name, argv=list(cmd), timeout_s=timeout_s)
+    log_event(
+        logger,
+        "subprocess_start",
+        operation=operation_name,
+        argv=list(cmd),
+        timeout_s=timeout_s,
+    )
     with METRICS.timed(f"{operation_name}.duration"):
         proc = subprocess.run(
             list(cmd),
@@ -170,9 +189,9 @@ def run_command(
             returncode=proc.returncode,
             stderr=proc.stderr.strip(),
         )
-        raise RuntimeError(
-            f"{operation_name} failed with exit code {proc.returncode}: {proc.stderr.strip()}"
-        )
+        raise RuntimeError(f"{operation_name} failed with exit code {proc.returncode}")
     METRICS.increment(f"{operation_name}.success")
     log_event(logger, "subprocess_success", operation=operation_name)
-    return CommandResult(returncode=proc.returncode, stdout=proc.stdout, stderr=proc.stderr)
+    return CommandResult(
+        returncode=proc.returncode, stdout=proc.stdout, stderr=proc.stderr
+    )

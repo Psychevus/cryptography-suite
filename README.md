@@ -6,7 +6,6 @@
 [![Version](https://img.shields.io/badge/version-3.0.0-blue)](https://github.com/Psychevus/cryptography-suite/releases/tag/v3.0.0)
 [![PyPI Version](https://img.shields.io/pypi/v/cryptography-suite)](https://pypi.org/project/cryptography-suite/)
 [![Build Status](https://github.com/Psychevus/cryptography-suite/actions/workflows/quality-gate.yml/badge.svg)](https://github.com/Psychevus/cryptography-suite/actions)
-[![Coverage](https://img.shields.io/badge/Coverage-99%25-brightgreen)](docs/testing.md)
 [![Provenance](https://img.shields.io/badge/provenance-signed-blue)](docs/release_process.md)
 [![Signed Releases](https://img.shields.io/badge/releases-signed-brightgreen)](docs/release_process.md)
 [![Fuzzed & Property-Tested](https://img.shields.io/badge/fuzzed--property--tested-true-brightgreen)](docs/fuzzing.md)
@@ -61,7 +60,9 @@ ______________________________________________________________________
 - **Zero-Knowledge Proof Helpers**: Bulletproof range proofs and zk-SNARK examples under `cryptography_suite.experimental` (**experimental**).
 - **Developer-Friendly API**: Intuitive, well-documented interfaces that simplify integration and accelerate development.
 - **Cross-Platform Compatibility**: Fully compatible with macOS, Linux, and Windows environments.
-- **Rigorous Testing**: ~**99%** test coverage as of v3.0.0, ensuring reliability and robustness.
+- **Rigorous Testing**: Behavioral, negative, property, and regression tests are
+  used to validate security-sensitive behavior. Project-wide coverage claims
+  are withheld until backed by meaningful test evidence.
 
 ## 🔍 Support Matrix
 
@@ -98,13 +99,13 @@ ______________________________________________________________________
 | bulletproof | | No | Yes | No | experimental | |
 | dilithium_sign | | No | No | No | experimental | |
 | dilithium_verify | | No | No | No | experimental | |
-| fhe_add | cryptography_suite.homomorphic | No | No | No | experimental | |
-| fhe_decrypt | cryptography_suite.homomorphic | No | No | No | experimental | |
-| fhe_encrypt | cryptography_suite.homomorphic | No | No | No | experimental | |
-| fhe_keygen | cryptography_suite.homomorphic | No | No | No | experimental | |
-| fhe_load_context | cryptography_suite.homomorphic | No | No | No | experimental | |
-| fhe_multiply | cryptography_suite.homomorphic | No | No | No | experimental | |
-| fhe_serialize_context | cryptography_suite.homomorphic | No | No | No | experimental | |
+| fhe_add | cryptography_suite.experimental | No | No | No | experimental | |
+| fhe_decrypt | cryptography_suite.experimental | No | No | No | experimental | |
+| fhe_encrypt | cryptography_suite.experimental | No | No | No | experimental | |
+| fhe_keygen | cryptography_suite.experimental | No | No | No | experimental | |
+| fhe_load_context | cryptography_suite.experimental | No | No | No | experimental | |
+| fhe_multiply | cryptography_suite.experimental | No | No | No | experimental | |
+| fhe_serialize_context | cryptography_suite.experimental | No | No | No | experimental | |
 | generate_bls_keypair | cryptography_suite.asymmetric.bls | No | No | No | deprecated | |
 | generate_dilithium_keypair | | No | Yes | No | experimental | |
 | generate_ed448_keypair | cryptography_suite.asymmetric.signatures | No | No | No | deprecated | |
@@ -229,7 +230,7 @@ To include deprecated stream ciphers:
 
 The **SPHINCS+** signature helpers are included in the `pqc` extra and are experimental/demo-only.
 
-> **Note**: Requires Python 3.10 or higher. Homomorphic encryption features need `Pyfhel` installed separately if the `fhe` extra is not used.
+> **Note**: Requires Python 3.10 or higher. Homomorphic encryption features are disabled by default, require `CRYPTOSUITE_ALLOW_EXPERIMENTAL=1`, and need `Pyfhel` installed separately if the `fhe` extra is not used.
 
 ### Install from Source
 
@@ -249,10 +250,10 @@ pip install -e ".[dev,pqc]"
 pip install cryptography-suite
 
 # Encrypt a file
-cryptography-suite file encrypt --in input.txt --out encrypted.bin --password mypass
+cryptography-suite file encrypt --in input.txt --out encrypted.bin
 
 # Decrypt it back
-cryptography-suite file decrypt --in encrypted.bin --out output.txt --password mypass
+cryptography-suite file decrypt --in encrypted.bin --out output.txt
 
 # Export a pipeline for formal verification
 cryptography-suite export examples/formal/pipeline.yaml --format proverif
@@ -300,7 +301,7 @@ ______________________________________________________________________
 - **One-Time Passwords (OTP)**: HOTP and TOTP algorithms for generating and verifying one-time passwords.
   > ⚠️ Secrets used for OTP (TOTP/HOTP) will now be auto-padded to prevent base32 decoding issues. No manual padding is required.
 - **Utility Functions**: Includes Base62 encoding/decoding, secure random string generation, and memory zeroing.
-- **Homomorphic Encryption**: Wrapper around Pyfhel supporting CKKS and BFV schemes. *(experimental)*
+- **Homomorphic Encryption**: Opt-in Pyfhel wrapper for CKKS and BFV schemes. It is experimental/demo-only and excluded from stable production API guarantees.
 - **Zero-Knowledge Proofs**: Bulletproof range proofs and zk-SNARK preimage proofs (optional dependencies, experimental).
 
 ______________________________________________________________________
@@ -326,8 +327,10 @@ policies on backend usage.
 ## ⚠️ Security Considerations
 
 - **Experimental/Insecure Primitives**: Functions like `salsa20_encrypt` or `ascon_encrypt` are for research/education only and will be removed in v4.0.0. They are NOT supported for production use. If you depend on them, migrate now.
-- **Verbose Mode**: Enabling `VERBOSE_MODE` leaks sensitive information to stdout; never
-  enable it in production.
+- **Verbose Mode**: Verbose and debug paths redact secret-bearing fields and no
+  longer print derived keys, nonces, private keys, plaintext, or ciphertext
+  internals. Keep verbose logging disabled in production unless you have a
+  specific operational need.
 - **Private Key Protection**: Private keys should always be stored encrypted, either with a strong
   password or in a hardware-backed keystore (HSM, KMS, etc.). Unencrypted PEMs are only acceptable
   for controlled testing or one-time migration. Use `to_encrypted_private_pem`,
@@ -398,9 +401,16 @@ additional dependencies.
 
 ### File Encryption
 
-Stream files of any size with AES-GCM in bounded memory. The current file
-format is versioned and self-describing with metadata for magic bytes,
-version, KDF identifier, salt, nonce, chunk size, and trailing GCM tag.
+Stream files of any size with AES-GCM in bounded memory. New files use the v2
+streaming format:
+
+`CSF! || version=2 || KDF id || salt length || nonce length || chunk size || salt || nonce || ciphertext || tag`
+
+The complete v2 header is authenticated as AES-GCM additional authenticated
+data (AAD). During decryption, plaintext is written to a temporary file in the
+same output directory and moved into place only after the GCM tag verifies.
+Wrong passwords, corruption, or malformed headers never overwrite or delete a
+pre-existing output path.
 
 ```python
 from cryptography_suite.symmetric import encrypt_file, decrypt_file
@@ -410,8 +420,12 @@ encrypt_file("secret.txt", "secret.enc", password, kdf="argon2")
 decrypt_file("secret.enc", "secret.out", password)
 ```
 
-`decrypt_file` remains backward-compatible with the legacy format
-(`salt || nonce || ciphertext+tag`) for existing encrypted files.
+Legacy v1 and raw files (`salt || nonce || ciphertext+tag`) are decrypt-only
+compatibility formats and must be requested explicitly:
+
+```python
+decrypt_file("legacy.enc", "legacy.out", password, allow_legacy_format=True)
+```
 
 For asynchronous applications install `aiofiles` and use the async variants:
 
@@ -428,9 +442,9 @@ async def main():
 asyncio.run(main())
 ```
 
-The async file helpers use the same versioned streaming format as the sync
-helpers and `decrypt_file_async` also supports legacy
-`salt || nonce || ciphertext+tag` files.
+The async file helpers use the same v2 streaming format and the same
+authenticate-before-replace failure behavior as the sync helpers. Legacy files
+require `allow_legacy_format=True`.
 
 ### Asymmetric Encryption
 
@@ -562,7 +576,14 @@ print(f"Recovered secret: {recovered_secret}")
 ### Homomorphic Encryption
 
 Perform arithmetic over encrypted values using Pyfhel. These helpers are
-experimental.
+experimental, disabled by default, and require
+`CRYPTOSUITE_ALLOW_EXPERIMENTAL=1` before importing
+`cryptography_suite.experimental`.
+
+Context serialization uses Pyfhel's native byte APIs only. The project does
+not deserialize FHE context data with `pickle`; `fhe_serialize_context` and
+`fhe_load_context` raise `UnsupportedOperationError` when safe Pyfhel context
+serialization is unavailable.
 
 ```python
 from cryptography_suite.experimental import (
@@ -771,8 +792,7 @@ ______________________________________________________________________
 Ensure the integrity of the suite by running comprehensive tests:
 
 ```bash
-coverage run -m unittest discover
-coverage report -m
+pytest --ignore=tests/generated --cov=cryptography_suite --cov-branch --cov-report=term-missing
 ```
 
 Some tests rely on optional dependencies such as `petlib` for zero-knowledge proofs.
@@ -782,7 +802,9 @@ Install extras before running them:
 pip install .[zk]
 ```
 
-Our test suite achieves **99% code coverage**, guaranteeing reliability and robustness.
+No project-wide coverage percentage is currently claimed. Coverage should come
+from meaningful behavioral, negative, property, and regression tests, not from
+generated smoke tests or no-op execution.
 
 ## 🖥 Command Line Interface
 
@@ -798,8 +820,8 @@ Run each command with `-h` for detailed help.
 File encryption and decryption are available via the main CLI:
 
 ```bash
-cryptography-suite file encrypt --in secret.txt --out secret.enc --password mypass --kdf argon2
-cryptography-suite file decrypt --in secret.enc --out decrypted.txt --password mypass
+cryptography-suite file encrypt --in secret.txt --out secret.enc --kdf argon2
+cryptography-suite file decrypt --in secret.enc --out decrypted.txt
 ```
 
 ______________________________________________________________________
@@ -809,7 +831,9 @@ ______________________________________________________________________
 - **Secure Key Storage**: Store private keys securely, using encrypted files or hardware security modules (HSMs).
 - **Password Management**: Use strong, unique passwords and consider integrating with secret management solutions.
 - **Key Rotation**: Regularly rotate cryptographic keys to minimize potential exposure.
-- **Environment Variables**: Use environment variables for sensitive configurations to prevent hardcoding secrets.
+- **Secret Input**: Prefer interactive prompts, stdin, or file descriptors for
+  CLI passwords. Environment variables are supported for automation but are less
+  safe because they can be inherited or exposed by process tooling.
 - **Regular Updates**: Keep dependencies up to date to benefit from the latest security patches.
 - **Post-Quantum Algorithms**: Use Kyber and Dilithium for data requiring long-term secrecy, noting their larger key sizes.
 - **Hybrid Encryption**: Combine classical and PQC schemes during migration to mitigate potential weaknesses.
@@ -898,7 +922,9 @@ cryptography-suite/
 │   ├── debug.py
 │   ├── errors.py
 │   ├── hashing/
-│   ├── homomorphic.py
+│   ├── experimental/
+│   │   ├── fhe.py
+│   │   └── ...
 │   ├── hybrid.py
 │   ├── pqc/
 │   ├── protocols/
@@ -1023,7 +1049,7 @@ ruff check .
 mypy --follow-imports=skip --ignore-missing-imports cryptography_suite
 bandit -q -r cryptography_suite -x tests,docs,examples -s B101,B110,B301,B311,B403,B404,B413,B603,B701
 pip-audit -r requirements.txt --strict
-pytest --cov=cryptography_suite --cov-branch --cov-fail-under=95
+pytest --ignore=tests/generated --cov=cryptography_suite --cov-branch
 ```
 
 ### Run in production

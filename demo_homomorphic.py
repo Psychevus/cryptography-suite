@@ -1,17 +1,24 @@
 """Demonstration of homomorphic encryption operations."""
-from cryptography_suite.homomorphic import keygen, encrypt, decrypt, add, multiply
+
+from cryptography_suite.experimental import (
+    fhe_add,
+    fhe_decrypt,
+    fhe_encrypt,
+    fhe_keygen,
+    fhe_multiply,
+)
 
 
 def main() -> None:
-    he = keygen("CKKS")
-    ct1 = encrypt(he, 10.5)
-    ct2 = encrypt(he, 5.25)
+    he = fhe_keygen("CKKS")
+    ct1 = fhe_encrypt(he, 10.5)
+    ct2 = fhe_encrypt(he, 5.25)
 
-    sum_ct = add(he, ct1, ct2)
-    prod_ct = multiply(he, ct1, ct2)
+    sum_ct = fhe_add(he, ct1, ct2)
+    prod_ct = fhe_multiply(he, ct1, ct2)
 
-    print("Decrypted Sum:", decrypt(he, sum_ct))
-    print("Decrypted Product:", decrypt(he, prod_ct))
+    print("Decrypted Sum:", fhe_decrypt(he, sum_ct))
+    print("Decrypted Product:", fhe_decrypt(he, prod_ct))
 
 
 if __name__ == "__main__":

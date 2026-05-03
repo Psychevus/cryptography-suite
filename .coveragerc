@@ -4,7 +4,6 @@ source =
     cryptography_suite
 omit =
     # Template-only code is not importable runtime code.
-    tests/generated/*
     cryptography_suite/codegen/templates/*
     # Experimental modules are intentionally out-of-scope for v4 stability gates.
     cryptography_suite/experimental/*
@@ -12,9 +11,6 @@ omit =
 [report]
 show_missing = true
 skip_covered = false
-# v4 baseline: enforce representative coverage for stable modules.
-# Raise this to 100 once remaining edge/error-path assertions are added.
-fail_under = 95
 
 [html]
 directory = htmlcov

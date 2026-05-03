@@ -65,6 +65,13 @@ class UnsupportedAlgorithm(CryptographySuiteError):
         super().__init__(message, code=ErrorCode.UNSUPPORTED_ALGORITHM, details=details)
 
 
+class UnsupportedOperationError(CryptographySuiteError):
+    """Raised when an optional operation is unavailable or disabled."""
+
+    def __init__(self, message: str, details: dict[str, str] | None = None) -> None:
+        super().__init__(message, code=ErrorCode.CONFIGURATION_ERROR, details=details)
+
+
 class SecurityError(CryptographySuiteError):
     """Raised when a security policy is violated."""
 

@@ -23,6 +23,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 - CLI key generation/import paths avoid printing private key material by default
   and support file/env/stdin password sources for private-key operations.
 
+### Security
+- Removed derived-key, nonce, ciphertext, private-key, plaintext, and shared
+  secret leakage from verbose/debug, dry-run, CLI, and structured logging paths.
+- Replaced CLI password argument values with prompt/stdin/fd/env/file input
+  sources; environment variables and files are documented as less safe
+  automation options.
+- Hardened AES-GCM file decryption so plaintext is written to a temporary file
+  and atomically replaces the requested output only after authentication
+  succeeds; failed decrypts leave existing outputs untouched and clean up
+  operation-owned temporary files.
+- Added v2 file-encryption headers authenticated as AES-GCM AAD. Pre-v2
+  versioned and raw legacy files are now decrypt-only compatibility formats
+  requiring explicit opt-in.
+- Removed pickle-based context serialization/deserialization from homomorphic
+  encryption helpers and quarantined FHE under the experimental opt-in API.
+
+### Removed
+- Artificial coverage inflation from generated no-op tests and forced execution
+  coverage.
+- Unsupported coverage claims; project-wide coverage claims will be restored
+  only after real test evidence supports them.
+
 ### Deprecated
 - `derive_pbkdf2` alias in `symmetric.kdf` (use `kdf_pbkdf2`; will be removed in v4.0.0).
 - Legacy helpers `generate_rsa_keypair_and_save` and `generate_ec_keypair_and_save`
@@ -101,7 +123,7 @@ These functions remain temporarily for backward compatibility but emit
 - Major refactor into a modular package structure.
 - Argon2id is now the default key derivation function.
 ### Fixed
-- Test suite expanded to 100% coverage.
+- Test suite expanded with additional behavioral coverage.
 
 ### Deprecated
 - ``derive_pbkdf2`` alias in ``symmetric.kdf``. Use ``kdf_pbkdf2`` instead.
@@ -121,7 +143,7 @@ These functions remain temporarily for backward compatibility but emit
 ### Added
 - Comprehensive documentation and usage examples.
 - Packaging metadata improvements and CI workflow updates.
-- Extensive tests providing full coverage.
+- Extensive tests for the initial package surface.
 ### Changed
 - Modules refined for better maintainability.
 - Security best practices documented.

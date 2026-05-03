@@ -1,8 +1,10 @@
-import importlib
+# mypy: disable-error-code=no-untyped-call
 import importlib
 import sys
 import types
+
 import pytest
+
 from cryptography_suite.errors import EncryptionError
 
 
@@ -40,19 +42,12 @@ class FakePyfhel:
         return ctxt.value
 
 
-fake_module = types.SimpleNamespace(PyCtxt=FakePyCtxt, Pyfhel=FakePyfhel)
-
-
-def reload_module(monkeypatch):
-    monkeypatch.setitem(sys.modules, "Pyfhel", fake_module)
-    import cryptography_suite.homomorphic as h
-    importlib.reload(h)
-    return h
-
 class FakePyfhelList(FakePyfhel):
     """Return list intact when decrypting for CKKS."""
+
     def decryptFrac(self, ctxt):
         return ctxt.value
+
 
 class TrackFakePyfhel(FakePyfhel):
     def __init__(self):
@@ -79,50 +74,60 @@ class TrackFakePyfhel(FakePyfhel):
         return super().decryptInt(ctxt)
 
 
+def _reload_experimental_fhe(monkeypatch, pyfhel_cls=FakePyfhel):
+    monkeypatch.setenv("CRYPTOSUITE_ALLOW_EXPERIMENTAL", "1")
+    monkeypatch.setitem(
+        sys.modules,
+        "Pyfhel",
+        types.SimpleNamespace(PyCtxt=FakePyCtxt, Pyfhel=pyfhel_cls),
+    )
+    for module_name in (
+        "cryptography_suite.homomorphic",
+        "cryptography_suite.experimental.fhe",
+        "cryptography_suite.experimental",
+    ):
+        sys.modules.pop(module_name, None)
+    return importlib.import_module("cryptography_suite.experimental.fhe")
+
+
 def test_keygen_case_insensitive(monkeypatch):
-    h = reload_module(monkeypatch)
-    he = h.keygen("ckks")
+    h = _reload_experimental_fhe(monkeypatch)
+    he = h.fhe_keygen("ckks")
     assert he.scheme == "CKKS"
-    he = h.keygen("bFv")
+    he = h.fhe_keygen("bFv")
     assert he.scheme == "BFV"
     with pytest.raises(EncryptionError):
-        h.keygen("unsupported")
+        h.fhe_keygen("unsupported")
 
 
 def test_encrypt_decrypt_iterable_ckks(monkeypatch):
-    fake_module = types.SimpleNamespace(PyCtxt=FakePyCtxt, Pyfhel=FakePyfhelList)
-    monkeypatch.setitem(sys.modules, "Pyfhel", fake_module)
-    import cryptography_suite.homomorphic as h
-    importlib.reload(h)
-    he = h.keygen("CKKS")
+    h = _reload_experimental_fhe(monkeypatch, FakePyfhelList)
+    he = h.fhe_keygen("CKKS")
     values = [1.1, -2.2, 3.3]
-    ct = h.encrypt(he, values)
+    ct = h.fhe_encrypt(he, values)
     assert isinstance(ct, FakePyCtxt)
-    assert h.decrypt(he, ct) == values
+    assert h.fhe_decrypt(he, ct) == values
 
 
 def test_large_integer_operations(monkeypatch):
-    h = reload_module(monkeypatch)
-    he = h.keygen("BFV")
-    big = 2 ** 60
-    ct1 = h.encrypt(he, big)
-    ct2 = h.encrypt(he, big)
-    assert h.decrypt(he, ct1) == big
-    added = h.add(he, ct1, ct2)
-    multiplied = h.multiply(he, ct1, ct2)
+    h = _reload_experimental_fhe(monkeypatch)
+    he = h.fhe_keygen("BFV")
+    big = 2**60
+    ct1 = h.fhe_encrypt(he, big)
+    ct2 = h.fhe_encrypt(he, big)
+    assert h.fhe_decrypt(he, ct1) == big
+    added = h.fhe_add(he, ct1, ct2)
+    multiplied = h.fhe_multiply(he, ct1, ct2)
     assert added.value == big * 2
-    assert multiplied.value == big ** 2
+    assert multiplied.value == big**2
 
 
 def test_unknown_scheme_uses_integer_ops(monkeypatch):
-    fake_module = types.SimpleNamespace(PyCtxt=FakePyCtxt, Pyfhel=TrackFakePyfhel)
-    monkeypatch.setitem(sys.modules, "Pyfhel", fake_module)
-    import cryptography_suite.homomorphic as h
-    importlib.reload(h)
+    h = _reload_experimental_fhe(monkeypatch, TrackFakePyfhel)
 
     he = TrackFakePyfhel()
     he.scheme = "OTHER"
-    ct = h.encrypt(he, 5)
+    ct = h.fhe_encrypt(he, 5)
     assert he.enc_int_called and not he.enc_frac_called
-    h.decrypt(he, ct)
+    h.fhe_decrypt(he, ct)
     assert he.dec_int_called and not he.dec_frac_called
