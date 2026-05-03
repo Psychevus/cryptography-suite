@@ -1,16 +1,19 @@
+import os
 import subprocess
 import sys
+from pathlib import Path
 
 import pytest
 
 pytest.importorskip("mypy")
+
 
 def run_mypy(path: str) -> subprocess.CompletedProcess:
     return subprocess.run(
         [sys.executable, "-m", "mypy", path],
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
-        env={"PYTHONPATH": "."},
+        env={**os.environ, "PYTHONPATH": str(Path.cwd())},
         text=True,
     )
 
