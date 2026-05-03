@@ -10,6 +10,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 - ``sensitive`` parameter for key generation functions returning
   :class:`KeyVault`-wrapped secrets by default.
 - Documentation on zeroization guarantees and Python's memory limitations.
+- Safe PEM helpers: `to_public_pem`, `to_encrypted_private_pem`,
+  `load_public_pem`, `load_encrypted_private_pem`, and the explicitly unsafe
+  `to_unencrypted_private_pem_unsafe`.
+
+### Changed
+- `to_pem(private_key)` and `pem_to_json(private_key)` no longer export
+  plaintext private keys through normal-looking helper paths.
+- `LocalKeyStore`, keystore migration, key rotation, and `KeyManager` writes now
+  preserve encrypted private keys and require explicit unsafe opt-in for
+  plaintext private-key storage or migration.
+- CLI key generation/import paths avoid printing private key material by default
+  and support file/env/stdin password sources for private-key operations.
 
 ### Security
 - Removed derived-key, nonce, ciphertext, private-key, plaintext, and shared
@@ -39,6 +51,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
   (use `KeyManager` methods; will be removed in v4.0.0).
 - Insecure ciphers `salsa20_encrypt`/`salsa20_decrypt` and experimental `ascon.encrypt`/`ascon.decrypt`
   (use `chacha20_encrypt`/`xchacha_encrypt` or authenticated ciphers like `aes_encrypt`).
+- Ambiguous `from_pem` private-key loading (use `load_public_pem` or
+  `load_encrypted_private_pem`).
 
 These functions remain temporarily for backward compatibility but emit
 `DeprecationWarning` on use.

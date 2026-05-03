@@ -5,12 +5,13 @@ import hashlib
 import json
 import warnings
 from pathlib import Path
-from typing import TypeAlias, cast
+from typing import Any, TypeAlias, cast
 
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ec, ed25519, rsa
 
 from .. import config
+from .._key_files import atomic_write_bytes
 from ..asymmetric import rsa_decrypt
 from ..asymmetric.signatures import (
     sign_message,
@@ -19,7 +20,7 @@ from ..asymmetric.signatures import (
 )
 from ..audit import audit_log
 from ..errors import StrictKeyPolicyError
-from ..utils import is_encrypted_pem
+from ..utils import _detect_private_pem_encryption, is_encrypted_pem
 from . import register_keystore
 from .base import KeyStoreCapability
 
@@ -46,7 +47,7 @@ class LocalKeyStore:
 
     def __init__(self, directory: str = "keys") -> None:
         self.dir = Path(directory)
-        self.dir.mkdir(exist_ok=True)
+        self.dir.mkdir(parents=True, exist_ok=True)
 
     def list_keys(self) -> list[str]:
         return [p.stem for p in self.dir.glob("*.pem")]
@@ -61,18 +62,19 @@ class LocalKeyStore:
         if not key_path.exists():
             raise FileNotFoundError(key_path)
         policy = config.STRICT_KEYS
-        if policy in {"warn", "error"} and not is_encrypted_pem(key_path):
+        detected_encrypted = is_encrypted_pem(key_path)
+        if policy in {"warn", "error"} and not detected_encrypted:
             msg = f"Unencrypted private key: {key_path}"
             if policy == "error":
                 raise StrictKeyPolicyError(msg)
             warnings.warn(msg, UserWarning, stacklevel=2)
         meta_path = key_path.with_suffix(".json")
-        encrypted = False
+        encrypted = detected_encrypted
         if meta_path.exists():
             try:
                 meta = json.loads(meta_path.read_text())
                 algo = meta.get("type")
-                encrypted = bool(meta.get("encrypted", False))
+                encrypted = detected_encrypted or bool(meta.get("encrypted", False))
                 if "password" in meta:
                     warnings.warn(
                         (
@@ -112,7 +114,7 @@ class LocalKeyStore:
                 algo = "rsa"
             else:
                 raise ValueError("Unsupported key type")
-            meta_path.write_text(json.dumps({"type": algo, "encrypted": encrypted}))
+            self._write_metadata(meta_path, {"type": algo, "encrypted": encrypted})
 
         return cast(PrivateKey, key), cast(str, algo)
 
@@ -161,8 +163,21 @@ class LocalKeyStore:
     ) -> tuple[bytes, dict]:
         key_path = self.dir / f"{key_id}.pem"
         raw = key_path.read_bytes()
-        _, algo = self._load_key(key_id, password=password)
-        return raw, {"id": key_id, "type": algo}
+        encrypted = _detect_private_pem_encryption(raw)
+        if encrypted is None:
+            raise ValueError(f"Stored key is not a PEM private key: {key_id}")
+
+        meta = self._read_metadata(key_path.with_suffix(".json"))
+        algo = meta.get("type")
+        if algo is None or password is not None or not encrypted:
+            _, algo = self._load_key(key_id, password=password)
+        return raw, {
+            "id": key_id,
+            "type": algo,
+            "encrypted": encrypted,
+            "fingerprint": meta.get("fingerprint"),
+            "name": meta.get("name", key_id),
+        }
 
     def _fingerprint(self, key: PrivateKey) -> str:
         pub = key.public_key().public_bytes(
@@ -180,21 +195,76 @@ class LocalKeyStore:
             return "rsa"
         raise ValueError("Unsupported key type")
 
+    def _read_metadata(self, path: Path) -> dict[str, Any]:
+        if not path.exists():
+            return {}
+        try:
+            data = json.loads(path.read_text())
+        except json.JSONDecodeError:
+            return {}
+        return data if isinstance(data, dict) else {}
+
+    def _write_metadata(self, path: Path, meta: dict[str, Any]) -> None:
+        atomic_write_bytes(path, json.dumps(meta, sort_keys=True).encode())
+
+    def _enforce_unencrypted_write_policy(
+        self,
+        action: str,
+        *,
+        allow_unencrypted: bool,
+    ) -> None:
+        msg = (
+            f"{action} unencrypted private key is disabled by default. Provide a "
+            "password or pass allow_unencrypted=True only for controlled "
+            "development/testing migration."
+        )
+        if config.STRICT_KEYS == "error":
+            raise StrictKeyPolicyError(
+                f"{action} unencrypted private key is blocked by "
+                "CRYPTOSUITE_STRICT_KEYS=error"
+            )
+        if not allow_unencrypted:
+            raise StrictKeyPolicyError(msg)
+        if config.STRICT_KEYS == "warn":
+            warnings.warn(
+                (
+                    f"UNSAFE: {action.lower()} unencrypted private key in "
+                    "LocalKeyStore. Use encrypted PEM or a hardware-backed keystore "
+                    "outside controlled testing/migration."
+                ),
+                UserWarning,
+                stacklevel=3,
+            )
+
+    def _allocate_import_path(self, key_id: str) -> tuple[str, Path]:
+        candidate = key_id
+        key_path = self.dir / f"{candidate}.pem"
+        if not key_path.exists():
+            return candidate, key_path
+        i = 1
+        while (self.dir / f"{key_id}_{i}.pem").exists():
+            i += 1
+        candidate = f"{key_id}_{i}"
+        return candidate, self.dir / f"{candidate}.pem"
+
     @audit_log
     def add_key(
-        self, private_key_obj: PrivateKey, name: str, password: str | None = None
+        self,
+        private_key_obj: PrivateKey,
+        name: str,
+        password: str | None = None,
+        *,
+        allow_unencrypted: bool = False,
     ) -> str:
         algo = self._algo(private_key_obj)
         fingerprint = self._fingerprint(private_key_obj)
         key_id = fingerprint[:16]
         key_path = self.dir / f"{key_id}.pem"
-        policy = config.STRICT_KEYS
         if not password:
-            msg = "Adding unencrypted private key"
-            if policy == "error":
-                raise StrictKeyPolicyError(msg)
-            if policy == "warn":
-                warnings.warn(msg, UserWarning, stacklevel=2)
+            self._enforce_unencrypted_write_policy(
+                "Adding",
+                allow_unencrypted=allow_unencrypted,
+            )
             encryption: serialization.KeySerializationEncryption = (
                 serialization.NoEncryption()
             )
@@ -205,7 +275,7 @@ class LocalKeyStore:
             serialization.PrivateFormat.PKCS8,
             encryption,
         )
-        key_path.write_bytes(pem)
+        atomic_write_bytes(key_path, pem)
         meta = {
             "name": name,
             "type": algo,
@@ -213,43 +283,58 @@ class LocalKeyStore:
             "fingerprint": fingerprint,
             "encrypted": bool(password),
         }
-        key_path.with_suffix(".json").write_text(json.dumps(meta))
+        self._write_metadata(key_path.with_suffix(".json"), meta)
         return key_id
 
     @audit_log
     def import_key(
-        self, raw: bytes, name_or_meta: str | dict, password: str | None = None
+        self,
+        raw: bytes,
+        name_or_meta: str | dict,
+        password: str | None = None,
+        *,
+        allow_unencrypted: bool = False,
     ) -> str:
+        detected_encrypted = _detect_private_pem_encryption(raw)
+        if detected_encrypted is None:
+            raise ValueError("LocalKeyStore only imports PEM private keys.")
+
         if isinstance(name_or_meta, dict):
             meta = name_or_meta
             key_id = cast(str, meta.get("id", "imported"))
-            encrypted = bool(meta.get("encrypted", False))
-            policy = config.STRICT_KEYS
-            if policy in {"warn", "error"}:
-                try:
-                    serialization.load_pem_private_key(raw, password=None)
-                    encrypted = False
-                except TypeError as exc:
-                    encrypted = "encrypted" in str(exc).lower()
-                if not encrypted:
-                    msg = "Importing unencrypted private key"
-                    if policy == "error":
-                        raise StrictKeyPolicyError(msg)
-                    warnings.warn(msg, UserWarning, stacklevel=2)
-            key_path = self.dir / f"{key_id}.pem"
-            if key_path.exists():
-                i = 1
-                while (self.dir / f"{key_id}_{i}.pem").exists():
-                    i += 1
-                key_id = f"{key_id}_{i}"
-                key_path = self.dir / f"{key_id}.pem"
-            key_path.write_bytes(raw)
-            (key_path.with_suffix(".json")).write_text(
-                json.dumps({"type": meta.get("type"), "encrypted": encrypted})
+            if not detected_encrypted:
+                self._enforce_unencrypted_write_policy(
+                    "Importing",
+                    allow_unencrypted=allow_unencrypted,
+                )
+            key_id, key_path = self._allocate_import_path(key_id)
+            atomic_write_bytes(key_path, raw)
+            migrated_meta = {
+                "name": meta.get("name", key_id),
+                "type": meta.get("type"),
+                "created": dt.datetime.now(dt.timezone.utc).isoformat(),
+                "fingerprint": meta.get("fingerprint"),
+                "encrypted": detected_encrypted,
+            }
+            self._write_metadata(
+                key_path.with_suffix(".json"),
+                migrated_meta,
             )
             return key_id
         name = name_or_meta
-        key = serialization.load_pem_private_key(
-            raw, password=password.encode() if password else None
+        if detected_encrypted and password is None:
+            raise ValueError("Password required to import encrypted private key.")
+        load_password = (
+            password.encode() if detected_encrypted and password is not None else None
         )
-        return self.add_key(key, name, password)
+        key = serialization.load_pem_private_key(
+            raw,
+            password=load_password,
+        )
+        if detected_encrypted or password:
+            return self.add_key(cast(PrivateKey, key), name, password)
+        return self.add_key(
+            cast(PrivateKey, key),
+            name,
+            allow_unencrypted=allow_unencrypted,
+        )

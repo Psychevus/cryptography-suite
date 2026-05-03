@@ -268,7 +268,10 @@ cryptography-suite keystore migrate --from local --to mock_hsm --dry-run
 
 Omit `--key` to stream all keys. Migration is allowed only when both backends
 advertise raw private-key export/import support (for example `local` ↔ `mock_hsm`).
-Migrating between different algorithms is not supported.
+Encrypted private-key PEMs remain encrypted during migration. Plaintext private-key
+migration is refused unless `--unsafe-allow-unencrypted-private-key` is supplied for
+controlled development/testing migration. Migrating between different algorithms is
+not supported.
 
 ### Fuzzing
 
@@ -330,8 +333,13 @@ policies on backend usage.
   specific operational need.
 - **Private Key Protection**: Private keys should always be stored encrypted, either with a strong
   password or in a hardware-backed keystore (HSM, KMS, etc.). Unencrypted PEMs are only acceptable
-  for testing or inside protected containers. When using `serialize_private_key` or
-  `KeyManager.save_private_key`, always provide a password.
+  for controlled testing or one-time migration. Use `to_encrypted_private_pem`,
+  `serialize_private_key`, or `KeyManager.save_private_key(..., password=...)` for private key
+  export/storage. The explicitly named `to_unencrypted_private_pem_unsafe` helper is the only
+  utility path for plaintext private-key PEM export and emits a warning.
+- **LocalKeyStore**: `LocalKeyStore` is for development/testing unless wrapped by your own
+  production controls. It refuses plaintext private-key writes by default and preserves encrypted
+  PEMs during import/export/migration.
 - **Strict Key Storage**: By default, unencrypted key files trigger a warning. Set
   `CRYPTOSUITE_STRICT_KEYS=error` to refuse loading or saving unencrypted private
   keys (raising an error). To disable these checks entirely – which is **unsafe** – set
@@ -471,10 +479,19 @@ future = generate_rsa_keypair_async(key_size=2048)
 private_async, public_async = future.result()
 
 # Serializing keys
-from cryptography_suite.utils import to_pem, from_pem, pem_to_json
+from cryptography_suite.utils import (
+    load_encrypted_private_pem,
+    load_public_pem,
+    pem_to_json,
+    to_encrypted_private_pem,
+    to_public_pem,
+)
 
-pem_priv: str = to_pem(private_key)
-loaded_priv = from_pem(pem_priv)
+key_password = "use-a-secret-manager-for-this"
+pem_priv: str = to_encrypted_private_pem(private_key, key_password)
+pem_pub: str = to_public_pem(public_key)
+loaded_priv = load_encrypted_private_pem(pem_priv, key_password)
+loaded_pub = load_public_pem(pem_pub)
 json_pub: str = pem_to_json(public_key)
 ```
 

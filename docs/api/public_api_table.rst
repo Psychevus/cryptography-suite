@@ -262,13 +262,28 @@ Public API Inventory
      - Context manager for sensitive key storage.
      - Core
    * - ``to_pem``
-     - Return a PEM-formatted string for a key.
+     - Return a PEM-formatted string for public keys only.
+     - Core
+   * - ``to_public_pem``
+     - Return a PEM-formatted public key string.
+     - Core
+   * - ``to_encrypted_private_pem``
+     - Return a password-encrypted private key PEM string.
+     - Core
+   * - ``to_unencrypted_private_pem_unsafe``
+     - Explicitly export a plaintext private key PEM with a warning.
      - Core
    * - ``from_pem``
-     - Load a key object from a PEM-formatted string.
+     - Deprecated ambiguous PEM loader for public-key compatibility only.
+     - Core
+   * - ``load_public_pem``
+     - Load a PEM-formatted public key.
+     - Core
+   * - ``load_encrypted_private_pem``
+     - Load a password-encrypted private key PEM.
      - Core
    * - ``pem_to_json``
-     - Serialize a key to a JSON object containing a PEM string.
+     - Serialize a public key or encrypted private key to a JSON PEM object.
      - Core
    * - ``encode_encrypted_message``
      - Convert a hybrid or Signal encrypted message into a Base64 string.

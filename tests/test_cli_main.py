@@ -39,6 +39,20 @@ def test_main_keygen_rsa(monkeypatch, capsys):
     assert "RSA keys saved" in capsys.readouterr().out
 
 
+def test_keygen_pqc_does_not_print_private_key(monkeypatch, capsys):
+    cli = reload_cli()
+    monkeypatch.setattr(cli, "PQCRYPTO_AVAILABLE", True)
+    monkeypatch.setattr(cli, "generate_kyber_keypair", lambda: (b"public", b"private"))
+
+    cli.keygen_cli(["kyber"])
+
+    captured = capsys.readouterr()
+    assert "key material was not printed" in captured.out
+    assert "7075626c6963" not in captured.out
+    assert "70726976617465" not in captured.out
+    assert captured.err == ""
+
+
 def test_main_hash(tmp_path, capsys):
     cli = reload_cli()
     file = tmp_path / "f.txt"

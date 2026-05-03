@@ -10,7 +10,7 @@ import logging
 import os
 import sys
 from pathlib import Path
-from typing import Protocol, cast
+from typing import Any, Protocol, cast
 
 from blake3 import blake3
 
@@ -34,6 +34,7 @@ from .pqc import (
 from .protocols import generate_totp
 from .protocols.key_management import KeyManager
 from .symmetric.kdf import DEFAULT_KDF
+from .utils import _detect_private_pem_encryption
 from .zk.bulletproof import (
     BULLETPROOF_AVAILABLE,
 )
@@ -312,6 +313,37 @@ def _validate_output_parent(path_str: str) -> None:
         raise ValueError(f"Output directory does not exist: {parent}")
 
 
+def _raw_private_key_is_unencrypted(raw: bytes, meta: dict[str, object]) -> bool:
+    encrypted_meta = meta.get("encrypted")
+    if encrypted_meta is False:
+        return True
+    detected = _detect_private_pem_encryption(raw)
+    return detected is False
+
+
+def _keystore_import_key(
+    store: Any,
+    raw: bytes,
+    meta: dict[str, object],
+    *,
+    allow_unencrypted: bool,
+) -> str:
+    import_key = store.import_key
+    try:
+        return cast(
+            str,
+            import_key(
+                raw,
+                meta,
+                allow_unencrypted=allow_unencrypted,
+            ),
+        )
+    except TypeError as exc:
+        if "allow_unencrypted" not in str(exc):
+            raise
+        return cast(str, import_key(raw, meta))
+
+
 def keygen_cli(argv: list[str] | None = None) -> None:
     """Generate RSA or post-quantum key pairs."""
 
@@ -462,12 +494,22 @@ def keystore_cli(argv: list[str] | None = None) -> None:
     imp.add_argument("--file", required=True)
     imp.add_argument("--name", required=True)
     _add_password_source_args(imp)
+    imp.add_argument(
+        "--unsafe-allow-unencrypted-private-key",
+        action="store_true",
+        help="Allow plaintext private key import for controlled testing/migration",
+    )
     mig = sub.add_parser("migrate", help="Migrate keys between keystores")
     mig.add_argument("--from", dest="src", required=True)
     mig.add_argument("--to", dest="dst", required=True)
     mig.add_argument("--key", dest="key")
     mig.add_argument("--dry-run", action="store_true")
     mig.add_argument("--apply", action="store_true")
+    mig.add_argument(
+        "--unsafe-allow-unencrypted-private-key",
+        action="store_true",
+        help="Allow plaintext private key migration for controlled testing only",
+    )
     args = parser.parse_args(argv)
 
     load_plugins()
@@ -517,7 +559,12 @@ def keystore_cli(argv: list[str] | None = None) -> None:
         ks = ks_cls()
         pem = Path(args.file).read_bytes()
         password = _resolve_password(args, "Key import password", required=False)
-        new_id = ks.import_key(pem, args.name, password)
+        new_id = ks.import_key(
+            pem,
+            args.name,
+            password,
+            allow_unencrypted=args.unsafe_allow_unencrypted_private_key,
+        )
         print(new_id)
     elif args.action == "migrate":
         if not args.dry_run and not getattr(args, "apply", False):
@@ -554,13 +601,37 @@ def keystore_cli(argv: list[str] | None = None) -> None:
         for key_id in ids:
             try:
                 raw, meta = src.export_key(key_id)
+                if (
+                    _raw_private_key_is_unencrypted(raw, meta)
+                    and not args.unsafe_allow_unencrypted_private_key
+                ):
+                    raise ValueError(
+                        "Refusing to migrate unencrypted private key without "
+                        "--unsafe-allow-unencrypted-private-key."
+                    )
                 new_id = key_id
                 if not args.dry_run:
-                    new_id = dst.import_key(raw, meta)
+                    new_id = _keystore_import_key(
+                        dst,
+                        raw,
+                        meta,
+                        allow_unencrypted=args.unsafe_allow_unencrypted_private_key,
+                    )
                 stats.append((key_id, new_id, meta.get("type"), "redacted"))
                 print(f"{key_id} -> {new_id}")
             except Exception as exc:  # pragma: no cover - user feedback
-                print(f"Error migrating {key_id}: {exc.__class__.__name__}")
+                raw_detail = str(exc)
+                if raw_detail.startswith("Refusing to migrate unencrypted"):
+                    detail = raw_detail
+                else:
+                    detail = redact_message(raw_detail)
+                if detail:
+                    print(
+                        f"Error migrating {key_id}: "
+                        f"{exc.__class__.__name__}: {detail}"
+                    )
+                else:
+                    print(f"Error migrating {key_id}: {exc.__class__.__name__}")
                 sys.exit(1)
         if stats:
             header = ("Old ID", "New ID", "Algorithm", "Private Material")
@@ -581,8 +652,6 @@ def export_cli(argv: list[str] | None = None) -> None:
     )
     args = parser.parse_args(argv)
     _validate_regular_file(args.pipeline, "pipeline")
-
-    from typing import Any
 
     yaml = __import__("yaml")
 
@@ -765,7 +834,15 @@ def main(argv: list[str] | None = None) -> None:
     ks_parser = sub.add_parser(
         "keystore", help="Manage keystores", description=keystore_cli.__doc__
     )
-    ks_parser.add_argument("action", choices=["list", "test", "migrate"])
+    ks_parser.add_argument("action", choices=["list", "test", "import", "migrate"])
+    ks_parser.add_argument("--file")
+    ks_parser.add_argument("--name")
+    _add_password_source_args(ks_parser)
+    ks_parser.add_argument(
+        "--unsafe-allow-unencrypted-private-key",
+        action="store_true",
+        help="Allow plaintext private key import/migration for controlled testing only",
+    )
     ks_parser.add_argument("--from", dest="src")
     ks_parser.add_argument("--to", dest="dst")
     ks_parser.add_argument("--key", dest="key")
@@ -892,10 +969,24 @@ def main(argv: list[str] | None = None) -> None:
             argv2.extend(["--to", args.dst])
         if args.key:
             argv2.extend(["--key", args.key])
+        if args.file:
+            argv2.extend(["--file", args.file])
+        if args.name:
+            argv2.extend(["--name", args.name])
+        if args.password:
+            argv2.extend(["--password", args.password])
+        if args.password_file:
+            argv2.extend(["--password-file", args.password_file])
+        if args.password_env:
+            argv2.extend(["--password-env", args.password_env])
+        if args.password_stdin:
+            argv2.append("--password-stdin")
         if getattr(args, "dry_run", False):
             argv2.append("--dry-run")
         if getattr(args, "apply", False):
             argv2.append("--apply")
+        if getattr(args, "unsafe_allow_unencrypted_private_key", False):
+            argv2.append("--unsafe-allow-unencrypted-private-key")
         keystore_cli(argv2)
     elif args.cmd == "migrate-keys":
         from importlib import util

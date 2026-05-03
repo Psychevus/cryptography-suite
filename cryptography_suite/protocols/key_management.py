@@ -2,30 +2,34 @@ import logging
 import os
 import secrets
 import string
-from ..utils import deprecated
+import warnings
+from os import path
+
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ec
-from os import path
+
+from .. import config
+from .._key_files import atomic_write_bytes
 from ..asymmetric import (
+    generate_ec_keypair,
+    generate_rsa_keypair,
     load_private_key,
     load_public_key,
-    generate_rsa_keypair,
     serialize_private_key,
     serialize_public_key,
-    generate_ec_keypair,
 )
 from ..asymmetric.signatures import (
-    generate_ed25519_keypair,
     generate_ed448_keypair,
+    generate_ed25519_keypair,
 )
 from ..errors import DecryptionError, SecurityError
-from ..utils import KeyVault
-from .. import config
+from ..utils import KeyVault, deprecated, is_encrypted_pem
 
 logger = logging.getLogger(__name__)
 
 # Constants
 DEFAULT_AES_KEY_SIZE = 32  # 256 bits
+EC_DEFAULT_CURVE: ec.EllipticCurve = ec.SECP256R1()
 
 
 def generate_aes_key(*, sensitive: bool = True) -> KeyVault | bytes:
@@ -81,21 +85,26 @@ def generate_random_password(length: int = 32) -> str:
 
     password_chars = [rng.choice(cat) for cat in categories]
     alphabet = "".join(categories)
-    password_chars.extend(rng.choice(alphabet) for _ in range(length - len(password_chars)))
+    password_chars.extend(
+        rng.choice(alphabet) for _ in range(length - len(password_chars))
+    )
     rng.shuffle(password_chars)
     return "".join(password_chars)
 
 
-def secure_save_key_to_file(key_data: bytes, filepath: str):
+def secure_save_key_to_file(
+    key_data: bytes,
+    filepath: str,
+    *,
+    overwrite: bool = False,
+) -> None:
     """
-    Saves key data to a specified file path with secure permissions.
+    Save key data atomically with private-file permissions.
     """
     try:
-        with open(filepath, "wb") as key_file:
-            key_file.write(key_data)
-        os.chmod(filepath, 0o600)
+        atomic_write_bytes(filepath, key_data, overwrite=overwrite)
     except Exception as e:
-        raise IOError(f"Failed to save key to {filepath}: {e}")
+        raise OSError(f"Failed to save key to {filepath}: {e}") from e
 
 
 def load_private_key_from_file(filepath: str, password: str):
@@ -129,7 +138,10 @@ def key_exists(filepath: str) -> bool:
     return path.exists(filepath)
 
 
-@deprecated("generate_rsa_keypair_and_save is deprecated; use KeyManager.generate_rsa_keypair_and_save")
+@deprecated(
+    "generate_rsa_keypair_and_save is deprecated; "
+    "use KeyManager.generate_rsa_keypair_and_save"
+)
 def generate_rsa_keypair_and_save(
     private_key_path: str,
     public_key_path: str,
@@ -156,7 +168,7 @@ def generate_ec_keypair_and_save(
     private_key_path: str,
     public_key_path: str,
     password: str,
-    curve: ec.EllipticCurve = ec.SECP256R1(),
+    curve: ec.EllipticCurve = EC_DEFAULT_CURVE,
 ):
     """Legacy wrapper for :class:`KeyManager` EC key generation.
 
@@ -174,14 +186,19 @@ class KeyManager:
     """Utility class for handling private key storage and rotation."""
 
     def save_private_key(
-        self, private_key, filepath: str, password: str | None = None
+        self,
+        private_key,
+        filepath: str,
+        password: str | None = None,
+        *,
+        allow_unencrypted: bool = False,
+        overwrite: bool = False,
     ) -> None:
         """Save a private key in PEM format.
 
-        If ``password`` is provided the key is wrapped using AES-256-CBC. If no
-        ``password`` is supplied the key is written in cleartext (mode 0600) and
-        a warning is logged. Setting the ``CRYPTOSUITE_STRICT_KEYS`` environment
-        variable to ``error`` will instead raise a ``SecurityError``.
+        ``password`` is required for normal use. Unencrypted private-key writes
+        require ``allow_unencrypted=True`` and are still blocked when
+        ``CRYPTOSUITE_STRICT_KEYS=error``.
         """
 
         if password:
@@ -194,12 +211,20 @@ class KeyManager:
                     "Saving unencrypted private keys is disabled by "
                     "CRYPTOSUITE_STRICT_KEYS"
                 )
-            if config.STRICT_KEYS == "warn":
-                logger.warning(
-                    "Warning: Saving private key unencrypted (PEM format, mode 0600). "
-                    "This is NOT recommended for production or shared environments. "
-                    "Always use a strong password or a hardware keystore."
+            if not allow_unencrypted:
+                raise SecurityError(
+                    "Saving unencrypted private keys is disabled by default. "
+                    "Provide a password or pass allow_unencrypted=True only for "
+                    "controlled development/testing migration."
                 )
+            if config.STRICT_KEYS == "warn":
+                msg = (
+                    "UNSAFE: Saving private key unencrypted (PEM format, mode 0600). "
+                    "This is only for controlled testing or migration. Always use "
+                    "a strong password or a hardware keystore."
+                )
+                logger.warning(msg)
+                warnings.warn(msg, UserWarning, stacklevel=2)
             encryption = serialization.NoEncryption()
 
         pem_data = private_key.private_bytes(
@@ -207,7 +232,7 @@ class KeyManager:
             format=serialization.PrivateFormat.PKCS8,
             encryption_algorithm=encryption,
         )
-        secure_save_key_to_file(pem_data, filepath)
+        secure_save_key_to_file(pem_data, filepath, overwrite=overwrite)
 
     def load_private_key(self, filepath: str, password: str | None = None):
         """Load a private key from ``filepath``.
@@ -221,28 +246,38 @@ class KeyManager:
         with open(filepath, "rb") as key_file:
             pem_data = key_file.read()
 
+        if config.STRICT_KEYS in {"warn", "error"} and not is_encrypted_pem(filepath):
+            msg = f"Unencrypted private key: {filepath}"
+            if config.STRICT_KEYS == "error":
+                raise SecurityError(msg)
+            warnings.warn(msg, UserWarning, stacklevel=2)
+
         pwd = password.encode() if password else None
         try:
             return serialization.load_pem_private_key(pem_data, password=pwd)
         except Exception as exc:  # pragma: no cover - defensive
             raise DecryptionError(f"Failed to load private key: {exc}") from exc
 
-    def rotate_keys(self, key_dir: str) -> None:
-        """Generate a new RSA key pair replacing any existing pair in ``key_dir``."""
+    def rotate_keys(self, key_dir: str, password: str | None = None) -> None:
+        """Generate a new encrypted RSA key pair in ``key_dir``."""
+
+        if not password:
+            raise SecurityError("Key rotation requires a private key password.")
 
         private_path = os.path.join(key_dir, "private_key.pem")
         public_path = os.path.join(key_dir, "public_key.pem")
 
-        if path.exists(private_path):
-            os.remove(private_path)
-        if path.exists(public_path):
-            os.remove(public_path)
-
         private_key, public_key = generate_rsa_keypair()
-        self.save_private_key(private_key, private_path)
+        self.save_private_key(
+            private_key,
+            private_path,
+            password,
+            overwrite=True,
+        )
         secure_save_key_to_file(
             serialize_public_key(public_key),
             public_path,
+            overwrite=True,
         )
 
     def generate_rsa_keypair_and_save(
@@ -252,7 +287,7 @@ class KeyManager:
         password: str,
         key_size: int = 4096,
     ):
-        """Generate an RSA key pair and save to ``private_key_path`` and ``public_key_path``."""
+        """Generate an RSA key pair and save private and public PEM files."""
 
         private_key, public_key = generate_rsa_keypair(key_size=key_size)
         private_pem = serialize_private_key(private_key, password)
@@ -266,9 +301,9 @@ class KeyManager:
         private_key_path: str,
         public_key_path: str,
         password: str,
-        curve: ec.EllipticCurve = ec.SECP256R1(),
+        curve: ec.EllipticCurve = EC_DEFAULT_CURVE,
     ):
-        """Generate an EC key pair and save to ``private_key_path`` and ``public_key_path``."""
+        """Generate an EC key pair and save private and public PEM files."""
 
         private_key, public_key = generate_ec_keypair(curve=curve)
         private_pem = serialize_private_key(private_key, password)
@@ -304,7 +339,9 @@ class KeyManager:
         private_pem = private_key.private_bytes(
             encoding=serialization.Encoding.PEM,
             format=serialization.PrivateFormat.PKCS8,
-            encryption_algorithm=serialization.BestAvailableEncryption(password.encode()),
+            encryption_algorithm=serialization.BestAvailableEncryption(
+                password.encode()
+            ),
         )
         public_pem = public_key.public_bytes(
             encoding=serialization.Encoding.PEM,

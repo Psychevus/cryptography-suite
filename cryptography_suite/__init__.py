@@ -129,9 +129,14 @@ from .utils import (
     encode_encrypted_message,
     from_pem,
     generate_secure_random_string,
+    load_encrypted_private_pem,
+    load_public_pem,
     pem_to_json,
     secure_zero,
+    to_encrypted_private_pem,
     to_pem,
+    to_public_pem,
+    to_unencrypted_private_pem_unsafe,
 )
 from .x509 import generate_csr, load_certificate, self_sign_certificate
 
@@ -228,7 +233,12 @@ __all__ = [
     "generate_secure_random_string",
     "KeyVault",
     "to_pem",
+    "to_public_pem",
+    "to_encrypted_private_pem",
+    "to_unencrypted_private_pem_unsafe",
     "from_pem",
+    "load_public_pem",
+    "load_encrypted_private_pem",
     "pem_to_json",
     "encode_encrypted_message",
     "decode_encrypted_message",
