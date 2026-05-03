@@ -1,15 +1,15 @@
 import unittest
 
 from cryptography_suite import hybrid_decrypt, hybrid_encrypt
+from cryptography_suite.asymmetric import generate_rsa_keypair, generate_x25519_keypair
+from cryptography_suite.errors import CryptographySuiteError
 from cryptography_suite.hybrid import EncryptedHybridMessage
 from cryptography_suite.pqc import (
     PQCRYPTO_AVAILABLE,
-    generate_kyber_keypair,
-    kyber_encrypt,
-    kyber_decrypt,
+    generate_ml_kem_keypair,
+    ml_kem_decrypt,
+    ml_kem_encrypt,
 )
-from cryptography_suite.asymmetric import generate_rsa_keypair, generate_x25519_keypair
-from cryptography_suite.errors import CryptographySuiteError
 
 
 class TestHybrid(unittest.TestCase):
@@ -57,10 +57,11 @@ class TestHybrid(unittest.TestCase):
     def test_kyber_aes_gcm_roundtrip(self):
         msg = b"kyber hybrid"
         for lvl in (512, 768, 1024):
-            pk, sk = generate_kyber_keypair(level=lvl)
-            ct, ss = kyber_encrypt(pk, msg, level=lvl)
-            self.assertEqual(kyber_decrypt(sk, ct, ss, level=lvl), msg)
-            self.assertEqual(kyber_decrypt(sk, ct, level=lvl), msg)
+            pk, sk = generate_ml_kem_keypair(level=lvl)
+            envelope = ml_kem_encrypt(pk, msg, level=lvl)
+            self.assertIsInstance(envelope, str)
+            self.assertNotIsInstance(envelope, tuple)
+            self.assertEqual(ml_kem_decrypt(sk, envelope, level=lvl), msg)
 
 
 if __name__ == "__main__":

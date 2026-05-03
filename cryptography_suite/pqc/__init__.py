@@ -1,16 +1,19 @@
-"""Post-quantum cryptography wrappers using pqcrypto.
+"""Experimental post-quantum cryptography wrappers using pqcrypto.
 
-This module provides simple interfaces for the NIST CRYSTALS-Kyber
-(KEM) and CRYSTALS-Dilithium (signature) algorithms using the
-``pqcrypto`` Python bindings. The functions rely on constant-time
-implementations from PQClean.
+This module provides simple interfaces for ML-KEM (formerly CRYSTALS-Kyber)
+and ML-DSA/Dilithium using the ``pqcrypto`` Python bindings. These helpers are
+for demos and interoperability experiments only; they are not production
+audited. ML-KEM encryption returns sealed envelopes and never exposes KEM
+shared secrets through the public API.
 """
 
 from __future__ import annotations
 
 import base64
-import hmac
 import os
+import struct
+import warnings
+from typing import Any
 
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
@@ -51,29 +54,194 @@ except Exception:  # pragma: no cover - fallback
 
 _KYBER_LEVEL_MAP = {512: ml_kem_512, 768: ml_kem_768, 1024: ml_kem_1024}
 _DILITHIUM_LEVEL_MAP = {2: ml_dsa_44, 3: ml_dsa_65, 5: ml_dsa_87}
+_ML_KEM_ENVELOPE_MAGIC = b"CSKEM1"
+_ML_KEM_HEADER = struct.Struct(">HIII")
+_ML_KEM_HEADER_SIZE = len(_ML_KEM_ENVELOPE_MAGIC) + _ML_KEM_HEADER.size
+_ML_KEM_SALT_SIZE = 16
+_ML_KEM_NONCE_SIZE = 12
+_ML_KEM_TAG_SIZE = 16
+
+
+def _get_ml_kem_algorithm(
+    level: int, error_type: type[EncryptionError] | type[DecryptionError]
+) -> Any:
+    if not PQCRYPTO_AVAILABLE:
+        raise ImportError("pqcrypto is required for ML-KEM functions")
+
+    alg = _KYBER_LEVEL_MAP.get(level)
+    if alg is None:
+        raise error_type("Invalid ML-KEM level")
+    return alg
+
+
+def _ml_kem_hkdf_info(level: int) -> bytes:
+    return b"cryptography-suite ml-kem aes-gcm envelope v1 level=" + str(level).encode(
+        "ascii"
+    )
+
+
+def _decode_ml_kem_envelope(envelope: bytes | str) -> bytes:
+    if isinstance(envelope, str):
+        try:
+            return base64.b64decode(envelope, validate=True)
+        except Exception as exc:
+            raise DecryptionError("Invalid ML-KEM envelope") from exc
+    if not isinstance(envelope, bytes):
+        raise DecryptionError("Invalid ML-KEM envelope")
+    if envelope.startswith(_ML_KEM_ENVELOPE_MAGIC):
+        return envelope
+    try:
+        decoded = base64.b64decode(envelope, validate=True)
+    except Exception as exc:
+        raise DecryptionError("Invalid ML-KEM envelope") from exc
+    if not decoded.startswith(_ML_KEM_ENVELOPE_MAGIC):
+        raise DecryptionError("Invalid ML-KEM envelope")
+    return decoded
+
+
+def _parse_ml_kem_envelope(
+    envelope: bytes | str, *, level: int
+) -> tuple[bytes, bytes, bytes, bytes, bytes]:
+    envelope_bytes = _decode_ml_kem_envelope(envelope)
+    if len(envelope_bytes) < _ML_KEM_HEADER_SIZE:
+        raise DecryptionError("Invalid ML-KEM envelope")
+    if not envelope_bytes.startswith(_ML_KEM_ENVELOPE_MAGIC):
+        raise DecryptionError("Invalid ML-KEM envelope")
+
+    alg = _get_ml_kem_algorithm(level, DecryptionError)
+    try:
+        envelope_level, kem_ct_len, salt_len, nonce_len = _ML_KEM_HEADER.unpack_from(
+            envelope_bytes, len(_ML_KEM_ENVELOPE_MAGIC)
+        )
+    except struct.error as exc:
+        raise DecryptionError("Invalid ML-KEM envelope") from exc
+
+    if envelope_level != level:
+        raise DecryptionError("Invalid ML-KEM envelope")
+    if kem_ct_len != alg.CIPHERTEXT_SIZE:
+        raise DecryptionError("Invalid ML-KEM envelope")
+    if salt_len != _ML_KEM_SALT_SIZE or nonce_len != _ML_KEM_NONCE_SIZE:
+        raise DecryptionError("Invalid ML-KEM envelope")
+
+    body_len = len(envelope_bytes) - _ML_KEM_HEADER_SIZE
+    prefix_len = kem_ct_len + salt_len + nonce_len
+    if prefix_len > body_len or body_len - prefix_len < _ML_KEM_TAG_SIZE:
+        raise DecryptionError("Invalid ML-KEM envelope")
+
+    offset = _ML_KEM_HEADER_SIZE
+    kem_ciphertext = envelope_bytes[offset : offset + kem_ct_len]
+    offset += kem_ct_len
+    salt = envelope_bytes[offset : offset + salt_len]
+    offset += salt_len
+    nonce = envelope_bytes[offset : offset + nonce_len]
+    offset += nonce_len
+    aes_ciphertext = envelope_bytes[offset:]
+    aad = envelope_bytes[:_ML_KEM_HEADER_SIZE]
+    return aad, kem_ciphertext, salt, nonce, aes_ciphertext
+
+
+def generate_ml_kem_keypair(
+    level: int = 512, *, sensitive: bool = True
+) -> tuple[bytes, KeyVault | bytes]:
+    """Generate an experimental ML-KEM key pair for the given ``level``.
+
+    Parameters
+    ----------
+    level : int
+        ML-KEM security level (512, 768 or 1024).
+    sensitive : bool, optional
+        If ``True`` (default) the private key is wrapped in :class:`KeyVault`
+        so it can be securely erased after use.
+    """
+    alg = _get_ml_kem_algorithm(level, EncryptionError)
+    pk, sk = alg.generate_keypair()
+    return pk, KeyVault(sk) if sensitive else sk
 
 
 def generate_kyber_keypair(
     level: int = 512, *, sensitive: bool = True
 ) -> tuple[bytes, KeyVault | bytes]:
-    """Generate a Kyber key pair for the given ``level``.
+    """Deprecated compatibility wrapper for :func:`generate_ml_kem_keypair`."""
+    warnings.warn(
+        "generate_kyber_keypair is deprecated; use generate_ml_kem_keypair.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    return generate_ml_kem_keypair(level=level, sensitive=sensitive)
 
-    Parameters
-    ----------
-    level : int
-        Kyber security level (512, 768 or 1024).
-    sensitive : bool, optional
-        If ``True`` (default) the private key is wrapped in :class:`KeyVault`
-        so it can be securely erased after use.
+
+def ml_kem_encrypt(
+    public_key: bytes,
+    plaintext: bytes,
+    *,
+    level: int = 512,
+    raw_output: bool = False,
+) -> str | bytes:
+    """Encrypt ``plaintext`` as a sealed ML-KEM/AES-GCM envelope.
+
+    The returned envelope contains the KEM ciphertext, salt, nonce, and
+    AES-GCM ciphertext/tag needed for decryption. The KEM shared secret remains
+    internal and is never returned by this API.
     """
-    if not PQCRYPTO_AVAILABLE:
-        raise ImportError("pqcrypto is required for Kyber functions")
+    alg = _get_ml_kem_algorithm(level, EncryptionError)
 
-    alg = _KYBER_LEVEL_MAP.get(level)
-    if alg is None:
-        raise EncryptionError("Invalid Kyber level")
-    pk, sk = alg.generate_keypair()
-    return pk, KeyVault(sk) if sensitive else sk
+    try:
+        kem_ciphertext, kem_secret = alg.encrypt(public_key)
+    except Exception as exc:
+        raise EncryptionError("ML-KEM encryption failed") from exc
+    if len(kem_ciphertext) != alg.CIPHERTEXT_SIZE:
+        raise EncryptionError("ML-KEM encryption failed")
+
+    salt = os.urandom(_ML_KEM_SALT_SIZE)
+    nonce = os.urandom(_ML_KEM_NONCE_SIZE)
+    aad = _ML_KEM_ENVELOPE_MAGIC + _ML_KEM_HEADER.pack(
+        level, len(kem_ciphertext), len(salt), len(nonce)
+    )
+    try:
+        with KeyVault(kem_secret) as secret_buf:
+            key = derive_hkdf(bytes(secret_buf), salt, _ml_kem_hkdf_info(level), 32)
+        with KeyVault(key) as key_buf:
+            aesgcm = AESGCM(bytes(key_buf))
+            aes_ciphertext = aesgcm.encrypt(nonce, plaintext, aad)
+    except Exception as exc:
+        raise EncryptionError("ML-KEM envelope encryption failed") from exc
+
+    envelope = aad + kem_ciphertext + salt + nonce + aes_ciphertext
+    if raw_output:
+        return envelope
+    return base64.b64encode(envelope).decode()
+
+
+def ml_kem_decrypt(
+    private_key: bytes | KeyVault,
+    envelope: bytes | str,
+    *,
+    level: int = 512,
+) -> bytes:
+    """Decrypt a sealed ML-KEM envelope.
+
+    ``private_key`` may be raw bytes or a :class:`KeyVault` returned by
+    :func:`generate_ml_kem_keypair`. Malformed envelopes, level mismatches,
+    decapsulation failures, and AES-GCM authentication failures all raise
+    :class:`DecryptionError` without exposing KEM shared secrets.
+    """
+    alg = _get_ml_kem_algorithm(level, DecryptionError)
+    aad, kem_ciphertext, salt, nonce, aes_ciphertext = _parse_ml_kem_envelope(
+        envelope, level=level
+    )
+    priv = bytes(private_key) if isinstance(private_key, KeyVault) else private_key
+    try:
+        kem_secret = alg.decrypt(priv, kem_ciphertext)
+    except Exception as exc:
+        raise DecryptionError("Invalid ML-KEM envelope") from exc
+    try:
+        with KeyVault(kem_secret) as secret_buf:
+            key = derive_hkdf(bytes(secret_buf), salt, _ml_kem_hkdf_info(level), 32)
+        with KeyVault(key) as key_buf:
+            aesgcm = AESGCM(bytes(key_buf))
+            return aesgcm.decrypt(nonce, aes_ciphertext, aad)
+    except Exception as exc:
+        raise DecryptionError("Invalid ML-KEM envelope") from exc
 
 
 def kyber_encrypt(
@@ -82,33 +250,19 @@ def kyber_encrypt(
     *,
     level: int = 512,
     raw_output: bool = False,
-) -> tuple[str | bytes, str | bytes]:
-    """Encrypt ``plaintext`` using Kyber and AES-GCM.
+) -> str | bytes:
+    """Deprecated compatibility wrapper for :func:`ml_kem_encrypt`.
 
-    ``level`` selects the ML-KEM security level (512, 768 or 1024).
-    The function encapsulates a shared secret with the chosen level and then
-    derives an AES key from that secret to encrypt the plaintext. The returned
-    tuple contains the Kyber ciphertext followed by the AES-GCM output and the
-    shared secret used for encryption.
+    Breaking change: this wrapper now returns only the sealed envelope. It does
+    not return a KEM shared secret.
     """
-    if not PQCRYPTO_AVAILABLE:
-        raise ImportError("pqcrypto is required for Kyber functions")
-
-    alg = _KYBER_LEVEL_MAP.get(level)
-    if alg is None:
-        raise EncryptionError("Invalid Kyber level")
-
-    kem_ct, ss = alg.encrypt(public_key)
-    salt = os.urandom(16)
-    key = derive_hkdf(ss, salt, b"kyber-aes-key", 32)
-    with KeyVault(key) as key_buf:
-        aesgcm = AESGCM(bytes(key_buf))
-        nonce = os.urandom(12)
-        enc = nonce + aesgcm.encrypt(nonce, plaintext, None)
-    ct = kem_ct + salt + enc
-    if raw_output:
-        return ct, ss
-    return base64.b64encode(ct).decode(), base64.b64encode(ss).decode()
+    warnings.warn(
+        "kyber_encrypt is deprecated; use ml_kem_encrypt. It now returns only "
+        "a sealed ML-KEM envelope and never returns the KEM shared secret.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    return ml_kem_encrypt(public_key, plaintext, level=level, raw_output=raw_output)
 
 
 def kyber_decrypt(
@@ -118,58 +272,26 @@ def kyber_decrypt(
     *,
     level: int = 512,
 ) -> bytes:
-    """Decrypt data encrypted by :func:`kyber_encrypt`.
+    """Deprecated compatibility wrapper for :func:`ml_kem_decrypt`.
 
-    ``private_key`` may be raw bytes or a :class:`KeyVault` returned by
-    :func:`generate_kyber_keypair`. ``shared_secret`` becomes optional; when
-    omitted the function decapsulates it from ``ciphertext``.
+    ``shared_secret`` is ignored when provided. New-format envelopes contain
+    the KEM ciphertext needed for decapsulation and do not require callers to
+    handle shared secrets.
     """
-    if not PQCRYPTO_AVAILABLE:
-        raise ImportError("pqcrypto is required for Kyber functions")
-
-    alg = _KYBER_LEVEL_MAP.get(level)
-    if alg is None:
-        raise DecryptionError("Invalid Kyber level")
-
-    ct_size = alg.CIPHERTEXT_SIZE
-    if isinstance(ciphertext, str):
-        try:
-            ciphertext = base64.b64decode(ciphertext)
-        except Exception as exc:  # pragma: no cover - defensive
-            raise DecryptionError(f"Invalid ciphertext: {exc}") from exc
-
-    if isinstance(shared_secret, str):
-        try:
-            shared_secret = base64.b64decode(shared_secret)
-        except Exception as exc:  # pragma: no cover - defensive
-            raise DecryptionError(f"Invalid shared secret: {exc}") from exc
-
-    min_ct_len = ct_size + 16 + 12 + 16
-    if len(ciphertext) < min_ct_len:
-        raise DecryptionError("Invalid ciphertext")
-
-    kem_ct = ciphertext[:ct_size]
-    salt = ciphertext[ct_size : ct_size + 16]
-    enc = ciphertext[ct_size + 16 :]
-    priv = bytes(private_key) if isinstance(private_key, KeyVault) else private_key
-    try:
-        ss_check = alg.decrypt(priv, kem_ct)
-    except Exception as exc:  # pragma: no cover - defensive
-        raise DecryptionError("Invalid ciphertext") from exc
-    if shared_secret is None:
-        shared_secret = ss_check
-    elif not hmac.compare_digest(ss_check, shared_secret):
-        raise DecryptionError("Shared secret mismatch")
-
-    key = derive_hkdf(shared_secret, salt, b"kyber-aes-key", 32)
-    try:
-        with KeyVault(key) as key_buf:
-            aesgcm = AESGCM(bytes(key_buf))
-            nonce = enc[:12]
-            ct = enc[12:]
-            return aesgcm.decrypt(nonce, ct, None)
-    except Exception as exc:
-        raise DecryptionError("Invalid ciphertext") from exc
+    warnings.warn(
+        "kyber_decrypt is deprecated; use ml_kem_decrypt with a sealed "
+        "ML-KEM envelope.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    if shared_secret is not None:
+        warnings.warn(
+            "kyber_decrypt(shared_secret=...) is deprecated and ignored; "
+            "safe ML-KEM envelopes do not require caller-provided shared secrets.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+    return ml_kem_decrypt(private_key, ciphertext, level=level)
 
 
 def generate_dilithium_keypair(
@@ -274,3 +396,21 @@ def sphincs_verify(public_key: bytes, message: bytes, signature: bytes | str) ->
         return bool(_sphincs_module.verify(public_key, message, signature))
     except Exception:
         return False
+
+
+__all__ = [
+    "PQCRYPTO_AVAILABLE",
+    "SPHINCS_AVAILABLE",
+    "generate_ml_kem_keypair",
+    "generate_kyber_keypair",
+    "ml_kem_encrypt",
+    "ml_kem_decrypt",
+    "kyber_encrypt",
+    "kyber_decrypt",
+    "generate_dilithium_keypair",
+    "dilithium_sign",
+    "dilithium_verify",
+    "generate_sphincs_keypair",
+    "sphincs_sign",
+    "sphincs_verify",
+]

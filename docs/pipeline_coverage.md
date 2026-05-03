@@ -8,6 +8,8 @@
 | `ec_decrypt` | `ECIESX25519Decrypt` |
 | `hybrid_encrypt` | `HybridEncrypt` |
 | `hybrid_decrypt` | `HybridDecrypt` |
+| `ml_kem_encrypt` | `MLKEMEncrypt` |
+| `ml_kem_decrypt` | `MLKEMDecrypt` |
 | `kyber_encrypt` | `KyberEncrypt` |
 | `kyber_decrypt` | `KyberDecrypt` |
 | `rsa_encrypt` | `RSAEncrypt`    |
