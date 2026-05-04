@@ -7,7 +7,7 @@
 | Unsafe destructive key migrations | Key loss or accidental overwrite | Keystore migrations now default to safe mode and require explicit `--apply` for live writes. |
 | Unbounded/unsafe subprocess execution | Hung processes, hidden failures, unclear diagnostics | Centralized subprocess runner with timeout, exit-code checks, redacted structured logging, and explicit failures. |
 | Secret leakage through logs or CLI arguments | Password/key/plaintext exposure in process lists, CI logs, or audit trails | CLI password values are read by prompt/stdin/fd/env/file sources, structured logs redact sensitive fields, and verbose/dry-run output never prints intermediate secrets. |
-| Transient network errors in AWS KMS workflows | Flaky production behavior, partial outages | Retry-with-backoff wrapper with jitter and bounded retry budget around KMS API calls. |
+| Transient network errors in AWS KMS workflows | Flaky service behavior, partial outages | Retry-with-backoff wrapper with jitter and bounded retry budget around KMS API calls. |
 | Poor observability during incidents | Slow triage and weak postmortems | Structured logs with command context, correlation IDs, and basic metrics counters/timers hooks. |
 | Abrupt termination (SIGINT/SIGTERM) | Incomplete operations and inconsistent state | Signal handlers set cancellation state, emit structured shutdown logs, and fail in-progress retries clearly. |
 | Invalid CLI/file inputs | Runtime crashes or unsafe behavior | Added input validation for file and pipeline paths, run bounds (`--runs`), and timeout validation. |

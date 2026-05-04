@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "cryptography-suite"
 dynamic = ["version"]
-description = "A comprehensive and secure cryptographic toolkit."
+description = "An educational and research-focused cryptography toolkit under active hardening."
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
@@ -25,7 +25,9 @@ keywords = [
     "hashing",
     "PAKE",
     "OTP",
-    "secret sharing"
+    "secret sharing",
+    "education",
+    "research"
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -35,8 +37,10 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Topic :: Security :: Cryptography",
-    "Development Status :: 5 - Production/Stable",
-    "Intended Audience :: Developers"
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research"
 ]
 
 dependencies = [

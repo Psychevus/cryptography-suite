@@ -22,7 +22,7 @@ with generate_aes_key() as key_bytes:
 
 ### Do native backends handle zeroization?
 
-Yes. Underlying libraries such as OpenSSL employ their own secure memory
-management and wipe key material when freed. When cryptographic objects are
-created via these backends, zeroization occurs inside the native code even
-though Python cannot directly guarantee it.
+Some underlying libraries, such as OpenSSL, provide their own memory-management
+and key-cleanup behavior. Treat those properties as backend-specific and consult
+the upstream backend documentation for high-assurance requirements; Python
+itself cannot directly guarantee cleanup for arbitrary objects.

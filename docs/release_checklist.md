@@ -20,7 +20,8 @@
   - SemVer tag validation
   - Changelog entry validation
   - Full quality gate rerun
-  - Reproducible build + SBOM generation
+  - Reproducibility check + SBOM generation
+  - Signature and provenance metadata generation, when release assets are present
   - Artifact linting + PyPI publish + GitHub Release upload
 
 ## Post-release

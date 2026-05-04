@@ -1,221 +1,88 @@
-# Migration from pyca/cryptography
+# Interoperability Notes for pyca/cryptography Users
 
-This guide shows how common `pyca/cryptography` tasks map to the upcoming `suite.recipes` helpers and the lower level `suite.core` APIs.
+`cryptography-suite` is not a replacement for `pyca/cryptography`. For
+production systems, prefer mature audited libraries and platform key management
+controls. This page maps a few familiar `pyca/cryptography` patterns to current
+`cryptography_suite` learning examples so contributors can compare behavior and
+write regression tests.
 
-## Symmetric encryption
+## AES-GCM style encryption
 
-| Scenario | pyca/cryptography | `suite.recipes` | `suite.core` | Notes |
-| --- | --- | --- | --- | --- |
-| Fernet-like | \`\`\`python
-from cryptography.fernet import Fernet
+`pyca/cryptography` exposes AEAD classes directly. In this project, the pipeline
+example wraps password-based AES-GCM encryption for demos and tests:
 
-key = Fernet.generate_key()
-f = Fernet(key)
-token = f.encrypt(b"data")
-assert f.decrypt(token) == b"data"
-`|`python
-from suite.recipes import aesgcm_encrypt, aesgcm_decrypt, generate_aesgcm_key
+```python
+from cryptography_suite.pipeline import AESGCMDecrypt, AESGCMEncrypt
 
-key = generate_aesgcm_key()
-nonce, ct = aesgcm_encrypt(key, b"data")
-pt = aesgcm_decrypt(key, nonce, ct)
-`|`python
-from suite.core import AESGCM
-import os
+password = "use-a-secret-manager-for-this"
+token = AESGCMEncrypt(password=password).run("data")
+assert AESGCMDecrypt(password=password).run(token) == "data"
+```
 
-key = AESGCM.generate_key(256)
-aesgcm = AESGCM(key)
-nonce = os.urandom(12)
-ct = aesgcm.encrypt(nonce, b"data", None)
-pt = aesgcm.decrypt(nonce, ct, None)
-`` | `recipes` auto-generate a nonce and fix AES-256-GCM; `core` requires explicit nonce management. | | AES-GCM | ``python
-from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-import os
+## File encryption
 
-key = AESGCM.generate_key(bit_length=256)
-aesgcm = AESGCM(key)
-nonce = os.urandom(12)
-ct = aesgcm.encrypt(nonce, b"data", None)
-pt = aesgcm.decrypt(nonce, ct, None)
-`|`python
-from suite.recipes import aesgcm_encrypt, aesgcm_decrypt, generate_aesgcm_key
+The current file helpers authenticate the v2 header as AES-GCM AAD and replace
+the output only after authentication succeeds:
 
-key = generate_aesgcm_key()
-nonce, ct = aesgcm_encrypt(key, b"data")
-pt = aesgcm_decrypt(key, nonce, ct)
-`|`python
-from suite.core import AESGCM
-import os
+```python
+from cryptography_suite.symmetric import decrypt_file, encrypt_file
 
-key = AESGCM.generate_key(256)
-aesgcm = AESGCM(key)
-nonce = os.urandom(12)
-ct = aesgcm.encrypt(nonce, b"data", None)
-pt = aesgcm.decrypt(nonce, ct, None)
-\`\`\` | Identical to Fernet example but without token wrapper. `recipes` keep parameters fixed; `core` mirrors pyca API. |
+password = "use-a-secret-manager-for-this"
+encrypt_file("plain.txt", "cipher.bin", password)
+decrypt_file("cipher.bin", "plain.out", password)
+```
 
-## RSA-OAEP encrypt/decrypt
+Legacy raw file formats are decrypt-only compatibility inputs and require
+`allow_legacy_format=True`.
 
-| pyca/cryptography | `suite.recipes` | `suite.core` | Notes |
-| --- | --- | --- | --- |
-| \`\`\`python
-from cryptography.hazmat.primitives.asymmetric import rsa, padding
-from cryptography.hazmat.primitives import hashes
+## RSA-OAEP pipeline example
 
-priv = rsa.generate_private_key(public_exponent=65537, key_size=2048)
-ct = priv.public_key().encrypt(
-b"data",
-padding.OAEP(
-mgf=padding.MGF1(algorithm=hashes.SHA256()),
-algorithm=hashes.SHA256(),
-label=None,
-),
+```python
+from cryptography_suite.asymmetric import generate_rsa_keypair
+from cryptography_suite.pipeline import RSADecrypt, RSAEncrypt
+
+private_key, public_key = generate_rsa_keypair()
+ciphertext = RSAEncrypt(public_key=public_key).run(b"data")
+assert RSADecrypt(private_key=private_key).run(ciphertext) == b"data"
+```
+
+## Ed25519 sign/verify example
+
+```python
+from cryptography_suite.asymmetric.signatures import (
+    generate_ed25519_keypair,
+    sign_message,
+    verify_signature,
 )
-pt = priv.decrypt(
-ct,
-padding.OAEP(
-mgf=padding.MGF1(algorithm=hashes.SHA256()),
-algorithm=hashes.SHA256(),
-label=None,
-),
+
+private_key, public_key = generate_ed25519_keypair()
+signature = sign_message(b"message", private_key)
+assert verify_signature(b"message", signature, public_key)
+```
+
+## Key serialization
+
+Normal private-key helpers prefer encrypted PEM output. Plaintext private-key
+export is available only through an explicitly unsafe helper for controlled
+testing or one-time migration.
+
+```python
+from cryptography_suite.asymmetric import generate_rsa_keypair
+from cryptography_suite.utils import (
+    load_encrypted_private_pem,
+    to_encrypted_private_pem,
+    to_public_pem,
 )
-`|`python
-from suite.recipes import rsa_oaep_encrypt, rsa_oaep_decrypt, generate_rsa_keypair
 
-priv, pub = generate_rsa_keypair()
-ct = rsa_oaep_encrypt(pub, b"data")
-pt = rsa_oaep_decrypt(priv, ct)
-`|`python
-from suite.core.asymmetric import RSA, OAEP, MGF1, SHA256
+private_key, public_key = generate_rsa_keypair()
+password = "use-a-secret-manager-for-this"
+private_pem = to_encrypted_private_pem(private_key, password)
+public_pem = to_public_pem(public_key)
+loaded_private_key = load_encrypted_private_pem(private_pem, password)
+```
 
-priv = RSA.generate_private_key(2048)
-ct = priv.public_key().encrypt(
-b"data",
-OAEP(
-mgf=MGF1(SHA256()),
-algorithm=SHA256(),
-label=None,
-),
-)
-pt = priv.decrypt(ct, OAEP(mgf=MGF1(SHA256()), algorithm=SHA256(), label=None))
-\`\`\` | `recipes` fix SHA-256 and sensible key sizes; `core` exposes padding parameters explicitly. |
+## What to keep in pyca/cryptography
 
-## Ed25519 sign/verify
-
-| pyca/cryptography | `suite.recipes` | `suite.core` | Notes |
-| --- | --- | --- | --- |
-| \`\`\`python
-from cryptography.hazmat.primitives.asymmetric import ed25519
-
-sk = ed25519.Ed25519PrivateKey.generate()
-sig = sk.sign(b"msg")
-sk.public_key().verify(sig, b"msg")
-`|`python
-from suite.recipes import ed25519_sign, ed25519_verify, generate_ed25519_keypair
-
-sk, pk = generate_ed25519_keypair()
-sig = ed25519_sign(sk, b"msg")
-ed25519_verify(pk, sig, b"msg")
-`|`python
-from suite.core.signatures import Ed25519PrivateKey
-
-sk = Ed25519PrivateKey.generate()
-sig = sk.sign(b"msg")
-sk.public_key().verify(sig, b"msg")
-\`\`\` | APIs are nearly identical; `recipes` return tuple keypairs and handle types. |
-
-## ECDSA (RFC 6979) sign/verify
-
-| pyca/cryptography | `suite.recipes` | `suite.core` | Notes |
-| --- | --- | --- | --- |
-| \`\`\`python
-from cryptography.hazmat.primitives.asymmetric import ec
-from cryptography.hazmat.primitives import hashes
-
-sk = ec.generate_private_key(ec.SECP256R1())
-sig = sk.sign(b"msg", ec.ECDSA(hashes.SHA256()))
-sk.public_key().verify(sig, b"msg", ec.ECDSA(hashes.SHA256()))
-`|`python
-from suite.recipes import ecdsa_sign, ecdsa_verify, generate_ecdsa_keypair
-
-sk, pk = generate_ecdsa_keypair()
-sig = ecdsa_sign(sk, b"msg")
-ecdsa_verify(pk, sig, b"msg")
-`|`python
-from suite.core.asymmetric import ECDSA, SECP256R1, SHA256
-
-sk = ECDSA.generate_private_key(SECP256R1())
-sig = sk.sign(b"msg", hash_alg=SHA256(), deterministic=True)
-sk.public_key().verify(sig, b"msg", hash_alg=SHA256(), deterministic=True)
-\`\`\` | `recipes` enforce RFC 6979; `core` exposes curve, hash, and deterministic flag. |
-
-## KDF examples
-
-| Algorithm | pyca/cryptography | `suite.recipes` | `suite.core` | Notes |
-| --- | --- | --- | --- | --- |
-| PBKDF2 | \`\`\`python
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from cryptography.hazmat.primitives import hashes
-import os
-
-salt = os.urandom(16)
-kdf = PBKDF2HMAC(
-algorithm=hashes.SHA256(),
-length=32,
-salt=salt,
-iterations=390000,
-)
-key = kdf.derive(b"password")
-`|`python
-from suite.recipes import pbkdf2
-
-key = pbkdf2(password=b"password")
-`|`python
-from suite.core.kdf import PBKDF2, SHA256
-import os
-
-salt = os.urandom(16)
-kdf = PBKDF2(
-algorithm=SHA256(),
-length=32,
-salt=salt,
-iterations=390000,
-)
-key = kdf.derive(b"password")
-`` | `recipes` select iteration count and salt length; `core` mirrors pyca API. | | scrypt | ``python
-from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
-import os
-
-salt = os.urandom(16)
-kdf = Scrypt(salt=salt, length=32, n=2\*\*14, r=8, p=1)
-key = kdf.derive(b"password")
-`|`python
-from suite.recipes import scrypt
-
-key = scrypt(password=b"password")
-`|`python
-from suite.core.kdf import Scrypt
-import os
-
-salt = os.urandom(16)
-kdf = Scrypt(salt=salt, length=32, n=2\*\*14, r=8, p=1)
-key = kdf.derive(b"password")
-`` | `recipes` fix N, r, p to recommended values; `core` exposes all parameters. | | Argon2id | ``python
-from cryptography.hazmat.primitives.kdf.argon2 import Argon2id
-import os
-
-salt = os.urandom(16)
-kdf = Argon2id(time_cost=2, memory_cost=102400, parallelism=8, length=32, salt=salt)
-key = kdf.derive(b"password")
-`|`python
-from suite.recipes import argon2id
-
-key = argon2id(password=b"password")
-`|`python
-from suite.core.kdf import Argon2id
-import os
-
-salt = os.urandom(16)
-kdf = Argon2id(time_cost=2, memory_cost=102400, parallelism=8, length=32, salt=salt)
-key = kdf.derive(b"password")
-\`\`\` | `recipes` hide tuning knobs; `core` exposes time, memory, and parallelism. |
+Keep direct `pyca/cryptography` usage for production applications, bespoke
+protocol work, certificate and X.509 operations, and cases where you need the
+audited upstream API surface directly.

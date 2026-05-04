@@ -43,7 +43,7 @@ as hidden aliases for backward compatibility.
 - ``keygen`` – generate key pairs
 - ``hash`` – compute file digests
 - ``otp`` – generate time-based OTP codes
-- ``export`` – export pipelines for formal verification
+- ``export`` – export pipelines to lightweight ProVerif/Tamarin model stubs
 - ``gen`` – scaffold application code
 - ``backends`` – manage crypto backends
 - ``keystore`` – manage key storage plugins
