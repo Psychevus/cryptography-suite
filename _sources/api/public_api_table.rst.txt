@@ -355,16 +355,25 @@ Public API Inventory
      - Generate a Dilithium key pair using level 2 parameters.
      - Experimental
    * - ``generate_kyber_keypair``
-     - Generate a Kyber key pair for the given ``level``.
+     - Deprecated compatibility wrapper for :func:`generate_ml_kem_keypair`.
+     - Experimental
+   * - ``generate_ml_kem_keypair``
+     - Generate an experimental ML-KEM key pair for the given ``level``.
      - Experimental
    * - ``generate_sphincs_keypair``
      - Generate a SPHINCS+ key pair using a 128-bit security level.
      - Experimental
    * - ``kyber_decrypt``
-     - Decrypt data encrypted by :func:`kyber_encrypt`.
+     - Deprecated compatibility wrapper for :func:`ml_kem_decrypt`.
      - Experimental
    * - ``kyber_encrypt``
-     - Encrypt ``plaintext`` using Kyber and AES-GCM.
+     - Deprecated compatibility wrapper for :func:`ml_kem_encrypt`.
+     - Experimental
+   * - ``ml_kem_decrypt``
+     - Decrypt a sealed ML-KEM envelope.
+     - Experimental
+   * - ``ml_kem_encrypt``
+     - Encrypt ``plaintext`` as a sealed ML-KEM/AES-GCM envelope.
      - Experimental
    * - ``sphincs_sign``
      - Sign ``message`` with SPHINCS+ returning Base64 by default.

@@ -262,11 +262,17 @@
 <tr class="row-odd"><td><p>HybridDecrypt</p></td>
 <td><p>Decrypt data produced by HybridEncrypt.</p></td>
 </tr>
+<tr class="row-even"><td><p>MLKEMEncrypt</p></td>
+<td><p>Encrypt data as a sealed ML-KEM/AES-GCM envelope.</p></td>
+</tr>
+<tr class="row-odd"><td><p>MLKEMDecrypt</p></td>
+<td><p>Decrypt data produced by MLKEMEncrypt.</p></td>
+</tr>
 <tr class="row-even"><td><p>KyberEncrypt</p></td>
-<td><p>Encrypt data using Kyber and AES-GCM.</p></td>
+<td><p>Deprecated compatibility wrapper for MLKEMEncrypt.</p></td>
 </tr>
 <tr class="row-odd"><td><p>KyberDecrypt</p></td>
-<td><p>Decrypt data produced by KyberEncrypt.</p></td>
+<td><p>Deprecated compatibility wrapper for MLKEMDecrypt.</p></td>
 </tr>
 </tbody>
 </table>

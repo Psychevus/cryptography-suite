@@ -509,34 +509,12 @@ helpers currently use the built-in AES implementation directly.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="cryptography_suite.pipeline.KyberDecrypt">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cryptography_suite.pipeline.</span></span><span class="sig-name descname"><span class="pre">KyberDecrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">private_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">512</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cryptography_suite.pipeline.KyberDecrypt" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cryptography_suite.pipeline.CryptoModule" title="cryptography_suite.pipeline.CryptoModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">CryptoModule</span></code></a>[<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code>]</p>
-<p>Decrypt data produced by <a class="reference internal" href="#cryptography_suite.pipeline.KyberEncrypt" title="cryptography_suite.pipeline.KyberEncrypt"><code class="xref py py-class docutils literal notranslate"><span class="pre">KyberEncrypt</span></code></a>.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="cryptography_suite.pipeline.KyberDecrypt.level">
-<span class="sig-name descname"><span class="pre">level</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">512</span></span><a class="headerlink" href="#cryptography_suite.pipeline.KyberDecrypt.level" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="cryptography_suite.pipeline.KyberDecrypt.private_key">
-<span class="sig-name descname"><span class="pre">private_key</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Any</span></span><a class="headerlink" href="#cryptography_suite.pipeline.KyberDecrypt.private_key" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
+<dd><p>Bases: <a class="reference internal" href="#cryptography_suite.pipeline.MLKEMDecrypt" title="cryptography_suite.pipeline.MLKEMDecrypt"><code class="xref py py-class docutils literal notranslate"><span class="pre">MLKEMDecrypt</span></code></a></p>
+<p>Deprecated compatibility wrapper for <a class="reference internal" href="#cryptography_suite.pipeline.MLKEMDecrypt" title="cryptography_suite.pipeline.MLKEMDecrypt"><code class="xref py py-class docutils literal notranslate"><span class="pre">MLKEMDecrypt</span></code></a>.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cryptography_suite.pipeline.KyberDecrypt.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.KyberDecrypt.run" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.KyberDecrypt.run" title="Link to this definition">¶</a></dt>
 <dd><p>Run the module on the provided data.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cryptography_suite.pipeline.KyberDecrypt.to_proverif">
-<span class="sig-name descname"><span class="pre">to_proverif</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.KyberDecrypt.to_proverif" title="Link to this definition">¶</a></dt>
-<dd><p>Return a ProVerif representation of the module.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cryptography_suite.pipeline.KyberDecrypt.to_tamarin">
-<span class="sig-name descname"><span class="pre">to_tamarin</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.KyberDecrypt.to_tamarin" title="Link to this definition">¶</a></dt>
-<dd><p>Return a Tamarin representation of the module.</p>
 </dd></dl>
 
 </dd></dl>
@@ -544,38 +522,86 @@ helpers currently use the built-in AES implementation directly.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="cryptography_suite.pipeline.KyberEncrypt">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cryptography_suite.pipeline.</span></span><span class="sig-name descname"><span class="pre">KyberEncrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">public_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">512</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cryptography_suite.pipeline.KyberEncrypt" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cryptography_suite.pipeline.CryptoModule" title="cryptography_suite.pipeline.CryptoModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">CryptoModule</span></code></a>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code>]]</p>
-<p>Encrypt data using Kyber and AES-GCM.</p>
+<dd><p>Bases: <a class="reference internal" href="#cryptography_suite.pipeline.MLKEMEncrypt" title="cryptography_suite.pipeline.MLKEMEncrypt"><code class="xref py py-class docutils literal notranslate"><span class="pre">MLKEMEncrypt</span></code></a></p>
+<p>Deprecated compatibility wrapper for <a class="reference internal" href="#cryptography_suite.pipeline.MLKEMEncrypt" title="cryptography_suite.pipeline.MLKEMEncrypt"><code class="xref py py-class docutils literal notranslate"><span class="pre">MLKEMEncrypt</span></code></a>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.KyberEncrypt.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.KyberEncrypt.run" title="Link to this definition">¶</a></dt>
+<dd><p>Run the module on the provided data.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.MLKEMDecrypt">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cryptography_suite.pipeline.</span></span><span class="sig-name descname"><span class="pre">MLKEMDecrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">private_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">512</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cryptography_suite.pipeline.MLKEMDecrypt" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cryptography_suite.pipeline.CryptoModule" title="cryptography_suite.pipeline.CryptoModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">CryptoModule</span></code></a>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code>]</p>
+<p>Decrypt data produced by <a class="reference internal" href="#cryptography_suite.pipeline.MLKEMEncrypt" title="cryptography_suite.pipeline.MLKEMEncrypt"><code class="xref py py-class docutils literal notranslate"><span class="pre">MLKEMEncrypt</span></code></a>.</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="cryptography_suite.pipeline.KyberEncrypt.level">
-<span class="sig-name descname"><span class="pre">level</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">512</span></span><a class="headerlink" href="#cryptography_suite.pipeline.KyberEncrypt.level" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.MLKEMDecrypt.level">
+<span class="sig-name descname"><span class="pre">level</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">512</span></span><a class="headerlink" href="#cryptography_suite.pipeline.MLKEMDecrypt.level" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="cryptography_suite.pipeline.KyberEncrypt.public_key">
-<span class="sig-name descname"><span class="pre">public_key</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bytes</span></span><a class="headerlink" href="#cryptography_suite.pipeline.KyberEncrypt.public_key" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="cryptography_suite.pipeline.KyberEncrypt.raw_output">
-<span class="sig-name descname"><span class="pre">raw_output</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></span><a class="headerlink" href="#cryptography_suite.pipeline.KyberEncrypt.raw_output" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.MLKEMDecrypt.private_key">
+<span class="sig-name descname"><span class="pre">private_key</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Any</span></span><a class="headerlink" href="#cryptography_suite.pipeline.MLKEMDecrypt.private_key" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="cryptography_suite.pipeline.KyberEncrypt.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.KyberEncrypt.run" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.MLKEMDecrypt.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.MLKEMDecrypt.run" title="Link to this definition">¶</a></dt>
 <dd><p>Run the module on the provided data.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="cryptography_suite.pipeline.KyberEncrypt.to_proverif">
-<span class="sig-name descname"><span class="pre">to_proverif</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.KyberEncrypt.to_proverif" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.MLKEMDecrypt.to_proverif">
+<span class="sig-name descname"><span class="pre">to_proverif</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.MLKEMDecrypt.to_proverif" title="Link to this definition">¶</a></dt>
 <dd><p>Return a ProVerif representation of the module.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="cryptography_suite.pipeline.KyberEncrypt.to_tamarin">
-<span class="sig-name descname"><span class="pre">to_tamarin</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.KyberEncrypt.to_tamarin" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.MLKEMDecrypt.to_tamarin">
+<span class="sig-name descname"><span class="pre">to_tamarin</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.MLKEMDecrypt.to_tamarin" title="Link to this definition">¶</a></dt>
+<dd><p>Return a Tamarin representation of the module.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.MLKEMEncrypt">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cryptography_suite.pipeline.</span></span><span class="sig-name descname"><span class="pre">MLKEMEncrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">public_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">512</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cryptography_suite.pipeline.MLKEMEncrypt" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cryptography_suite.pipeline.CryptoModule" title="cryptography_suite.pipeline.CryptoModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">CryptoModule</span></code></a>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code>]</p>
+<p>Encrypt data as a sealed ML-KEM/AES-GCM envelope.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.MLKEMEncrypt.level">
+<span class="sig-name descname"><span class="pre">level</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">512</span></span><a class="headerlink" href="#cryptography_suite.pipeline.MLKEMEncrypt.level" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.MLKEMEncrypt.public_key">
+<span class="sig-name descname"><span class="pre">public_key</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bytes</span></span><a class="headerlink" href="#cryptography_suite.pipeline.MLKEMEncrypt.public_key" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.MLKEMEncrypt.raw_output">
+<span class="sig-name descname"><span class="pre">raw_output</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></span><a class="headerlink" href="#cryptography_suite.pipeline.MLKEMEncrypt.raw_output" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.MLKEMEncrypt.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.MLKEMEncrypt.run" title="Link to this definition">¶</a></dt>
+<dd><p>Run the module on the provided data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.MLKEMEncrypt.to_proverif">
+<span class="sig-name descname"><span class="pre">to_proverif</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.MLKEMEncrypt.to_proverif" title="Link to this definition">¶</a></dt>
+<dd><p>Return a ProVerif representation of the module.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cryptography_suite.pipeline.MLKEMEncrypt.to_tamarin">
+<span class="sig-name descname"><span class="pre">to_tamarin</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#cryptography_suite.pipeline.MLKEMEncrypt.to_tamarin" title="Link to this definition">¶</a></dt>
 <dd><p>Return a Tamarin representation of the module.</p>
 </dd></dl>
 
@@ -849,20 +875,28 @@ importable from <a class="reference internal" href="#module-cryptography_suite.p
 </ul>
 </li>
 <li><a class="reference internal" href="#cryptography_suite.pipeline.KyberDecrypt"><code class="docutils literal notranslate"><span class="pre">KyberDecrypt</span></code></a><ul>
-<li><a class="reference internal" href="#cryptography_suite.pipeline.KyberDecrypt.level"><code class="docutils literal notranslate"><span class="pre">KyberDecrypt.level</span></code></a></li>
-<li><a class="reference internal" href="#cryptography_suite.pipeline.KyberDecrypt.private_key"><code class="docutils literal notranslate"><span class="pre">KyberDecrypt.private_key</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.pipeline.KyberDecrypt.run"><code class="docutils literal notranslate"><span class="pre">KyberDecrypt.run()</span></code></a></li>
-<li><a class="reference internal" href="#cryptography_suite.pipeline.KyberDecrypt.to_proverif"><code class="docutils literal notranslate"><span class="pre">KyberDecrypt.to_proverif()</span></code></a></li>
-<li><a class="reference internal" href="#cryptography_suite.pipeline.KyberDecrypt.to_tamarin"><code class="docutils literal notranslate"><span class="pre">KyberDecrypt.to_tamarin()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#cryptography_suite.pipeline.KyberEncrypt"><code class="docutils literal notranslate"><span class="pre">KyberEncrypt</span></code></a><ul>
-<li><a class="reference internal" href="#cryptography_suite.pipeline.KyberEncrypt.level"><code class="docutils literal notranslate"><span class="pre">KyberEncrypt.level</span></code></a></li>
-<li><a class="reference internal" href="#cryptography_suite.pipeline.KyberEncrypt.public_key"><code class="docutils literal notranslate"><span class="pre">KyberEncrypt.public_key</span></code></a></li>
-<li><a class="reference internal" href="#cryptography_suite.pipeline.KyberEncrypt.raw_output"><code class="docutils literal notranslate"><span class="pre">KyberEncrypt.raw_output</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.pipeline.KyberEncrypt.run"><code class="docutils literal notranslate"><span class="pre">KyberEncrypt.run()</span></code></a></li>
-<li><a class="reference internal" href="#cryptography_suite.pipeline.KyberEncrypt.to_proverif"><code class="docutils literal notranslate"><span class="pre">KyberEncrypt.to_proverif()</span></code></a></li>
-<li><a class="reference internal" href="#cryptography_suite.pipeline.KyberEncrypt.to_tamarin"><code class="docutils literal notranslate"><span class="pre">KyberEncrypt.to_tamarin()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.MLKEMDecrypt"><code class="docutils literal notranslate"><span class="pre">MLKEMDecrypt</span></code></a><ul>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.MLKEMDecrypt.level"><code class="docutils literal notranslate"><span class="pre">MLKEMDecrypt.level</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.MLKEMDecrypt.private_key"><code class="docutils literal notranslate"><span class="pre">MLKEMDecrypt.private_key</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.MLKEMDecrypt.run"><code class="docutils literal notranslate"><span class="pre">MLKEMDecrypt.run()</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.MLKEMDecrypt.to_proverif"><code class="docutils literal notranslate"><span class="pre">MLKEMDecrypt.to_proverif()</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.MLKEMDecrypt.to_tamarin"><code class="docutils literal notranslate"><span class="pre">MLKEMDecrypt.to_tamarin()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.MLKEMEncrypt"><code class="docutils literal notranslate"><span class="pre">MLKEMEncrypt</span></code></a><ul>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.MLKEMEncrypt.level"><code class="docutils literal notranslate"><span class="pre">MLKEMEncrypt.level</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.MLKEMEncrypt.public_key"><code class="docutils literal notranslate"><span class="pre">MLKEMEncrypt.public_key</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.MLKEMEncrypt.raw_output"><code class="docutils literal notranslate"><span class="pre">MLKEMEncrypt.raw_output</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.MLKEMEncrypt.run"><code class="docutils literal notranslate"><span class="pre">MLKEMEncrypt.run()</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.MLKEMEncrypt.to_proverif"><code class="docutils literal notranslate"><span class="pre">MLKEMEncrypt.to_proverif()</span></code></a></li>
+<li><a class="reference internal" href="#cryptography_suite.pipeline.MLKEMEncrypt.to_tamarin"><code class="docutils literal notranslate"><span class="pre">MLKEMEncrypt.to_tamarin()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#cryptography_suite.pipeline.Pipeline"><code class="docutils literal notranslate"><span class="pre">Pipeline</span></code></a><ul>
