@@ -182,6 +182,10 @@ def ml_kem_encrypt(
     The returned envelope contains the KEM ciphertext, salt, nonce, and
     AES-GCM ciphertext/tag needed for decryption. The KEM shared secret remains
     internal and is never returned by this API.
+
+    Note: shared-secret cleanup is best-effort in Python because KEM backends
+    return immutable ``bytes`` before this function can wrap them in
+    :class:`KeyVault`.
     """
     alg = _get_ml_kem_algorithm(level, EncryptionError)
 
@@ -224,6 +228,10 @@ def ml_kem_decrypt(
     :func:`generate_ml_kem_keypair`. Malformed envelopes, level mismatches,
     decapsulation failures, and AES-GCM authentication failures all raise
     :class:`DecryptionError` without exposing KEM shared secrets.
+
+    Note: shared-secret cleanup is best-effort in Python because KEM backends
+    return immutable ``bytes`` before this function can wrap them in
+    :class:`KeyVault`.
     """
     alg = _get_ml_kem_algorithm(level, DecryptionError)
     aad, kem_ciphertext, salt, nonce, aes_ciphertext = _parse_ml_kem_envelope(
