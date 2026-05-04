@@ -2,7 +2,9 @@ Security Considerations
 =======================
 
 .. warning::
-   The following notes highlight important aspects for using ``cryptography-suite`` safely.
+   ``cryptography-suite`` is not independently audited and is not recommended
+   for protecting production secrets. The following notes highlight important
+   limits for educational and research use.
 
  - Experimental/insecure primitives (e.g., ``salsa20_encrypt``, ``ascon_encrypt``) are for research/education only and will be removed in v4.0.0. They are NOT supported for production use. If you depend on them, migrate now.
 
@@ -25,6 +27,8 @@ Security Considerations
   Pre-v2 versioned files and raw ``salt || nonce || ciphertext || tag`` files
   are decrypt-only compatibility formats and require explicit
   ``allow_legacy_format=True`` or the CLI ``--allow-legacy-format`` flag.
+- The suite makes no side-channel guarantee and no constant-time guarantee
+  across modules or platforms unless a specific module documents that review.
 - Private keys should always be stored encrypted, either with a strong password or in
   a hardware-backed keystore (HSM, KMS, etc.). Use
   ``to_encrypted_private_pem`` / ``load_encrypted_private_pem`` for PEM helpers,
@@ -53,20 +57,22 @@ assurance, wrap secrets in ``KeyVault`` or generate them with the
 Signal Protocol: Experimental Demo Only
 ---------------------------------------
 
-The ``cryptography_suite.experimental.signal`` module is not a full Signal
+The ``cryptography_suite.experimental.signal_demo`` module is not a full Signal
 implementation. It lacks critical security properties and should never be
 used for production or high-assurance messaging.
 
 Supply Chain Security
 ---------------------
 
-All release artifacts are built in isolated environments with pinned
-dependencies. Each GitHub release contains:
+The release workflow is configured to build artifacts in isolated CI jobs with
+version-pinned tooling. For releases where the corresponding assets are present,
+the workflow produces verification aids such as:
 
 * a CycloneDX SBOM (``sbom.json``),
-* a SLSA provenance attestation (``provenance.intoto.jsonl``), and
+* in-toto provenance metadata (``provenance.intoto.jsonl``), and
 * ``cosign`` signatures for every file.
 
 To verify a download, use ``cosign verify-blob`` against the artifact and
 inspect the SBOM with ``cyclonedx-bom`` or ``pip sbom``. Detailed
-instructions are available in :doc:`release_process`.
+instructions are available in :doc:`release_process`. These artifacts are not
+a compliance certification.

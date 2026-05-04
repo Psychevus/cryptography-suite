@@ -4,17 +4,19 @@
 
 Need to serve beginners, professionals, and researchers without cross-contamination of risk.
 
-## Decision
+## Historical Decision
 
-Adopt a three-layer API design: `suite.recipes`, `suite.core`, and `suite.experimental`, with strict boundaries between layers.
+This RFC originally proposed a three-layer API design. That namespace layout was
+not implemented as written. Current docs should describe the real
+`cryptography_suite` package surface instead of promising the proposed names.
 
 ## Consequences
 
 **Pros**
 
 - Tailored interfaces reduce accidental misuse.
-- Clear demarcation supports audits and review.
-- Maps to the pyca/cryptography "hazmat" mental model, easing migration.
+- Clear demarcation supports review.
+- Maps to familiar high-level versus low-level API patterns.
 
 **Cons**
 
@@ -24,20 +26,20 @@ Adopt a three-layer API design: `suite.recipes`, `suite.core`, and `suite.experi
 
 ## API Design Rules
 
-### recipes
+### Learning helpers
 
-- Secure defaults.
+- Conservative examples.
 - Minimal parameters.
 - Explicit safe algorithms only.
-- Stable.
+- Stability documented per module.
 
-### core
+### Contributor hardening utilities
 
 - Explicit parameters.
-- Safe defaults with documented trade-offs.
-- Stable-ish.
+- Documented trade-offs.
+- Not positioned as a standalone public cryptography API.
 
-### experimental
+### Experimental modules
 
 - Behind feature flags or extras.
 - Marked unstable.
@@ -95,6 +97,6 @@ Adopt a three-layer API design: `suite.recipes`, `suite.core`, and `suite.experi
 - Semantic Versioning.
 - Deprecations announced and removed after two minor releases.
 - Stability notes:
-  - `recipes`: stable.
-  - `core`: stable with minor optional parameters.
-  - `experimental`: unstable; breaking changes permitted at any time.
+  - public facade and common helpers: learning API under hardening.
+  - `cryptography_suite.core`: contributor hardening utilities.
+  - `cryptography_suite.experimental`: unstable; breaking changes permitted at any time.

@@ -14,20 +14,22 @@ documentation for details.
 What's new in 3.0.0
 -------------------
 
-Cryptography Suite 3.0.0 introduces a fully modular design and a focus on
-formally verified, misuse-resistant workflows.
+Cryptography Suite 3.0.0 introduced the current pipeline-oriented structure,
+typed hardening helpers, and optional research modules. The project is in
+pre-v4 hardening, is not independently audited, and is not recommended for
+protecting production secrets.
 
 - Backend-Agnostic Core (Crypto Abstraction Layer)
 - Pipeline DSL for Crypto Workflows
-- Misuse-Resistant API (mypy plugin)
-- Zeroization & Constant-Time Guarantees
-- Formal Verification Export (ProVerif/Tamarin)
+- Mypy plugin experiment for selected API checks
+- Best-effort zeroization helpers
+- Formal model export stubs (ProVerif/Tamarin)
 - Auto-Stub Generator for App Skeletons
 - Rich Logging & Jupyter Widgets for Visualization
-- HSM, YubiKey, PKCS#11, Cloud KMS Plugin Architecture
+- Local, mock HSM, PKCS#11, and AWS KMS keystore experiments
 - Fuzzing Harness & Property-Based Testing
-- Supply-Chain Attestation, SLSA, and Reproducible Builds
-- Signal Protocol components (X3DH + Double Ratchet) for demo use (*experimental, not production-ready*)
+- Release tooling for SBOM, signatures, provenance metadata, and reproducibility checks
+- Signal Protocol components (X3DH + Double Ratchet) for demo use (*experimental*)
 - Post-Quantum primitives: *experimental/demo-only* ML-KEM/Kyber envelopes, Dilithium signatures, and SPHINCS+ (requires `pip install "cryptography-suite[pqc]"`)
 - Homomorphic encryption helpers via Pyfhel under ``cryptography_suite.experimental.fhe`` (*experimental, opt-in only, no pickle context loading*)
 - Zero-knowledge proof demos (Bulletproofs, zk-SNARK) (*experimental*)

@@ -1,11 +1,12 @@
 # Backend Consistency
 
-Cryptography Suite standardizes on well audited backends for each primitive to
-avoid accidental mixing of incompatible libraries.
+Cryptography Suite standardizes on widely used upstream backends for each
+primitive where practical. This keeps examples consistent, but it is not an
+independent audit of this package.
 
 ## Philosophy
 
-- **pyca/cryptography** is the authoritative backend for all symmetric and
+- **pyca/cryptography** is the primary backend for all symmetric and
   asymmetric primitives such as AES, ChaCha20-Poly1305, RSA, ECDSA, and EdDSA.
 - Third-party libraries are only used when a primitive is unavailable in
   `cryptography`. Such usage is isolated in optional modules and marked as
@@ -17,15 +18,15 @@ avoid accidental mixing of incompatible libraries.
 
 | Primitive | Backend | Notes |
 | --- | --- | --- |
-| AES-GCM | pyca/cryptography | Authoritative |
-| ChaCha20-Poly1305 / XChaCha20-Poly1305 | pyca/cryptography | Authoritative |
+| AES-GCM | pyca/cryptography | Primary backend |
+| ChaCha20-Poly1305 / XChaCha20-Poly1305 | pyca/cryptography | Primary backend |
 | Salsa20 | PyCryptodome (optional) | Deprecated; reference only |
 | Ascon-128a | Pure Python | Experimental |
-| RSA, ECDSA, Ed25519, Ed448 | pyca/cryptography | Authoritative |
+| RSA, ECDSA, Ed25519, Ed448 | pyca/cryptography | Primary backend |
 | BLS12-381 | py_ecc | Optional |
-| SHA-2, SHA-3, BLAKE2b | pyca/cryptography | Authoritative |
-| BLAKE3 | blake3 | Authoritative |
-| Argon2id, Scrypt, PBKDF2, HKDF | pyca/cryptography | Authoritative |
+| SHA-2, SHA-3, BLAKE2b | pyca/cryptography | Primary backend |
+| BLAKE3 | blake3 | Primary backend |
+| Argon2id, Scrypt, PBKDF2, HKDF | pyca/cryptography | Primary backend |
 | Kyber, Dilithium (PQC) | pqcrypto (optional) | Optional |
 
 ### Future Migration

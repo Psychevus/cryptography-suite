@@ -2,7 +2,14 @@
 
 ## Scope
 
-Production security guarantees apply to `suite.recipes` and `suite.core` only. The `suite.experimental` package is research-only and excluded from support. Importing experimental modules emits an explicit runtime warning.
+`cryptography-suite` is an educational/research cryptography suite under active
+hardening. It is not independently audited and is not recommended for protecting
+production secrets yet.
+
+Security fixes are accepted for the maintained package surface. Experimental
+modules, optional demos, generated examples, visualization helpers, and fuzzing
+harnesses are not covered by production-style support commitments. Importing
+experimental modules requires the documented opt-in guard.
 
 ## Responsible disclosure
 
@@ -21,8 +28,10 @@ Please do **not** open public GitHub issues for exploitable vulnerabilities befo
 
 ## Risk acceptance & limitations
 
-- No side-channel hardening claims are made unless explicitly stated.
-- Constant-time hardening is ongoing and may vary by backend/platform.
+- No side-channel claims are made unless a specific module has been
+  reviewed and documented for that property.
+- There is no constant-time guarantee across the package; timing behavior may
+  vary by backend, dependency, Python runtime, and platform.
 - Deployments must provide cryptographically secure randomness and adequate entropy.
 - Private keys should be encrypted with a strong password or kept in an HSM/KMS. Normal PEM helpers do not export plaintext private keys; `to_unencrypted_private_pem_unsafe` and LocalKeyStore plaintext import/write flags are for controlled testing or one-time migration only.
 - `LocalKeyStore` is a development/testing backend unless you add production controls around filesystem permissions, backup handling, monitoring, and secret lifecycle management. Set `CRYPTOSUITE_STRICT_KEYS=error` in production-sensitive environments.
@@ -35,8 +44,14 @@ Please do **not** open public GitHub issues for exploitable vulnerabilities befo
   process and filesystem controls.
 - Homomorphic encryption helpers are experimental-only under
   `cryptography_suite.experimental.fhe`. They require explicit
-  `CRYPTOSUITE_ALLOW_EXPERIMENTAL=1` opt-in, are excluded from production
-  security guarantees, and do not use pickle for context deserialization.
+  `CRYPTOSUITE_ALLOW_EXPERIMENTAL=1` opt-in and do not use pickle for context
+  deserialization.
+- PQC helpers, including ML-KEM/Kyber compatibility wrappers and Dilithium, are
+  experimental. ML-KEM encryption returns a sealed envelope and the package does
+  not expose caller-visible KEM shared secrets through the current envelope APIs.
+- The Signal demo, FHE helpers, ZK helpers, BLS helpers, visualization widgets,
+  code generators, and fuzzing demos require independent review before any
+  high-assurance use.
 
 ## Version support
 

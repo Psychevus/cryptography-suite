@@ -1,4 +1,4 @@
-# Architecture (Production Hardening Plan)
+# Architecture Hardening Plan
 
 ## Target Structure
 
@@ -42,7 +42,8 @@ cryptography_suite/
 - `CRYPTOSUITE_ENV=dev`: local defaults, with verbose diagnostics still subject
   to secret redaction.
 - `CRYPTOSUITE_ENV=test`: deterministic test profile.
-- `CRYPTOSUITE_ENV=prod`: production profile with strict validation and stable structured logs.
+- `CRYPTOSUITE_ENV=prod`: stricter profile with stronger validation and stable
+  structured logs. This setting is not a deployment-safety claim.
 
 ## Error Handling Standard
 

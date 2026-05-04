@@ -1,6 +1,8 @@
 # Release Process
 
-This project uses a SemVer release workflow with reproducible builds.
+This project uses a SemVer release workflow with reproducibility checks and
+artifact verification aids. These release artifacts are useful for inspection;
+they are not an audit or compliance certification.
 
 ## Versioning policy
 
@@ -27,7 +29,7 @@ This project uses a SemVer release workflow with reproducible builds.
 6. Build deterministic wheel/sdist artifacts (`tools/reproducible_build.py`).
 7. Generate SBOM (`tools/generate_sbom.py`).
 8. Install `cosign` and sign all distributable artifacts with keyless Sigstore.
-9. Generate SLSA-style in-toto provenance (`dist/provenance.intoto.jsonl`) and sign it.
+9. Generate in-toto provenance metadata (`dist/provenance.intoto.jsonl`) and sign it.
 10. Validate artifacts (`tools/release_lint.py`).
 11. Publish to PyPI and create a GitHub Release.
 
@@ -36,7 +38,7 @@ Release artifacts include:
 - `dist/*.whl`
 - `dist/*.tar.gz`
 - `dist/sbom.json` (CycloneDX)
-- `dist/provenance.intoto.jsonl` (in-toto attestations)
+- `dist/provenance.intoto.jsonl` (in-toto provenance metadata)
 - `*.sig` and `*.cert` for each artifact above.
 
 ## Local verification with cosign

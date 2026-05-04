@@ -7,14 +7,14 @@ framework.
 
 - Backend-agnostic Crypto Abstraction Layer
 - Pipeline DSL for building workflows
-- Misuse-resistant API with a mypy plugin
-- Zeroization and constant-time safety guarantees
-- Formal verification export tools
+- Mypy plugin experiment for selected API checks
+- Best-effort zeroization helpers
+- Formal model export tools for ProVerif/Tamarin stubs
 - Automatic stub generator for new applications
 - Rich logging and interactive widgets
 - Plugin architecture for HSM and cloud KMS
 - Integrated fuzzing harness
-- Supply-chain attestation and reproducible builds
+- Release tooling for SBOMs, signatures, provenance metadata, and reproducibility checks
 
 ---
 
@@ -48,11 +48,12 @@ Enjoy the improvements and minor fixes introduced in version 2.0.1.
 
 # Release Notes - Cryptography Suite 2.0.0
 
-Cryptography Suite 2.0.0 delivers a major update with post-quantum readiness and enhanced tooling.
+Cryptography Suite 2.0.0 delivers a major update with experimental
+post-quantum helpers and enhanced tooling.
 
 ## Highlights
 
-- **Post-Quantum Cryptography**: Kyber key encapsulation and Dilithium signatures provide quantum-safe building blocks.
+- **Post-Quantum Cryptography**: Kyber key encapsulation and Dilithium signatures provide experimental post-quantum examples.
 - **Hybrid Encryption**: Convenient helpers combine asymmetric keys with AES-GCM for secure and efficient messaging.
 - **XChaCha20-Poly1305**: Optional modern stream cipher support when available from the ``cryptography`` library.
 - **KeyVault**: Context manager for safely handling secrets in memory.

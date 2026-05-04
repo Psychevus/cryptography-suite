@@ -9,10 +9,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 ### Added
 - ``sensitive`` parameter for key generation functions returning
   :class:`KeyVault`-wrapped secrets by default.
-- Documentation on zeroization guarantees and Python's memory limitations.
+- Documentation on zeroization limits and Python's memory model.
 - Safe PEM helpers: `to_public_pem`, `to_encrypted_private_pem`,
   `load_public_pem`, `load_encrypted_private_pem`, and the explicitly unsafe
   `to_unencrypted_private_pem_unsafe`.
+- A documentation claim regression guard that scans project docs, metadata,
+  examples, and release notes for unsupported trust and maturity claims.
 
 ### Changed
 - `to_pem(private_key)` and `pem_to_json(private_key)` no longer export
@@ -22,6 +24,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
   plaintext private-key storage or migration.
 - CLI key generation/import paths avoid printing private key material by default
   and support file/env/stdin password sources for private-key operations.
+- Corrected project positioning to describe the suite as pre-v4 educational and
+  research software under active hardening.
+- Clarified that the project is not independently audited and is not
+  recommended for protecting production secrets.
+- Clarified experimental status for PQC, FHE, ZK, Signal demo, BLS,
+  visualization, code generation, and fuzzing demos.
 
 ### Security
 - Removed derived-key, nonce, ciphertext, private-key, plaintext, and shared
@@ -44,6 +52,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
   coverage.
 - Unsupported coverage claims; project-wide coverage claims will be restored
   only after real test evidence supports them.
+- Unsupported security, coverage, release, and supply-chain claims from current
+  documentation.
+- References to nonexistent `suite.recipes` and `suite.core` public namespaces
+  from current user-facing docs.
 
 ### Deprecated
 - `derive_pbkdf2` alias in `symmetric.kdf` (use `kdf_pbkdf2`; will be removed in v4.0.0).
@@ -61,14 +73,14 @@ These functions remain temporarily for backward compatibility but emit
 ### Major Changes
 - Backend-Agnostic Core (Crypto Abstraction Layer)
 - Pipeline DSL for Crypto Workflows
-- Misuse-Resistant API (mypy plugin)
-- Zeroization & Constant-Time Guarantees
-- Formal Verification Export (ProVerif/Tamarin)
+- Mypy plugin experiment for selected API checks
+- Best-effort zeroization helpers
+- Formal model export stubs (ProVerif/Tamarin)
 - Auto-Stub Generator for App Skeletons
 - Rich Logging & Jupyter Widgets for Visualization
 - HSM, YubiKey, PKCS#11, Cloud KMS Plugin Architecture
 - Fuzzing Harness & Property-Based Testing
-- Supply-Chain Attestation, SLSA, and Reproducible Builds
+- Release tooling for SBOMs, signatures, provenance metadata, and reproducibility checks
 
 ### Breaking Changes
 - Old helper modules removed in favor of the Pipeline API.
@@ -88,7 +100,8 @@ These functions remain temporarily for backward compatibility but emit
 - Deprecated functions from the 2.x series.
 
 ### Security
-- Strengthened zeroization and constant-time operations.
+- Strengthened secret-handling helpers and timing-sensitive comparisons where
+  delegated to reviewed upstream primitives.
 
 ### Fixed
 - Miscellaneous bugs resolved during refactor.
