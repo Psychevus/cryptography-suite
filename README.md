@@ -27,7 +27,7 @@ storage where appropriate.
 | Status | Pre-v4 hardening; experimental educational suite |
 | Security | Not independently audited |
 | Production use | Not recommended for production secrets |
-| Stable-ish areas | Hashing, KDF helpers, common symmetric/asymmetric examples, file encryption format handling, CLI secret-input hardening, private-key serialization defaults |
+| Core example areas | Hashing, KDF helpers, common symmetric/asymmetric examples, file encryption format handling, CLI secret-input hardening, private-key serialization defaults |
 | Experimental modules | PQC/ML-KEM and Dilithium, FHE, ZK, Signal demo, BLS, visualization, code generation, fuzzing demos |
 | Recommended production choice | Use mature audited libraries and platform KMS/HSM controls where appropriate |
 | Contribution focus | Tests, documentation accuracy, hardening, focused review |
@@ -41,7 +41,7 @@ evidence.
 
 The `cryptography_suite.experimental` namespace is for opt-in research and demo
 code. Importing experimental modules requires explicit acknowledgement through
-the documented environment guard. The stable-looking public helpers are still
+the documented environment guard. The non-experimental public helpers are still
 best treated as learning APIs unless you have performed your own threat review.
 
 See [Vision details](docs/vision.md) for expansion.
@@ -84,23 +84,23 @@ ______________________________________________________________________
 
 | Feature | Module | Pipeline? | CLI? | Keystore? | Status | Extra |
 | --- | --- | --- | --- | --- | --- | --- |
-| AESGCMDecrypt | cryptography_suite.pipeline | Yes | No | No | stable | |
-| AESGCMEncrypt | cryptography_suite.pipeline | Yes | No | No | stable | |
+| AESGCMDecrypt | cryptography_suite.pipeline | Yes | No | No | core example | |
+| AESGCMEncrypt | cryptography_suite.pipeline | Yes | No | No | core example | |
 | BULLETPROOF_AVAILABLE | | No | Yes | No | experimental | |
-| ECIESX25519Decrypt | cryptography_suite.pipeline | Yes | No | No | stable | |
-| ECIESX25519Encrypt | cryptography_suite.pipeline | Yes | No | No | stable | |
+| ECIESX25519Decrypt | cryptography_suite.pipeline | Yes | No | No | core example | |
+| ECIESX25519Encrypt | cryptography_suite.pipeline | Yes | No | No | core example | |
 | FHE_AVAILABLE | | No | No | No | experimental | |
 | HandshakeFlowWidget | cryptography_suite.viz.widgets | No | No | No | experimental | |
-| HybridDecrypt | cryptography_suite.pipeline | Yes | No | No | stable | |
-| HybridEncrypt | cryptography_suite.pipeline | Yes | No | No | stable | |
+| HybridDecrypt | cryptography_suite.pipeline | Yes | No | No | core example | |
+| HybridEncrypt | cryptography_suite.pipeline | Yes | No | No | core example | |
 | KeyGraphWidget | cryptography_suite.viz.widgets | No | No | No | experimental | |
 | KyberDecrypt | cryptography_suite.pipeline | Yes | No | No | experimental | |
 | KyberEncrypt | cryptography_suite.pipeline | Yes | No | No | experimental | |
 | MLKEMDecrypt | cryptography_suite.pipeline | Yes | No | No | experimental | |
 | MLKEMEncrypt | cryptography_suite.pipeline | Yes | No | No | experimental | |
 | PQCRYPTO_AVAILABLE | | No | Yes | No | experimental | |
-| RSADecrypt | cryptography_suite.pipeline | Yes | No | No | stable | |
-| RSAEncrypt | cryptography_suite.pipeline | Yes | No | No | stable | |
+| RSADecrypt | cryptography_suite.pipeline | Yes | No | No | core example | |
+| RSAEncrypt | cryptography_suite.pipeline | Yes | No | No | core example | |
 | SIGNAL_AVAILABLE | | No | No | No | experimental | |
 | SPHINCS_AVAILABLE | | No | Yes | No | experimental | |
 | SessionTimelineWidget | cryptography_suite.viz.widgets | No | No | No | experimental | |
