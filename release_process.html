@@ -229,7 +229,9 @@
         <article role="main" id="furo-main-content">
           <section id="release-process">
 <h1>Release Process<a class="headerlink" href="#release-process" title="Link to this heading">¶</a></h1>
-<p>This project uses a SemVer release workflow with reproducible builds.</p>
+<p>This project uses a SemVer release workflow with reproducibility checks and
+artifact verification aids. These release artifacts are useful for inspection;
+they are not an audit or compliance certification.</p>
 <section id="versioning-policy">
 <h2>Versioning policy<a class="headerlink" href="#versioning-policy" title="Link to this heading">¶</a></h2>
 <ul class="simple">
@@ -260,7 +262,7 @@
 <li><p>Build deterministic wheel/sdist artifacts (<code class="docutils literal notranslate"><span class="pre">tools/reproducible_build.py</span></code>).</p></li>
 <li><p>Generate SBOM (<code class="docutils literal notranslate"><span class="pre">tools/generate_sbom.py</span></code>).</p></li>
 <li><p>Install <code class="docutils literal notranslate"><span class="pre">cosign</span></code> and sign all distributable artifacts with keyless Sigstore.</p></li>
-<li><p>Generate SLSA-style in-toto provenance (<code class="docutils literal notranslate"><span class="pre">dist/provenance.intoto.jsonl</span></code>) and sign it.</p></li>
+<li><p>Generate in-toto provenance metadata (<code class="docutils literal notranslate"><span class="pre">dist/provenance.intoto.jsonl</span></code>) and sign it.</p></li>
 <li><p>Validate artifacts (<code class="docutils literal notranslate"><span class="pre">tools/release_lint.py</span></code>).</p></li>
 <li><p>Publish to PyPI and create a GitHub Release.</p></li>
 </ol>
@@ -269,7 +271,7 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">dist/*.whl</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">dist/*.tar.gz</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">dist/sbom.json</span></code> (CycloneDX)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">dist/provenance.intoto.jsonl</span></code> (in-toto attestations)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dist/provenance.intoto.jsonl</span></code> (in-toto provenance metadata)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">*.sig</span></code> and <code class="docutils literal notranslate"><span class="pre">*.cert</span></code> for each artifact above.</p></li>
 </ul>
 </section>

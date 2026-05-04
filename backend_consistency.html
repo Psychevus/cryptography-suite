@@ -229,12 +229,13 @@
         <article role="main" id="furo-main-content">
           <section id="backend-consistency">
 <h1>Backend Consistency<a class="headerlink" href="#backend-consistency" title="Link to this heading">¶</a></h1>
-<p>Cryptography Suite standardizes on well audited backends for each primitive to
-avoid accidental mixing of incompatible libraries.</p>
+<p>Cryptography Suite standardizes on widely used upstream backends for each
+primitive where practical. This keeps examples consistent, but it is not an
+independent audit of this package.</p>
 <section id="philosophy">
 <h2>Philosophy<a class="headerlink" href="#philosophy" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p><strong>pyca/cryptography</strong> is the authoritative backend for all symmetric and
+<li><p><strong>pyca/cryptography</strong> is the primary backend for all symmetric and
 asymmetric primitives such as AES, ChaCha20-Poly1305, RSA, ECDSA, and EdDSA.</p></li>
 <li><p>Third-party libraries are only used when a primitive is unavailable in
 <code class="docutils literal notranslate"><span class="pre">cryptography</span></code>. Such usage is isolated in optional modules and marked as
@@ -256,11 +257,11 @@ supported by <code class="docutils literal notranslate"><span class="pre">crypto
 <tbody>
 <tr class="row-even"><td><p>AES-GCM</p></td>
 <td><p>pyca/cryptography</p></td>
-<td><p>Authoritative</p></td>
+<td><p>Primary backend</p></td>
 </tr>
 <tr class="row-odd"><td><p>ChaCha20-Poly1305 / XChaCha20-Poly1305</p></td>
 <td><p>pyca/cryptography</p></td>
-<td><p>Authoritative</p></td>
+<td><p>Primary backend</p></td>
 </tr>
 <tr class="row-even"><td><p>Salsa20</p></td>
 <td><p>PyCryptodome (optional)</p></td>
@@ -272,7 +273,7 @@ supported by <code class="docutils literal notranslate"><span class="pre">crypto
 </tr>
 <tr class="row-even"><td><p>RSA, ECDSA, Ed25519, Ed448</p></td>
 <td><p>pyca/cryptography</p></td>
-<td><p>Authoritative</p></td>
+<td><p>Primary backend</p></td>
 </tr>
 <tr class="row-odd"><td><p>BLS12-381</p></td>
 <td><p>py_ecc</p></td>
@@ -280,15 +281,15 @@ supported by <code class="docutils literal notranslate"><span class="pre">crypto
 </tr>
 <tr class="row-even"><td><p>SHA-2, SHA-3, BLAKE2b</p></td>
 <td><p>pyca/cryptography</p></td>
-<td><p>Authoritative</p></td>
+<td><p>Primary backend</p></td>
 </tr>
 <tr class="row-odd"><td><p>BLAKE3</p></td>
 <td><p>blake3</p></td>
-<td><p>Authoritative</p></td>
+<td><p>Primary backend</p></td>
 </tr>
 <tr class="row-even"><td><p>Argon2id, Scrypt, PBKDF2, HKDF</p></td>
 <td><p>pyca/cryptography</p></td>
-<td><p>Authoritative</p></td>
+<td><p>Primary backend</p></td>
 </tr>
 <tr class="row-odd"><td><p>Kyber, Dilithium (PQC)</p></td>
 <td><p>pqcrypto (optional)</p></td>

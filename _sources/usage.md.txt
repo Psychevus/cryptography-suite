@@ -34,15 +34,15 @@ cryptography-suite migrate-keys --from file --to hsm --batch --forensics-report 
 cryptography-suite migrate-keys --from file --to hsm --batch --webhook https://siem.example/ingest
 ```
 
-## Security guarantees
+## Safety notes
 
-- Keys are never written to disk; all migrations operate on in-memory
-  representations only.
+- The legacy `migrate-keys` demo operates on in-memory representations and
+  should be reviewed before adapting it to persistent backends.
 - Every action is appended to `audit.log` using a SHA256 hash chain,
-  signed with an Ed25519 key and chained by SHA256, providing
-  tamper-evident auditability.
+  signed with an Ed25519 key and chained by SHA256, providing a
+  tamper-evident local log format for the demo.
 - Supported backends: `file`, `vault`, and `hsm`.  Classical and
-  NIST post-quantum algorithms are supported for migration in both
+  NIST post-quantum algorithm examples are supported for migration in both
   interactive and batch modes.
 - Optional `--forensics-report` exports JSON evidence with a signed
   digest and public key for verification.  Log entries can also be

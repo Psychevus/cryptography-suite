@@ -1,7 +1,7 @@
 # Experimental Feature Roadmap
 
-The following checklists outline work required to bring optional components to
-production readiness.
+The following checklists outline review and hardening work required before any
+optional component could be considered for high-assurance use.
 
 ## Signal Protocol
 

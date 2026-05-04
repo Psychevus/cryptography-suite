@@ -231,7 +231,13 @@
 <h1>Security Policy<a class="headerlink" href="#security-policy" title="Link to this heading">¶</a></h1>
 <section id="scope">
 <h2>Scope<a class="headerlink" href="#scope" title="Link to this heading">¶</a></h2>
-<p>Production security guarantees apply to <code class="docutils literal notranslate"><span class="pre">suite.recipes</span></code> and <code class="docutils literal notranslate"><span class="pre">suite.core</span></code> only. The <code class="docutils literal notranslate"><span class="pre">suite.experimental</span></code> package is research-only and excluded from support. Importing experimental modules emits an explicit runtime warning.</p>
+<p><code class="docutils literal notranslate"><span class="pre">cryptography-suite</span></code> is an educational/research cryptography suite under active
+hardening. It is not independently audited and is not recommended for protecting
+production secrets yet.</p>
+<p>Security fixes are accepted for the maintained package surface. Experimental
+modules, optional demos, generated examples, visualization helpers, and fuzzing
+harnesses are not covered by production-style support commitments. Importing
+experimental modules requires the documented opt-in guard.</p>
 </section>
 <section id="responsible-disclosure">
 <h2>Responsible disclosure<a class="headerlink" href="#responsible-disclosure" title="Link to this heading">¶</a></h2>
@@ -253,8 +259,10 @@
 <section id="risk-acceptance-limitations">
 <h2>Risk acceptance &amp; limitations<a class="headerlink" href="#risk-acceptance-limitations" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>No side-channel hardening claims are made unless explicitly stated.</p></li>
-<li><p>Constant-time hardening is ongoing and may vary by backend/platform.</p></li>
+<li><p>No side-channel claims are made unless a specific module has been
+reviewed and documented for that property.</p></li>
+<li><p>There is no constant-time guarantee across the package; timing behavior may
+vary by backend, dependency, Python runtime, and platform.</p></li>
 <li><p>Deployments must provide cryptographically secure randomness and adequate entropy.</p></li>
 <li><p>Private keys should be encrypted with a strong password or kept in an HSM/KMS. Normal PEM helpers do not export plaintext private keys; <code class="docutils literal notranslate"><span class="pre">to_unencrypted_private_pem_unsafe</span></code> and LocalKeyStore plaintext import/write flags are for controlled testing or one-time migration only.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">LocalKeyStore</span></code> is a development/testing backend unless you add production controls around filesystem permissions, backup handling, monitoring, and secret lifecycle management. Set <code class="docutils literal notranslate"><span class="pre">CRYPTOSUITE_STRICT_KEYS=error</span></code> in production-sensitive environments.</p></li>
@@ -267,8 +275,14 @@ and password-file inputs are supported for automation but require additional
 process and filesystem controls.</p></li>
 <li><p>Homomorphic encryption helpers are experimental-only under
 <code class="docutils literal notranslate"><span class="pre">cryptography_suite.experimental.fhe</span></code>. They require explicit
-<code class="docutils literal notranslate"><span class="pre">CRYPTOSUITE_ALLOW_EXPERIMENTAL=1</span></code> opt-in, are excluded from production
-security guarantees, and do not use pickle for context deserialization.</p></li>
+<code class="docutils literal notranslate"><span class="pre">CRYPTOSUITE_ALLOW_EXPERIMENTAL=1</span></code> opt-in and do not use pickle for context
+deserialization.</p></li>
+<li><p>PQC helpers, including ML-KEM/Kyber compatibility wrappers and Dilithium, are
+experimental. ML-KEM encryption returns a sealed envelope and the package does
+not expose caller-visible KEM shared secrets through the current envelope APIs.</p></li>
+<li><p>The Signal demo, FHE helpers, ZK helpers, BLS helpers, visualization widgets,
+code generators, and fuzzing demos require independent review before any
+high-assurance use.</p></li>
 </ul>
 </section>
 <section id="version-support">

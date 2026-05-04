@@ -232,7 +232,9 @@
 <section id="trust-model-v1">
 <h2>Trust Model v1<a class="headerlink" href="#trust-model-v1" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p><strong>Keys</strong>: generated or imported through vetted sources; the library attempts to zeroise secrets after use but assumes applications keep keys confidential.</p></li>
+<li><p><strong>Keys</strong>: generated or imported through documented sources; the library
+provides best-effort cleanup helpers but assumes applications keep keys
+confidential.</p></li>
 <li><p><strong>Randomness</strong>: relies on the operating system’s CSPRNG; deployments must ensure sufficient entropy.</p></li>
 <li><p><strong>KDF parameters</strong>: conservative defaults are provided; tuning is bounded by documented ranges.</p></li>
 <li><p><strong>Padding choices</strong>: authenticated modes are preferred; explicit padding helpers validate lengths.</p></li>
@@ -244,7 +246,7 @@
 <section id="must">
 <h3>Must<a class="headerlink" href="#must" title="Link to this heading">¶</a></h3>
 <ul class="simple">
-<li><p>Provide safe defaults for all cryptographic parameters.</p></li>
+<li><p>Prefer conservative defaults for documented examples.</p></li>
 <li><p>Fail closed on invalid or missing parameters.</p></li>
 <li><p>Emit clear warnings when leaving secure operating envelopes.</p></li>
 </ul>
@@ -260,10 +262,14 @@
 <section id="abuser-stories">
 <h2>Abuser Stories<a class="headerlink" href="#abuser-stories" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p><strong>Developer reuses a nonce</strong>: high-level APIs auto-generate nonces and track uniqueness.</p></li>
-<li><p><strong>Developer picks trivial KDF iterations</strong>: recipes lock in conservative iteration counts; core validates minimums.</p></li>
-<li><p><strong>Developer encrypts with password only</strong>: APIs require explicit opt-in for weak schemes and warn about low entropy.</p></li>
-<li><p><strong>Developer transmits unpadded data</strong>: recipes default to authenticated modes; padding helpers in core verify lengths.</p></li>
+<li><p><strong>Developer reuses a nonce</strong>: examples should prefer APIs that generate or
+validate nonces.</p></li>
+<li><p><strong>Developer picks trivial KDF iterations</strong>: helpers should reject or warn on
+weak settings where policy checks exist.</p></li>
+<li><p><strong>Developer encrypts with password only</strong>: docs should call out password
+entropy and KDF parameters.</p></li>
+<li><p><strong>Developer transmits unauthenticated data</strong>: examples should prefer
+authenticated modes.</p></li>
 </ul>
 </section>
 </section>

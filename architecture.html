@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html">
 
     <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
-        <title>Architecture (Production Hardening Plan) - cryptography-suite 3.0.0 documentation</title>
+        <title>Architecture Hardening Plan - cryptography-suite 3.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -227,8 +227,8 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="architecture-production-hardening-plan">
-<h1>Architecture (Production Hardening Plan)<a class="headerlink" href="#architecture-production-hardening-plan" title="Link to this heading">¶</a></h1>
+          <section id="architecture-hardening-plan">
+<h1>Architecture Hardening Plan<a class="headerlink" href="#architecture-hardening-plan" title="Link to this heading">¶</a></h1>
 <section id="target-structure">
 <h2>Target Structure<a class="headerlink" href="#target-structure" title="Link to this heading">¶</a></h2>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>cryptography_suite/
@@ -278,7 +278,8 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">CRYPTOSUITE_ENV=dev</span></code>: local defaults, with verbose diagnostics still subject
 to secret redaction.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">CRYPTOSUITE_ENV=test</span></code>: deterministic test profile.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">CRYPTOSUITE_ENV=prod</span></code>: production profile with strict validation and stable structured logs.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CRYPTOSUITE_ENV=prod</span></code>: stricter profile with stronger validation and stable
+structured logs. This setting is not a deployment-safety claim.</p></li>
 </ul>
 </section>
 <section id="error-handling-standard">
@@ -337,7 +338,7 @@ to secret redaction.</p></li>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Architecture (Production Hardening Plan)</a><ul>
+<li><a class="reference internal" href="#">Architecture Hardening Plan</a><ul>
 <li><a class="reference internal" href="#target-structure">Target Structure</a><ul>
 <li><a class="reference internal" href="#boundary-rules">Boundary Rules</a></li>
 </ul>

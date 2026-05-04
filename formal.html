@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html">
 
     <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
-        <title>Formal Verification Support - cryptography-suite 3.0.0 documentation</title>
+        <title>Formal Model Export - cryptography-suite 3.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -227,13 +227,13 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="formal-verification-support">
-<h1>Formal Verification Support<a class="headerlink" href="#formal-verification-support" title="Link to this heading">¶</a></h1>
+          <section id="formal-model-export">
+<h1>Formal Model Export<a class="headerlink" href="#formal-model-export" title="Link to this heading">¶</a></h1>
 <p>Pipelines can be exported to simple ProVerif or Tamarin models using the
 <code class="docutils literal notranslate"><span class="pre">export</span></code> CLI command. The exported files are intentionally lightweight and only
 capture the order of pipeline steps and any secrets you choose to track.
-They are suitable for quick syntax checking but <strong>do not</strong> automatically encode
-complex protocol semantics.</p>
+They are suitable for quick syntax checking and manual modeling starts, but
+<strong>do not</strong> automatically encode complex protocol semantics.</p>
 <p>Example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cryptography</span><span class="o">-</span><span class="n">suite</span> <span class="n">export</span> <span class="n">examples</span><span class="o">/</span><span class="n">formal</span><span class="o">/</span><span class="n">pipeline</span><span class="o">.</span><span class="n">yaml</span> <span class="o">--</span><span class="nb">format</span> <span class="n">proverif</span>
 </pre></div>

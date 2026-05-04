@@ -250,10 +250,10 @@ collection. The library’s :class:<code class="docutils literal notranslate"><s
 </section>
 <section id="do-native-backends-handle-zeroization">
 <h2>Do native backends handle zeroization?<a class="headerlink" href="#do-native-backends-handle-zeroization" title="Link to this heading">¶</a></h2>
-<p>Yes. Underlying libraries such as OpenSSL employ their own secure memory
-management and wipe key material when freed. When cryptographic objects are
-created via these backends, zeroization occurs inside the native code even
-though Python cannot directly guarantee it.</p>
+<p>Some underlying libraries, such as OpenSSL, provide their own memory-management
+and key-cleanup behavior. Treat those properties as backend-specific and consult
+the upstream backend documentation for high-assurance requirements; Python
+itself cannot directly guarantee cleanup for arbitrary objects.</p>
 </section>
 </section>
 

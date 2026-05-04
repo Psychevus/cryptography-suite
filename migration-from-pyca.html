@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html">
 
     <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
-        <title>Migration from pyca/cryptography - cryptography-suite 3.0.0 documentation</title>
+        <title>Interoperability Notes for pyca/cryptography Users - cryptography-suite 3.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -227,321 +227,89 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="migration-from-pyca-cryptography">
-<h1>Migration from pyca/cryptography<a class="headerlink" href="#migration-from-pyca-cryptography" title="Link to this heading">¶</a></h1>
-<p>This guide shows how common <code class="docutils literal notranslate"><span class="pre">pyca/cryptography</span></code> tasks map to the upcoming <code class="docutils literal notranslate"><span class="pre">suite.recipes</span></code> helpers and the lower level <code class="docutils literal notranslate"><span class="pre">suite.core</span></code> APIs.</p>
-<section id="symmetric-encryption">
-<h2>Symmetric encryption<a class="headerlink" href="#symmetric-encryption" title="Link to this heading">¶</a></h2>
-<div class="table-wrapper colwidths-auto docutils container">
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>Scenario</p></th>
-<th class="head"><p>pyca/cryptography</p></th>
-<th class="head"><p><code class="docutils literal notranslate"><span class="pre">suite.recipes</span></code></p></th>
-<th class="head"><p><code class="docutils literal notranslate"><span class="pre">suite.core</span></code></p></th>
-<th class="head"><p>Notes</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>Fernet-like</p></td>
-<td><p>```python</p></td>
-<td><p></p></td>
-<td><p></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p>from cryptography.fernet import Fernet</p></td>
-<td><p></p></td>
-<td><p></p></td>
-<td><p></p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
+          <section id="interoperability-notes-for-pyca-cryptography-users">
+<h1>Interoperability Notes for pyca/cryptography Users<a class="headerlink" href="#interoperability-notes-for-pyca-cryptography-users" title="Link to this heading">¶</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">cryptography-suite</span></code> is not a replacement for <code class="docutils literal notranslate"><span class="pre">pyca/cryptography</span></code>. For
+production systems, prefer mature audited libraries and platform key management
+controls. This page maps a few familiar <code class="docutils literal notranslate"><span class="pre">pyca/cryptography</span></code> patterns to current
+<code class="docutils literal notranslate"><span class="pre">cryptography_suite</span></code> learning examples so contributors can compare behavior and
+write regression tests.</p>
+<section id="aes-gcm-style-encryption">
+<h2>AES-GCM style encryption<a class="headerlink" href="#aes-gcm-style-encryption" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">pyca/cryptography</span></code> exposes AEAD classes directly. In this project, the pipeline
+example wraps password-based AES-GCM encryption for demos and tests:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cryptography_suite.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">AESGCMDecrypt</span><span class="p">,</span> <span class="n">AESGCMEncrypt</span>
+
+<span class="n">password</span> <span class="o">=</span> <span class="s2">&quot;use-a-secret-manager-for-this&quot;</span>
+<span class="n">token</span> <span class="o">=</span> <span class="n">AESGCMEncrypt</span><span class="p">(</span><span class="n">password</span><span class="o">=</span><span class="n">password</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">AESGCMDecrypt</span><span class="p">(</span><span class="n">password</span><span class="o">=</span><span class="n">password</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">token</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;data&quot;</span>
+</pre></div>
 </div>
-<p>key = Fernet.generate_key()
-f = Fernet(key)
-token = f.encrypt(b”data”)
-assert f.decrypt(token) == b”data”
-<code class="docutils literal notranslate"><span class="pre">|</span></code>python
-from suite.recipes import aesgcm_encrypt, aesgcm_decrypt, generate_aesgcm_key</p>
-<p>key = generate_aesgcm_key()
-nonce, ct = aesgcm_encrypt(key, b”data”)
-pt = aesgcm_decrypt(key, nonce, ct)
-<code class="docutils literal notranslate"><span class="pre">|</span></code>python
-from suite.core import AESGCM
-import os</p>
-<p>key = AESGCM.generate_key(256)
-aesgcm = AESGCM(key)
-nonce = os.urandom(12)
-ct = aesgcm.encrypt(nonce, b”data”, None)
-pt = aesgcm.decrypt(nonce, ct, None)
-<code class="docutils literal notranslate"><span class="pre">|</span> <span class="pre">`recipes`</span> <span class="pre">auto-generate</span> <span class="pre">a</span> <span class="pre">nonce</span> <span class="pre">and</span> <span class="pre">fix</span> <span class="pre">AES-256-GCM;</span> <span class="pre">`core`</span> <span class="pre">requires</span> <span class="pre">explicit</span> <span class="pre">nonce</span> <span class="pre">management.</span> <span class="pre">|</span> <span class="pre">|</span> <span class="pre">AES-GCM</span> <span class="pre">|</span></code>python
-from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-import os</p>
-<p>key = AESGCM.generate_key(bit_length=256)
-aesgcm = AESGCM(key)
-nonce = os.urandom(12)
-ct = aesgcm.encrypt(nonce, b”data”, None)
-pt = aesgcm.decrypt(nonce, ct, None)
-<code class="docutils literal notranslate"><span class="pre">|</span></code>python
-from suite.recipes import aesgcm_encrypt, aesgcm_decrypt, generate_aesgcm_key</p>
-<p>key = generate_aesgcm_key()
-nonce, ct = aesgcm_encrypt(key, b”data”)
-pt = aesgcm_decrypt(key, nonce, ct)
-<code class="docutils literal notranslate"><span class="pre">|</span></code>python
-from suite.core import AESGCM
-import os</p>
-<p>key = AESGCM.generate_key(256)
-aesgcm = AESGCM(key)
-nonce = os.urandom(12)
-ct = aesgcm.encrypt(nonce, b”data”, None)
-pt = aesgcm.decrypt(nonce, ct, None)
-``` | Identical to Fernet example but without token wrapper. <code class="docutils literal notranslate"><span class="pre">recipes</span></code> keep parameters fixed; <code class="docutils literal notranslate"><span class="pre">core</span></code> mirrors pyca API. |</p>
 </section>
-<section id="rsa-oaep-encrypt-decrypt">
-<h2>RSA-OAEP encrypt/decrypt<a class="headerlink" href="#rsa-oaep-encrypt-decrypt" title="Link to this heading">¶</a></h2>
-<div class="table-wrapper colwidths-auto docutils container">
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>pyca/cryptography</p></th>
-<th class="head"><p><code class="docutils literal notranslate"><span class="pre">suite.recipes</span></code></p></th>
-<th class="head"><p><code class="docutils literal notranslate"><span class="pre">suite.core</span></code></p></th>
-<th class="head"><p>Notes</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>```python</p></td>
-<td><p></p></td>
-<td><p></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p>from cryptography.hazmat.primitives.asymmetric import rsa, padding</p></td>
-<td><p></p></td>
-<td><p></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p>from cryptography.hazmat.primitives import hashes</p></td>
-<td><p></p></td>
-<td><p></p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
+<section id="file-encryption">
+<h2>File encryption<a class="headerlink" href="#file-encryption" title="Link to this heading">¶</a></h2>
+<p>The current file helpers authenticate the v2 header as AES-GCM AAD and replace
+the output only after authentication succeeds:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cryptography_suite.symmetric</span><span class="w"> </span><span class="kn">import</span> <span class="n">decrypt_file</span><span class="p">,</span> <span class="n">encrypt_file</span>
+
+<span class="n">password</span> <span class="o">=</span> <span class="s2">&quot;use-a-secret-manager-for-this&quot;</span>
+<span class="n">encrypt_file</span><span class="p">(</span><span class="s2">&quot;plain.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;cipher.bin&quot;</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+<span class="n">decrypt_file</span><span class="p">(</span><span class="s2">&quot;cipher.bin&quot;</span><span class="p">,</span> <span class="s2">&quot;plain.out&quot;</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+</pre></div>
 </div>
-<p>priv = rsa.generate_private_key(public_exponent=65537, key_size=2048)
-ct = priv.public_key().encrypt(
-b”data”,
-padding.OAEP(
-mgf=padding.MGF1(algorithm=hashes.SHA256()),
-algorithm=hashes.SHA256(),
-label=None,
-),
-)
-pt = priv.decrypt(
-ct,
-padding.OAEP(
-mgf=padding.MGF1(algorithm=hashes.SHA256()),
-algorithm=hashes.SHA256(),
-label=None,
-),
-)
-<code class="docutils literal notranslate"><span class="pre">|</span></code>python
-from suite.recipes import rsa_oaep_encrypt, rsa_oaep_decrypt, generate_rsa_keypair</p>
-<p>priv, pub = generate_rsa_keypair()
-ct = rsa_oaep_encrypt(pub, b”data”)
-pt = rsa_oaep_decrypt(priv, ct)
-<code class="docutils literal notranslate"><span class="pre">|</span></code>python
-from suite.core.asymmetric import RSA, OAEP, MGF1, SHA256</p>
-<p>priv = RSA.generate_private_key(2048)
-ct = priv.public_key().encrypt(
-b”data”,
-OAEP(
-mgf=MGF1(SHA256()),
-algorithm=SHA256(),
-label=None,
-),
-)
-pt = priv.decrypt(ct, OAEP(mgf=MGF1(SHA256()), algorithm=SHA256(), label=None))
-``` | <code class="docutils literal notranslate"><span class="pre">recipes</span></code> fix SHA-256 and sensible key sizes; <code class="docutils literal notranslate"><span class="pre">core</span></code> exposes padding parameters explicitly. |</p>
+<p>Legacy raw file formats are decrypt-only compatibility inputs and require
+<code class="docutils literal notranslate"><span class="pre">allow_legacy_format=True</span></code>.</p>
 </section>
-<section id="ed25519-sign-verify">
-<h2>Ed25519 sign/verify<a class="headerlink" href="#ed25519-sign-verify" title="Link to this heading">¶</a></h2>
-<div class="table-wrapper colwidths-auto docutils container">
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>pyca/cryptography</p></th>
-<th class="head"><p><code class="docutils literal notranslate"><span class="pre">suite.recipes</span></code></p></th>
-<th class="head"><p><code class="docutils literal notranslate"><span class="pre">suite.core</span></code></p></th>
-<th class="head"><p>Notes</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>```python</p></td>
-<td><p></p></td>
-<td><p></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p>from cryptography.hazmat.primitives.asymmetric import ed25519</p></td>
-<td><p></p></td>
-<td><p></p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
+<section id="rsa-oaep-pipeline-example">
+<h2>RSA-OAEP pipeline example<a class="headerlink" href="#rsa-oaep-pipeline-example" title="Link to this heading">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cryptography_suite.asymmetric</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_rsa_keypair</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cryptography_suite.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">RSADecrypt</span><span class="p">,</span> <span class="n">RSAEncrypt</span>
+
+<span class="n">private_key</span><span class="p">,</span> <span class="n">public_key</span> <span class="o">=</span> <span class="n">generate_rsa_keypair</span><span class="p">()</span>
+<span class="n">ciphertext</span> <span class="o">=</span> <span class="n">RSAEncrypt</span><span class="p">(</span><span class="n">public_key</span><span class="o">=</span><span class="n">public_key</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">RSADecrypt</span><span class="p">(</span><span class="n">private_key</span><span class="o">=</span><span class="n">private_key</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">ciphertext</span><span class="p">)</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;data&quot;</span>
+</pre></div>
 </div>
-<p>sk = ed25519.Ed25519PrivateKey.generate()
-sig = sk.sign(b”msg”)
-sk.public_key().verify(sig, b”msg”)
-<code class="docutils literal notranslate"><span class="pre">|</span></code>python
-from suite.recipes import ed25519_sign, ed25519_verify, generate_ed25519_keypair</p>
-<p>sk, pk = generate_ed25519_keypair()
-sig = ed25519_sign(sk, b”msg”)
-ed25519_verify(pk, sig, b”msg”)
-<code class="docutils literal notranslate"><span class="pre">|</span></code>python
-from suite.core.signatures import Ed25519PrivateKey</p>
-<p>sk = Ed25519PrivateKey.generate()
-sig = sk.sign(b”msg”)
-sk.public_key().verify(sig, b”msg”)
-``` | APIs are nearly identical; <code class="docutils literal notranslate"><span class="pre">recipes</span></code> return tuple keypairs and handle types. |</p>
 </section>
-<section id="ecdsa-rfc-6979-sign-verify">
-<h2>ECDSA (RFC 6979) sign/verify<a class="headerlink" href="#ecdsa-rfc-6979-sign-verify" title="Link to this heading">¶</a></h2>
-<div class="table-wrapper colwidths-auto docutils container">
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>pyca/cryptography</p></th>
-<th class="head"><p><code class="docutils literal notranslate"><span class="pre">suite.recipes</span></code></p></th>
-<th class="head"><p><code class="docutils literal notranslate"><span class="pre">suite.core</span></code></p></th>
-<th class="head"><p>Notes</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>```python</p></td>
-<td><p></p></td>
-<td><p></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p>from cryptography.hazmat.primitives.asymmetric import ec</p></td>
-<td><p></p></td>
-<td><p></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p>from cryptography.hazmat.primitives import hashes</p></td>
-<td><p></p></td>
-<td><p></p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
+<section id="ed25519-sign-verify-example">
+<h2>Ed25519 sign/verify example<a class="headerlink" href="#ed25519-sign-verify-example" title="Link to this heading">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cryptography_suite.asymmetric.signatures</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">generate_ed25519_keypair</span><span class="p">,</span>
+    <span class="n">sign_message</span><span class="p">,</span>
+    <span class="n">verify_signature</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">private_key</span><span class="p">,</span> <span class="n">public_key</span> <span class="o">=</span> <span class="n">generate_ed25519_keypair</span><span class="p">()</span>
+<span class="n">signature</span> <span class="o">=</span> <span class="n">sign_message</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;message&quot;</span><span class="p">,</span> <span class="n">private_key</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">verify_signature</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;message&quot;</span><span class="p">,</span> <span class="n">signature</span><span class="p">,</span> <span class="n">public_key</span><span class="p">)</span>
+</pre></div>
 </div>
-<p>sk = ec.generate_private_key(ec.SECP256R1())
-sig = sk.sign(b”msg”, ec.ECDSA(hashes.SHA256()))
-sk.public_key().verify(sig, b”msg”, ec.ECDSA(hashes.SHA256()))
-<code class="docutils literal notranslate"><span class="pre">|</span></code>python
-from suite.recipes import ecdsa_sign, ecdsa_verify, generate_ecdsa_keypair</p>
-<p>sk, pk = generate_ecdsa_keypair()
-sig = ecdsa_sign(sk, b”msg”)
-ecdsa_verify(pk, sig, b”msg”)
-<code class="docutils literal notranslate"><span class="pre">|</span></code>python
-from suite.core.asymmetric import ECDSA, SECP256R1, SHA256</p>
-<p>sk = ECDSA.generate_private_key(SECP256R1())
-sig = sk.sign(b”msg”, hash_alg=SHA256(), deterministic=True)
-sk.public_key().verify(sig, b”msg”, hash_alg=SHA256(), deterministic=True)
-``` | <code class="docutils literal notranslate"><span class="pre">recipes</span></code> enforce RFC 6979; <code class="docutils literal notranslate"><span class="pre">core</span></code> exposes curve, hash, and deterministic flag. |</p>
 </section>
-<section id="kdf-examples">
-<h2>KDF examples<a class="headerlink" href="#kdf-examples" title="Link to this heading">¶</a></h2>
-<div class="table-wrapper colwidths-auto docutils container">
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>Algorithm</p></th>
-<th class="head"><p>pyca/cryptography</p></th>
-<th class="head"><p><code class="docutils literal notranslate"><span class="pre">suite.recipes</span></code></p></th>
-<th class="head"><p><code class="docutils literal notranslate"><span class="pre">suite.core</span></code></p></th>
-<th class="head"><p>Notes</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>PBKDF2</p></td>
-<td><p>```python</p></td>
-<td><p></p></td>
-<td><p></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p>from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC</p></td>
-<td><p></p></td>
-<td><p></p></td>
-<td><p></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p>from cryptography.hazmat.primitives import hashes</p></td>
-<td><p></p></td>
-<td><p></p></td>
-<td><p></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p>import os</p></td>
-<td><p></p></td>
-<td><p></p></td>
-<td><p></p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
+<section id="key-serialization">
+<h2>Key serialization<a class="headerlink" href="#key-serialization" title="Link to this heading">¶</a></h2>
+<p>Normal private-key helpers prefer encrypted PEM output. Plaintext private-key
+export is available only through an explicitly unsafe helper for controlled
+testing or one-time migration.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cryptography_suite.asymmetric</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_rsa_keypair</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cryptography_suite.utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">load_encrypted_private_pem</span><span class="p">,</span>
+    <span class="n">to_encrypted_private_pem</span><span class="p">,</span>
+    <span class="n">to_public_pem</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">private_key</span><span class="p">,</span> <span class="n">public_key</span> <span class="o">=</span> <span class="n">generate_rsa_keypair</span><span class="p">()</span>
+<span class="n">password</span> <span class="o">=</span> <span class="s2">&quot;use-a-secret-manager-for-this&quot;</span>
+<span class="n">private_pem</span> <span class="o">=</span> <span class="n">to_encrypted_private_pem</span><span class="p">(</span><span class="n">private_key</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+<span class="n">public_pem</span> <span class="o">=</span> <span class="n">to_public_pem</span><span class="p">(</span><span class="n">public_key</span><span class="p">)</span>
+<span class="n">loaded_private_key</span> <span class="o">=</span> <span class="n">load_encrypted_private_pem</span><span class="p">(</span><span class="n">private_pem</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+</pre></div>
 </div>
-<p>salt = os.urandom(16)
-kdf = PBKDF2HMAC(
-algorithm=hashes.SHA256(),
-length=32,
-salt=salt,
-iterations=390000,
-)
-key = kdf.derive(b”password”)
-<code class="docutils literal notranslate"><span class="pre">|</span></code>python
-from suite.recipes import pbkdf2</p>
-<p>key = pbkdf2(password=b”password”)
-<code class="docutils literal notranslate"><span class="pre">|</span></code>python
-from suite.core.kdf import PBKDF2, SHA256
-import os</p>
-<p>salt = os.urandom(16)
-kdf = PBKDF2(
-algorithm=SHA256(),
-length=32,
-salt=salt,
-iterations=390000,
-)
-key = kdf.derive(b”password”)
-<code class="docutils literal notranslate"><span class="pre">|</span> <span class="pre">`recipes`</span> <span class="pre">select</span> <span class="pre">iteration</span> <span class="pre">count</span> <span class="pre">and</span> <span class="pre">salt</span> <span class="pre">length;</span> <span class="pre">`core`</span> <span class="pre">mirrors</span> <span class="pre">pyca</span> <span class="pre">API.</span> <span class="pre">|</span> <span class="pre">|</span> <span class="pre">scrypt</span> <span class="pre">|</span></code>python
-from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
-import os</p>
-<p>salt = os.urandom(16)
-kdf = Scrypt(salt=salt, length=32, n=2**14, r=8, p=1)
-key = kdf.derive(b”password”)
-<code class="docutils literal notranslate"><span class="pre">|</span></code>python
-from suite.recipes import scrypt</p>
-<p>key = scrypt(password=b”password”)
-<code class="docutils literal notranslate"><span class="pre">|</span></code>python
-from suite.core.kdf import Scrypt
-import os</p>
-<p>salt = os.urandom(16)
-kdf = Scrypt(salt=salt, length=32, n=2**14, r=8, p=1)
-key = kdf.derive(b”password”)
-<code class="docutils literal notranslate"><span class="pre">|</span> <span class="pre">`recipes`</span> <span class="pre">fix</span> <span class="pre">N,</span> <span class="pre">r,</span> <span class="pre">p</span> <span class="pre">to</span> <span class="pre">recommended</span> <span class="pre">values;</span> <span class="pre">`core`</span> <span class="pre">exposes</span> <span class="pre">all</span> <span class="pre">parameters.</span> <span class="pre">|</span> <span class="pre">|</span> <span class="pre">Argon2id</span> <span class="pre">|</span></code>python
-from cryptography.hazmat.primitives.kdf.argon2 import Argon2id
-import os</p>
-<p>salt = os.urandom(16)
-kdf = Argon2id(time_cost=2, memory_cost=102400, parallelism=8, length=32, salt=salt)
-key = kdf.derive(b”password”)
-<code class="docutils literal notranslate"><span class="pre">|</span></code>python
-from suite.recipes import argon2id</p>
-<p>key = argon2id(password=b”password”)
-<code class="docutils literal notranslate"><span class="pre">|</span></code>python
-from suite.core.kdf import Argon2id
-import os</p>
-<p>salt = os.urandom(16)
-kdf = Argon2id(time_cost=2, memory_cost=102400, parallelism=8, length=32, salt=salt)
-key = kdf.derive(b”password”)
-``` | <code class="docutils literal notranslate"><span class="pre">recipes</span></code> hide tuning knobs; <code class="docutils literal notranslate"><span class="pre">core</span></code> exposes time, memory, and parallelism. |</p>
+</section>
+<section id="what-to-keep-in-pyca-cryptography">
+<h2>What to keep in pyca/cryptography<a class="headerlink" href="#what-to-keep-in-pyca-cryptography" title="Link to this heading">¶</a></h2>
+<p>Keep direct <code class="docutils literal notranslate"><span class="pre">pyca/cryptography</span></code> usage for production applications, bespoke
+protocol work, certificate and X.509 operations, and cases where you need the
+audited upstream API surface directly.</p>
 </section>
 </section>
 
@@ -582,12 +350,13 @@ key = kdf.derive(b”password”)
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Migration from pyca/cryptography</a><ul>
-<li><a class="reference internal" href="#symmetric-encryption">Symmetric encryption</a></li>
-<li><a class="reference internal" href="#rsa-oaep-encrypt-decrypt">RSA-OAEP encrypt/decrypt</a></li>
-<li><a class="reference internal" href="#ed25519-sign-verify">Ed25519 sign/verify</a></li>
-<li><a class="reference internal" href="#ecdsa-rfc-6979-sign-verify">ECDSA (RFC 6979) sign/verify</a></li>
-<li><a class="reference internal" href="#kdf-examples">KDF examples</a></li>
+<li><a class="reference internal" href="#">Interoperability Notes for pyca/cryptography Users</a><ul>
+<li><a class="reference internal" href="#aes-gcm-style-encryption">AES-GCM style encryption</a></li>
+<li><a class="reference internal" href="#file-encryption">File encryption</a></li>
+<li><a class="reference internal" href="#rsa-oaep-pipeline-example">RSA-OAEP pipeline example</a></li>
+<li><a class="reference internal" href="#ed25519-sign-verify-example">Ed25519 sign/verify example</a></li>
+<li><a class="reference internal" href="#key-serialization">Key serialization</a></li>
+<li><a class="reference internal" href="#what-to-keep-in-pyca-cryptography">What to keep in pyca/cryptography</a></li>
 </ul>
 </li>
 </ul>

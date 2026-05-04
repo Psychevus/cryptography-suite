@@ -232,69 +232,57 @@
 <!-- markdownlint-disable MD013 -->
 <section id="problem-statement">
 <h2>Problem Statement<a class="headerlink" href="#problem-statement" title="Link to this heading">¶</a></h2>
-<p>pyca/cryptography dominates Python cryptography but exposes sharp edges and uneven defaults.
-Projects need a suite that defaults to safe parameters, layers APIs for different skill levels,
-and still allows research explorations.</p>
+<p>Python developers need approachable cryptography examples that are explicit
+about risk. This project explores that space while it hardens docs, tests,
+secret handling, and experimental-module boundaries before a future v4 line.</p>
 </section>
 <section id="ux-principles">
 <h2>UX Principles<a class="headerlink" href="#ux-principles" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>Safe by default and explicit about risk.</p></li>
-<li><p>Small, predictable surface area.</p></li>
-<li><p>Errors fail closed with clear guidance.</p></li>
-<li><p>Documentation and warnings embedded in the API.</p></li>
+<li><p>Prefer conservative examples and make risky paths explicit.</p></li>
+<li><p>Keep the public surface small and predictable.</p></li>
+<li><p>Fail closed on invalid parameters where practical.</p></li>
+<li><p>Put warnings in both documentation and API boundaries.</p></li>
+<li><p>Avoid claims that are not backed by tests, review, or release evidence.</p></li>
 </ul>
 </section>
-<section id="api-layering-philosophy">
-<h2>API Layering Philosophy<a class="headerlink" href="#api-layering-philosophy" title="Link to this heading">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">suite.recipes</span></code> provides narrow, opinionated helpers for common tasks.
-<code class="docutils literal notranslate"><span class="pre">suite.core</span></code> exposes primitives with explicit parameters and documented trade-offs.
-<code class="docutils literal notranslate"><span class="pre">suite.experimental</span></code> isolates research features and demands explicit opt-in.</p>
+<section id="current-layering">
+<h2>Current Layering<a class="headerlink" href="#current-layering" title="Link to this heading">¶</a></h2>
+<p>The current package is organized around the real <code class="docutils literal notranslate"><span class="pre">cryptography_suite</span></code> namespace:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">cryptography_suite.symmetric</span></code>, <code class="docutils literal notranslate"><span class="pre">cryptography_suite.asymmetric</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">cryptography_suite.protocols</span></code> hold learning APIs for common primitives and
+protocols.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cryptography_suite.pipeline</span></code> composes selected helpers into workflow
+examples and lightweight model exports.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cryptography_suite.core</span></code> contains hardening utilities such as settings,
+structured logging, typed errors, and subprocess wrappers.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cryptography_suite.experimental</span></code> isolates opt-in research and demo modules.</p></li>
+</ul>
 </section>
 <section id="non-goals">
 <h2>Non-goals<a class="headerlink" href="#non-goals" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Re-implementing every historical algorithm.</p></li>
-<li><p>Guaranteeing stability for experimental modules.</p></li>
-<li><p>Acting as a drop-in replacement for arbitrary third‑party extensions.</p></li>
+<li><p>Acting as a drop-in replacement for <code class="docutils literal notranslate"><span class="pre">pyca/cryptography</span></code>.</p></li>
+<li><p>Promising stability for experimental modules.</p></li>
+<li><p>Presenting release metadata, tests, or model exports as a security audit.</p></li>
 </ul>
 </section>
 <section id="trust-model-v1">
 <h2>Trust Model v1<a class="headerlink" href="#trust-model-v1" title="Link to this heading">¶</a></h2>
-<p>Keys are handled as opaque objects with explicit lifecycle management.
-Randomness is drawn from the OS CSPRNG and only injectable for tests.
-KDFs surface parameters like iterations or memory cost but warn on weak settings.
-Padding and mode choices default to authenticated encryption.
-Configuration is limited to reduce foot-guns; unsafe options require deliberate flags.</p>
+<p>Keys are handled as opaque objects with explicit lifecycle guidance.
+Randomness is drawn from the OS CSPRNG and only injectable for tests. KDFs
+surface parameters and warn or fail on weak settings where checks exist.
+Authenticated encryption is preferred in examples. Unsafe options require
+deliberately named flags or helpers.</p>
 </section>
-<section id="compatibility-migration">
-<h2>Compatibility &amp; Migration<a class="headerlink" href="#compatibility-migration" title="Link to this heading">¶</a></h2>
-<div class="table-wrapper colwidths-auto docutils container">
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>pyca/cryptography use-case</p></th>
-<th class="head"><p>Planned suite API</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">AESGCM.encrypt</span></code> for AEAD</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">suite.recipes.aead.encrypt</span></code> or <code class="docutils literal notranslate"><span class="pre">suite.core.aead.AESGCM</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p>RSA signing via <code class="docutils literal notranslate"><span class="pre">hazmat.primitives.asymmetric.rsa</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">suite.recipes.sign</span></code> or <code class="docutils literal notranslate"><span class="pre">suite.core.signatures.RSA</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">PBKDF2HMAC</span></code> for password derivation</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">suite.recipes.kdf.derive</span></code> or <code class="docutils literal notranslate"><span class="pre">suite.core.kdf.pbkdf2</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p>Fernet token handling</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">suite.recipes.tokens.fernet</span></code></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<p>The suite will provide adapters and guides to migrate existing pyca/cryptography code.
-Common patterns such as AEAD encryption, RSA signatures, PBKDF2, and Fernet tokens map
-directly to the planned APIs above.</p>
+<section id="compatibility-notes">
+<h2>Compatibility Notes<a class="headerlink" href="#compatibility-notes" title="Link to this heading">¶</a></h2>
+<p>The suite should teach how common Python cryptography workflows fit together,
+while recommending mature audited libraries for production systems. Migration
+guides should describe current <code class="docutils literal notranslate"><span class="pre">cryptography_suite</span></code> examples honestly and avoid
+promising future APIs as if they already exist.</p>
 </section>
 </section>
 
@@ -338,10 +326,10 @@ directly to the planned APIs above.</p>
 <li><a class="reference internal" href="#">Vision v4.0.0</a><ul>
 <li><a class="reference internal" href="#problem-statement">Problem Statement</a></li>
 <li><a class="reference internal" href="#ux-principles">UX Principles</a></li>
-<li><a class="reference internal" href="#api-layering-philosophy">API Layering Philosophy</a></li>
+<li><a class="reference internal" href="#current-layering">Current Layering</a></li>
 <li><a class="reference internal" href="#non-goals">Non-goals</a></li>
 <li><a class="reference internal" href="#trust-model-v1">Trust Model v1</a></li>
-<li><a class="reference internal" href="#compatibility-migration">Compatibility &amp; Migration</a></li>
+<li><a class="reference internal" href="#compatibility-notes">Compatibility Notes</a></li>
 </ul>
 </li>
 </ul>

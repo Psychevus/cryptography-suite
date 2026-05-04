@@ -236,19 +236,23 @@
 <thead>
 <tr class="row-odd"><th class="head"><p>Module</p></th>
 <th class="head"><p>Stability</p></th>
-<th class="head"><p>Guarantee</p></th>
+<th class="head"><p>Compatibility expectation</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">suite.recipes</span></code></p></td>
-<td><p>Stable</p></td>
-<td><p>Backward-compatible within a major release. Breaking changes only with a new major version.</p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">cryptography_suite</span></code> public facade</p></td>
+<td><p>Learning API under hardening</p></td>
+<td><p>Backward compatibility is intended within a major release, but security-sensitive callers should review changes closely.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">suite.core</span></code></p></td>
-<td><p>Stable-with-deprecations</p></td>
-<td><p>Follows semver; features may be deprecated but remain functional for <strong>two minor releases</strong> before removal.</p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">cryptography_suite.symmetric</span></code>, <code class="docutils literal notranslate"><span class="pre">cryptography_suite.asymmetric</span></code>, <code class="docutils literal notranslate"><span class="pre">cryptography_suite.protocols</span></code>, <code class="docutils literal notranslate"><span class="pre">cryptography_suite.pipeline</span></code></p></td>
+<td><p>Core examples with deprecations</p></td>
+<td><p>Existing helpers generally follow SemVer; deprecations should remain functional for <strong>two minor releases</strong> before removal when practical.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">suite.experimental</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">cryptography_suite.core</span></code></p></td>
+<td><p>Internal hardening utilities</p></td>
+<td><p>Available to contributors, but not positioned as a standalone public cryptography API.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">cryptography_suite.experimental</span></code></p></td>
 <td><p>Unstable</p></td>
 <td><p>May change or be removed at any time without notice.</p></td>
 </tr>

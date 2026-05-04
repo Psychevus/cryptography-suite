@@ -258,16 +258,16 @@ cryptography-suite<span class="w"> </span>migrate-keys<span class="w"> </span>--
 </pre></div>
 </div>
 </section>
-<section id="security-guarantees">
-<h2>Security guarantees<a class="headerlink" href="#security-guarantees" title="Link to this heading">¶</a></h2>
+<section id="safety-notes">
+<h2>Safety notes<a class="headerlink" href="#safety-notes" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>Keys are never written to disk; all migrations operate on in-memory
-representations only.</p></li>
+<li><p>The legacy <code class="docutils literal notranslate"><span class="pre">migrate-keys</span></code> demo operates on in-memory representations and
+should be reviewed before adapting it to persistent backends.</p></li>
 <li><p>Every action is appended to <code class="docutils literal notranslate"><span class="pre">audit.log</span></code> using a SHA256 hash chain,
-signed with an Ed25519 key and chained by SHA256, providing
-tamper-evident auditability.</p></li>
+signed with an Ed25519 key and chained by SHA256, providing a
+tamper-evident local log format for the demo.</p></li>
 <li><p>Supported backends: <code class="docutils literal notranslate"><span class="pre">file</span></code>, <code class="docutils literal notranslate"><span class="pre">vault</span></code>, and <code class="docutils literal notranslate"><span class="pre">hsm</span></code>.  Classical and
-NIST post-quantum algorithms are supported for migration in both
+NIST post-quantum algorithm examples are supported for migration in both
 interactive and batch modes.</p></li>
 <li><p>Optional <code class="docutils literal notranslate"><span class="pre">--forensics-report</span></code> exports JSON evidence with a signed
 digest and public key for verification.  Log entries can also be
@@ -316,7 +316,7 @@ forwarded to syslog or a webhook for SIEM integration.</p></li>
 <li><a class="reference internal" href="#">migrate-keys command</a><ul>
 <li><a class="reference internal" href="#interactive-wizard">Interactive wizard</a></li>
 <li><a class="reference internal" href="#batch-mode">Batch mode</a></li>
-<li><a class="reference internal" href="#security-guarantees">Security guarantees</a></li>
+<li><a class="reference internal" href="#safety-notes">Safety notes</a></li>
 </ul>
 </li>
 </ul>

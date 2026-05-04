@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html">
 
     <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
-        <title>Recipes Cheat Sheet - cryptography-suite 3.0.0 documentation</title>
+        <title>Current API Cheat Sheet - cryptography-suite 3.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -227,60 +227,68 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="recipes-cheat-sheet">
-<h1>Recipes Cheat Sheet<a class="headerlink" href="#recipes-cheat-sheet" title="Link to this heading">¶</a></h1>
-<p>Copy-paste-ready snippets for common tasks using <code class="docutils literal notranslate"><span class="pre">suite.recipes</span></code>.</p>
+          <section id="current-api-cheat-sheet">
+<h1>Current API Cheat Sheet<a class="headerlink" href="#current-api-cheat-sheet" title="Link to this heading">¶</a></h1>
+<p>Copy-paste-ready snippets for the current <code class="docutils literal notranslate"><span class="pre">cryptography_suite</span></code> namespace. These
+examples are for learning and local experiments; review your own threat model
+before handling real secrets.</p>
 <section id="encrypt-and-decrypt-bytes">
 <h2>Encrypt and decrypt bytes<a class="headerlink" href="#encrypt-and-decrypt-bytes" title="Link to this heading">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">suite.recipes</span><span class="w"> </span><span class="kn">import</span> <span class="n">aesgcm_encrypt</span><span class="p">,</span> <span class="n">aesgcm_decrypt</span><span class="p">,</span> <span class="n">generate_aesgcm_key</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cryptography_suite.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">AESGCMDecrypt</span><span class="p">,</span> <span class="n">AESGCMEncrypt</span>
 
-<span class="n">key</span> <span class="o">=</span> <span class="n">generate_aesgcm_key</span><span class="p">()</span>
-<span class="n">nonce</span><span class="p">,</span> <span class="n">ct</span> <span class="o">=</span> <span class="n">aesgcm_encrypt</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;secret&quot;</span><span class="p">)</span>
-<span class="n">pt</span> <span class="o">=</span> <span class="n">aesgcm_decrypt</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">nonce</span><span class="p">,</span> <span class="n">ct</span><span class="p">)</span>
+<span class="n">password</span> <span class="o">=</span> <span class="s2">&quot;use-a-secret-manager-for-this&quot;</span>
+<span class="n">token</span> <span class="o">=</span> <span class="n">AESGCMEncrypt</span><span class="p">(</span><span class="n">password</span><span class="o">=</span><span class="n">password</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;secret&quot;</span><span class="p">)</span>
+<span class="n">plaintext</span> <span class="o">=</span> <span class="n">AESGCMDecrypt</span><span class="p">(</span><span class="n">password</span><span class="o">=</span><span class="n">password</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
 <section id="encrypt-and-decrypt-files">
 <h2>Encrypt and decrypt files<a class="headerlink" href="#encrypt-and-decrypt-files" title="Link to this heading">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">suite.recipes</span><span class="w"> </span><span class="kn">import</span> <span class="n">encrypt_file</span><span class="p">,</span> <span class="n">decrypt_file</span><span class="p">,</span> <span class="n">generate_aesgcm_key</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cryptography_suite.symmetric</span><span class="w"> </span><span class="kn">import</span> <span class="n">decrypt_file</span><span class="p">,</span> <span class="n">encrypt_file</span>
 
-<span class="n">key</span> <span class="o">=</span> <span class="n">generate_aesgcm_key</span><span class="p">()</span>
-<span class="n">encrypt_file</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;plain.txt&quot;</span><span class="p">),</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;cipher.bin&quot;</span><span class="p">))</span>
-<span class="n">decrypt_file</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;cipher.bin&quot;</span><span class="p">),</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;plain.txt&quot;</span><span class="p">))</span>
-</pre></div>
-</div>
-</section>
-<section id="password-based-encryption">
-<h2>Password-based encryption<a class="headerlink" href="#password-based-encryption" title="Link to this heading">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">suite.recipes</span><span class="w"> </span><span class="kn">import</span> <span class="n">password_encrypt</span><span class="p">,</span> <span class="n">password_decrypt</span>
-
-<span class="n">token</span> <span class="o">=</span> <span class="n">password_encrypt</span><span class="p">(</span><span class="s2">&quot;hunter2&quot;</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;secret&quot;</span><span class="p">)</span>
-<span class="n">plaintext</span> <span class="o">=</span> <span class="n">password_decrypt</span><span class="p">(</span><span class="s2">&quot;hunter2&quot;</span><span class="p">,</span> <span class="n">token</span><span class="p">)</span>
+<span class="n">password</span> <span class="o">=</span> <span class="s2">&quot;use-a-secret-manager-for-this&quot;</span>
+<span class="n">encrypt_file</span><span class="p">(</span><span class="s2">&quot;plain.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;cipher.bin&quot;</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+<span class="n">decrypt_file</span><span class="p">(</span><span class="s2">&quot;cipher.bin&quot;</span><span class="p">,</span> <span class="s2">&quot;plain.out&quot;</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
 <section id="sign-and-verify-messages">
 <h2>Sign and verify messages<a class="headerlink" href="#sign-and-verify-messages" title="Link to this heading">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">suite.recipes</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_ed25519_keypair</span><span class="p">,</span> <span class="n">sign_message</span><span class="p">,</span> <span class="n">verify_message</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cryptography_suite.asymmetric.signatures</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">generate_ed25519_keypair</span><span class="p">,</span>
+    <span class="n">sign_message</span><span class="p">,</span>
+    <span class="n">verify_signature</span><span class="p">,</span>
+<span class="p">)</span>
 
-<span class="n">sk</span><span class="p">,</span> <span class="n">pk</span> <span class="o">=</span> <span class="n">generate_ed25519_keypair</span><span class="p">()</span>
-<span class="n">sig</span> <span class="o">=</span> <span class="n">sign_message</span><span class="p">(</span><span class="n">sk</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
-<span class="n">verify_message</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
+<span class="n">private_key</span><span class="p">,</span> <span class="n">public_key</span> <span class="o">=</span> <span class="n">generate_ed25519_keypair</span><span class="p">()</span>
+<span class="n">signature</span> <span class="o">=</span> <span class="n">sign_message</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">private_key</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">verify_signature</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">signature</span><span class="p">,</span> <span class="n">public_key</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
-<section id="key-generation-and-serialization">
-<h2>Key generation and serialization<a class="headerlink" href="#key-generation-and-serialization" title="Link to this heading">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">suite.recipes</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">generate_ed25519_keypair</span><span class="p">,</span>
-    <span class="n">serialize_private_key</span><span class="p">,</span>
-    <span class="n">load_private_key</span><span class="p">,</span>
+<section id="key-generation-and-encrypted-serialization">
+<h2>Key generation and encrypted serialization<a class="headerlink" href="#key-generation-and-encrypted-serialization" title="Link to this heading">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cryptography_suite.asymmetric</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_rsa_keypair</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cryptography_suite.utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">load_encrypted_private_pem</span><span class="p">,</span>
+    <span class="n">to_encrypted_private_pem</span><span class="p">,</span>
+    <span class="n">to_public_pem</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="n">sk</span><span class="p">,</span> <span class="n">pk</span> <span class="o">=</span> <span class="n">generate_ed25519_keypair</span><span class="p">()</span>
-<span class="n">pem</span> <span class="o">=</span> <span class="n">serialize_private_key</span><span class="p">(</span><span class="n">sk</span><span class="p">)</span>
-<span class="n">sk2</span> <span class="o">=</span> <span class="n">load_private_key</span><span class="p">(</span><span class="n">pem</span><span class="p">)</span>
+<span class="n">private_key</span><span class="p">,</span> <span class="n">public_key</span> <span class="o">=</span> <span class="n">generate_rsa_keypair</span><span class="p">()</span>
+<span class="n">password</span> <span class="o">=</span> <span class="s2">&quot;use-a-secret-manager-for-this&quot;</span>
+<span class="n">private_pem</span> <span class="o">=</span> <span class="n">to_encrypted_private_pem</span><span class="p">(</span><span class="n">private_key</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+<span class="n">public_pem</span> <span class="o">=</span> <span class="n">to_public_pem</span><span class="p">(</span><span class="n">public_key</span><span class="p">)</span>
+<span class="n">loaded_private_key</span> <span class="o">=</span> <span class="n">load_encrypted_private_pem</span><span class="p">(</span><span class="n">private_pem</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="pipeline-composition">
+<h2>Pipeline composition<a class="headerlink" href="#pipeline-composition" title="Link to this heading">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cryptography_suite.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">AESGCMDecrypt</span><span class="p">,</span> <span class="n">AESGCMEncrypt</span><span class="p">,</span> <span class="n">Pipeline</span>
+
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">()</span> <span class="o">&gt;&gt;</span> <span class="n">AESGCMEncrypt</span><span class="p">(</span><span class="n">password</span><span class="o">=</span><span class="s2">&quot;pw&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">AESGCMDecrypt</span><span class="p">(</span><span class="n">password</span><span class="o">=</span><span class="s2">&quot;pw&quot;</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;secret&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;secret&quot;</span>
 </pre></div>
 </div>
 </section>
@@ -323,12 +331,12 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Recipes Cheat Sheet</a><ul>
+<li><a class="reference internal" href="#">Current API Cheat Sheet</a><ul>
 <li><a class="reference internal" href="#encrypt-and-decrypt-bytes">Encrypt and decrypt bytes</a></li>
 <li><a class="reference internal" href="#encrypt-and-decrypt-files">Encrypt and decrypt files</a></li>
-<li><a class="reference internal" href="#password-based-encryption">Password-based encryption</a></li>
 <li><a class="reference internal" href="#sign-and-verify-messages">Sign and verify messages</a></li>
-<li><a class="reference internal" href="#key-generation-and-serialization">Key generation and serialization</a></li>
+<li><a class="reference internal" href="#key-generation-and-encrypted-serialization">Key generation and encrypted serialization</a></li>
+<li><a class="reference internal" href="#pipeline-composition">Pipeline composition</a></li>
 </ul>
 </li>
 </ul>

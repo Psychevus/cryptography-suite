@@ -229,22 +229,24 @@
         <article role="main" id="furo-main-content">
           <section id="supply-chain-threat-model">
 <h1>Supply Chain Threat Model<a class="headerlink" href="#supply-chain-threat-model" title="Link to this heading">¶</a></h1>
-<p>This document outlines security measures for the build and release process.</p>
+<p>This document outlines planned and implemented build/release mitigations. It is
+not a supply-chain compliance claim.</p>
 <section id="mitigations">
 <h2>Mitigations<a class="headerlink" href="#mitigations" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>Deterministic builds using a fixed <code class="docutils literal notranslate"><span class="pre">SOURCE_DATE_EPOCH</span></code> ensure identical artifacts across environments.</p></li>
+<li><p>Deterministic build tooling uses a fixed <code class="docutils literal notranslate"><span class="pre">SOURCE_DATE_EPOCH</span></code> to reduce
+build-time variation across environments.</p></li>
 <li><p>GitHub Actions OIDC is used to obtain ephemeral signing credentials.</p></li>
 <li><p>Artifacts are signed with <code class="docutils literal notranslate"><span class="pre">cosign</span></code> and include provenance metadata.</p></li>
 <li><p>A CycloneDX SBOM lists all dependencies with exact versions.</p></li>
-<li><p>Reproducibility tests detect any build-time tampering.</p></li>
+<li><p>Reproducibility tests help detect unexpected build-time variation.</p></li>
 </ul>
 </section>
 <section id="attack-vectors">
 <h2>Attack Vectors<a class="headerlink" href="#attack-vectors" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><strong>Compromised CI runner</strong>: mitigated by minimal permissions and ephemeral credentials.</p></li>
-<li><p><strong>Dependency substitution</strong>: pinned hashes in requirements and SBOM verification.</p></li>
+<li><p><strong>Dependency substitution</strong>: version-pinned requirements and SBOM inspection.</p></li>
 <li><p><strong>Malicious release artifact</strong>: users can verify signatures and hashes before installation.</p></li>
 </ul>
 </section>

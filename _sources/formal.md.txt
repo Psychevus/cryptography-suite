@@ -1,10 +1,10 @@
-# Formal Verification Support
+# Formal Model Export
 
 Pipelines can be exported to simple ProVerif or Tamarin models using the
 `export` CLI command. The exported files are intentionally lightweight and only
 capture the order of pipeline steps and any secrets you choose to track.
-They are suitable for quick syntax checking but **do not** automatically encode
-complex protocol semantics.
+They are suitable for quick syntax checking and manual modeling starts, but
+**do not** automatically encode complex protocol semantics.
 
 Example:
 ```

@@ -1,57 +1,65 @@
-# Recipes Cheat Sheet
+# Current API Cheat Sheet
 
-Copy-paste-ready snippets for common tasks using `suite.recipes`.
+Copy-paste-ready snippets for the current `cryptography_suite` namespace. These
+examples are for learning and local experiments; review your own threat model
+before handling real secrets.
 
 ## Encrypt and decrypt bytes
 
 ```python
-from suite.recipes import aesgcm_encrypt, aesgcm_decrypt, generate_aesgcm_key
+from cryptography_suite.pipeline import AESGCMDecrypt, AESGCMEncrypt
 
-key = generate_aesgcm_key()
-nonce, ct = aesgcm_encrypt(key, b"secret")
-pt = aesgcm_decrypt(key, nonce, ct)
+password = "use-a-secret-manager-for-this"
+token = AESGCMEncrypt(password=password).run("secret")
+plaintext = AESGCMDecrypt(password=password).run(token)
 ```
 
 ## Encrypt and decrypt files
 
 ```python
-from pathlib import Path
-from suite.recipes import encrypt_file, decrypt_file, generate_aesgcm_key
+from cryptography_suite.symmetric import decrypt_file, encrypt_file
 
-key = generate_aesgcm_key()
-encrypt_file(key, Path("plain.txt"), Path("cipher.bin"))
-decrypt_file(key, Path("cipher.bin"), Path("plain.txt"))
-```
-
-## Password-based encryption
-
-```python
-from suite.recipes import password_encrypt, password_decrypt
-
-token = password_encrypt("hunter2", b"secret")
-plaintext = password_decrypt("hunter2", token)
+password = "use-a-secret-manager-for-this"
+encrypt_file("plain.txt", "cipher.bin", password)
+decrypt_file("cipher.bin", "plain.out", password)
 ```
 
 ## Sign and verify messages
 
 ```python
-from suite.recipes import generate_ed25519_keypair, sign_message, verify_message
-
-sk, pk = generate_ed25519_keypair()
-sig = sign_message(sk, b"data")
-verify_message(pk, sig, b"data")
-```
-
-## Key generation and serialization
-
-```python
-from suite.recipes import (
+from cryptography_suite.asymmetric.signatures import (
     generate_ed25519_keypair,
-    serialize_private_key,
-    load_private_key,
+    sign_message,
+    verify_signature,
 )
 
-sk, pk = generate_ed25519_keypair()
-pem = serialize_private_key(sk)
-sk2 = load_private_key(pem)
+private_key, public_key = generate_ed25519_keypair()
+signature = sign_message(b"data", private_key)
+assert verify_signature(b"data", signature, public_key)
+```
+
+## Key generation and encrypted serialization
+
+```python
+from cryptography_suite.asymmetric import generate_rsa_keypair
+from cryptography_suite.utils import (
+    load_encrypted_private_pem,
+    to_encrypted_private_pem,
+    to_public_pem,
+)
+
+private_key, public_key = generate_rsa_keypair()
+password = "use-a-secret-manager-for-this"
+private_pem = to_encrypted_private_pem(private_key, password)
+public_pem = to_public_pem(public_key)
+loaded_private_key = load_encrypted_private_pem(private_pem, password)
+```
+
+## Pipeline composition
+
+```python
+from cryptography_suite.pipeline import AESGCMDecrypt, AESGCMEncrypt, Pipeline
+
+pipeline = Pipeline() >> AESGCMEncrypt(password="pw") >> AESGCMDecrypt(password="pw")
+assert pipeline.run("secret") == "secret"
 ```

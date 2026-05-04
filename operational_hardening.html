@@ -253,7 +253,7 @@
 <td><p>CLI password values are read by prompt/stdin/fd/env/file sources, structured logs redact sensitive fields, and verbose/dry-run output never prints intermediate secrets.</p></td>
 </tr>
 <tr class="row-odd"><td><p>Transient network errors in AWS KMS workflows</p></td>
-<td><p>Flaky production behavior, partial outages</p></td>
+<td><p>Flaky service behavior, partial outages</p></td>
 <td><p>Retry-with-backoff wrapper with jitter and bounded retry budget around KMS API calls.</p></td>
 </tr>
 <tr class="row-even"><td><p>Poor observability during incidents</p></td>

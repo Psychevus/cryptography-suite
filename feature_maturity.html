@@ -172,7 +172,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -222,48 +222,194 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
           <section id="feature-maturity">
 <h1>Feature Maturity<a class="headerlink" href="#feature-maturity" title="Link to this heading">¶</a></h1>
-<p>This table summarizes the stability of major optional components. Items marked
-as <em>experimental</em> are <strong>not</strong> production-ready.</p>
+<p>This project is in pre-v4 hardening. The categories below describe how the
+current features should be treated by readers, contributors, and downstream
+experimenters. None of these categories is an independent security audit.</p>
+<section id="core-examples-learning-apis">
+<h2>Core Examples / Learning APIs<a class="headerlink" href="#core-examples-learning-apis" title="Link to this heading">¶</a></h2>
+<p>These APIs are useful for learning, tests, demos, and local experiments. They
+wrap common primitives and formats, but callers still need their own threat
+model and review before handling real secrets.</p>
 <div class="table-wrapper colwidths-auto docutils container">
 <table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Feature</p></th>
-<th class="head"><p>Module</p></th>
-<th class="head"><p>Maturity</p></th>
+<th class="head"><p>Examples</p></th>
 <th class="head"><p>Notes</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>Signal Protocol (X3DH + Double Ratchet)</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">cryptography_suite.experimental.signal</span></code></p></td>
-<td><p>Experimental</p></td>
-<td><p>Lacks multi-session support, message counters, and long-term key storage</p></td>
+<tr class="row-even"><td><p>Symmetric encryption helpers</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">cryptography_suite.symmetric</span></code>, pipeline AES-GCM modules</p></td>
+<td><p>Prefer authenticated modes; follow nonce and key-lifecycle guidance.</p></td>
 </tr>
-<tr class="row-odd"><td><p>Homomorphic Encryption (Pyfhel)</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">cryptography_suite.experimental.fhe</span></code></p></td>
-<td><p>Experimental</p></td>
-<td><p>Opt-in only; no pickle deserialization; context serialization requires Pyfhel native byte APIs</p></td>
+<tr class="row-odd"><td><p>Asymmetric examples</p></td>
+<td><p>RSA, ECIES/X25519, Ed25519, ECDSA</p></td>
+<td><p>Backed by upstream libraries where possible; still not independently audited as a suite.</p></td>
 </tr>
-<tr class="row-even"><td><p>Zero-Knowledge Proof Helpers</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">cryptography_suite.zk</span></code> via <code class="docutils literal notranslate"><span class="pre">cryptography_suite.experimental</span></code></p></td>
-<td><p>Experimental</p></td>
-<td><p>Requires optional deps; limited error handling</p></td>
+<tr class="row-even"><td><p>Hashing and KDF helpers</p></td>
+<td><p>SHA-2, SHA-3, BLAKE2b, BLAKE3, PBKDF2, Scrypt, Argon2id, HKDF</p></td>
+<td><p>Educational wrappers around common algorithms and dependency APIs.</p></td>
 </tr>
-<tr class="row-odd"><td><p>Core symmetric/asymmetric primitives</p></td>
-<td><p>core modules</p></td>
-<td><p>Stable</p></td>
-<td><p>Production-ready</p></td>
+<tr class="row-odd"><td><p>CLI examples</p></td>
+<td><p>file encryption, hashing, OTP, pipeline export</p></td>
+<td><p>Useful for local workflows; review secret input/output behavior before automation.</p></td>
+</tr>
+<tr class="row-even"><td><p>Pipeline DSL</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">cryptography_suite.pipeline</span></code></p></td>
+<td><p>Good for composing examples and regression tests; exported models are stubs.</p></td>
 </tr>
 </tbody>
 </table>
 </div>
+</section>
+<section id="hardened-but-still-not-audited">
+<h2>Hardened But Still Not Audited<a class="headerlink" href="#hardened-but-still-not-audited" title="Link to this heading">¶</a></h2>
+<p>These areas have received targeted hardening and regression tests. They remain
+unaudited and should not be treated as a blanket approval for production
+secrets.</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Area</p></th>
+<th class="head"><p>Current hardening</p></th>
+<th class="head"><p>Remaining caution</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>File decryption</p></td>
+<td><p>Writes plaintext to a temporary file and replaces the destination only after AES-GCM authentication succeeds.</p></td>
+<td><p>Confirm filesystem, backup, and incident-response behavior in your environment.</p></td>
+</tr>
+<tr class="row-odd"><td><p>CLI and verbose output</p></td>
+<td><p>Redacts secret-bearing fields and avoids printing passwords, derived keys, nonces, private keys, shared secrets, plaintext, or ciphertext internals.</p></td>
+<td><p>Treat shell history, environment variables, logs, and CI artifacts as separate risk surfaces.</p></td>
+</tr>
+<tr class="row-even"><td><p>Private-key serialization</p></td>
+<td><p>Normal helper paths prefer encrypted private-key PEMs; plaintext export is explicitly named unsafe.</p></td>
+<td><p>Use strong passwords or external key management for real deployments.</p></td>
+</tr>
+<tr class="row-odd"><td><p>LocalKeyStore</p></td>
+<td><p>Refuses plaintext private-key writes by default and preserves encrypted PEMs during migration.</p></td>
+<td><p>Development/testing backend unless wrapped with filesystem, backup, monitoring, and lifecycle controls.</p></td>
+</tr>
+<tr class="row-even"><td><p>FHE context loading</p></td>
+<td><p>Experimental FHE helpers reject pickle context deserialization.</p></td>
+<td><p>FHE remains experimental and opt-in.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ML-KEM envelope helpers</p></td>
+<td><p>Current ML-KEM APIs return sealed envelopes and keep KEM shared secrets internal.</p></td>
+<td><p>PQC support remains experimental and depends on optional third-party libraries.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="experimental-opt-in-demo-only">
+<h2>Experimental / Opt-In / Demo-Only<a class="headerlink" href="#experimental-opt-in-demo-only" title="Link to this heading">¶</a></h2>
+<p>These features are intentionally conservative opt-in demos or research helpers.
+They require independent review before high-assurance use.</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Feature</p></th>
+<th class="head"><p>Module or entry point</p></th>
+<th class="head"><p>Status</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>PQC and ML-KEM/Kyber compatibility</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">cryptography_suite.pqc</span></code>, pipeline ML-KEM/Kyber modules</p></td>
+<td><p>Experimental post-quantum learning demos.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Dilithium and SPHINCS+</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">cryptography_suite.pqc</span></code></p></td>
+<td><p>Experimental optional-dependency demos.</p></td>
+</tr>
+<tr class="row-even"><td><p>Homomorphic encryption</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">cryptography_suite.experimental.fhe</span></code></p></td>
+<td><p>Experimental, requires <code class="docutils literal notranslate"><span class="pre">CRYPTOSUITE_ALLOW_EXPERIMENTAL=1</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Zero-knowledge helpers</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">cryptography_suite.experimental.zk</span></code>, <code class="docutils literal notranslate"><span class="pre">cryptography_suite.zk</span></code></p></td>
+<td><p>Experimental optional-dependency demos.</p></td>
+</tr>
+<tr class="row-even"><td><p>Signal protocol demo</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">cryptography_suite.experimental.signal_demo</span></code></p></td>
+<td><p>Demonstration only; not a full Signal implementation.</p></td>
+</tr>
+<tr class="row-odd"><td><p>BLS helpers</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">cryptography_suite.asymmetric.bls</span></code></p></td>
+<td><p>Demo/legacy helper surface; treat as experimental unless independently reviewed.</p></td>
+</tr>
+<tr class="row-even"><td><p>Visualization widgets</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">cryptography_suite.viz</span></code></p></td>
+<td><p>Developer visualization aids, not security controls.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Code generation templates</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">cryptography_suite.codegen</span></code></p></td>
+<td><p>Scaffolding examples that require application review.</p></td>
+</tr>
+<tr class="row-even"><td><p>Fuzzing harnesses</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">cryptosuite-fuzz</span></code>, <code class="docutils literal notranslate"><span class="pre">fuzz/</span></code></p></td>
+<td><p>Testing tools, not proof of security.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Formal model export</p></td>
+<td><p>pipeline <code class="docutils literal notranslate"><span class="pre">to_proverif</span></code>/<code class="docutils literal notranslate"><span class="pre">to_tamarin</span></code>, CLI <code class="docutils literal notranslate"><span class="pre">export</span></code></p></td>
+<td><p>Lightweight stubs; no automatic proof claims.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="deprecated-legacy-compatibility">
+<h2>Deprecated / Legacy Compatibility<a class="headerlink" href="#deprecated-legacy-compatibility" title="Link to this heading">¶</a></h2>
+<p>These remain only for compatibility, tests, or migration. New examples should
+avoid them.</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Feature</p></th>
+<th class="head"><p>Status</p></th>
+<th class="head"><p>Replacement direction</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">salsa20_encrypt</span></code> / <code class="docutils literal notranslate"><span class="pre">salsa20_decrypt</span></code></p></td>
+<td><p>Deprecated legacy compatibility</p></td>
+<td><p>Use authenticated ciphers such as AES-GCM or ChaCha20-Poly1305 helpers.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Experimental Ascon helper</p></td>
+<td><p>Deprecated or experimental depending on entry point</p></td>
+<td><p>Prefer authenticated primitives backed by maintained dependencies.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">derive_pbkdf2</span></code> alias</p></td>
+<td><p>Deprecated</p></td>
+<td><p>Use <code class="docutils literal notranslate"><span class="pre">kdf_pbkdf2</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">generate_rsa_keypair_and_save</span></code> / <code class="docutils literal notranslate"><span class="pre">generate_ec_keypair_and_save</span></code> standalone helpers</p></td>
+<td><p>Deprecated</p></td>
+<td><p>Use <code class="docutils literal notranslate"><span class="pre">KeyManager</span></code> methods and encrypted private-key paths.</p></td>
+</tr>
+<tr class="row-even"><td><p>Ambiguous <code class="docutils literal notranslate"><span class="pre">from_pem</span></code> private-key loading</p></td>
+<td><p>Deprecated for private-key use</p></td>
+<td><p>Use <code class="docutils literal notranslate"><span class="pre">load_public_pem</span></code> or <code class="docutils literal notranslate"><span class="pre">load_encrypted_private_pem</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Kyber-named wrappers</p></td>
+<td><p>Compatibility wrappers for ML-KEM envelope APIs</p></td>
+<td><p>Prefer ML-KEM names for new examples.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
 </section>
 
         </article>
@@ -291,8 +437,30 @@ as <em>experimental</em> are <strong>not</strong> production-ready.</p>
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Feature Maturity</a><ul>
+<li><a class="reference internal" href="#core-examples-learning-apis">Core Examples / Learning APIs</a></li>
+<li><a class="reference internal" href="#hardened-but-still-not-audited">Hardened But Still Not Audited</a></li>
+<li><a class="reference internal" href="#experimental-opt-in-demo-only">Experimental / Opt-In / Demo-Only</a></li>
+<li><a class="reference internal" href="#deprecated-legacy-compatibility">Deprecated / Legacy Compatibility</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
