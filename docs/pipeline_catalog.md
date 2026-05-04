@@ -12,5 +12,7 @@ Quick reference of built-in modules for the `Pipeline` DSL.
 | ECIESX25519Decrypt | Decrypt ECIES X25519 ciphertext. |
 | HybridEncrypt | Encrypt using hybrid RSA/ECIES + AES-GCM. |
 | HybridDecrypt | Decrypt data produced by HybridEncrypt. |
-| KyberEncrypt | Encrypt data using Kyber and AES-GCM. |
-| KyberDecrypt | Decrypt data produced by KyberEncrypt. |
+| MLKEMEncrypt | Encrypt data as a sealed ML-KEM/AES-GCM envelope. |
+| MLKEMDecrypt | Decrypt data produced by MLKEMEncrypt. |
+| KyberEncrypt | Deprecated compatibility wrapper for MLKEMEncrypt. |
+| KyberDecrypt | Deprecated compatibility wrapper for MLKEMDecrypt. |

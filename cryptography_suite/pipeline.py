@@ -500,54 +500,87 @@ class HybridDecrypt(CryptoModule[Any, bytes]):
 
 @register_module
 @dataclass
-class KyberEncrypt(CryptoModule[bytes, tuple[str | bytes, str | bytes]]):
-    """Encrypt data using Kyber and AES-GCM."""
+class MLKEMEncrypt(CryptoModule[bytes, str | bytes]):
+    """Encrypt data as a sealed ML-KEM/AES-GCM envelope."""
 
     public_key: bytes
     level: int = 512
     raw_output: bool = False
 
-    def run(self, data: bytes) -> tuple[str | bytes, str | bytes]:
+    def run(self, data: bytes) -> str | bytes:
         import warnings
 
-        from .pqc import kyber_encrypt
+        from .pqc import ml_kem_encrypt
 
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=DeprecationWarning)
-            return kyber_encrypt(
+            return ml_kem_encrypt(
                 self.public_key, data, level=self.level, raw_output=self.raw_output
             )
 
     def to_proverif(self) -> str:  # pragma: no cover - simple serialization
-        return f"kyber_encrypt({self.level})"
+        return f"ml_kem_encrypt({self.level})"
 
     def to_tamarin(self) -> str:  # pragma: no cover - simple serialization
-        return f"kyber_encrypt({self.level})"
+        return f"ml_kem_encrypt({self.level})"
 
 
 @register_module
 @dataclass
-class KyberDecrypt(CryptoModule[tuple[str | bytes, str | bytes], bytes]):
-    """Decrypt data produced by :class:`KyberEncrypt`."""
+class MLKEMDecrypt(CryptoModule[str | bytes, bytes]):
+    """Decrypt data produced by :class:`MLKEMEncrypt`."""
 
     private_key: Any
     level: int = 512
 
-    def run(self, data: tuple[str | bytes, str | bytes]) -> bytes:
+    def run(self, data: str | bytes) -> bytes:
         import warnings
 
-        from .pqc import kyber_decrypt
+        from .pqc import ml_kem_decrypt
 
-        ct, ss = data
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=DeprecationWarning)
-            return kyber_decrypt(self.private_key, ct, ss, level=self.level)
+            return ml_kem_decrypt(self.private_key, data, level=self.level)
 
     def to_proverif(self) -> str:  # pragma: no cover - simple serialization
-        return f"kyber_decrypt({self.level})"
+        return f"ml_kem_decrypt({self.level})"
 
     def to_tamarin(self) -> str:  # pragma: no cover - simple serialization
-        return f"kyber_decrypt({self.level})"
+        return f"ml_kem_decrypt({self.level})"
+
+
+@register_module
+@dataclass
+class KyberEncrypt(MLKEMEncrypt):
+    """Deprecated compatibility wrapper for :class:`MLKEMEncrypt`."""
+
+    def run(self, data: bytes) -> str | bytes:
+        import warnings
+
+        warnings.warn(
+            "KyberEncrypt is deprecated; use MLKEMEncrypt. It returns only a "
+            "sealed ML-KEM envelope and never returns a KEM shared secret.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return super().run(data)
+
+
+@register_module
+@dataclass
+class KyberDecrypt(MLKEMDecrypt):
+    """Deprecated compatibility wrapper for :class:`MLKEMDecrypt`."""
+
+    def run(self, data: str | bytes) -> bytes:
+        import warnings
+
+        warnings.warn(
+            "KyberDecrypt is deprecated; use MLKEMDecrypt with a sealed "
+            "ML-KEM envelope.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return super().run(data)
 
 
 __all__ = [
@@ -564,6 +597,8 @@ __all__ = [
     "ECIESX25519Decrypt",
     "HybridEncrypt",
     "HybridDecrypt",
+    "MLKEMEncrypt",
+    "MLKEMDecrypt",
     "KyberEncrypt",
     "KyberDecrypt",
 ]

@@ -4,10 +4,14 @@ import cryptography_suite as cs
 
 
 def test_root_exports_available():
-    from cryptography_suite.pipeline import AESGCMEncrypt, RSAEncrypt
+    from cryptography_suite.pipeline import AESGCMEncrypt, MLKEMEncrypt, RSAEncrypt
+    from cryptography_suite.pqc import ml_kem_decrypt, ml_kem_encrypt
 
     assert callable(AESGCMEncrypt)
     assert callable(RSAEncrypt)
+    assert callable(MLKEMEncrypt)
+    assert callable(ml_kem_encrypt)
+    assert callable(ml_kem_decrypt)
     assert callable(cs.KeyVault)
     assert callable(cs.to_pem)
     assert callable(cs.to_public_pem)

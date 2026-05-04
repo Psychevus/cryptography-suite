@@ -376,7 +376,7 @@ def keygen_cli(argv: list[str] | None = None) -> None:
         else:
             generate_sphincs_keypair()
         _emit(
-            f"{args.scheme} key pair generated; key material was not printed.",
+            f"{args.scheme} private key material was generated but not printed.",
             {
                 "private_key_output": "suppressed",
                 "public_key_output": "suppressed",

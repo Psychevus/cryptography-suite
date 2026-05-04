@@ -54,7 +54,7 @@ ______________________________________________________________________
 ## 🔑 Key Features
 
 - **Comprehensive Functionality**: Symmetric and asymmetric encryption, digital signatures, key management, secret sharing, password-authenticated key exchange (PAKE), and one-time passwords (OTP).
-- **Post-Quantum Primitives**: Kyber KEM, Dilithium signatures, and **experimental SPHINCS+** support (enable via `pip install "cryptography-suite[pqc]"` – demo-only, not production-grade). These are available under `cryptography_suite.experimental`.
+- **Post-Quantum Primitives**: experimental ML-KEM/Kyber KEM, Dilithium signatures, and **experimental SPHINCS+** support (enable via `pip install "cryptography-suite[pqc]"` – demo-only, not production-grade). These are available under `cryptography_suite.experimental`.
 - **Signal Protocol Demo**: Minimal X3DH + Double Ratchet implementation located in `cryptography_suite.experimental.signal` (**experimental, not production-ready**).
 - **Homomorphic Encryption**: Pyfhel-based helpers exposed via `cryptography_suite.experimental` (**experimental, demo-only**).
 - **Zero-Knowledge Proof Helpers**: Bulletproof range proofs and zk-SNARK examples under `cryptography_suite.experimental` (**experimental**).
@@ -82,6 +82,8 @@ ______________________________________________________________________
 | KeyGraphWidget | cryptography_suite.viz.widgets | No | No | No | experimental | |
 | KyberDecrypt | cryptography_suite.pipeline | Yes | No | No | experimental | |
 | KyberEncrypt | cryptography_suite.pipeline | Yes | No | No | experimental | |
+| MLKEMDecrypt | cryptography_suite.pipeline | Yes | No | No | experimental | |
+| MLKEMEncrypt | cryptography_suite.pipeline | Yes | No | No | experimental | |
 | PQCRYPTO_AVAILABLE | | No | Yes | No | experimental | |
 | RSADecrypt | cryptography_suite.pipeline | Yes | No | No | stable | |
 | RSAEncrypt | cryptography_suite.pipeline | Yes | No | No | stable | |
@@ -110,10 +112,13 @@ ______________________________________________________________________
 | generate_dilithium_keypair | | No | Yes | No | experimental | |
 | generate_ed448_keypair | cryptography_suite.asymmetric.signatures | No | No | No | deprecated | |
 | generate_kyber_keypair | | No | Yes | No | experimental | |
+| generate_ml_kem_keypair | | No | Yes | No | experimental | |
 | generate_sphincs_keypair | | No | Yes | No | experimental | |
 | initialize_signal_session | cryptography_suite.experimental.signal | No | No | No | experimental | |
 | kyber_decrypt | | No | No | No | experimental | |
 | kyber_encrypt | | No | No | No | experimental | |
+| ml_kem_decrypt | | No | No | No | experimental | |
+| ml_kem_encrypt | | No | No | No | experimental | |
 | sign_message_ed448 | cryptography_suite.asymmetric.signatures | No | No | No | deprecated | |
 | sphincs_sign | | No | No | No | experimental | |
 | sphincs_verify | | No | No | No | experimental | |
@@ -200,7 +205,7 @@ print(p.to_proverif())    # formal model output
 
 ## ✨ Version 2.0.0 Highlights
 
-- **Post-Quantum Readiness**: Kyber KEM and Dilithium signature helpers.
+- **Post-Quantum Readiness**: experimental ML-KEM/Kyber KEM and Dilithium signature helpers.
 - **Hybrid Encryption**: Combine asymmetric encryption with AES-GCM.
 - **XChaCha20-Poly1305**: Modern stream cipher support when available.
 - **Key Management Enhancements**: `KeyVault` context manager and `KeyManager` utilities.
@@ -292,7 +297,7 @@ ______________________________________________________________________
 - **Key Management**: Secure generation, storage, loading, and rotation of cryptographic keys.
 - **Secret Sharing**: Implementation of Shamir's Secret Sharing scheme for splitting and reconstructing secrets.
 - **Hybrid Encryption**: Combine RSA/ECIES with AES-GCM for performance and security.
-- **Post-Quantum Cryptography**: Kyber key encapsulation and Dilithium signatures for quantum-safe workflows.
+- **Post-Quantum Cryptography**: experimental ML-KEM/Kyber key encapsulation and Dilithium signatures for quantum-safe demos.
 - **XChaCha20-Poly1305**: Modern stream cipher support when `cryptography` exposes `XChaCha20Poly1305`.
 - **Salsa20 and Ascon**: Deprecated and provided for reference only. **Not recommended for production**, removed from public imports, and scheduled for removal in v4.0.0. Use authenticated ciphers like `chacha20_encrypt`/`xchacha_encrypt` or `AESGCMEncrypt` instead.
 - **Audit Logging**: Decorators and helpers for encrypted audit trails.
@@ -624,22 +629,25 @@ print(zksnark.verify(hash_hex, proof_file))
 
 ### Post-Quantum Cryptography
 
-Leverage Kyber and Dilithium for quantum-resistant operations. See
-[`tests/test_pqc.py`](tests/test_pqc.py) for thorough unit tests.
+Explore experimental ML-KEM (formerly Kyber) and Dilithium helpers for
+quantum-resistant demos. These PQC helpers are not production audited. Safe
+ML-KEM encryption returns a sealed envelope; KEM shared secrets remain internal
+and are never returned by the safe APIs. See [`tests/test_pqc.py`](tests/test_pqc.py)
+for regression tests.
 
 ```python
 from cryptography_suite.pqc import (
-    generate_kyber_keypair,
-    kyber_encrypt,
-    kyber_decrypt,
+    generate_ml_kem_keypair,
+    ml_kem_encrypt,
+    ml_kem_decrypt,
     generate_dilithium_keypair,
     dilithium_sign,
     dilithium_verify,
 )
 
-ky_pub, ky_priv = generate_kyber_keypair()
-ct, ss = kyber_encrypt(ky_pub, b"hello pqc")
-assert kyber_decrypt(ky_priv, ct, ss) == b"hello pqc"
+ml_kem_pub, ml_kem_priv = generate_ml_kem_keypair()
+envelope = ml_kem_encrypt(ml_kem_pub, b"hello pqc")
+assert ml_kem_decrypt(ml_kem_priv, envelope) == b"hello pqc"
 
 dl_pub, dl_priv = generate_dilithium_keypair()
 sig = dilithium_sign(dl_priv, b"package")
@@ -835,7 +843,7 @@ ______________________________________________________________________
   CLI passwords. Environment variables are supported for automation but are less
   safe because they can be inherited or exposed by process tooling.
 - **Regular Updates**: Keep dependencies up to date to benefit from the latest security patches.
-- **Post-Quantum Algorithms**: Use Kyber and Dilithium for data requiring long-term secrecy, noting their larger key sizes.
+- **Post-Quantum Algorithms**: ML-KEM/Kyber and Dilithium helpers are experimental/demo-only and not production audited; note their larger key sizes.
 - **Hybrid Encryption**: Combine classical and PQC schemes during migration to mitigate potential weaknesses.
 
 ______________________________________________________________________
@@ -965,9 +973,11 @@ ______________________________________________________________________
   `raw_output=True`.
 - **Audit and Key Vault**: Use `audit_log` and `KeyVault` for logging and
   secure key handling.
-- **Kyber API Updates**: `kyber_encrypt` and `kyber_decrypt` accept a
-  `level` parameter (512/768/1024). `kyber_decrypt` now computes the shared
-  secret automatically when omitted.
+- **ML-KEM/Kyber API Updates**: `ml_kem_encrypt` returns a sealed envelope and
+  `ml_kem_decrypt` opens it without caller-visible KEM shared secrets. The old
+  `kyber_encrypt`/`kyber_decrypt` names are compatibility wrappers; this breaks
+  code that unpacked `(ciphertext, shared_secret)` or passed `shared_secret` to
+  decrypt.
 - **Key Management**: `KeyManager` now provides `generate_rsa_keypair_and_save`.
   The standalone `generate_rsa_keypair_and_save` helper is deprecated and will
   be removed in v4.0.0.

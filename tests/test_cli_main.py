@@ -47,9 +47,10 @@ def test_keygen_pqc_does_not_print_private_key(monkeypatch, capsys):
     cli.keygen_cli(["kyber"])
 
     captured = capsys.readouterr()
-    assert "key material was not printed" in captured.out
+    assert "private key material was generated but not printed" in captured.out
     assert "7075626c6963" not in captured.out
     assert "70726976617465" not in captured.out
+    assert "shared secret" not in captured.out.lower()
     assert captured.err == ""
 
 
