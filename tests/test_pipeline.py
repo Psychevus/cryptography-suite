@@ -1,9 +1,10 @@
 import json
 import unittest
-from typing import Protocol
+from typing import Any, Protocol, cast
 
 from cryptography_suite.pipeline import (
     AESGCMEncrypt,
+    CryptoModule,
     MLKEMDecrypt,
     MLKEMEncrypt,
     Pipeline,
@@ -18,20 +19,34 @@ class UpperCase:
     def run(self, data: bytes) -> bytes:
         return data.upper()
 
+    def to_proverif(self) -> str:
+        return "uppercase"
+
+    def to_tamarin(self) -> str:
+        return "uppercase"
+
 
 class Reverse:
     def run(self, data: bytes) -> bytes:
         return data[::-1]
 
+    def to_proverif(self) -> str:
+        return "reverse"
+
+    def to_tamarin(self) -> str:
+        return "reverse"
+
 
 class TestPipeline(unittest.TestCase):
     def test_sequential_pipeline(self):
-        p = Pipeline() >> UpperCase() >> Reverse()
+        p: Pipeline[Any, Any] = Pipeline()
+        p = p >> UpperCase() >> Reverse()
         result = p.run(b"abc")
         self.assertEqual(result, b"CBA")
 
     def test_describe(self):
-        p = Pipeline() >> UpperCase()
+        p: Pipeline[Any, Any] = Pipeline()
+        p = p >> UpperCase()
         desc = p.describe()
         self.assertEqual(desc[0]["module"], "UpperCase")
 
@@ -53,10 +68,10 @@ class TestPipeline(unittest.TestCase):
         public_key = b"MLKEM_PUBLIC_KEY_MARKER"
         private_key = b"MLKEM_PRIVATE_KEY_MARKER"
         shared_secret_like = "DUMMY_KEM_SHARED_SECRET_MARKER"
-        p = Pipeline(
+        p: Pipeline[Any, Any] = Pipeline(
             [
-                MLKEMEncrypt(public_key=public_key),
-                MLKEMDecrypt(private_key=private_key),
+                cast(CryptoModule[Any, Any], MLKEMEncrypt(public_key=public_key)),
+                cast(CryptoModule[Any, Any], MLKEMDecrypt(private_key=private_key)),
             ]
         )
 
