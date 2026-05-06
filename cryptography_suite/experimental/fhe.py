@@ -77,7 +77,8 @@ class PyfhelBackend(HEBackend):
     def __init__(self) -> None:
         if Pyfhel is None:  # pragma: no cover - dependency missing
             raise MissingDependencyError(
-                "Pyfhel is required for experimental homomorphic encryption features"
+                "Pyfhel is required for experimental homomorphic encryption "
+                "features. Install cryptography-suite[fhe] to use this feature."
             )
 
     _CKKS_DEFAULTS: dict[str, Any] = {

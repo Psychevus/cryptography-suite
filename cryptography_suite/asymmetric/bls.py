@@ -11,11 +11,28 @@ from __future__ import annotations
 import base64
 from collections.abc import Iterable, Sequence
 from os import urandom
+from typing import Any
 
-from py_ecc.bls import G2Basic
+try:  # pragma: no cover - optional dependency
+    from py_ecc.bls import G2Basic
+except Exception:  # pragma: no cover - dependency missing
+    G2Basic = None
 
-from ..errors import KeyDerivationError, SignatureVerificationError
+from ..errors import (
+    KeyDerivationError,
+    MissingDependencyError,
+    SignatureVerificationError,
+)
 from ..utils import KeyVault
+
+
+def _require_py_ecc() -> Any:
+    if G2Basic is None:
+        raise MissingDependencyError(
+            "BLS signatures require py_ecc. "
+            "Install cryptography-suite[bls] to use this feature."
+        )
+    return G2Basic
 
 
 def generate_bls_keypair(
@@ -42,9 +59,10 @@ def generate_bls_keypair(
     if seed is not None and len(seed) == 0:
         raise KeyDerivationError("Seed cannot be empty.")
 
+    g2_basic = _require_py_ecc()
     ikm = seed if seed is not None else urandom(32)
-    sk = G2Basic.KeyGen(ikm)
-    pk = G2Basic.SkToPk(sk)
+    sk = g2_basic.KeyGen(ikm)
+    pk = g2_basic.SkToPk(sk)
     if sensitive:
         sk_bytes = sk.to_bytes(32, "big")
         return KeyVault(sk_bytes), pk
@@ -80,7 +98,7 @@ def bls_sign(
         private_key = int.from_bytes(private_key, "big")
     if not isinstance(private_key, int):
         raise TypeError("Private key must be an int or bytes.")
-    sig = G2Basic.Sign(private_key, message)
+    sig = _require_py_ecc().Sign(private_key, message)
     if raw_output:
         return sig
     return base64.b64encode(sig).decode()
@@ -114,11 +132,11 @@ def bls_verify(message: bytes, signature: bytes | str, public_key: bytes) -> boo
             signature = base64.b64decode(signature)
         except Exception:
             return False
-    return G2Basic.Verify(public_key, message, signature)
+    return _require_py_ecc().Verify(public_key, message, signature)
 
 
 def bls_aggregate(
-    signatures: Iterable[bytes], *, raw_output: bool = False
+    signatures: Iterable[bytes | str], *, raw_output: bool = False
 ) -> str | bytes:
     """Aggregate multiple BLS signatures into one.
 
@@ -142,7 +160,7 @@ def bls_aggregate(
         sig_list.append(sig)
     if not sig_list:
         raise SignatureVerificationError("No signatures provided for aggregation.")
-    agg = G2Basic.Aggregate(sig_list)
+    agg = _require_py_ecc().Aggregate(sig_list)
     if raw_output:
         return agg
     return base64.b64encode(agg).decode()
@@ -182,4 +200,6 @@ def bls_aggregate_verify(
             signature = base64.b64decode(signature)
         except Exception:
             return False
-    return G2Basic.AggregateVerify(list(public_keys), list(messages), signature)
+    return _require_py_ecc().AggregateVerify(
+        list(public_keys), list(messages), signature
+    )

@@ -2,6 +2,10 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 
+from ..errors import MissingDependencyError
+
+_VIZ_IMPORT_ERROR: Exception | None = None
+
 try:
     import networkx as nx
     from IPython.display import display
@@ -9,8 +13,9 @@ try:
     from networkx.readwrite import json_graph
 
     _HAS_VIZ_DEPS = True
-except Exception:  # pragma: no cover - optional visualization dependencies
+except Exception as exc:  # pragma: no cover - optional dependency
     _HAS_VIZ_DEPS = False
+    _VIZ_IMPORT_ERROR = exc
 
     class HTML:  # type: ignore[no-redef]
         def __init__(self, value: str = "") -> None:
@@ -60,10 +65,19 @@ except Exception:  # pragma: no cover - optional visualization dependencies
         return None
 
 
+def _require_viz_deps() -> None:
+    if not _HAS_VIZ_DEPS:
+        raise MissingDependencyError(
+            "Visualization widgets require ipywidgets and networkx. "
+            "Install cryptography-suite[viz] to use this feature."
+        ) from _VIZ_IMPORT_ERROR
+
+
 class HandshakeFlowWidget(VBox):
     """Animated visualization of a handshake protocol."""
 
     def __init__(self, steps: Iterable[str]):
+        _require_viz_deps()
         self._steps = list(steps)
         self._index = 0
         self.output = HTML()
@@ -84,6 +98,7 @@ class KeyGraphWidget(VBox):
     """Display key relationships as a graph."""
 
     def __init__(self, edges: Iterable[tuple[str, str]] = ()):  # simple graph
+        _require_viz_deps()
         super().__init__()
         self._edges = list(edges)
         self.output = Output()
@@ -112,6 +127,7 @@ class SessionTimelineWidget(VBox):
     """Visualize message and key events over time."""
 
     def __init__(self, events: Iterable[str] = ()):  # simple timeline
+        _require_viz_deps()
         self._events = list(events)
         self.output = HTML("<br>".join(self._events))
         super().__init__([self.output])

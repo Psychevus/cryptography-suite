@@ -2,11 +2,23 @@ import hashlib
 import importlib
 import io
 from types import ModuleType
+from typing import Any
 
 import pytest
-from blake3 import blake3
 
 import cryptography_suite.cli as cli
+
+blake3: Any = None
+try:
+    blake3 = importlib.import_module("blake3").blake3
+except Exception:  # pragma: no cover - optional dependency missing
+    pass
+
+BLAKE3_AVAILABLE = blake3 is not None
+requires_blake3 = pytest.mark.skipif(
+    not BLAKE3_AVAILABLE,
+    reason="blake3 not installed; install cryptography-suite[hashing-extra]",
+)
 
 
 def reload_cli() -> ModuleType:
@@ -54,6 +66,7 @@ def test_keygen_pqc_does_not_print_private_key(monkeypatch, capsys):
     assert captured.err == ""
 
 
+@requires_blake3
 def test_main_hash(tmp_path, capsys):
     cli = reload_cli()
     file = tmp_path / "f.txt"
@@ -69,7 +82,11 @@ def test_main_hash(tmp_path, capsys):
         ("sha3-256", lambda payload: hashlib.sha3_256(payload).hexdigest()),
         ("sha3-512", lambda payload: hashlib.sha3_512(payload).hexdigest()),
         ("blake2b", lambda payload: hashlib.blake2b(payload).hexdigest()),
-        ("blake3", lambda payload: blake3(payload).hexdigest()),
+        pytest.param(
+            "blake3",
+            lambda payload: blake3(payload).hexdigest(),
+            marks=requires_blake3,
+        ),
     ],
 )
 def test_main_hash_binary_input(tmp_path, capsys, algorithm, expected):
@@ -91,6 +108,7 @@ def test_main_otp(monkeypatch, capsys):
     assert capsys.readouterr().out.strip() == "123"
 
 
+@requires_blake3
 def test_main_hash_json_output(tmp_path, capsys):
     cli = reload_cli()
     file = tmp_path / "f.txt"
@@ -101,6 +119,7 @@ def test_main_hash_json_output(tmp_path, capsys):
     assert '"digest"' in out
 
 
+@requires_blake3
 def test_main_json_alias_deprecation(tmp_path, capsys):
     cli = reload_cli()
     file = tmp_path / "f.txt"
