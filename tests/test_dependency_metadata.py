@@ -21,6 +21,11 @@ DISALLOWED_DEFAULTS = {
     "ipywidgets",
     "networkx",
     "jinja2",
+    "requests",
+    "boto3",
+    "python-pkcs11",
+    "pkcs11",
+    "pyyaml",
     "rich",
     "pytest",
     "hypothesis",
@@ -40,9 +45,31 @@ EXPECTED_EXTRAS = {
     "hashing-extra",
     "hsm",
     "kms",
+    "network",
     "pake",
     "pqc",
     "viz",
+    "aws",
+    "legacy",
+    "zk",
+}
+OPTIONAL_DISTRIBUTION_NAMES = {
+    "aiofiles",
+    "blake3",
+    "boto3",
+    "jinja2",
+    "networkx",
+    "pkcs11",
+    "pqcrypto",
+    "py-ecc",
+    "pybulletproofs",
+    "pyfhel",
+    "pyyaml",
+    "pysnark",
+    "python-pkcs11",
+    "requests",
+    "rich",
+    "spake2",
 }
 OPTIONAL_IMPORT_ROOTS = [
     "blake3",
@@ -91,12 +118,42 @@ def test_requirements_txt_matches_minimal_runtime_dependencies() -> None:
     assert not requirements & DISALLOWED_DEFAULTS
 
 
+def test_optional_dependency_names_are_not_base_dependencies() -> None:
+    project = cast(dict[str, Any], _pyproject()["project"])
+    base_dependencies = {
+        _requirement_name(req) for req in project.get("dependencies", [])
+    }
+    optional_dependencies = cast(dict[str, list[str]], project["optional-dependencies"])
+    extras_dependencies = {
+        _requirement_name(req)
+        for dependencies in optional_dependencies.values()
+        for req in dependencies
+    }
+
+    assert not base_dependencies & OPTIONAL_DISTRIBUTION_NAMES
+    assert extras_dependencies & OPTIONAL_DISTRIBUTION_NAMES
+
+
 def test_expected_optional_extras_exist() -> None:
     project = cast(dict[str, Any], _pyproject()["project"])
     optional_dependencies = cast(dict[str, list[str]], project["optional-dependencies"])
     extras = set(optional_dependencies)
 
     assert EXPECTED_EXTRAS <= extras
+
+
+def test_requests_is_not_part_of_local_cli_extra() -> None:
+    project = cast(dict[str, Any], _pyproject()["project"])
+    optional_dependencies = cast(dict[str, list[str]], project["optional-dependencies"])
+    cli_dependencies = {
+        _requirement_name(req) for req in optional_dependencies.get("cli", [])
+    }
+    network_dependencies = {
+        _requirement_name(req) for req in optional_dependencies.get("network", [])
+    }
+
+    assert "requests" not in cli_dependencies
+    assert "requests" in network_dependencies
 
 
 def test_package_discovery_does_not_include_tools() -> None:

@@ -254,7 +254,7 @@ pip install "cryptography-suite[hashing-extra]"
 pip install "cryptography-suite[pqc]"
 pip install "cryptography-suite[fhe]"
 pip install "cryptography-suite[bls,pake,viz,codegen]"
-pip install "cryptography-suite[kms,hsm,async]"
+pip install "cryptography-suite[kms,hsm,network,async]"
 pip install "cryptography-suite[dev]"
 ```
 

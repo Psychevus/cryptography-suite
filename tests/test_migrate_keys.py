@@ -17,6 +17,7 @@ MODULE_PATH = (
 spec = importlib.util.spec_from_file_location(
     "cryptography_suite.cli.migrate_keys", MODULE_PATH
 )
+assert spec is not None
 migrate_keys = importlib.util.module_from_spec(spec)
 sys.modules[spec.name] = migrate_keys
 assert spec.loader is not None
@@ -65,7 +66,7 @@ def test_wizard_interactive(tmp_path, monkeypatch, capsys):
         "migrate",
         "migrate",
     ]
-    kyber_line = next(l for l in lines if "kyber" in l)
+    kyber_line = next(line for line in lines if "kyber" in line)
     assert "Kyber/3:file->vault" in kyber_line
     assert {p.name for p in tmp_path.iterdir()} == {"audit.log"}
 
@@ -154,14 +155,10 @@ def test_webhook_integration(tmp_path, monkeypatch):
     log = tmp_path / "audit.log"
     calls: list[dict] = []
 
-    class DummyResp:
-        status_code = 200
+    def fake_post_webhook(url, payload):
+        calls.append(payload)
 
-    def fake_post(url, json, timeout=5):
-        calls.append(json)
-        return DummyResp()
-
-    monkeypatch.setattr(migrate_keys.requests, "post", fake_post)
+    monkeypatch.setattr(migrate_keys, "_post_webhook", fake_post_webhook)
     logger = AuditLogger(log, webhook="https://example")
     migrate_batch(src, dst, logger, dry_run=True)
     assert len(calls) == 5

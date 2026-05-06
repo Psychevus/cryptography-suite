@@ -1101,10 +1101,10 @@ def main(argv: list[str] | None = None) -> None:
         try:
             spec.loader.exec_module(module)
         except ModuleNotFoundError as exc:
-            if exc.name in {"requests", "rich"}:
+            if exc.name == "rich":
                 _handle_missing_dependency_and_exit(
                     MissingDependencyError(
-                        "Key migration CLI support requires rich and requests. "
+                        "Key migration CLI support requires rich. "
                         "Install cryptography-suite[cli] to use this feature."
                     )
                 )

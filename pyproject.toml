@@ -51,7 +51,7 @@ dependencies = [
 "gcm-sst" = "cryptography_suite.aead_plugins:aes_gcm_sst_encrypt"
 
 [project.optional-dependencies]
-cli = ["PyYAML", "rich", "requests"]
+cli = ["PyYAML", "rich"]
 hashing-extra = ["blake3"]
 bls = ["py_ecc"]
 pake = ["spake2"]
@@ -59,6 +59,7 @@ pqc = ["pqcrypto"]
 fhe = ["Pyfhel"]
 zk = ["pybulletproofs", "PySNARK"]
 codegen = ["Jinja2", "PyYAML"]
+network = ["requests"]
 dev = [
     "pytest",
     "pytest-cov",
