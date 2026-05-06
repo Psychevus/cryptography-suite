@@ -55,8 +55,9 @@ jobs:
       - name: pip-audit
         run: python3 -m pip_audit --ignore-vuln CVE-2026-3219
       - name: Install Trivy
-        run: |
-          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+        uses: aquasecurity/setup-trivy@e07451d2e059ed86c2870430ea286b3a9e0bf241
+        with:
+          version: v0.68.2
       - name: Trivy fs scan
         run: trivy fs --severity HIGH,CRITICAL --exit-code 1 .
       - name: Upload wheels

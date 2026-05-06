@@ -164,7 +164,7 @@ def test_package_discovery_does_not_include_tools() -> None:
     package_find = cast(dict[str, list[str]], packages["find"])
     includes = package_find["include"]
 
-    assert "tools*" not in includes
+    assert all(not include.startswith("tools") for include in includes)
     assert "cryptography_suite*" in includes
 
 
