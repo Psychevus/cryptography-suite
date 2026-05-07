@@ -1,12 +1,21 @@
 import unittest
+from importlib.util import find_spec
+
+import pytest
+
 from cryptography_suite.asymmetric.bls import (
-    generate_bls_keypair,
-    bls_sign,
-    bls_verify,
     bls_aggregate,
     bls_aggregate_verify,
+    bls_sign,
+    bls_verify,
+    generate_bls_keypair,
 )
 from cryptography_suite.errors import CryptographySuiteError
+
+pytestmark = pytest.mark.skipif(
+    find_spec("py_ecc") is None,
+    reason="py_ecc not installed; install cryptography-suite[bls]",
+)
 
 
 class TestBLS(unittest.TestCase):
@@ -29,7 +38,7 @@ class TestBLS(unittest.TestCase):
         sk, _ = generate_bls_keypair()
         sig = bls_sign(self.message1, sk)
         with self.assertRaises(TypeError):
-            bls_verify(self.message1, sig, "not_bytes")
+            bls_verify(self.message1, sig, "not_bytes")  # type: ignore[arg-type]
 
     def test_aggregate_and_verify(self):
         sk1, pk1 = generate_bls_keypair()
@@ -51,15 +60,12 @@ class TestBLS(unittest.TestCase):
     def test_known_vector(self):
         """Verify implementation against a deterministic test vector."""
         seed = b"\x11" * 32
-        expected_sk = 23657700540186605117143072292512185602964840914375503215744843051745997498405
+        expected_sk = int(
+            "23657700540186605117143072292512185602964840914375503215744843051745997498405"
+        )
         expected_pk = bytes.fromhex(
             "8e5a712e4cb2c51893c27ae19afb3455f3efcc66030dc25e13eb1afc2edf3973"
             "17a0bb2d28a55513a32d7dcc404be3ba"
-        )
-        expected_sig = bytes.fromhex(
-            "a008c7df216b75c7497dbde10d2188fb6b943f999b654df82a064c10723b9249"
-            "93d9d4933c4670e7e2e536ddc87b9a7a0e0f8ecf5faedbeda5ee2ea7bee4065f"
-            "4aefed8f4d665569ec636b04f36ff6fd853f66283d413843761acbda652fd43d"
         )
 
         sk, pk = generate_bls_keypair(seed, sensitive=False)

@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 from ..audit import audit_log
 from ..core.logging import get_structured_logger
 from ..core.operations import RetryPolicy, retry_with_backoff
+from ..errors import MissingDependencyError
 from . import register_keystore
 from .base import KeyStoreCapability
 
@@ -57,7 +58,10 @@ class AWSKMSKeyStore:
         try:
             boto3_mod = import_module("boto3")
         except Exception as exc:
-            raise RuntimeError("boto3 is required for AWSKMSKeyStore") from exc
+            raise MissingDependencyError(
+                "AWS KMS keystore support requires boto3. "
+                "Install cryptography-suite[kms] to use this feature."
+            ) from exc
         self.client = boto3_mod.client("kms", region_name=region_name)
         self._logger_name = "cryptography_suite.keystores.aws_kms"
         self._retry = RetryPolicy(

@@ -1,10 +1,16 @@
 import unittest
+from importlib.util import find_spec
 
-from cryptography_suite.errors import CryptographySuiteError
-
+import pytest
 from cryptography.exceptions import InvalidKey
 
+from cryptography_suite.errors import CryptographySuiteError
 from cryptography_suite.protocols import SPAKE2Client, SPAKE2Server
+
+pytestmark = pytest.mark.skipif(
+    find_spec("spake2") is None,
+    reason="spake2 not installed; install cryptography-suite[pake]",
+)
 
 
 class TestPAKE(unittest.TestCase):
@@ -57,9 +63,9 @@ class TestPAKE(unittest.TestCase):
         client.generate_message()
         with self.assertRaises(CryptographySuiteError) as context:
             client.get_shared_key()
-        self.assertEqual(str(context.exception), "Shared key has not been computed yet.")
-
-
+        self.assertEqual(
+            str(context.exception), "Shared key has not been computed yet."
+        )
 
     def test_spake2_get_shared_key_after_computation(self):
         client = SPAKE2Client(self.password)

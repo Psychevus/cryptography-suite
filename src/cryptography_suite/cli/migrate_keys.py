@@ -13,18 +13,29 @@ import datetime as dt
 import hashlib
 import json
 import logging
+from collections.abc import Iterable
 from dataclasses import dataclass
 from logging.handlers import SysLogHandler
 from pathlib import Path
-from typing import Dict, Iterable, Optional
 
-import requests
-
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import ec, ed25519, rsa
 from rich.console import Console
 from rich.prompt import Prompt
 from rich.table import Table
-from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric import ec, ed25519, rsa
+
+from cryptography_suite.errors import MissingDependencyError
+
+
+def _post_webhook(url: str, payload: dict[str, str]) -> None:
+    try:
+        import requests  # type: ignore[import-untyped]
+    except Exception as exc:  # pragma: no cover - optional dependency missing
+        raise MissingDependencyError(
+            "Webhook audit export requires requests. "
+            "Install cryptography-suite[network] to use this feature."
+        ) from exc
+    requests.post(url, json=payload, timeout=5)
 
 
 class PQPublicKey:
@@ -86,7 +97,7 @@ class KeyInfo:
 
     @property
     def fingerprint(self) -> str:
-        pub = self.key_obj.public_key().public_bytes(
+        pub = self.key_obj.public_key().public_bytes(  # type: ignore[attr-defined]
             serialization.Encoding.DER,
             serialization.PublicFormat.SubjectPublicKeyInfo,
         )
@@ -95,12 +106,11 @@ class KeyInfo:
     @property
     def insecure(self) -> bool:
         return (
-            isinstance(self.key_obj, rsa.RSAPrivateKey)
-            and self.key_obj.key_size < 2048
+            isinstance(self.key_obj, rsa.RSAPrivateKey) and self.key_obj.key_size < 2048
         )
 
     @property
-    def pq_mode(self) -> Optional[str]:
+    def pq_mode(self) -> str | None:
         if isinstance(self.key_obj, PQPrivateKey):
             return self.key_obj.mode
         return None
@@ -109,13 +119,13 @@ class KeyInfo:
 class InMemoryBackend:
     """Simple in-memory backend for demonstration."""
 
-    def __init__(self, name: str, keys: Optional[Dict[str, object]] = None) -> None:
+    def __init__(self, name: str, keys: dict[str, object] | None = None) -> None:
         self.name = name
-        self._keys: Dict[str, object] = keys or {}
+        self._keys: dict[str, object] = keys or {}
 
     @classmethod
-    def with_sample_keys(cls, name: str) -> "InMemoryBackend":
-        keys: Dict[str, object] = {
+    def with_sample_keys(cls, name: str) -> InMemoryBackend:
+        keys: dict[str, object] = {
             "rsa": rsa.generate_private_key(public_exponent=65537, key_size=2048),
             "ecc": ec.generate_private_key(ec.SECP256R1()),
             "ed": ed25519.Ed25519PrivateKey.generate(),
@@ -132,7 +142,7 @@ class InMemoryBackend:
         self._keys[info.identifier] = info.key_obj
 
 
-BACKENDS: Dict[str, InMemoryBackend] = {
+BACKENDS: dict[str, InMemoryBackend] = {
     "file": InMemoryBackend.with_sample_keys("file"),
     "vault": InMemoryBackend.with_sample_keys("vault"),
     "hsm": InMemoryBackend.with_sample_keys("hsm"),
@@ -147,7 +157,7 @@ class AuditLogger:
         path: Path,
         *,
         syslog: bool = False,
-        webhook: Optional[str] = None,
+        webhook: str | None = None,
     ) -> None:
         self.path = path
         self.webhook = webhook
@@ -157,7 +167,7 @@ class AuditLogger:
             encoding=serialization.Encoding.Raw,
             format=serialization.PublicFormat.Raw,
         )
-        self._syslog_logger: Optional[logging.Logger] = None
+        self._syslog_logger: logging.Logger | None = None
         if syslog:
             logger = logging.getLogger("migrate_keys.siem")
             handler = SysLogHandler(address=("localhost", 514))
@@ -192,11 +202,12 @@ class AuditLogger:
                 pass
         if self.webhook:
             try:
-                requests.post(
+                _post_webhook(
                     self.webhook,
-                    json={"entry": entry, "digest": digest, "signature": sig_b64},
-                    timeout=5,
+                    {"entry": entry, "digest": digest, "signature": sig_b64},
                 )
+            except MissingDependencyError:
+                raise
             except Exception:  # pragma: no cover - network best effort
                 pass
 
@@ -259,11 +270,13 @@ def migrate_wizard(
         if info.insecure:
             console.print("[red]Warning: RSA key <2048 bits[/red]")
         if info.pq_mode in {"hybrid", "legacy"}:
-            console.print(
-                f"[yellow]Warning: PQ key in {info.pq_mode} mode[/yellow]"
+            console.print(f"[yellow]Warning: PQ key in {info.pq_mode} mode[/yellow]")
+        choice = (
+            "y"
+            if migrate_all
+            else Prompt.ask(
+                "Migrate this key?", choices=["y", "n", "all", "skip"], default="n"
             )
-        choice = "y" if migrate_all else Prompt.ask(
-            "Migrate this key?", choices=["y", "n", "all", "skip"], default="n"
         )
         if choice in {"y", "all"}:
             action = "dry-run" if dry_run else "migrate"
@@ -345,7 +358,7 @@ def migrate_batch(
     console.print(table)
 
 
-def wizard_cli(argv: Optional[list[str]] = None) -> None:
+def wizard_cli(argv: list[str] | None = None) -> None:
     """CLI wrapper for key migration modes."""
 
     parser = argparse.ArgumentParser(description="Migrate keys between backends")
@@ -371,16 +384,12 @@ def wizard_cli(argv: Optional[list[str]] = None) -> None:
     parser.add_argument(
         "--syslog", action="store_true", help="Mirror audit log to syslog"
     )
-    parser.add_argument(
-        "--webhook", help="POST audit entries to a webhook URL"
-    )
+    parser.add_argument("--webhook", help="POST audit entries to a webhook URL")
     args = parser.parse_args(argv)
 
     source = BACKENDS[args.src]
     target = BACKENDS[args.dst]
-    logger = AuditLogger(
-        Path("audit.log"), syslog=args.syslog, webhook=args.webhook
-    )
+    logger = AuditLogger(Path("audit.log"), syslog=args.syslog, webhook=args.webhook)
 
     if args.batch:
         migrate_batch(

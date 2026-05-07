@@ -25,6 +25,7 @@ except Exception:  # pragma: no cover - dependency missing
     pkcs11 = None
 
 from ..audit import audit_log
+from ..errors import MissingDependencyError
 from . import register_keystore
 from .base import KeyStoreCapability
 
@@ -57,7 +58,10 @@ class PKCS11KeyStore:
         pin: str | None = None,
     ) -> None:
         if pkcs11 is None:  # pragma: no cover - dependency missing
-            raise ImportError("python-pkcs11>=0.8.1 is required for PKCS11KeyStore")
+            raise MissingDependencyError(
+                "PKCS#11 keystore support requires python-pkcs11>=0.8.1. "
+                "Install cryptography-suite[hsm] to use this feature."
+            )
 
         library_path, token_label, pin = self._load_config(
             library_path, token_label, pin

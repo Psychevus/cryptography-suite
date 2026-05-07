@@ -1,25 +1,45 @@
 """Code generation utilities for cryptosuite."""
+
 from __future__ import annotations
 
+from collections.abc import Iterable
 from importlib import resources
 from pathlib import Path
-from typing import Iterable
+from typing import Any
 
-import yaml
-from jinja2 import Environment, FileSystemLoader
+from ..errors import MissingDependencyError
+
+
+def _load_codegen_dependencies() -> tuple[Any, type[Any], type[Any]]:
+    try:
+        import yaml
+    except Exception as exc:  # pragma: no cover - dependency missing
+        raise MissingDependencyError(
+            "Code generation requires PyYAML. "
+            "Install cryptography-suite[codegen] to use this feature."
+        ) from exc
+    try:
+        from jinja2 import Environment, FileSystemLoader
+    except Exception as exc:  # pragma: no cover - dependency missing
+        raise MissingDependencyError(
+            "Code generation requires Jinja2. "
+            "Install cryptography-suite[codegen] to use this feature."
+        ) from exc
+    return yaml, Environment, FileSystemLoader
 
 
 def generate(target: str, pipeline_file: str, out_dir: str | None = None) -> Path:
     """Generate an application skeleton for the given target."""
+    yaml, environment_cls, file_system_loader_cls = _load_codegen_dependencies()
     out_path = Path(out_dir or f"generated_{target}")
     out_path.mkdir(parents=True, exist_ok=True)
 
-    with open(pipeline_file, "r", encoding="utf-8") as fh:
+    with open(pipeline_file, encoding="utf-8") as fh:
         steps: Iterable[str] = yaml.safe_load(fh) or []
 
     # Load templates
     with resources.path(__name__, "templates") as tpl_dir:
-        env = Environment(loader=FileSystemLoader(str(tpl_dir)))
+        env = environment_cls(loader=file_system_loader_cls(str(tpl_dir)))
         if target == "fastapi":
             template = env.get_template("fastapi/app.py.j2")
             fname = "app.py"

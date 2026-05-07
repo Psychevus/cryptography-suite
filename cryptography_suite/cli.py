@@ -12,8 +12,6 @@ import sys
 from pathlib import Path
 from typing import Any, Protocol, cast
 
-from blake3 import blake3
-
 from . import __version__
 from .core.logging import configure_structured_logging, get_structured_logger, log_event
 from .core.operations import (
@@ -24,13 +22,6 @@ from .core.operations import (
 from .crypto_backends import available_backends
 from .debug import redact_message
 from .errors import DecryptionError, MissingDependencyError
-from .pqc import (
-    PQCRYPTO_AVAILABLE,
-    SPHINCS_AVAILABLE,
-    generate_dilithium_keypair,
-    generate_kyber_keypair,
-    generate_sphincs_keypair,
-)
 from .protocols import generate_totp
 from .protocols.key_management import KeyManager
 from .symmetric.kdf import DEFAULT_KDF
@@ -49,12 +40,61 @@ from .zk.bulletproof import (
 )
 
 _OUTPUT_FORMAT = "text"
+PQCRYPTO_AVAILABLE = False
+SPHINCS_AVAILABLE = False
+generate_dilithium_keypair = None
+generate_kyber_keypair = None
+generate_sphincs_keypair = None
 
 
 class _HasherLike(Protocol):
     def update(self, data: bytes) -> object: ...
 
     def hexdigest(self) -> str: ...
+
+
+def _load_blake3_hasher() -> _HasherLike:
+    try:
+        from blake3 import blake3
+    except Exception as exc:  # pragma: no cover - dependency missing
+        raise MissingDependencyError(
+            "BLAKE3 hashing requires blake3. "
+            "Install cryptography-suite[hashing-extra] to use this feature."
+        ) from exc
+    return cast(_HasherLike, blake3())
+
+
+def _load_pqc_keygen_helpers() -> None:
+    global PQCRYPTO_AVAILABLE
+    global SPHINCS_AVAILABLE
+    global generate_dilithium_keypair
+    global generate_kyber_keypair
+    global generate_sphincs_keypair
+
+    if generate_kyber_keypair is not None:
+        return
+
+    from .pqc import (
+        PQCRYPTO_AVAILABLE as pqcrypto_available,
+    )
+    from .pqc import (
+        SPHINCS_AVAILABLE as sphincs_available,
+    )
+    from .pqc import (
+        generate_dilithium_keypair as dilithium_keypair,
+    )
+    from .pqc import (
+        generate_kyber_keypair as kyber_keypair,
+    )
+    from .pqc import (
+        generate_sphincs_keypair as sphincs_keypair,
+    )
+
+    PQCRYPTO_AVAILABLE = pqcrypto_available
+    SPHINCS_AVAILABLE = sphincs_available
+    generate_dilithium_keypair = dilithium_keypair
+    generate_kyber_keypair = kyber_keypair
+    generate_sphincs_keypair = sphincs_keypair
 
 
 def _set_output_format(fmt: str) -> None:
@@ -178,10 +218,16 @@ def zksnark_cli(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description="SHA256 pre-image proof")
     parser.add_argument("preimage", help="Preimage string")
     if not ZKSNARK_AVAILABLE and argv and not any(a in ("-h", "--help") for a in argv):
-        raise MissingDependencyError("PySNARK not installed")
+        raise MissingDependencyError(
+            "PySNARK is required for zk-SNARK proofs. "
+            "Install cryptography-suite[zk] to use this feature."
+        )
     args = parser.parse_args(argv)
     if not ZKSNARK_AVAILABLE:
-        raise MissingDependencyError("PySNARK not installed")
+        raise MissingDependencyError(
+            "PySNARK is required for zk-SNARK proofs. "
+            "Install cryptography-suite[zk] to use this feature."
+        )
     zksnark.setup()
     hash_hex, proof_path = zksnark.prove(args.preimage.encode())
     valid = zksnark.verify(hash_hex, proof_path)
@@ -301,6 +347,11 @@ def _handle_cli_error(exc: Exception) -> None:
         )
 
 
+def _handle_missing_dependency_and_exit(exc: MissingDependencyError) -> None:
+    _handle_cli_error(exc)
+    raise SystemExit(1) from exc
+
+
 def _validate_regular_file(path_str: str, label: str) -> None:
     path = Path(path_str)
     if not path.exists() or not path.is_file():
@@ -355,11 +406,9 @@ def keygen_cli(argv: list[str] | None = None) -> None:
     rsa_p.add_argument("--public", required=True, help="Public key path")
     _add_password_source_args(rsa_p)
 
-    if PQCRYPTO_AVAILABLE:
-        sub.add_parser("dilithium", help="Generate a Dilithium key pair")
-        sub.add_parser("kyber", help="Generate a Kyber key pair")
-        if SPHINCS_AVAILABLE:
-            sub.add_parser("sphincs", help="Generate a SPHINCS+ key pair")
+    sub.add_parser("dilithium", help="Generate a Dilithium key pair")
+    sub.add_parser("kyber", help="Generate a Kyber key pair")
+    sub.add_parser("sphincs", help="Generate a SPHINCS+ key pair")
 
     args = parser.parse_args(argv)
 
@@ -369,11 +418,37 @@ def keygen_cli(argv: list[str] | None = None) -> None:
         km.generate_rsa_keypair_and_save(args.private, args.public, password)
         print(f"RSA keys saved to {args.private} and {args.public}")
     else:
+        _load_pqc_keygen_helpers()
+        if not PQCRYPTO_AVAILABLE:
+            raise MissingDependencyError(
+                "PQC key generation requires pqcrypto. "
+                "Install cryptography-suite[pqc] to use this feature."
+            )
+        if args.scheme == "sphincs" and not SPHINCS_AVAILABLE:
+            raise MissingDependencyError(
+                "SPHINCS+ key generation requires pqcrypto with SPHINCS+ support. "
+                "Install cryptography-suite[pqc] to use this feature."
+            )
         if args.scheme == "dilithium":
+            if generate_dilithium_keypair is None:
+                raise MissingDependencyError(
+                    "Dilithium key generation requires pqcrypto. "
+                    "Install cryptography-suite[pqc] to use this feature."
+                )
             generate_dilithium_keypair()
         elif args.scheme == "kyber":
+            if generate_kyber_keypair is None:
+                raise MissingDependencyError(
+                    "ML-KEM key generation requires pqcrypto. "
+                    "Install cryptography-suite[pqc] to use this feature."
+                )
             generate_kyber_keypair()
         else:
+            if generate_sphincs_keypair is None:
+                raise MissingDependencyError(
+                    "SPHINCS+ key generation requires pqcrypto. "
+                    "Install cryptography-suite[pqc] to use this feature."
+                )
             generate_sphincs_keypair()
         _emit(
             f"{args.scheme} private key material was generated but not printed.",
@@ -408,7 +483,7 @@ def hash_cli(argv: list[str] | None = None) -> None:
     elif args.algorithm == "blake2b":
         hasher = hashlib.blake2b()
     else:
-        hasher = blake3()
+        hasher = _load_blake3_hasher()
 
     with open(args.file, "rb") as file_handle:
         while chunk := file_handle.read(8192):
@@ -653,7 +728,13 @@ def export_cli(argv: list[str] | None = None) -> None:
     args = parser.parse_args(argv)
     _validate_regular_file(args.pipeline, "pipeline")
 
-    yaml = __import__("yaml")
+    try:
+        yaml = __import__("yaml")
+    except Exception as exc:
+        raise MissingDependencyError(
+            "Pipeline export requires PyYAML. "
+            "Install cryptography-suite[cli] to use this feature."
+        ) from exc
 
     from .pipeline import CryptoModule, Pipeline
 
@@ -948,19 +1029,31 @@ def main(argv: list[str] | None = None) -> None:
         if args.public:
             argv2.extend(["--public", args.public])
         _append_password_source_args(argv2, args)
-        keygen_cli(argv2)
+        try:
+            keygen_cli(argv2)
+        except MissingDependencyError as exc:
+            _handle_missing_dependency_and_exit(exc)
     elif args.cmd == "hash":
-        hash_cli([args.file, f"--algorithm={args.algorithm}"])
+        try:
+            hash_cli([args.file, f"--algorithm={args.algorithm}"])
+        except MissingDependencyError as exc:
+            _handle_missing_dependency_and_exit(exc)
     elif args.cmd == "export":
         argv2 = [args.pipeline, f"--format={args.format}"]
         for sec in args.track:
             argv2.extend(["--track", sec])
-        export_cli(argv2)
+        try:
+            export_cli(argv2)
+        except MissingDependencyError as exc:
+            _handle_missing_dependency_and_exit(exc)
     elif args.cmd == "gen":
         argv2 = [f"--target={args.target}", f"--pipeline={args.pipeline}"]
         if args.output:
             argv2.extend(["--output", args.output])
-        gen_cli(argv2)
+        try:
+            gen_cli(argv2)
+        except MissingDependencyError as exc:
+            _handle_missing_dependency_and_exit(exc)
     elif args.cmd == "keystore":
         argv2 = [args.action]
         if args.src:
@@ -1005,7 +1098,17 @@ def main(argv: list[str] | None = None) -> None:
         if spec is None or spec.loader is None:
             raise RuntimeError("Unable to load migrate_keys module")
         module = util.module_from_spec(spec)
-        spec.loader.exec_module(module)
+        try:
+            spec.loader.exec_module(module)
+        except ModuleNotFoundError as exc:
+            if exc.name == "rich":
+                _handle_missing_dependency_and_exit(
+                    MissingDependencyError(
+                        "Key migration CLI support requires rich. "
+                        "Install cryptography-suite[cli] to use this feature."
+                    )
+                )
+            raise
         argv2 = ["--from", args.src, "--to", args.dst]
         if getattr(args, "batch", False):
             argv2.append("--batch")
@@ -1013,7 +1116,10 @@ def main(argv: list[str] | None = None) -> None:
             argv2.append("--ignore-errors")
         if getattr(args, "dry_run", False):
             argv2.append("--dry-run")
-        module.wizard_cli(argv2)
+        try:
+            module.wizard_cli(argv2)
+        except MissingDependencyError as exc:
+            _handle_missing_dependency_and_exit(exc)
     elif args.cmd in ("file", "encrypt", "decrypt"):
         if args.cmd == "file":
             mode = args.file_cmd

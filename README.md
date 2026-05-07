@@ -242,10 +242,20 @@ Install the latest published release from PyPI:
 pip install cryptography-suite
 ```
 
-For optional functionality install extras:
+The default install is intentionally minimal: it installs the core educational
+APIs and default examples without pulling in optional research, notebook,
+code-generation, cloud, HSM, or developer tooling dependencies.
+
+Install extras only for the feature families you need:
 
 ```bash
-pip install "cryptography-suite[pqc,fhe,zk]"
+pip install "cryptography-suite[cli]"
+pip install "cryptography-suite[hashing-extra]"
+pip install "cryptography-suite[pqc]"
+pip install "cryptography-suite[fhe]"
+pip install "cryptography-suite[bls,pake,viz,codegen]"
+pip install "cryptography-suite[kms,hsm,network,async]"
+pip install "cryptography-suite[dev]"
 ```
 
 To include deprecated stream ciphers:
@@ -253,6 +263,8 @@ To include deprecated stream ciphers:
 > pip install cryptography-suite[legacy]
 
 The **SPHINCS+** signature helpers are included in the `pqc` extra and are experimental/demo-only.
+PQC, FHE, ZK, BLS, Signal/demo, and visualization extras remain experimental
+and are not independently audited.
 
 > **Note**: Requires Python 3.10 or higher. Homomorphic encryption features are disabled by default, require `CRYPTOSUITE_ALLOW_EXPERIMENTAL=1`, and need `Pyfhel` installed separately if the `fhe` extra is not used.
 
@@ -264,14 +276,14 @@ Clone the repository and install manually:
 git clone https://github.com/Psychevus/cryptography-suite.git
 cd cryptography-suite
 pip install .
-# Optional extras for development (pytest, mypy, etc.) and PQC
-pip install -e ".[dev,pqc]"
+# Optional extras for development and selected feature tests
+pip install -e ".[dev,pqc,bls,pake,hashing-extra]"
 ```
 
 ### Quick Start CLI
 
 ```bash
-pip install cryptography-suite
+pip install "cryptography-suite[cli]"
 
 # Encrypt a file
 cryptography-suite file encrypt --in input.txt --out encrypted.bin
@@ -348,7 +360,7 @@ ______________________________________________________________________
 | RSA, ECDSA, Ed25519, Ed448 | pyca/cryptography | Primary backend |
 | BLS12-381 | py_ecc | Optional |
 | SHA-2, SHA-3, BLAKE2b | pyca/cryptography | Primary backend |
-| BLAKE3 | blake3 | Primary backend |
+| BLAKE3 | blake3 (optional) | Optional |
 | Argon2id, Scrypt, PBKDF2, HKDF | pyca/cryptography | Primary backend |
 | Kyber, Dilithium (PQC) | pqcrypto (optional) | Optional |
 

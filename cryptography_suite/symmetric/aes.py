@@ -239,7 +239,8 @@ def _import_aiofiles() -> Any:
         return aiofiles
     except Exception as exc:  # pragma: no cover - fallback when aiofiles missing
         raise MissingDependencyError(
-            "aiofiles is required for async operations"
+            "aiofiles is required for async file operations. "
+            "Install cryptography-suite[async] to use this feature."
         ) from exc
 
 

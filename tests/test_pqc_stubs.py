@@ -5,6 +5,8 @@ from typing import Any
 
 import pytest
 
+from cryptography_suite.errors import MissingDependencyError
+
 
 class DummyKEM:
     CIPHERTEXT = b"ct"
@@ -93,5 +95,5 @@ def test_pqc_import_error(monkeypatch):
 
     importlib.reload(pqc)
     pqc.PQCRYPTO_AVAILABLE = False
-    with pytest.raises(ImportError):
+    with pytest.raises(MissingDependencyError):
         pqc.generate_ml_kem_keypair()

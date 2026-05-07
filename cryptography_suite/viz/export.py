@@ -6,6 +6,8 @@ from importlib.util import find_spec
 from pathlib import Path
 from typing import Any
 
+from ..errors import MissingDependencyError
+
 _HAS_WIDGETS = find_spec("ipywidgets") is not None
 
 if _HAS_WIDGETS:
@@ -22,10 +24,9 @@ def export_widget_html(widget: Widget, path: str | Path) -> None:
         embed_minimal_html(str(output_path), views=[widget], title="Widget Export")
         return
 
-    output_path.write_text(
-        "<html><body><h1>Widget Export</h1>"
-        "<p>ipywidgets is not installed.</p></body></html>",
-        encoding="utf-8",
+    raise MissingDependencyError(
+        "Widget export requires ipywidgets. "
+        "Install cryptography-suite[viz] to use this feature."
     )
 
 

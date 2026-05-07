@@ -17,7 +17,7 @@ from typing import Any
 
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
-from ..errors import DecryptionError, EncryptionError
+from ..errors import DecryptionError, EncryptionError, MissingDependencyError
 from ..symmetric.kdf import derive_hkdf
 from ..utils import KeyVault
 
@@ -66,7 +66,10 @@ def _get_ml_kem_algorithm(
     level: int, error_type: type[EncryptionError] | type[DecryptionError]
 ) -> Any:
     if not PQCRYPTO_AVAILABLE:
-        raise ImportError("pqcrypto is required for ML-KEM functions")
+        raise MissingDependencyError(
+            "ML-KEM functions require pqcrypto. "
+            "Install cryptography-suite[pqc] to use this feature."
+        )
 
     alg = _KYBER_LEVEL_MAP.get(level)
     if alg is None:
@@ -311,7 +314,10 @@ def generate_dilithium_keypair(
     :class:`KeyVault`.
     """
     if not PQCRYPTO_AVAILABLE:
-        raise ImportError("pqcrypto is required for Dilithium functions")
+        raise MissingDependencyError(
+            "Dilithium functions require pqcrypto. "
+            "Install cryptography-suite[pqc] to use this feature."
+        )
 
     pk, sk = ml_dsa_44.generate_keypair()
     return pk, KeyVault(sk) if sensitive else sk
@@ -328,7 +334,10 @@ def dilithium_sign(
     ``private_key`` may be provided as raw bytes or a :class:`KeyVault`.
     """
     if not PQCRYPTO_AVAILABLE:
-        raise ImportError("pqcrypto is required for Dilithium functions")
+        raise MissingDependencyError(
+            "Dilithium functions require pqcrypto. "
+            "Install cryptography-suite[pqc] to use this feature."
+        )
 
     key = bytes(private_key) if isinstance(private_key, KeyVault) else private_key
     sig = ml_dsa_44.sign(key, message)
@@ -344,7 +353,10 @@ def dilithium_verify(
 ) -> bool:
     """Verify a Dilithium signature using level 2."""
     if not PQCRYPTO_AVAILABLE:
-        raise ImportError("pqcrypto is required for Dilithium functions")
+        raise MissingDependencyError(
+            "Dilithium functions require pqcrypto. "
+            "Install cryptography-suite[pqc] to use this feature."
+        )
 
     if isinstance(signature, str):
         try:
@@ -367,7 +379,10 @@ def generate_sphincs_keypair(
     :class:`KeyVault`.
     """
     if not PQCRYPTO_AVAILABLE or not SPHINCS_AVAILABLE:
-        raise ImportError("pqcrypto with SPHINCS+ support is required")
+        raise MissingDependencyError(
+            "SPHINCS+ functions require pqcrypto with SPHINCS+ support. "
+            "Install cryptography-suite[pqc] to use this feature."
+        )
 
     pk, sk = _sphincs_module.generate_keypair()
     return pk, KeyVault(sk) if sensitive else sk
@@ -381,7 +396,10 @@ def sphincs_sign(
     ``private_key`` may be a byte string or :class:`KeyVault`.
     """
     if not PQCRYPTO_AVAILABLE or not SPHINCS_AVAILABLE:
-        raise ImportError("pqcrypto with SPHINCS+ support is required")
+        raise MissingDependencyError(
+            "SPHINCS+ functions require pqcrypto with SPHINCS+ support. "
+            "Install cryptography-suite[pqc] to use this feature."
+        )
 
     key = bytes(private_key) if isinstance(private_key, KeyVault) else private_key
     sig = _sphincs_module.sign(key, message)
@@ -393,7 +411,10 @@ def sphincs_sign(
 def sphincs_verify(public_key: bytes, message: bytes, signature: bytes | str) -> bool:
     """Verify a SPHINCS+ signature."""
     if not PQCRYPTO_AVAILABLE or not SPHINCS_AVAILABLE:
-        raise ImportError("pqcrypto with SPHINCS+ support is required")
+        raise MissingDependencyError(
+            "SPHINCS+ functions require pqcrypto with SPHINCS+ support. "
+            "Install cryptography-suite[pqc] to use this feature."
+        )
 
     if isinstance(signature, str):
         try:

@@ -1,10 +1,9 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 
-from typing import Callable, Optional
-
-from mypy.plugin import Plugin, FunctionContext
 from mypy.nodes import StrExpr
+from mypy.plugin import FunctionContext, Plugin
 from mypy.types import Type
 
 
@@ -12,10 +11,13 @@ class CryptoCheckerPlugin(Plugin):
     """Static analysis checks for insecure crypto usage."""
 
     insecure_hashes = {"hashlib.md5", "hashlib.sha1"}
+    insecure_hash_message = (
+        "Insecure hash function '{alg}' used; use SHA-256 or stronger."
+    )
 
     def get_function_hook(
         self, fullname: str
-    ) -> Optional[Callable[[FunctionContext], Type]]:
+    ) -> Callable[[FunctionContext], Type] | None:
         if (
             fullname in self.insecure_hashes
             or fullname == "hashlib.new"
@@ -24,7 +26,7 @@ class CryptoCheckerPlugin(Plugin):
             or fullname.endswith("openssl_sha1")
         ):
 
-            def hook(ctx: FunctionContext, fname=fullname) -> Type:
+            def hook(ctx: FunctionContext, fname: str = fullname) -> Type:
                 return self._check_call(ctx, fname)
 
             return hook
@@ -38,7 +40,7 @@ class CryptoCheckerPlugin(Plugin):
         ):
             alg = fullname.split(".")[-1]
             ctx.api.fail(
-                f"Insecure hash function '{alg}' used; use SHA-256 or stronger.",
+                self.insecure_hash_message.format(alg=alg),
                 ctx.context,
             )
         elif fullname == "hashlib.new":
@@ -46,7 +48,7 @@ class CryptoCheckerPlugin(Plugin):
                 alg = ctx.args[0][0].value.lower()
                 if alg in {"md5", "sha1"}:
                     ctx.api.fail(
-                        f"Insecure hash function '{alg}' used; use SHA-256 or stronger.",
+                        self.insecure_hash_message.format(alg=alg),
                         ctx.context,
                     )
         elif fullname == "Crypto.Cipher.AES.new":
