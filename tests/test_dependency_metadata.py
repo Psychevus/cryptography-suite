@@ -156,6 +156,28 @@ def test_requests_is_not_part_of_local_cli_extra() -> None:
     assert "requests" in network_dependencies
 
 
+def test_codegen_and_pake_dependencies_stay_in_optional_extras() -> None:
+    project = cast(dict[str, Any], _pyproject()["project"])
+    base_dependencies = {
+        _requirement_name(req) for req in project.get("dependencies", [])
+    }
+    optional_dependencies = cast(dict[str, list[str]], project["optional-dependencies"])
+    codegen_dependencies = {
+        _requirement_name(req) for req in optional_dependencies.get("codegen", [])
+    }
+    pake_dependencies = {
+        _requirement_name(req) for req in optional_dependencies.get("pake", [])
+    }
+    cli_dependencies = {
+        _requirement_name(req) for req in optional_dependencies.get("cli", [])
+    }
+
+    assert {"jinja2", "pyyaml"} <= codegen_dependencies
+    assert "spake2" in pake_dependencies
+    assert not {"jinja2", "pyyaml", "spake2"} & base_dependencies
+    assert "spake2" not in cli_dependencies
+
+
 def test_package_discovery_does_not_include_tools() -> None:
     data = _pyproject()
     tool = cast(dict[str, Any], data["tool"])

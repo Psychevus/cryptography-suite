@@ -1,43 +1,44 @@
+import base64
 import importlib
+import os
 import sys
 import types
-import base64
-import os
+from typing import Any
 
 import pytest
 
 if not os.getenv("CRYPTOSUITE_ALLOW_EXPERIMENTAL"):
     pytest.skip("experimental features disabled", allow_module_level=True)
-from cryptography_suite.errors import DecryptionError
-from cryptography.exceptions import InvalidKey
+import warnings
+
+from cryptography.exceptions import InvalidKey, InvalidTag
 from cryptography.hazmat.primitives.asymmetric import x25519
-from cryptography.exceptions import InvalidTag
 
 from cryptography_suite.asymmetric import (
     ec_decrypt,
     ec_encrypt,
     generate_x25519_keypair,
 )
-from cryptography_suite.protocols import (
-    SPAKE2Client,
-    SPAKE2Server,
-)
-import warnings
-
+from cryptography_suite.errors import DecryptionError
 from cryptography_suite.experimental.signal_demo import (
-    initialize_signal_session,
     SignalReceiver,
-    SignalSender,
+    initialize_signal_session,
 )
-from cryptography_suite.zk import zksnark
-
 
 # ----------------------- SPAKE2 Tests -----------------------
 
 
-def test_spake2_success():
-    client = SPAKE2Client("secret")
-    server = SPAKE2Server("secret")
+def _spake2_classes() -> tuple[type[Any], type[Any]]:
+    pytest.importorskip("spake2", reason="requires pake extra")
+    from cryptography_suite.protocols import SPAKE2Client, SPAKE2Server
+
+    return SPAKE2Client, SPAKE2Server
+
+
+def test_spake2_success() -> None:
+    spake2_client, spake2_server = _spake2_classes()
+    client = spake2_client("secret")
+    server = spake2_server("secret")
     cm = client.generate_message()
     sm = server.generate_message()
     ck = client.compute_shared_key(sm)
@@ -45,9 +46,10 @@ def test_spake2_success():
     assert ck == sk
 
 
-def test_spake2_incorrect_password():
-    client = SPAKE2Client("secret")
-    server = SPAKE2Server("other")
+def test_spake2_incorrect_password() -> None:
+    spake2_client, spake2_server = _spake2_classes()
+    client = spake2_client("secret")
+    server = spake2_server("other")
     cm = client.generate_message()
     sm = server.generate_message()
     ck = client.compute_shared_key(sm)
@@ -55,8 +57,9 @@ def test_spake2_incorrect_password():
     assert ck != sk
 
 
-def test_spake2_invalid_peer_message():
-    client = SPAKE2Client("secret")
+def test_spake2_invalid_peer_message() -> None:
+    spake2_client, _ = _spake2_classes()
+    client = spake2_client("secret")
     client.generate_message()
     with pytest.raises(InvalidKey):
         client.compute_shared_key(b"bad")
@@ -65,7 +68,7 @@ def test_spake2_invalid_peer_message():
 # ------------------- Signal Protocol Tests ------------------
 
 
-def test_signal_protocol_valid_flow():
+def test_signal_protocol_valid_flow() -> None:
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("always")
         sender, receiver = initialize_signal_session()
@@ -79,7 +82,7 @@ def test_signal_protocol_valid_flow():
     assert sender.decrypt(enc2) == reply
 
 
-def test_signal_protocol_tampered_ciphertext():
+def test_signal_protocol_tampered_ciphertext() -> None:
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("always")
         sender, receiver = initialize_signal_session()
@@ -94,7 +97,7 @@ def test_signal_protocol_tampered_ciphertext():
         receiver.decrypt(tampered)
 
 
-def test_signal_protocol_wrong_receiver():
+def test_signal_protocol_wrong_receiver() -> None:
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("always")
         sender, receiver = initialize_signal_session()
@@ -103,14 +106,14 @@ def test_signal_protocol_wrong_receiver():
     other.initialize_session(*sender.handshake_public)
     enc = sender.encrypt(b"hi")
     # other has different keys; decryption should fail
-    with pytest.raises(Exception):
+    with pytest.raises(InvalidTag):
         other.decrypt(enc)
 
 
 # ----------------------- ECIES Tests -----------------------
 
 
-def test_ecies_roundtrip():
+def test_ecies_roundtrip() -> None:
     priv, pub = generate_x25519_keypair()
     msg = b"top"
     ct = ec_encrypt(msg, pub)
@@ -118,7 +121,7 @@ def test_ecies_roundtrip():
     assert ec_decrypt(ct, priv) == msg
 
 
-def test_ecies_wrong_key():
+def test_ecies_wrong_key() -> None:
     priv, pub = generate_x25519_keypair()
     wrong_priv, _ = generate_x25519_keypair()
     ct = ec_encrypt(b"msg", pub)
@@ -126,7 +129,7 @@ def test_ecies_wrong_key():
         ec_decrypt(ct, wrong_priv)
 
 
-def test_ecies_tamper(monkeypatch):
+def test_ecies_tamper(monkeypatch: pytest.MonkeyPatch) -> None:
     priv, pub = generate_x25519_keypair()
     ct = ec_encrypt(b"msg", pub)
     raw = base64.b64decode(ct)
@@ -136,7 +139,7 @@ def test_ecies_tamper(monkeypatch):
         ec_decrypt(tampered_b64, priv)
 
 
-def test_ecies_deterministic(monkeypatch):
+def test_ecies_deterministic(monkeypatch: pytest.MonkeyPatch) -> None:
     priv, pub = generate_x25519_keypair()
     fake_priv = x25519.X25519PrivateKey.from_private_bytes(b"\x01" * 32)
     monkeypatch.setattr(x25519.X25519PrivateKey, "generate", lambda: fake_priv)
@@ -152,13 +155,13 @@ def test_ecies_deterministic(monkeypatch):
 
 
 class DummyPrivVal:
-    def __init__(self, val):
+    def __init__(self, val: Any) -> None:
         self.val = val
 
 
-def dummy_sha256(secret):
+def dummy_sha256(secret: DummyPrivVal) -> Any:
     class Bits:
-        def __init__(self, val):
+        def __init__(self, val: Any) -> None:
             self.val = val
 
     return Bits(secret.val)
@@ -166,19 +169,21 @@ def dummy_sha256(secret):
 
 class DummySnark:
     @staticmethod
-    def prove():
+    def prove() -> str:
         return "proof"
 
 
 class DummyRun:
-    def __init__(self, result=True):
+    def __init__(self, result: bool = True) -> None:
         self._result = result
 
-    def verify(self, hash_hex, proof_path):
+    def verify(self, hash_hex: str, proof_path: str) -> bool:
         return self._result
 
 
-def _setup_pysnark(monkeypatch, result=True):
+def _setup_pysnark(
+    monkeypatch: pytest.MonkeyPatch, result: bool = True
+) -> types.ModuleType:
     runtime = types.SimpleNamespace(
         PrivVal=DummyPrivVal, snark=DummySnark, run=DummyRun(result)
     )
@@ -194,14 +199,14 @@ def _setup_pysnark(monkeypatch, result=True):
     return zk
 
 
-def test_zksnark_valid(monkeypatch):
+def test_zksnark_valid(monkeypatch: pytest.MonkeyPatch) -> None:
     zk = _setup_pysnark(monkeypatch, True)
     zk.setup()
     digest, proof = zk.prove(b"x")
     assert zk.verify(digest, proof)
 
 
-def test_zksnark_invalid_proof(monkeypatch):
+def test_zksnark_invalid_proof(monkeypatch: pytest.MonkeyPatch) -> None:
     zk = _setup_pysnark(monkeypatch, False)
     zk.setup()
     digest, proof = zk.prove(b"x")
