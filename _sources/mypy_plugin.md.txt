@@ -10,7 +10,7 @@ Detected issues include:
 - Use of weak hash functions like `md5` or `sha1`.
 - Creating AES ciphers in `ECB` mode.
 
-To enable the plugin manually add `tools.mypy_crypto_checker` to the
+To enable the plugin manually add `cryptography_suite._mypy_crypto_checker` to the
 `plugins` option in your `mypy` configuration. The repository has this
 enabled by default via ``setup.cfg``.
 

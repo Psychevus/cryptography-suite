@@ -1293,110 +1293,6 @@ code.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="cryptography_suite.legacy.bls_aggregate">
-<span class="sig-prename descclassname"><span class="pre">cryptography_suite.legacy.</span></span><span class="sig-name descname"><span class="pre">bls_aggregate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signatures</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></span><a class="headerlink" href="#cryptography_suite.legacy.bls_aggregate" title="Link to this definition">¶</a></dt>
-<dd><p>Aggregate multiple BLS signatures into one.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>signatures</strong> (<em>Iterable</em><em>[</em><em>bytes</em><em>]</em>) – Individual signatures to aggregate.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Aggregated signature value.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bytes</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="cryptography_suite.legacy.bls_aggregate_verify">
-<span class="sig-prename descclassname"><span class="pre">cryptography_suite.legacy.</span></span><span class="sig-name descname"><span class="pre">bls_aggregate_verify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">public_keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">messages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#cryptography_suite.legacy.bls_aggregate_verify" title="Link to this definition">¶</a></dt>
-<dd><p>Verify an aggregated BLS signature against multiple messages.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>public_keys</strong> (<em>Sequence</em><em>[</em><em>bytes</em><em>]</em>) – Public keys used to sign each message.</p></li>
-<li><p><strong>messages</strong> (<em>Sequence</em><em>[</em><em>bytes</em><em>]</em>) – Messages that were individually signed.</p></li>
-<li><p><strong>signature</strong> (<em>bytes</em>) – Aggregated signature to verify.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if the aggregated signature is valid, otherwise <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="cryptography_suite.legacy.bls_sign">
-<span class="sig-prename descclassname"><span class="pre">cryptography_suite.legacy.</span></span><span class="sig-name descname"><span class="pre">bls_sign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">private_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytearray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#cryptography_suite.KeyVault" title="cryptography_suite.utils.KeyVault"><span class="pre">KeyVault</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span></span></span><a class="headerlink" href="#cryptography_suite.legacy.bls_sign" title="Link to this definition">¶</a></dt>
-<dd><p>Sign a message using the BLS signature scheme.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>message</strong> (<em>bytes</em>) – Message to sign.</p></li>
-<li><p><strong>private_key</strong> (<em>int</em><em> | </em><em>bytes</em><em> | </em><a class="reference internal" href="#cryptography_suite.KeyVault" title="cryptography_suite.KeyVault"><em>KeyVault</em></a>) – Private key generated via <a class="reference internal" href="#cryptography_suite.legacy.generate_bls_keypair" title="cryptography_suite.legacy.generate_bls_keypair"><code class="xref py py-func docutils literal notranslate"><span class="pre">generate_bls_keypair()</span></code></a>. It may be
-provided as a <code class="xref py py-class docutils literal notranslate"><span class="pre">KeyVault</span></code> instance or raw integer/bytes.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Signature for <code class="docutils literal notranslate"><span class="pre">message</span></code>.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bytes</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="cryptography_suite.legacy.bls_verify">
-<span class="sig-prename descclassname"><span class="pre">cryptography_suite.legacy.</span></span><span class="sig-name descname"><span class="pre">bls_verify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">public_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#cryptography_suite.legacy.bls_verify" title="Link to this definition">¶</a></dt>
-<dd><p>Verify a BLS signature.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>message</strong> (<em>bytes</em>) – Signed message.</p></li>
-<li><p><strong>signature</strong> (<em>bytes</em>) – Signature to verify.</p></li>
-<li><p><strong>public_key</strong> (<em>bytes</em>) – Signer’s public key.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if the signature is valid, otherwise <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="cryptography_suite.legacy.generate_bls_keypair">
-<span class="sig-prename descclassname"><span class="pre">cryptography_suite.legacy.</span></span><span class="sig-name descname"><span class="pre">generate_bls_keypair</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensitive</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#cryptography_suite.KeyVault" title="cryptography_suite.utils.KeyVault"><span class="pre">KeyVault</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#cryptography_suite.legacy.generate_bls_keypair" title="Link to this definition">¶</a></dt>
-<dd><p>Generate a BLS12-381 key pair.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>seed</strong> (<em>bytes</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Optional 32-byte seed used as input key material. When <code class="docutils literal notranslate"><span class="pre">None</span></code> a
-cryptographically secure random seed is generated.</p></li>
-<li><p><strong>sensitive</strong> (<em>bool</em><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default) the private key is returned wrapped in
-<code class="xref py py-class docutils literal notranslate"><span class="pre">KeyVault</span></code> for zeroization after use. Set to <code class="docutils literal notranslate"><span class="pre">False</span></code> to
-receive the key as a Python integer.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The private key as either an integer or a <code class="xref py py-class docutils literal notranslate"><span class="pre">KeyVault</span></code>-wrapped
-byte string, and the corresponding public key.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Tuple[Union[int, <a class="reference internal" href="#cryptography_suite.KeyVault" title="cryptography_suite.KeyVault">KeyVault</a>], bytes]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="cryptography_suite.legacy.generate_ed448_keypair">
 <span class="sig-prename descclassname"><span class="pre">cryptography_suite.legacy.</span></span><span class="sig-name descname"><span class="pre">generate_ed448_keypair</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Ed448PrivateKey</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Ed448PublicKey</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#cryptography_suite.legacy.generate_ed448_keypair" title="Link to this definition">¶</a></dt>
 <dd><p>Generates an Ed448 private and public key pair.</p>
@@ -1655,11 +1551,6 @@ byte string, and the corresponding public key.</p>
 <li><a class="reference internal" href="#experimental-api">Experimental API</a></li>
 <li><a class="reference internal" href="#module-cryptography_suite.legacy">Legacy API</a><ul>
 <li><a class="reference internal" href="#cryptography_suite.legacy.blake3_hash_v2"><code class="docutils literal notranslate"><span class="pre">blake3_hash_v2()</span></code></a></li>
-<li><a class="reference internal" href="#cryptography_suite.legacy.bls_aggregate"><code class="docutils literal notranslate"><span class="pre">bls_aggregate()</span></code></a></li>
-<li><a class="reference internal" href="#cryptography_suite.legacy.bls_aggregate_verify"><code class="docutils literal notranslate"><span class="pre">bls_aggregate_verify()</span></code></a></li>
-<li><a class="reference internal" href="#cryptography_suite.legacy.bls_sign"><code class="docutils literal notranslate"><span class="pre">bls_sign()</span></code></a></li>
-<li><a class="reference internal" href="#cryptography_suite.legacy.bls_verify"><code class="docutils literal notranslate"><span class="pre">bls_verify()</span></code></a></li>
-<li><a class="reference internal" href="#cryptography_suite.legacy.generate_bls_keypair"><code class="docutils literal notranslate"><span class="pre">generate_bls_keypair()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.legacy.generate_ed448_keypair"><code class="docutils literal notranslate"><span class="pre">generate_ed448_keypair()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.legacy.sign_message_ed448"><code class="docutils literal notranslate"><span class="pre">sign_message_ed448()</span></code></a></li>
 <li><a class="reference internal" href="#cryptography_suite.legacy.verify_signature_ed448"><code class="docutils literal notranslate"><span class="pre">verify_signature_ed448()</span></code></a></li>
