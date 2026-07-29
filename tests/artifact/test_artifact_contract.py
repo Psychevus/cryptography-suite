@@ -133,7 +133,9 @@ def test_wheel_metadata_has_no_entry_points(
     assert set(metadata.get_all("Provides-Extra", [])) == EXPECTED_EXTRAS
     assert set(metadata.get_all("Provides-Extra", [])).isdisjoint(REMOVED_EXTRAS)
 
-    description = metadata.get_payload().lower()
+    payload = metadata.get_payload()
+    assert isinstance(payload, str)
+    description = payload.lower()
     assert "declaration-only v4 development skeleton" in description
     assert "no operational encryption or decryption" in description
     for obsolete_advertisement in (
