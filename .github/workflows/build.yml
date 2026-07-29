@@ -11,17 +11,17 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            cibw_build: "*-manylinux_x86_64"
+            cibw_build: "cp3{10,11,12}-manylinux_x86_64 pp310-manylinux_x86_64"
             plat_name: manylinux_2_28_x86_64
-            manylinux_image: quay.io/pypa/manylinux_2_28_x86_64
+            manylinux_image: manylinux_2_28
           - os: manylinux_x86_64
-            cibw_build: "*-manylinux_x86_64"
+            cibw_build: "cp3{10,11,12}-manylinux_x86_64 pp310-manylinux_x86_64"
             plat_name: manylinux_2_28_x86_64
-            manylinux_image: quay.io/pypa/manylinux_2_28_x86_64
+            manylinux_image: manylinux_2_28
           - os: musllinux_x86_64
-            cibw_build: "*-musllinux_x86_64"
+            cibw_build: "cp3{10,11,12}-musllinux_x86_64"
             plat_name: musllinux_1_2_x86_64
-            musllinux_image: quay.io/pypa/musllinux_1_2_x86_64
+            musllinux_image: musllinux_1_2
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -33,7 +33,7 @@ jobs:
           PIP_BREAK_SYSTEM_PACKAGES: "1"
         run: |
           python3 -m pip install --upgrade pip
-          python3 -m pip install cibuildwheel==2.18 pip-audit 'cryptography>=46.0.5'
+          python3 -m pip install cibuildwheel==2.22.0 pip-audit 'cryptography>=46.0.5'
       - name: Build wheels
         env:
           CFLAGS: -O2 -fstack-protector-strong -fPIC
