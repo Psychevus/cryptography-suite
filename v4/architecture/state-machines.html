@@ -1,0 +1,632 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html">
+
+    <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
+        <title>v4 State Machines - cryptography-suite 3.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">cryptography-suite 3.0.0 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  <span class="sidebar-brand-text">cryptography-suite 3.0.0 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../../_sources/v4/architecture/state-machines.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="v4-state-machines">
+<h1>v4 State Machines<a class="headerlink" href="#v4-state-machines" title="Link to this heading">¶</a></h1>
+<ul class="simple">
+<li><p><strong>Status:</strong> Proposed for v4 implementation</p></li>
+<li><p><strong>Last updated:</strong> 2026-07-29</p></li>
+</ul>
+<p>Every transition is persisted with operation/idempotency id and emits the named
+secret-free audit event. “Failure state” is durable when external mutation may
+have occurred; otherwise the operation returns to its pre-state.</p>
+<section id="key-lifecycle">
+<h2>Key lifecycle<a class="headerlink" href="#key-lifecycle" title="Link to this heading">¶</a></h2>
+<div class="highlight-mermaid notranslate"><div class="highlight"><pre><span></span>stateDiagram-v2
+    [*] --&gt; PENDING
+    PENDING --&gt; PRIMARY: provider confirmed + CAS
+    PENDING --&gt; DISABLED: abandon + provider confirm
+    PRIMARY --&gt; DECRYPT_ONLY: replacement primary confirmed
+    DECRYPT_ONLY --&gt; PRIMARY: explicit rollback + CAS
+    DECRYPT_ONLY --&gt; DISABLED: retention elapsed
+    DISABLED --&gt; DECRYPT_ONLY: approved recovery
+    DISABLED --&gt; DESTROYED: destroy gates + provider confirm
+    DESTROYED --&gt; [*]
+</pre></div>
+</div>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Transition</p></th>
+<th class="head"><p>Preconditions / operation</p></th>
+<th class="head"><p>Success / failure state</p></th>
+<th class="head"><p>Retry safety, audit, rollback</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>create → <code class="docutils literal notranslate"><span class="pre">PENDING</span></code></p></td>
+<td><p>Idempotency key; provider accepts create</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PENDING</span></code>; ambiguous result → <code class="docutils literal notranslate"><span class="pre">PENDING_RECONCILE</span></code> operational substate</p></td>
+<td><p>Retry only provider-idempotent request; <code class="docutils literal notranslate"><span class="pre">key.created</span></code>; reconcile by describe, never duplicate blindly</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">PENDING</span></code> → <code class="docutils literal notranslate"><span class="pre">PRIMARY</span></code></p></td>
+<td><p>Exact version enabled, wrap/unwrap capable; no competing primary; generation CAS</p></td>
+<td><p>Sole <code class="docutils literal notranslate"><span class="pre">PRIMARY</span></code>; CAS/provider uncertainty leaves <code class="docutils literal notranslate"><span class="pre">PENDING</span></code></p></td>
+<td><p>Same CAS id safe; <code class="docutils literal notranslate"><span class="pre">key.promoted</span></code>; rollback disables/abandons pending version</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">PENDING</span></code> → <code class="docutils literal notranslate"><span class="pre">DISABLED</span></code></p></td>
+<td><p>No envelope uses version; provider confirms disable</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">DISABLED</span></code>; otherwise <code class="docutils literal notranslate"><span class="pre">PENDING</span></code>/reconcile</p></td>
+<td><p>Idempotent disable; <code class="docutils literal notranslate"><span class="pre">key.disabled</span></code>; re-enable only through recovery</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">PRIMARY</span></code> → <code class="docutils literal notranslate"><span class="pre">DECRYPT_ONLY</span></code></p></td>
+<td><p>New primary already confirmed; CAS</p></td>
+<td><p>Old <code class="docutils literal notranslate"><span class="pre">DECRYPT_ONLY</span></code>; failure keeps effective state stricter and blocks rotation completion</p></td>
+<td><p>Idempotent by generation; <code class="docutils literal notranslate"><span class="pre">key.demoted</span></code>; rollback may explicitly re-promote</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">DECRYPT_ONLY</span></code> → <code class="docutils literal notranslate"><span class="pre">PRIMARY</span></code></p></td>
+<td><p>Policy/dual control; provider enabled; no competing primary</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PRIMARY</span></code>; failure stays <code class="docutils literal notranslate"><span class="pre">DECRYPT_ONLY</span></code></p></td>
+<td><p>CAS-safe; <code class="docutils literal notranslate"><span class="pre">key.promoted</span></code> reason rollback; undo by demotion after replacement</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">DECRYPT_ONLY</span></code> → <code class="docutils literal notranslate"><span class="pre">DISABLED</span></code></p></td>
+<td><p>Retention/inventory gates; not sole required decrypt version</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">DISABLED</span></code>; failure remains decrypt-only/reconcile</p></td>
+<td><p>Provider-idempotent; <code class="docutils literal notranslate"><span class="pre">key.disabled</span></code>; approved re-enable possible</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">DISABLED</span></code> → <code class="docutils literal notranslate"><span class="pre">DECRYPT_ONLY</span></code></p></td>
+<td><p>Not destroyed; recovery approval; provider re-enabled</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">DECRYPT_ONLY</span></code>; failure remains disabled</p></td>
+<td><p>Reconcile provider state; <code class="docutils literal notranslate"><span class="pre">key.recovered</span></code>; disable again</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">DISABLED</span></code> → <code class="docutils literal notranslate"><span class="pre">DESTROYED</span></code></p></td>
+<td><p>Earliest time, inventory, retention, dual approval, audit checkpoint</p></td>
+<td><p>terminal <code class="docutils literal notranslate"><span class="pre">DESTROYED</span></code>; ambiguity → <code class="docutils literal notranslate"><span class="pre">DESTROY_RECONCILE</span></code> and deny use</p></td>
+<td><p>Never blind retry; <code class="docutils literal notranslate"><span class="pre">key.destroyed</span></code>; no rollback</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">PRIMARY</span> <span class="pre">→</span> <span class="pre">DESTROYED</span></code>, multiple primaries, any transition from <code class="docutils literal notranslate"><span class="pre">DESTROYED</span></code>, and
+promotion from local metadata alone are invalid and audited as denied.</p>
+</section>
+<section id="envelope-processing">
+<h2>Envelope processing<a class="headerlink" href="#envelope-processing" title="Link to this heading">¶</a></h2>
+<div class="highlight-mermaid notranslate"><div class="highlight"><pre><span></span>stateDiagram-v2
+    [*] --&gt; FRAMING
+    FRAMING --&gt; STRUCTURED: fixed preamble and limits pass
+    STRUCTURED --&gt; POLICY_ACCEPTED: canonical header and policy pass
+    POLICY_ACCEPTED --&gt; KEY_READY: fresh or unwrapped DEK
+    KEY_READY --&gt; CONTEXT_BOUND: keyed commitment created or verified
+    CONTEXT_BOUND --&gt; PROCESSING
+    PROCESSING --&gt; AUTHENTICATED: final record verifies
+    AUTHENTICATED --&gt; COMMITTED
+    FRAMING --&gt; REJECTED
+    STRUCTURED --&gt; REJECTED
+    POLICY_ACCEPTED --&gt; REJECTED
+    KEY_READY --&gt; REJECTED
+    CONTEXT_BOUND --&gt; REJECTED
+    PROCESSING --&gt; REJECTED
+</pre></div>
+</div>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Transition</p></th>
+<th class="head"><p>Preconditions / operation</p></th>
+<th class="head"><p>Success / failure</p></th>
+<th class="head"><p>Retry, audit, rollback</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>start → <code class="docutils literal notranslate"><span class="pre">FRAMING</span></code></p></td>
+<td><p>Fixed input handle/bytes</p></td>
+<td><p>bounded preamble; invalid → <code class="docutils literal notranslate"><span class="pre">REJECTED</span></code></p></td>
+<td><p>Read-only retry safe; <code class="docutils literal notranslate"><span class="pre">envelope.started</span></code>; no output</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">FRAMING</span></code> → <code class="docutils literal notranslate"><span class="pre">STRUCTURED</span></code></p></td>
+<td><p>Checked lengths within hard limits</p></td>
+<td><p>restricted deterministic-CBOR model; malformed → rejected</p></td>
+<td><p>Deterministic; <code class="docutils literal notranslate"><span class="pre">envelope.rejected</span></code>; discard parse state</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">STRUCTURED</span></code> → <code class="docutils literal notranslate"><span class="pre">POLICY_ACCEPTED</span></code></p></td>
+<td><p>Version/suite/critical/quota/context requirements/provider allowed</p></td>
+<td><p>accepted; denial → rejected before provider</p></td>
+<td><p>Re-evaluate only same policy id; <code class="docutils literal notranslate"><span class="pre">policy.decision</span></code>; no output</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">POLICY_ACCEPTED</span></code> → <code class="docutils literal notranslate"><span class="pre">KEY_READY</span></code></p></td>
+<td><p>Seal generates fresh DEK; open unwraps pinned version using protected-header bytes</p></td>
+<td><p>internal DEK; transient provider failure remains retryable pre-processing</p></td>
+<td><p>RFC-0006 retry; <code class="docutils literal notranslate"><span class="pre">provider.call</span></code>; release secret on failure</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">KEY_READY</span></code> → <code class="docutils literal notranslate"><span class="pre">CONTEXT_BOUND</span></code></p></td>
+<td><p>Canonical caller context; derived context-binding key</p></td>
+<td><p>Seal stores keyed commitment then wraps with completed header; open constant-time verifies commitment; mismatch rejected</p></td>
+<td><p>New seal DEK on retry; <code class="docutils literal notranslate"><span class="pre">context.bound</span></code> or redacted mismatch; provider never receives context</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">CONTEXT_BOUND</span></code> → <code class="docutils literal notranslate"><span class="pre">PROCESSING</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">TransactionalSink</span></code> is open and accepts bounded writes</p></td>
+<td><p>records processed; any auth/order/I/O/cancel → rejected</p></td>
+<td><p>Open read retry safe; call idempotent sink abort</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">PROCESSING</span></code> → <code class="docutils literal notranslate"><span class="pre">AUTHENTICATED</span></code></p></td>
+<td><p>Final record/manifest verified</p></td>
+<td><p>authenticated uncommitted sink; failure rejected</p></td>
+<td><p>No retry from partial state unless sealed resumable profile later; <code class="docutils literal notranslate"><span class="pre">envelope.authenticated</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">AUTHENTICATED</span></code> → <code class="docutils literal notranslate"><span class="pre">COMMITTED</span></code></p></td>
+<td><p>Sink and output policy checks pass</p></td>
+<td><p>sink commit or one-shot bytes return; commit failure enters typed I/O failure</p></td>
+<td><p>Exactly-once commit; <code class="docutils literal notranslate"><span class="pre">envelope.completed</span></code>; pre-commit failures call idempotent abort</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="streaming-encryption">
+<h2>Streaming encryption<a class="headerlink" href="#streaming-encryption" title="Link to this heading">¶</a></h2>
+<p>States are <code class="docutils literal notranslate"><span class="pre">INIT</span> <span class="pre">→</span> <span class="pre">SINK_OPEN</span> <span class="pre">→</span> <span class="pre">DEK_READY</span> <span class="pre">→</span> <span class="pre">CONTEXT_COMMITTED</span> <span class="pre">→</span> <span class="pre">KEY_WRAPPED</span> <span class="pre">→</span> <span class="pre">HEADER_WRITTEN</span> <span class="pre">→</span> <span class="pre">CHUNKS</span> <span class="pre">→</span> <span class="pre">FINAL_AUTHENTICATED</span> <span class="pre">→</span> <span class="pre">COMMITTED</span></code>. Before
+<code class="docutils literal notranslate"><span class="pre">CONTEXT_COMMITTED</span></code>, policy and immutable provider version must pass and a fresh
+DEK must exist. Context is canonicalized and committed with a DEK-derived key;
+provider wrapping then binds the completed protected-header bytes. Each
+<code class="docutils literal notranslate"><span class="pre">CHUNKS</span></code> transition reads at most the policy chunk, increments exactly one
+index, authenticates index/length/final flag/header digest, and performs one
+bounded sink write.</p>
+<p>Final authentication is followed by exactly one sink commit. Authentication,
+context, quota, cancellation, provider, or I/O failure invokes idempotent abort;
+existing destination remains unchanged. A retry is a new envelope with a new
+DEK/idempotency key unless no provider mutation occurred. Events:
+<code class="docutils literal notranslate"><span class="pre">stream.seal.started</span></code>, per-policy coarse progress, <code class="docutils literal notranslate"><span class="pre">stream.seal.completed</span></code> or
+<code class="docutils literal notranslate"><span class="pre">stream.seal.failed</span></code>. Rollback never deletes caller source.</p>
+</section>
+<section id="streaming-decryption">
+<h2>Streaming decryption<a class="headerlink" href="#streaming-decryption" title="Link to this heading">¶</a></h2>
+<p>States are <code class="docutils literal notranslate"><span class="pre">INIT</span> <span class="pre">→</span> <span class="pre">SINK_OPEN</span> <span class="pre">→</span> <span class="pre">HEADER_ACCEPTED</span> <span class="pre">→</span> <span class="pre">KEY_UNWRAPPED</span> <span class="pre">→</span> <span class="pre">CONTEXT_VERIFIED</span> <span class="pre">→</span> <span class="pre">CHUNKS_STAGED</span> <span class="pre">→</span> <span class="pre">FINAL_AUTHENTICATED</span> <span class="pre">→</span> <span class="pre">COMMITTED</span></code>.
+Provider unwrap binds the protected-header bytes without receiving context.
+After unwrap, the derived keyed commitment is recomputed from caller context and
+compared in constant time; mismatch aborts before plaintext writes. Each record
+must be the next index, within declared/actual limits, and nonempty unless final.
+Missing/duplicate/reordered/trailing records transition to <code class="docutils literal notranslate"><span class="pre">FAILED</span></code>.</p>
+<p>Plaintext remains uncommitted in the <code class="docutils literal notranslate"><span class="pre">TransactionalSink</span></code> through
+<code class="docutils literal notranslate"><span class="pre">CHUNKS_STAGED</span></code>; exactly one commit follows <code class="docutils literal notranslate"><span class="pre">FINAL_AUTHENTICATED</span></code>. Every failure
+or cancellation invokes idempotent abort and leaves pre-existing output
+unchanged. Open is read-only/provider-idempotent and may restart from byte zero;
+partial plaintext is never resumed. Events:
+<code class="docutils literal notranslate"><span class="pre">stream.open.started/completed/failed</span></code>.</p>
+</section>
+<section id="rotation">
+<h2>Rotation<a class="headerlink" href="#rotation" title="Link to this heading">¶</a></h2>
+<div class="highlight-mermaid notranslate"><div class="highlight"><pre><span></span>stateDiagram-v2
+    [*] --&gt; PLANNED
+    PLANNED --&gt; CREATED_PENDING
+    CREATED_PENDING --&gt; CONFIRMED
+    CONFIRMED --&gt; PROMOTED
+    PROMOTED --&gt; OLD_DEMOTED
+    OLD_DEMOTED --&gt; REWRAPPING
+    REWRAPPING --&gt; OBSERVING
+    OBSERVING --&gt; COMPLETE
+    CREATED_PENDING --&gt; RECONCILING
+    CONFIRMED --&gt; RECONCILING
+    PROMOTED --&gt; RECONCILING
+</pre></div>
+</div>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Transition</p></th>
+<th class="head"><p>Preconditions / operation</p></th>
+<th class="head"><p>Failure and retry</p></th>
+<th class="head"><p>Audit / rollback</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>plan → pending</p></td>
+<td><p>Policy, approvals, unique operation/generation</p></td>
+<td><p>Creation ambiguity → reconcile; retry only idempotent</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">rotation.started</span></code>; abandon confirmed-unused version</p></td>
+</tr>
+<tr class="row-odd"><td><p>pending → confirmed</p></td>
+<td><p>Fresh provider description exact version/capability</p></td>
+<td><p>Stay/reconcile; never local promotion</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">key.confirmed</span></code>; disable pending on cancellation</p></td>
+</tr>
+<tr class="row-even"><td><p>confirmed → promoted</p></td>
+<td><p>CAS makes sole primary</p></td>
+<td><p>CAS loser reconciles to winning primary</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">key.promoted</span></code>; explicit previous-version rollback</p></td>
+</tr>
+<tr class="row-odd"><td><p>promoted → old demoted</p></td>
+<td><p>New primary independently confirmed</p></td>
+<td><p>Block completion if demotion uncertain</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">key.demoted</span></code>; may restore old if policy permits</p></td>
+</tr>
+<tr class="row-even"><td><p>demoted → rewrapping</p></td>
+<td><p>Durable inventory/idempotency queue</p></td>
+<td><p>Per-envelope failures retained, bounded retry</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">rotation.rewrap_progress</span></code>; original envelopes retained</p></td>
+</tr>
+<tr class="row-odd"><td><p>rewrapping → observing → complete</p></td>
+<td><p>Required coverage/soak/retention met</p></td>
+<td><p>Remain observing; no premature disable/destroy</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">rotation.completed</span></code>; later lifecycle gates independent</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="rewrap">
+<h2>Rewrap<a class="headerlink" href="#rewrap" title="Link to this heading">¶</a></h2>
+<p>States: <code class="docutils literal notranslate"><span class="pre">PARSED</span> <span class="pre">→</span> <span class="pre">POLICY_ACCEPTED</span> <span class="pre">→</span> <span class="pre">SOURCE_DEK_UNWRAPPED</span> <span class="pre">→</span> <span class="pre">DESTINATION_VERSION_CONFIRMED</span> <span class="pre">→</span> <span class="pre">DESTINATION_WRAPPED</span> <span class="pre">→</span> <span class="pre">RECIPIENT_AUTH_UPDATED</span> <span class="pre">→</span> <span class="pre">VERIFIED</span> <span class="pre">→</span> <span class="pre">COMMITTED</span></code>.</p>
+<p>Preconditions are canonical v4 envelope, allowed source/destination providers,
+immutable versions, and idempotency key. Ciphertext records are copied exactly.
+Same source/destination version returns the canonical original and is idempotent.
+Any failure before commit returns the original unchanged and releases the DEK.
+Ambiguous destination wrap reconciles through provider semantics; it is never
+blindly duplicated. <code class="docutils literal notranslate"><span class="pre">VERIFIED</span></code> checks recipient/header integrity, exact
+ciphertext digest equality, and metadata; content status is “preserved, not
+reverified” unless actually verified. Events are
+<code class="docutils literal notranslate"><span class="pre">rewrap.started/completed/failed</span></code>; rollback discards the new envelope.</p>
+</section>
+<section id="migration">
+<h2>Migration<a class="headerlink" href="#migration" title="Link to this heading">¶</a></h2>
+<div class="highlight-mermaid notranslate"><div class="highlight"><pre><span></span>stateDiagram-v2
+    [*] --&gt; INVENTORIED
+    INVENTORIED --&gt; DRY_RUN_VALID
+    DRY_RUN_VALID --&gt; BACKUP_CONFIRMED
+    BACKUP_CONFIRMED --&gt; STAGED
+    STAGED --&gt; REENCRYPTED
+    REENCRYPTED --&gt; VERIFIED
+    VERIFIED --&gt; PROMOTED
+    PROMOTED --&gt; RECEIPTED
+    RECEIPTED --&gt; COMPLETE
+    STAGED --&gt; FAILED_RESUMABLE
+    REENCRYPTED --&gt; FAILED_RESUMABLE
+    VERIFIED --&gt; FAILED_RESUMABLE
+    PROMOTED --&gt; RECONCILE
+</pre></div>
+</div>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Transition</p></th>
+<th class="head"><p>Preconditions / operation</p></th>
+<th class="head"><p>Failure/retry</p></th>
+<th class="head"><p>Audit/rollback</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>inventory/dry run</p></td>
+<td><p>Named format, source digest, quotas, deadline, context/key capacity</p></td>
+<td><p>Quarantine malformed; retry read-only with same digest</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">migration.inventoried/validated</span></code>; no writes</p></td>
+</tr>
+<tr class="row-odd"><td><p>backup → staged</p></td>
+<td><p>Caller backup confirmation; destination/link policy; durable id</p></td>
+<td><p>Collision fails; same id/digest resumes</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">migration.staged</span></code>; remove owned temp</p></td>
+</tr>
+<tr class="row-even"><td><p>staged → reencrypted</p></td>
+<td><p>Declared legacy decrypt then v4 seal</p></td>
+<td><p>Auth/provider/cancel → resumable/failed, no promotion</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">migration.reencrypted</span></code>; source retained</p></td>
+</tr>
+<tr class="row-odd"><td><p>reencrypted → verified</p></td>
+<td><p>Independent v4 reopen and keyed stream digest/length compare</p></td>
+<td><p>Verification failure quarantines output</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">migration.verified</span></code>; discard staged envelope</p></td>
+</tr>
+<tr class="row-even"><td><p>verified → promoted</p></td>
+<td><p>Fsync and atomic same-filesystem replace</p></td>
+<td><p>Ambiguous crash → reconcile filesystem/digests</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">migration.promoted</span></code>; source/backup retained</p></td>
+</tr>
+<tr class="row-odd"><td><p>promoted → receipted/complete</p></td>
+<td><p>Durable receipt and audit checkpoint</p></td>
+<td><p>Mandatory sink failure → reconcile, not false success</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">migration.completed</span></code>; rollback uses caller backup/retains both</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Source deletion is not a transition in this machine.</p>
+</section>
+<section id="provider-health">
+<h2>Provider health<a class="headerlink" href="#provider-health" title="Link to this heading">¶</a></h2>
+<p>States are <code class="docutils literal notranslate"><span class="pre">UNKNOWN</span></code>, <code class="docutils literal notranslate"><span class="pre">HEALTHY</span></code>, <code class="docutils literal notranslate"><span class="pre">DEGRADED</span></code>, <code class="docutils literal notranslate"><span class="pre">UNAVAILABLE</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">MISCONFIGURED</span></code>. Explicit health check maps successful full check to <code class="docutils literal notranslate"><span class="pre">HEALTHY</span></code>,
+partial/rate-limited dependency to <code class="docutils literal notranslate"><span class="pre">DEGRADED</span></code>, transient reachability to
+<code class="docutils literal notranslate"><span class="pre">UNAVAILABLE</span></code>, permanent credential/config to <code class="docutils literal notranslate"><span class="pre">MISCONFIGURED</span></code>, and cancelled/
+unclassifiable to <code class="docutils literal notranslate"><span class="pre">UNKNOWN</span></code>. Checks are read-only and retry only under RFC-0006.
+<code class="docutils literal notranslate"><span class="pre">provider.health</span></code> records safe state/latency bucket. Health transitions have no
+cryptographic rollback and never override actual call/policy results.</p>
+</section>
+<section id="release-maturity">
+<h2>Release maturity<a class="headerlink" href="#release-maturity" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">ALPHA</span> <span class="pre">→</span> <span class="pre">BETA</span> <span class="pre">→</span> <span class="pre">RC1_FROZEN</span> <span class="pre">→</span> <span class="pre">AUDITED</span> <span class="pre">→</span> <span class="pre">REMEDIATION_VALIDATED</span> <span class="pre">→</span> <span class="pre">SOAKED</span> <span class="pre">→</span> <span class="pre">STABLE</span></code> follows RFC-0010. Any failed gate remains at the prior state;
+format/API freeze exception returns to <code class="docutils literal notranslate"><span class="pre">BETA</span></code> for affected evidence. Promotion
+requires linked artifacts/approvals and is not retryable by workflow alone.
+<code class="docutils literal notranslate"><span class="pre">release.promoted</span></code> records commit/artifact digests and approvers; rollback
+withdraws/quarantines artifacts but never reuses a version.</p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, Mojtaba Zaferanloo
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">v4 State Machines</a><ul>
+<li><a class="reference internal" href="#key-lifecycle">Key lifecycle</a></li>
+<li><a class="reference internal" href="#envelope-processing">Envelope processing</a></li>
+<li><a class="reference internal" href="#streaming-encryption">Streaming encryption</a></li>
+<li><a class="reference internal" href="#streaming-decryption">Streaming decryption</a></li>
+<li><a class="reference internal" href="#rotation">Rotation</a></li>
+<li><a class="reference internal" href="#rewrap">Rewrap</a></li>
+<li><a class="reference internal" href="#migration">Migration</a></li>
+<li><a class="reference internal" href="#provider-health">Provider health</a></li>
+<li><a class="reference internal" href="#release-maturity">Release maturity</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=acc74ff5"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
+</html>

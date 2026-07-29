@@ -1,0 +1,629 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html">
+
+    <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
+        <title>RFC-0004: Stable Public Python API - cryptography-suite 3.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">cryptography-suite 3.0.0 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  <span class="sidebar-brand-text">cryptography-suite 3.0.0 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../../_sources/v4/rfcs/RFC-0004-public-python-api.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="rfc-0004-stable-public-python-api">
+<h1>RFC-0004: Stable Public Python API<a class="headerlink" href="#rfc-0004-stable-public-python-api" title="Link to this heading">¶</a></h1>
+<ul class="simple">
+<li><p><strong>Status:</strong> Proposed for v4 implementation</p></li>
+<li><p><strong>Owner:</strong> Python API architecture</p></li>
+<li><p><strong>Last updated:</strong> 2026-07-29</p></li>
+</ul>
+<section id="context">
+<h2>Context<a class="headerlink" href="#context" title="Link to this heading">¶</a></h2>
+<p>v4 needs one deliberate high-level API for bytes and bounded streams. Models are
+frozen value objects; protocols are runtime-checkable and statically typed.</p>
+</section>
+<section id="phase-1-evidence">
+<h2>Phase 1 evidence<a class="headerlink" href="#phase-1-evidence" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="../baseline/public-api-inventory.html"><span class="std std-doc">Public API inventory</span></a> finds 111 explicit
+root names plus <code class="docutils literal notranslate"><span class="pre">__version__</span></code>, broad public submodules, caller nonces/KDFs/raw
+keys, and mutable backend controls.</p>
+</section>
+<section id="problem-statement">
+<h2>Problem statement<a class="headerlink" href="#problem-statement" title="Link to this heading">¶</a></h2>
+<p>The current API makes unsafe choice and accidental compatibility part of the
+contract. It cannot express provider, context, policy, inspection, or rewrap as
+one coherent operation.</p>
+</section>
+<section id="goals">
+<h2>Goals<a class="headerlink" href="#goals" title="Link to this heading">¶</a></h2>
+<p>Define exact root exports, method signatures, immutability, errors, cancellation,
+redaction, inspection, rewrap, and versioning.</p>
+</section>
+<section id="non-goals">
+<h2>Non-goals<a class="headerlink" href="#non-goals" title="Link to this heading">¶</a></h2>
+<p>The API does not expose primitives, raw DEKs, long-term private keys, async
+facsimiles, or a generic provider registry.</p>
+</section>
+<section id="binding-decision">
+<h2>Binding decision<a class="headerlink" href="#binding-decision" title="Link to this heading">¶</a></h2>
+<p>The package root MUST export exactly these 15 symbols:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;AuthenticationError&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ContextMismatchError&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CryptographySuiteError&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;EncryptionContext&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Envelope&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;EnvelopeError&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;EnvelopeMetadata&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ErrorCode&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;KeyProvider&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;KeyRef&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;MigrationError&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Policy&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;PolicyError&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Protector&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ProviderError&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">__version__</span></code> remains readable package metadata but is intentionally not in
+<code class="docutils literal notranslate"><span class="pre">__all__</span></code>. No lazy compatibility exports are allowed.</p>
+<p>The proposed signatures are normative:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Protector</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">provider</span><span class="p">:</span> <span class="n">KeyProvider</span><span class="p">,</span>
+        <span class="n">policy</span><span class="p">:</span> <span class="n">Policy</span><span class="p">,</span>
+        <span class="n">primary_key</span><span class="p">:</span> <span class="n">KeyRef</span><span class="p">,</span>
+        <span class="n">audit_sink</span><span class="p">:</span> <span class="n">AuditSink</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">seal</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">plaintext</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">context</span><span class="p">:</span> <span class="n">EncryptionContext</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Envelope</span><span class="p">:</span> <span class="o">...</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">open</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">envelope</span><span class="p">:</span> <span class="n">Envelope</span> <span class="o">|</span> <span class="nb">bytes</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">context</span><span class="p">:</span> <span class="n">EncryptionContext</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span> <span class="o">...</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">inspect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">envelope</span><span class="p">:</span> <span class="n">Envelope</span> <span class="o">|</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EnvelopeMetadata</span><span class="p">:</span> <span class="o">...</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">rewrap</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">envelope</span><span class="p">:</span> <span class="n">Envelope</span> <span class="o">|</span> <span class="nb">bytes</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">destination_key</span><span class="p">:</span> <span class="n">KeyRef</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Envelope</span><span class="p">:</span> <span class="o">...</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">seal_stream</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">source</span><span class="p">:</span> <span class="n">BinaryIO</span><span class="p">,</span>
+        <span class="n">destination</span><span class="p">:</span> <span class="n">TransactionalSink</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">context</span><span class="p">:</span> <span class="n">EncryptionContext</span><span class="p">,</span>
+        <span class="n">cancel</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EnvelopeMetadata</span><span class="p">:</span> <span class="o">...</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">open_stream</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">source</span><span class="p">:</span> <span class="n">BinaryIO</span><span class="p">,</span>
+        <span class="n">destination</span><span class="p">:</span> <span class="n">TransactionalSink</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">context</span><span class="p">:</span> <span class="n">EncryptionContext</span><span class="p">,</span>
+        <span class="n">cancel</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EnvelopeMetadata</span><span class="p">:</span> <span class="o">...</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Envelope(data:</span> <span class="pre">bytes)</span></code> is an immutable validated byte container;
+<code class="docutils literal notranslate"><span class="pre">bytes(envelope)</span></code> returns the original canonical bytes. Construction performs
+only hard-limit framing validation and no provider call. <code class="docutils literal notranslate"><span class="pre">EnvelopeMetadata</span></code> is
+an immutable, redacted view containing format/profile/version, algorithm-suite
+identifier, provider/key references and immutable versions, sizes/counts, an
+opaque context-commitment identifier (never context values), creation time if
+present, critical features, and policy identifier. It contains no plaintext,
+DEK, nonce, wrapped key bytes, password/KDF salt, or ciphertext samples.</p>
+<p><code class="docutils literal notranslate"><span class="pre">EncryptionContext</span></code> is a frozen mapping of UTF-8 string keys to UTF-8 string or
+bytes values with convenience fields <code class="docutils literal notranslate"><span class="pre">purpose</span></code> and <code class="docutils literal notranslate"><span class="pre">tenant_id</span></code>. Keys are
+normalized and duplicates rejected; values are size-bounded. Its deterministic
+encoding is authenticated but not stored in clear. Seal MUST derive a
+domain-separated context-binding key from the fresh envelope DEK and use a
+reviewed keyed construction to compute an opaque context commitment over the
+canonical context encoding. Only that commitment is stored in protected
+metadata. Provider wrap/unwrap binding uses protected-header bytes; providers
+do not receive plaintext context.</p>
+<p>After unwrapping the DEK, open MUST derive the same context-binding key,
+recompute the commitment from the caller-supplied context, and compare it in
+constant time. Mismatch raises <code class="docutils literal notranslate"><span class="pre">ContextMismatchError</span></code> without identifying the
+field or value that failed. The exact KDF/keyed construction is assigned to the
+normative format/security review before implementation.</p>
+<p><code class="docutils literal notranslate"><span class="pre">KeyRef(provider_id:</span> <span class="pre">str,</span> <span class="pre">key_id:</span> <span class="pre">str,</span> <span class="pre">version:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">None)</span></code> is frozen. Seal
+MUST resolve and record an immutable version; an alias without a resolved
+version MUST NOT be written into a recipient entry. Metadata may additionally
+record a non-authoritative logical alias.</p>
+<p><code class="docutils literal notranslate"><span class="pre">Policy</span></code> is frozen and validated as in
+<a class="reference internal" href="RFC-0007-policy-model.html"><span class="std std-doc">RFC-0007</span></a>. <code class="docutils literal notranslate"><span class="pre">KeyProvider</span></code> is the explicit protocol in
+<a class="reference internal" href="RFC-0006-provider-and-key-lifecycle.html"><span class="std std-doc">RFC-0006</span></a>. Supporting provider/audit/
+lifecycle/streaming models remain stable in their named submodules but are not
+root exports. <code class="docutils literal notranslate"><span class="pre">TransactionalSink</span></code> is imported from
+<code class="docutils literal notranslate"><span class="pre">cryptography_suite.streaming</span></code>.</p>
+<p>The stable sink contract is normative:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">TransactionalSink</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">max_write_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span> <span class="o">...</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">commit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">abort</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
+</pre></div>
+</div>
+<p>The sink states are <code class="docutils literal notranslate"><span class="pre">OPEN</span></code>, <code class="docutils literal notranslate"><span class="pre">COMMITTED</span></code>, and <code class="docutils literal notranslate"><span class="pre">ABORTED</span></code>. <code class="docutils literal notranslate"><span class="pre">write</span></code> is valid only
+while <code class="docutils literal notranslate"><span class="pre">OPEN</span></code>, MUST reject a chunk larger than <code class="docutils literal notranslate"><span class="pre">max_write_size</span></code>, and MUST keep
+written bytes uncommitted and externally invisible. <code class="docutils literal notranslate"><span class="pre">commit</span></code> is permitted only
+after final authentication and all policy/I/O checks and MUST atomically
+transition <code class="docutils literal notranslate"><span class="pre">OPEN</span></code> to <code class="docutils literal notranslate"><span class="pre">COMMITTED</span></code>; a failed commit MUST leave no committed result
+and must permit idempotent abort. <code class="docutils literal notranslate"><span class="pre">abort</span></code> transitions <code class="docutils literal notranslate"><span class="pre">OPEN</span></code> to <code class="docutils literal notranslate"><span class="pre">ABORTED</span></code>, is a
+no-op when already <code class="docutils literal notranslate"><span class="pre">ABORTED</span></code>, and MUST run on authentication, context, quota,
+cancellation, provider, and I/O failure. After commit, neither further write nor
+abort may alter the committed result. SDK filesystem sinks use same-directory
+exclusive staging, fsync, atomic promotion, and directory fsync.</p>
+<p>Both safe stable stream methods require <code class="docutils literal notranslate"><span class="pre">TransactionalSink</span></code>, including seal, so
+the failure-atomic promise is consistent for ciphertext and plaintext output.
+Pipes, sockets, stdout, and arbitrary already-open <code class="docutils literal notranslate"><span class="pre">BinaryIO</span></code> destinations are
+not valid sinks. An explicitly unsafe/uncommitted API, if ever proposed, MUST
+live outside the default stable path and cannot inherit these guarantees.</p>
+<p>The initial API is synchronous. Provider SDKs and file I/O may block subject to
+required timeouts. A future native async API requires a separate RFC and MUST
+NOT implement blocking calls on an event loop. One-shot calls have no
+cooperative cancellation point; stream calls check <code class="docutils literal notranslate"><span class="pre">cancel</span></code> before provider
+calls, before each chunk, and before sink commit. Cancellation raises a typed
+error and invokes sink abort.</p>
+<p><code class="docutils literal notranslate"><span class="pre">inspect</span></code> MUST parse and policy-check structural metadata without unwrapping a
+DEK, decrypting content, or making a network/provider call. It MUST clearly mark
+authentication as “not verified”; callers cannot use it as proof of
+authenticity. It MAY expose only an opaque context-commitment identifier and
+MUST NOT imply that a public hash protects low-entropy context values.</p>
+<p><code class="docutils literal notranslate"><span class="pre">rewrap</span></code> MUST parse and enforce policy, unwrap the existing DEK internally, wrap
+it to a resolved destination version, update only the mutable recipient
+section/authenticator, and preserve ciphertext bytes. It MUST NOT return or log
+the DEK/plaintext. It verifies recipient/header integrity; unless the format can
+verify the content tag without materializing plaintext, it MUST report content
+authentication as “preserved, not reverified.” Same-key/version rewrap is
+idempotent.</p>
+</section>
+<section id="error-taxonomy">
+<h2>Error taxonomy<a class="headerlink" href="#error-taxonomy" title="Link to this heading">¶</a></h2>
+<p>All stable exceptions inherit <code class="docutils literal notranslate"><span class="pre">CryptographySuiteError</span></code> and expose immutable
+<code class="docutils literal notranslate"><span class="pre">code:</span> <span class="pre">ErrorCode</span></code>, <code class="docutils literal notranslate"><span class="pre">retryable:</span> <span class="pre">bool</span></code>, and redacted <code class="docutils literal notranslate"><span class="pre">details:</span> <span class="pre">Mapping[str,</span> <span class="pre">JSONScalar]</span></code>.
+<code class="docutils literal notranslate"><span class="pre">str(error)</span></code> is safe for logs.</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Root type</p></th>
+<th class="head"><p>Stable code families</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">EnvelopeError</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">FORMAT_INVALID</span></code>, <code class="docutils literal notranslate"><span class="pre">FORMAT_UNSUPPORTED</span></code>, <code class="docutils literal notranslate"><span class="pre">LIMIT_EXCEEDED</span></code>, <code class="docutils literal notranslate"><span class="pre">CRITICAL_FIELD_UNSUPPORTED</span></code>, <code class="docutils literal notranslate"><span class="pre">TRAILING_DATA</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">AuthenticationError</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">AUTHENTICATION_FAILED</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ContextMismatchError</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CONTEXT_MISMATCH</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">PolicyError</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">POLICY_INVALID</span></code>, <code class="docutils literal notranslate"><span class="pre">POLICY_DENIED</span></code>, <code class="docutils literal notranslate"><span class="pre">KEY_STATE_DENIED</span></code>, <code class="docutils literal notranslate"><span class="pre">LEGACY_DENIED</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ProviderError</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PROVIDER_UNAVAILABLE</span></code>, <code class="docutils literal notranslate"><span class="pre">PROVIDER_TIMEOUT</span></code>, <code class="docutils literal notranslate"><span class="pre">PROVIDER_RATE_LIMITED</span></code>, <code class="docutils literal notranslate"><span class="pre">PROVIDER_AUTH_FAILED</span></code>, <code class="docutils literal notranslate"><span class="pre">KEY_NOT_FOUND</span></code>, <code class="docutils literal notranslate"><span class="pre">KEY_VERSION_STALE</span></code>, <code class="docutils literal notranslate"><span class="pre">CAPABILITY_UNSUPPORTED</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MigrationError</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">MIGRATION_INCOMPLETE</span></code>, <code class="docutils literal notranslate"><span class="pre">MIGRATION_VERIFY_FAILED</span></code>, <code class="docutils literal notranslate"><span class="pre">MIGRATION_CONFLICT</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>base-only operational subclasses in <code class="docutils literal notranslate"><span class="pre">errors</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IO_FAILED</span></code>, <code class="docutils literal notranslate"><span class="pre">OUTPUT_EXISTS</span></code>, <code class="docutils literal notranslate"><span class="pre">CANCELLED</span></code>, <code class="docutils literal notranslate"><span class="pre">INTERNAL_ERROR</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Authentication and context mismatch are distinct programmatically but default
+human messages MUST be equally non-diagnostic where an oracle is plausible.
+Unknown provider messages, paths, tokens, payload fragments, key material, and
+context values MUST be redacted.</p>
+</section>
+<section id="api-or-architecture-implications">
+<h2>API or architecture implications<a class="headerlink" href="#api-or-architecture-implications" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">Protector</span></code> is the sole stable orchestration object. Safe stream output always
+uses <code class="docutils literal notranslate"><span class="pre">TransactionalSink</span></code>. File-path convenience lives in <code class="docutils literal notranslate"><span class="pre">streaming</span></code> and MUST
+apply RFC-0007/RFC-0009 atomic/link policy. Providers cannot be registered
+globally or selected from environment/import state.</p>
+</section>
+<section id="security-consequences">
+<h2>Security consequences<a class="headerlink" href="#security-consequences" title="Link to this heading">¶</a></h2>
+<p>Callers cannot choose nonces, tags, modes, arbitrary algorithms/KDF work
+factors, raw DEKs, or provider fallback. Python memory cannot guarantee DEK
+zeroization; internal mutable buffers and prompt release are best effort and
+must not be advertised otherwise.</p>
+</section>
+<section id="privacy-consequences">
+<h2>Privacy consequences<a class="headerlink" href="#privacy-consequences" title="Link to this heading">¶</a></h2>
+<p>Context values can be sensitive and low entropy. Only a DEK-keyed opaque context
+commitment is serialized. Inspection and exceptions are redacted by
+construction, and providers never receive plaintext context.</p>
+</section>
+<section id="compatibility-consequences">
+<h2>Compatibility consequences<a class="headerlink" href="#compatibility-consequences" title="Link to this heading">¶</a></h2>
+<p>v3 imports are removed. Additive root exports and signature changes require the
+stability process; changing <code class="docutils literal notranslate"><span class="pre">ErrorCode</span></code> meaning is breaking. Unknown enum codes
+must remain representable in serialized operational output.</p>
+</section>
+<section id="operational-consequences">
+<h2>Operational consequences<a class="headerlink" href="#operational-consequences" title="Link to this heading">¶</a></h2>
+<p>Applications explicitly own provider instances, primary key selection, policy,
+audit sink, timeouts configured on providers, and stream lifetime.</p>
+</section>
+<section id="failure-behavior">
+<h2>Failure behavior<a class="headerlink" href="#failure-behavior" title="Link to this heading">¶</a></h2>
+<p>No operation returns partial success. One-shot open returns no bytes before full
+authentication. Stream methods write only through an <code class="docutils literal notranslate"><span class="pre">OPEN</span></code>
+<code class="docutils literal notranslate"><span class="pre">TransactionalSink</span></code>; they call <code class="docutils literal notranslate"><span class="pre">commit</span></code> after final authentication and call
+idempotent <code class="docutils literal notranslate"><span class="pre">abort</span></code> on every failure. No externally visible committed plaintext
+or ciphertext exists before commit.</p>
+</section>
+<section id="alternatives-considered">
+<h2>Alternatives considered<a class="headerlink" href="#alternatives-considered" title="Link to this heading">¶</a></h2>
+<p>Module-level <code class="docutils literal notranslate"><span class="pre">seal/open</span></code>; async-first API; separate protector classes per
+provider; a larger convenience facade.</p>
+</section>
+<section id="rejected-alternatives">
+<h2>Rejected alternatives<a class="headerlink" href="#rejected-alternatives" title="Link to this heading">¶</a></h2>
+<p>Module globals hide ownership, async wrappers risk blocking, provider-specific
+protectors fragment semantics, and convenience exports regrow the audit surface.</p>
+</section>
+<section id="implementation-constraints">
+<h2>Implementation constraints<a class="headerlink" href="#implementation-constraints" title="Link to this heading">¶</a></h2>
+<p>Models MUST use defensive copies and frozen fields. Bytes-like inputs other than
+<code class="docutils literal notranslate"><span class="pre">bytes</span></code> MAY be accepted internally but return types are exact. No implicit text
+encoding is permitted. Safe stream implementations MUST reject objects that do
+not implement the transactional state contract.</p>
+</section>
+<section id="test-and-validation-requirements">
+<h2>Test and validation requirements<a class="headerlink" href="#test-and-validation-requirements" title="Link to this heading">¶</a></h2>
+<p>Snapshot <code class="docutils literal notranslate"><span class="pre">__all__</span></code>, signatures, typing behavior, immutability, error codes,
+redaction, keyed context-commitment vectors/mismatch/non-oracle behavior,
+no-network inspect, same-key rewrap, cancellation at every transition, sink
+write bounds, idempotent abort, commit timing, and authenticate-before-release
+behavior.</p>
+</section>
+<section id="migration-implications">
+<h2>Migration implications<a class="headerlink" href="#migration-implications" title="Link to this heading">¶</a></h2>
+<p>Mapping tables must direct v3 callers either to <code class="docutils literal notranslate"><span class="pre">Protector</span></code>, explicit
+RFC-0008 migration, labs, or removal; no raw helper maps directly into root.</p>
+</section>
+<section id="unresolved-questions">
+<h2>Unresolved questions<a class="headerlink" href="#unresolved-questions" title="Link to this heading">¶</a></h2>
+<p>Whether a later minor adds native async services is deferred with API-owner
+review; it cannot alter these synchronous semantics.</p>
+</section>
+<section id="explicitly-deferred-work">
+<h2>Explicitly deferred work<a class="headerlink" href="#explicitly-deferred-work" title="Link to this heading">¶</a></h2>
+<p>Implementation, async API, dataclass/library selection, and performance tuning
+are deferred.</p>
+</section>
+<section id="acceptance-criteria">
+<h2>Acceptance criteria<a class="headerlink" href="#acceptance-criteria" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Root exports and signatures match this RFC exactly.</p></li>
+<li><p>Every error has stable code/redaction tests.</p></li>
+<li><p>No stable high-level path exposes prohibited controls or secret DEKs.</p></li>
+</ul>
+</section>
+<section id="supersession-rules">
+<h2>Supersession rules<a class="headerlink" href="#supersession-rules" title="Link to this heading">¶</a></h2>
+<p>Root changes require an accepted API RFC, SemVer analysis, migration guidance,
+and security-owner approval.</p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, Mojtaba Zaferanloo
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">RFC-0004: Stable Public Python API</a><ul>
+<li><a class="reference internal" href="#context">Context</a></li>
+<li><a class="reference internal" href="#phase-1-evidence">Phase 1 evidence</a></li>
+<li><a class="reference internal" href="#problem-statement">Problem statement</a></li>
+<li><a class="reference internal" href="#goals">Goals</a></li>
+<li><a class="reference internal" href="#non-goals">Non-goals</a></li>
+<li><a class="reference internal" href="#binding-decision">Binding decision</a></li>
+<li><a class="reference internal" href="#error-taxonomy">Error taxonomy</a></li>
+<li><a class="reference internal" href="#api-or-architecture-implications">API or architecture implications</a></li>
+<li><a class="reference internal" href="#security-consequences">Security consequences</a></li>
+<li><a class="reference internal" href="#privacy-consequences">Privacy consequences</a></li>
+<li><a class="reference internal" href="#compatibility-consequences">Compatibility consequences</a></li>
+<li><a class="reference internal" href="#operational-consequences">Operational consequences</a></li>
+<li><a class="reference internal" href="#failure-behavior">Failure behavior</a></li>
+<li><a class="reference internal" href="#alternatives-considered">Alternatives considered</a></li>
+<li><a class="reference internal" href="#rejected-alternatives">Rejected alternatives</a></li>
+<li><a class="reference internal" href="#implementation-constraints">Implementation constraints</a></li>
+<li><a class="reference internal" href="#test-and-validation-requirements">Test and validation requirements</a></li>
+<li><a class="reference internal" href="#migration-implications">Migration implications</a></li>
+<li><a class="reference internal" href="#unresolved-questions">Unresolved questions</a></li>
+<li><a class="reference internal" href="#explicitly-deferred-work">Explicitly deferred work</a></li>
+<li><a class="reference internal" href="#acceptance-criteria">Acceptance criteria</a></li>
+<li><a class="reference internal" href="#supersession-rules">Supersession rules</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=acc74ff5"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
+</html>

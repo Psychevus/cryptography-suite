@@ -1,0 +1,527 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html">
+
+    <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
+        <title>Phase 2 Product and Architecture Contracts - cryptography-suite 3.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">cryptography-suite 3.0.0 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  <span class="sidebar-brand-text">cryptography-suite 3.0.0 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../_sources/v4/phase-2-summary.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="phase-2-product-and-architecture-contracts">
+<h1>Phase 2 Product and Architecture Contracts<a class="headerlink" href="#phase-2-product-and-architecture-contracts" title="Link to this heading">¶</a></h1>
+<ul class="simple">
+<li><p><strong>Status:</strong> Proposed for v4 implementation</p></li>
+<li><p><strong>Last updated:</strong> 2026-07-29</p></li>
+<li><p><strong>Base:</strong> <code class="docutils literal notranslate"><span class="pre">origin/main</span></code> at <code class="docutils literal notranslate"><span class="pre">693b4731f08819be63f7ba5812d7b82828950f7b</span></code></p></li>
+</ul>
+<section id="outcome">
+<h2>Outcome<a class="headerlink" href="#outcome" title="Link to this heading">¶</a></h2>
+<p>Phase 2 converts the Phase 1 baseline into binding proposed contracts without
+changing runtime code, tests, dependencies, packaging, workflows, release
+automation, or version. Phase 1 remains anchored at
+<code class="docutils literal notranslate"><span class="pre">fb8b0f39c4c598adbd8ffb85667acf3f37174b77</span></code>; its documents were not rewritten.</p>
+<p>The product is a small policy-driven envelope-encryption/key-lifecycle SDK, not
+a broader primitive suite. The selected envelope representation is a strict
+binary preamble/record framing with deterministic CBOR protected metadata.
+One-shot and streaming are compatible profiles. Final byte labels and the
+cryptographic suite require a normative format review before implementation.
+Application context is represented only by an opaque keyed commitment: seal
+canonically encodes context, derives a context-binding key from the envelope
+DEK, and stores the keyed commitment in protected metadata. Providers bind
+wrap/unwrap to protected-header bytes and never receive plaintext context. Open
+recomputes and compares the commitment after DEK unwrap. The exact
+KDF/commitment construction remains assigned to the normative format/security
+review.</p>
+<p>Labs is a separate repository and separately versioned
+<code class="docutils literal notranslate"><span class="pre">cryptography-suite-labs</span></code> distribution. Stable core never depends on or imports
+it. Provider integrations are also separate explicit distributions, not ambient
+plugins.</p>
+</section>
+<section id="binding-surface">
+<h2>Binding surface<a class="headerlink" href="#binding-surface" title="Link to this heading">¶</a></h2>
+<p>The exact stable root is:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>AuthenticationError
+ContextMismatchError
+CryptographySuiteError
+EncryptionContext
+Envelope
+EnvelopeError
+EnvelopeMetadata
+ErrorCode
+KeyProvider
+KeyRef
+MigrationError
+Policy
+PolicyError
+Protector
+ProviderError
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Protector</span></code> owns sync seal/open/inspect/rewrap and bounded stream orchestration.
+Both safe stream methods require the public-submodule <code class="docutils literal notranslate"><span class="pre">TransactionalSink</span></code>;
+bounded writes remain uncommitted until final authentication, commit occurs
+once, and every failure invokes idempotent abort. Pipes, sockets, stdout, and
+arbitrary <code class="docutils literal notranslate"><span class="pre">BinaryIO</span></code> outputs are outside the safe stable path. High-level
+callers never provide nonces, algorithms, KDF tuning, raw DEKs, or long-term
+private keys. Provider contract methods are <code class="docutils literal notranslate"><span class="pre">wrap_data_key</span></code>,
+<code class="docutils literal notranslate"><span class="pre">unwrap_data_key</span></code>, <code class="docutils literal notranslate"><span class="pre">describe_key</span></code>, and <code class="docutils literal notranslate"><span class="pre">health_check</span></code>. Key states are <code class="docutils literal notranslate"><span class="pre">PENDING</span></code>,
+<code class="docutils literal notranslate"><span class="pre">PRIMARY</span></code>, <code class="docutils literal notranslate"><span class="pre">DECRYPT_ONLY</span></code>, <code class="docutils literal notranslate"><span class="pre">DISABLED</span></code>, and <code class="docutils literal notranslate"><span class="pre">DESTROYED</span></code>, with provider
+confirmation and CAS required for promotion.</p>
+<p>The optional portable password profile ships separately enabled in stable v4,
+is absent from the root, serializes/authenticates all KDF parameters, enforces
+policy floors/ceilings, and is disabled by <code class="docutils literal notranslate"><span class="pre">Policy.enterprise()</span></code>.</p>
+<p>Stable legacy adapters are explicit, migration-oriented, deadline-bound, and
+never fallback after v4 parse failure. CSF v2 remains through v4 support (not
+before 2031-12-31 removal); CSF v1/raw/one-shot password/local metadata adapters
+target 2029-12-31 end; hybrid, ML-KEM, pipeline/demo/audit and other research
+formats are labs/external only. Sources are never automatically deleted.</p>
+<p>The stable CLI is:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>cryptosuite encrypt
+cryptosuite decrypt
+cryptosuite inspect
+cryptosuite rewrap
+cryptosuite migrate
+cryptosuite provider health
+cryptosuite policy validate
+cryptosuite doctor
+</pre></div>
+</div>
+<p>It has stable exit codes and <code class="docutils literal notranslate"><span class="pre">cryptosuite-status/1</span></code>, no secret argv/environment
+values, no overwrite by default, transactional atomic file outputs, explicit
+legacy format, and no protected-output stdout path.</p>
+</section>
+<section id="phase-1-proposal-resolution">
+<h2>Phase 1 proposal resolution<a class="headerlink" href="#phase-1-proposal-resolution" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Five core candidates are accepted only as responsibilities requiring review,
+not current code approval.</p></li>
+<li><p>Twenty-six “rewrite” paths are narrowed into public services, internal
+implementations, provider packages, or maintainer tooling.</p></li>
+<li><p>Two legacy-decrypt proposals are accepted and expanded only by the explicit
+RFC-0008 matrix.</p></li>
+<li><p>All 46 labs proposals, 12 dead-duplicate proposals, and the labs-only
+generated-file proposal are accepted.</p></li>
+<li><p>Current local/mock/AWS/PKCS#11 code is not mechanically promoted. Local is
+development-only, fake is tests-only, cloud integrations need separate
+packages/conformance, and PKCS#11 remains experimental pending hardware and
+mechanism review.</p></li>
+</ul>
+<p><a class="reference internal" href="architecture/decision-register.html"><span class="std std-doc">The decision register</span></a> resolves all 15
+Phase 1 open decisions or assigns owner/target to bounded deferred evidence.</p>
+</section>
+<section id="ordered-mechanical-phase-3-plan">
+<h2>Ordered mechanical Phase 3 plan<a class="headerlink" href="#ordered-mechanical-phase-3-plan" title="Link to this heading">¶</a></h2>
+<p>Phase 3 MUST execute no cryptographic behavior:</p>
+<ol class="arabic simple">
+<li><p>Pin the Phase 2 base/head, record all four source-tree hashes, current wheel
+inventory, and a rollback tag/checkpoint.</p></li>
+<li><p>Establish empty canonical <code class="docutils literal notranslate"><span class="pre">src/cryptography_suite/</span></code> directories from
+RFC-0003 and a non-cryptographic typed API skeleton.</p></li>
+<li><p>Change packaging to discover only that source root and allowlisted package
+data; make one focused rollback commit.</p></li>
+<li><p>Add source-discovery and import-boundary tests before porting foundations.</p></li>
+<li><p>Add isolated installed-wheel/sdist tests outside the checkout.</p></li>
+<li><p>Add exact root API/error/signature snapshots.</p></li>
+<li><p>Rewrite or port accepted small foundations only after file-by-file semantic
+review; do not implement cryptography.</p></li>
+<li><p>Create the explicit <code class="docutils literal notranslate"><span class="pre">legacy</span></code> namespace/service boundary without parser
+implementations or default imports.</p></li>
+<li><p>Remove dynamic source loading, <code class="docutils literal notranslate"><span class="pre">sys.path</span></code>/<code class="docutils literal notranslate"><span class="pre">__path__</span></code> mutation, CWD/entry-point
+discovery, and insertion-ordered selection.</p></li>
+<li><p>Exclude repository-root and duplicate trees from artifacts; prove every
+excluded Phase 1 path cannot enter the wheel before deletion.</p></li>
+<li><p>Remove root <code class="docutils literal notranslate"><span class="pre">cryptography_suite/</span></code>, <code class="docutils literal notranslate"><span class="pre">src/crypto_suite/</span></code>, and <code class="docutils literal notranslate"><span class="pre">src/suite/</span></code>
+only after equivalence/disposition review and a separate rollback checkpoint.</p></li>
+<li><p>Build/install artifacts and prove labs, fake/demo providers, templates,
+duplicate modules, tests, caches, and unapproved data are absent.</p></li>
+<li><p>Verify all Phase 1 documents and historical anchor text are byte-unchanged.</p></li>
+<li><p>Stop at the skeleton/migration boundary; publish a Phase 3 evidence report
+before any implementation or remediation phase.</p></li>
+</ol>
+</section>
+<section id="assurance-status">
+<h2>Assurance status<a class="headerlink" href="#assurance-status" title="Link to this heading">¶</a></h2>
+<section id="deep-security-scan-status-blocked-by-tooling-failure">
+<h3>Deep Security Scan status: BLOCKED BY TOOLING FAILURE<a class="headerlink" href="#deep-security-scan-status-blocked-by-tooling-failure" title="Link to this heading">¶</a></h3>
+<p>The previous scan failed because a discovery worker did not create its required
+<code class="docutils literal notranslate"><span class="pre">threat_model.md</span></code>; deterministic validation ended with <code class="docutils literal notranslate"><span class="pre">ENOENT</span></code>. Its manifest,
+partial worker artifacts, and candidates are not reused or validated, and no
+no-findings result is claimed. A fresh successful independent scan is required
+for Phase 4 completion and stable release. An external independent audit,
+validated remediation, design-partner soak, installed-wheel tests, migration
+rollback, provenance/signing, and two-person release approval are also future
+gates—not current controls.</p>
+</section>
+</section>
+<section id="definition-of-done-matrix">
+<h2>Definition of Done matrix<a class="headerlink" href="#definition-of-done-matrix" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Requirement</p></th>
+<th class="head"><p>Result / authority</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>10 RFCs exist with mandatory sections/status</p></td>
+<td><p>Met; <code class="docutils literal notranslate"><span class="pre">docs/v4/rfcs/RFC-0001</span></code> through <code class="docutils literal notranslate"><span class="pre">RFC-0010</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Five architecture docs and summary exist</p></td>
+<td><p>Met; <code class="docutils literal notranslate"><span class="pre">docs/v4/architecture/</span></code> plus this file</p></td>
+</tr>
+<tr class="row-even"><td><p>Product charter and refusal boundary</p></td>
+<td><p>Met; RFC-0001</p></td>
+</tr>
+<tr class="row-odd"><td><p>Stable/internal/legacy/labs/tooling/dead boundaries</p></td>
+<td><p>Met; RFC-0002</p></td>
+</tr>
+<tr class="row-even"><td><p>Canonical <code class="docutils literal notranslate"><span class="pre">src/cryptography_suite/</span></code> and Phase 3 plan</p></td>
+<td><p>Met; RFC-0003 and plan above</p></td>
+</tr>
+<tr class="row-odd"><td><p>Exact root API, typed errors, and transactional stream sink</p></td>
+<td><p>Met; RFC-0004 and exact list above</p></td>
+</tr>
+<tr class="row-even"><td><p>Envelope encoding, keyed context commitment, quotas, critical fields, stream failure</p></td>
+<td><p>Met at requirements level; RFC-0005; byte/commitment constructions explicitly deferred before implementation</p></td>
+</tr>
+<tr class="row-odd"><td><p>Password-derived encryption decision</p></td>
+<td><p>Met; explicit stable optional profile, enterprise-disabled</p></td>
+</tr>
+<tr class="row-even"><td><p>Provider interface, credentials, retry, idempotency</p></td>
+<td><p>Met; RFC-0006</p></td>
+</tr>
+<tr class="row-odd"><td><p>Lifecycle states/transitions/rollback/partial failure</p></td>
+<td><p>Met; RFC-0006 and <code class="docutils literal notranslate"><span class="pre">state-machines.md</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Immutable policy, file/audit behavior</p></td>
+<td><p>Met; RFC-0007</p></td>
+</tr>
+<tr class="row-odd"><td><p>Every current serialized format decided</p></td>
+<td><p>Met; RFC-0008 matrix</p></td>
+</tr>
+<tr class="row-even"><td><p>CLI commands, codes, JSON, secrets, overwrite</p></td>
+<td><p>Met; RFC-0009</p></td>
+</tr>
+<tr class="row-odd"><td><p>Support/release/audit/supply-chain gates</p></td>
+<td><p>Met as future gates; RFC-0010</p></td>
+</tr>
+<tr class="row-even"><td><p>All 15 open decisions resolved/deferred with owner/target</p></td>
+<td><p>Met; <code class="docutils literal notranslate"><span class="pre">decision-register.md</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Every current public API group has destination</p></td>
+<td><p>Met; RFC-0002 classification</p></td>
+</tr>
+<tr class="row-even"><td><p>Deep Scan failure accurately retained</p></td>
+<td><p>Met; no failed-run reuse/no no-findings claim</p></td>
+</tr>
+<tr class="row-odd"><td><p>Phase 3/remediation not started</p></td>
+<td><p>Met by scope; only these documents are authorized</p></td>
+</tr>
+<tr class="row-even"><td><p>Runtime/tests/dependencies/packaging/workflows/version unchanged</p></td>
+<td><p>Met; staged diff contains only the 16 Phase 2 documents</p></td>
+</tr>
+<tr class="row-odd"><td><p>Links, RFC sections, Mermaid, whitespace, exact 16-file scope</p></td>
+<td><p>Met; deterministic checks and manual Mermaid review completed before commit</p></td>
+</tr>
+<tr class="row-even"><td><p>Focused draft PR opened, not merged/auto-merged</p></td>
+<td><p>External publication gate; must be confirmed in the final report</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="material-disagreements">
+<h2>Material disagreements<a class="headerlink" href="#material-disagreements" title="Link to this heading">¶</a></h2>
+<p>There is no material disagreement with the requested preferred direction.
+Where the task allowed alternatives, this phase chose the strongest separation:
+labs in a separate repository, concrete provider SDKs in separate distributions,
+and no legacy fallback. The portable password profile is retained only as an
+explicit stable optional profile, not as an enterprise-default/root primitive.</p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, Mojtaba Zaferanloo
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Phase 2 Product and Architecture Contracts</a><ul>
+<li><a class="reference internal" href="#outcome">Outcome</a></li>
+<li><a class="reference internal" href="#binding-surface">Binding surface</a></li>
+<li><a class="reference internal" href="#phase-1-proposal-resolution">Phase 1 proposal resolution</a></li>
+<li><a class="reference internal" href="#ordered-mechanical-phase-3-plan">Ordered mechanical Phase 3 plan</a></li>
+<li><a class="reference internal" href="#assurance-status">Assurance status</a><ul>
+<li><a class="reference internal" href="#deep-security-scan-status-blocked-by-tooling-failure">Deep Security Scan status: BLOCKED BY TOOLING FAILURE</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#definition-of-done-matrix">Definition of Done matrix</a></li>
+<li><a class="reference internal" href="#material-disagreements">Material disagreements</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=acc74ff5"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
+</html>

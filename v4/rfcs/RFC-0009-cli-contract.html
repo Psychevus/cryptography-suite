@@ -1,0 +1,565 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html">
+
+    <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
+        <title>RFC-0009: Stable Command-Line Contract - cryptography-suite 3.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">cryptography-suite 3.0.0 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  <span class="sidebar-brand-text">cryptography-suite 3.0.0 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../../_sources/v4/rfcs/RFC-0009-cli-contract.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="rfc-0009-stable-command-line-contract">
+<h1>RFC-0009: Stable Command-Line Contract<a class="headerlink" href="#rfc-0009-stable-command-line-contract" title="Link to this heading">¶</a></h1>
+<ul class="simple">
+<li><p><strong>Status:</strong> Proposed for v4 implementation</p></li>
+<li><p><strong>Owner:</strong> CLI and operations architecture</p></li>
+<li><p><strong>Last updated:</strong> 2026-07-29</p></li>
+</ul>
+<section id="context">
+<h2>Context<a class="headerlink" href="#context" title="Link to this heading">¶</a></h2>
+<p>The CLI is a thin interface over public services, suitable for safe file
+operations and automation. The executable is <code class="docutils literal notranslate"><span class="pre">cryptosuite</span></code>.</p>
+</section>
+<section id="phase-1-evidence">
+<h2>Phase 1 evidence<a class="headerlink" href="#phase-1-evidence" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="../baseline/cli-contract-inventory.html"><span class="std std-doc">CLI inventory</span></a> records primitive,
+OTP, codegen, fuzz, registry, raw migration, and file commands; installed-wheel
+keystore/migration failures; duplicate logs; and an argv OTP secret.</p>
+</section>
+<section id="problem-statement">
+<h2>Problem statement<a class="headerlink" href="#problem-statement" title="Link to this heading">¶</a></h2>
+<p>The current surface lacks stable schemas/exit distinctions and exposes
+out-of-scope or broken behavior.</p>
+</section>
+<section id="goals">
+<h2>Goals<a class="headerlink" href="#goals" title="Link to this heading">¶</a></h2>
+<p>Exact commands, secret sources, JSON schema, exit codes, atomic I/O, progress,
+signals, legacy opt-in, and noninteractive safety.</p>
+</section>
+<section id="non-goals">
+<h2>Non-goals<a class="headerlink" href="#non-goals" title="Link to this heading">¶</a></h2>
+<p>No primitive keygen/hash/OTP, pipeline/export/codegen/fuzz, backend mutation,
+raw-key migration, demo backend, or secret value in argv.</p>
+</section>
+<section id="binding-decision">
+<h2>Binding decision<a class="headerlink" href="#binding-decision" title="Link to this heading">¶</a></h2>
+<p>The stable command tree is exactly:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>cryptosuite encrypt
+cryptosuite decrypt
+cryptosuite inspect
+cryptosuite rewrap
+cryptosuite migrate
+cryptosuite provider health
+cryptosuite policy validate
+cryptosuite doctor
+</pre></div>
+</div>
+<p>Global options are <code class="docutils literal notranslate"><span class="pre">--help</span></code>, <code class="docutils literal notranslate"><span class="pre">--version</span></code>, <code class="docutils literal notranslate"><span class="pre">--output</span> <span class="pre">{text,json}</span></code>,
+<code class="docutils literal notranslate"><span class="pre">--status-file</span> <span class="pre">PATH</span></code>, <code class="docutils literal notranslate"><span class="pre">--policy</span> <span class="pre">PATH</span></code>, <code class="docutils literal notranslate"><span class="pre">--provider-config</span> <span class="pre">PATH</span></code>,
+<code class="docutils literal notranslate"><span class="pre">--timeout</span> <span class="pre">SECONDS</span></code>, <code class="docutils literal notranslate"><span class="pre">--non-interactive</span></code>, <code class="docutils literal notranslate"><span class="pre">--quiet</span></code>, and <code class="docutils literal notranslate"><span class="pre">--log-level</span> <span class="pre">{error,warning,info}</span></code>. No debug mode may emit secret-bearing payloads.
+Provider type/package is named in nonsecret config and instantiated explicitly;
+there is no discovery/list command.</p>
+<p><code class="docutils literal notranslate"><span class="pre">encrypt/decrypt</span></code> require <code class="docutils literal notranslate"><span class="pre">--input</span> <span class="pre">PATH|-</span></code> and a filesystem <code class="docutils literal notranslate"><span class="pre">--output</span> <span class="pre">PATH</span></code>.
+<code class="docutils literal notranslate"><span class="pre">encrypt</span></code> requires <code class="docutils literal notranslate"><span class="pre">--key-ref</span></code> through config/file/stdin-safe structured input,
+not a secret, plus repeatable <code class="docutils literal notranslate"><span class="pre">--context-file</span></code>; <code class="docutils literal notranslate"><span class="pre">decrypt</span></code> requires equivalent
+context. <code class="docutils literal notranslate"><span class="pre">rewrap</span></code> requires input/output and destination key reference.
+<code class="docutils literal notranslate"><span class="pre">inspect</span></code> accepts input and emits only RFC-0004 metadata with
+<code class="docutils literal notranslate"><span class="pre">authentication_status:</span> <span class="pre">&quot;not_verified&quot;</span></code>. <code class="docutils literal notranslate"><span class="pre">migrate</span></code> requires
+<code class="docutils literal notranslate"><span class="pre">--legacy-format</span></code>, <code class="docutils literal notranslate"><span class="pre">--receipt</span> <span class="pre">PATH</span></code>, explicit context, and defaults to <code class="docutils literal notranslate"><span class="pre">--dry-run</span></code>;
+live execution requires <code class="docutils literal notranslate"><span class="pre">--execute</span></code>. <code class="docutils literal notranslate"><span class="pre">provider</span> <span class="pre">health</span></code> performs only the
+configured provider check. <code class="docutils literal notranslate"><span class="pre">policy</span> <span class="pre">validate</span></code> is offline. <code class="docutils literal notranslate"><span class="pre">doctor</span></code> checks
+versions/config/file capabilities without encrypting, decrypting, creating keys,
+printing credentials, or sending telemetry.</p>
+<p>Overwrite is denied by default. <code class="docutils literal notranslate"><span class="pre">--overwrite</span></code> is accepted only when policy
+allows it and still uses same-directory exclusive staging, link checks, fsync,
+atomic replace, and directory fsync. Input=output, symlinks, hardlinked
+destinations and cross-filesystem atomic claims are rejected. Encrypt, decrypt,
+rewrap, and migrate outputs use an SDK-owned filesystem <code class="docutils literal notranslate"><span class="pre">TransactionalSink</span></code>.
+Pipes, sockets, stdout, and arbitrary already-open streams cannot satisfy the
+safe commit/abort contract and MUST NOT be accepted as output by these stable
+commands. An unsafe/uncommitted streaming interface would require a separate
+non-default proposal and is not part of this CLI.</p>
+<section id="secret-and-context-input">
+<h3>Secret and context input<a class="headerlink" href="#secret-and-context-input" title="Link to this heading">¶</a></h3>
+<p>Secrets may come only from hidden TTY prompt, inherited file descriptor
+(<code class="docutils literal notranslate"><span class="pre">--secret-fd</span></code>), stdin when stdin is not data (<code class="docutils literal notranslate"><span class="pre">--secret-stdin</span></code>), or an
+OS/provider credential mechanism owned by the configured provider. Secret
+values, passwords, PINs, tokens, private keys, DEKs, and plaintext MUST NOT be
+argv option values, environment variables introduced by this CLI, config JSON,
+status/progress, logs, errors, metrics, receipts, or audit. Secret-file paths
+are not supported by the stable generic CLI; provider SDK mechanisms are
+documented separately.</p>
+<p>Context values use bounded JSON files or a dedicated nonsecret FD, never
+repeatable <code class="docutils literal notranslate"><span class="pre">key=value</span></code> argv. The operator is warned that context may be
+sensitive; output may contain only an opaque context-commitment identifier.</p>
+<p>TTY prompts are used only when stdin/stdout roles permit and
+<code class="docutils literal notranslate"><span class="pre">--non-interactive</span></code> is absent. Noninteractive mode never prompts, guesses,
+overwrites, enables legacy, accepts unsafe stdout, or retries permanent errors.</p>
+</section>
+<section id="json-status-contract">
+<h3>JSON/status contract<a class="headerlink" href="#json-status-contract" title="Link to this heading">¶</a></h3>
+<p>JSON is one UTF-8 object per final status, schema:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;schema_version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;cryptosuite-status/1&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;command&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;encrypt&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ok&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;operation_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;opaque&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;result&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="nt">&quot;warnings&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>On error, <code class="docutils literal notranslate"><span class="pre">status</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;error&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">error</span></code> contains exactly <code class="docutils literal notranslate"><span class="pre">code</span></code>,
+<code class="docutils literal notranslate"><span class="pre">category</span></code>, <code class="docutils literal notranslate"><span class="pre">message</span></code>, <code class="docutils literal notranslate"><span class="pre">retryable</span></code>, and redacted <code class="docutils literal notranslate"><span class="pre">details</span></code>; <code class="docutils literal notranslate"><span class="pre">result</span></code> is null.
+Keys are emitted in the documented order, unknown additive result keys may be
+ignored within schema major 1, and secret fields are forbidden. Protected binary
+output is written only to the transactional filesystem destination. Final
+status uses stdout or <code class="docutils literal notranslate"><span class="pre">--status-file</span></code>; logs use stderr. Text output is
+human-facing and not parsed/stable except command names, exit codes, and the
+promise that secrets are absent.</p>
+<p>Machine progress is newline-delimited <code class="docutils literal notranslate"><span class="pre">cryptosuite-progress/1</span></code> JSON sent only to
+<code class="docutils literal notranslate"><span class="pre">--status-file</span></code>; fields are schema version, operation id, phase, completed bytes,
+total bytes if nonsecret/known, and UTC time. It never includes paths, context,
+key ids, or payload rates precise enough to violate policy. Text progress is
+TTY-only and disabled by <code class="docutils literal notranslate"><span class="pre">--quiet</span></code>.</p>
+<p>Stable exit codes are:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head text-right"><p>Code</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-right"><p>0</p></td>
+<td><p>Success, including successful dry run</p></td>
+</tr>
+<tr class="row-odd"><td class="text-right"><p>2</p></td>
+<td><p>Usage/config schema error</p></td>
+</tr>
+<tr class="row-even"><td class="text-right"><p>3</p></td>
+<td><p>Input/envelope/legacy format or quota error</p></td>
+</tr>
+<tr class="row-odd"><td class="text-right"><p>4</p></td>
+<td><p>Authentication or context mismatch</p></td>
+</tr>
+<tr class="row-even"><td class="text-right"><p>5</p></td>
+<td><p>Policy/key-state/legacy denial</p></td>
+</tr>
+<tr class="row-odd"><td class="text-right"><p>6</p></td>
+<td><p>Permanent provider/auth/key/capability failure</p></td>
+</tr>
+<tr class="row-even"><td class="text-right"><p>7</p></td>
+<td><p>Transient provider timeout/unavailable/rate limit exhausted</p></td>
+</tr>
+<tr class="row-odd"><td class="text-right"><p>8</p></td>
+<td><p>I/O, output exists, link, or atomic-promotion failure</p></td>
+</tr>
+<tr class="row-even"><td class="text-right"><p>9</p></td>
+<td><p>Cancelled/interrupted; no final output committed</p></td>
+</tr>
+<tr class="row-odd"><td class="text-right"><p>10</p></td>
+<td><p>Migration incomplete/conflict/verification failure</p></td>
+</tr>
+<tr class="row-even"><td class="text-right"><p>70</p></td>
+<td><p>Redacted internal error</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>SIGINT/SIGTERM set cooperative cancellation. A second SIGINT may terminate
+immediately after best-effort cleanup. Exit 9 never implies provider mutations
+were rolled back; the status/receipt identifies reconciliation requirement.
+Retries follow RFC-0006 and respect <code class="docutils literal notranslate"><span class="pre">--timeout</span></code>.</p>
+<p>Every operation emits RFC-0007 audit events when required. Logs go to stderr
+and contain operation/code/category only at default level.</p>
+<p>The v3 <code class="docutils literal notranslate"><span class="pre">cryptography-suite</span></code> binary and hidden aliases are not v4 stable
+commands. A packaging-only deprecation launcher MAY exist in pre-release builds
+but MUST be removed by RC1 and MUST NOT expose old behavior.</p>
+</section>
+</section>
+<section id="api-or-architecture-implications">
+<h2>API or architecture implications<a class="headerlink" href="#api-or-architecture-implications" title="Link to this heading">¶</a></h2>
+<p>CLI imports public application services, provider package constructors selected
+from explicit config, and schema serializers; it MUST NOT import codecs,
+primitives, legacy adapters directly, or labs.</p>
+</section>
+<section id="security-consequences">
+<h2>Security consequences<a class="headerlink" href="#security-consequences" title="Link to this heading">¶</a></h2>
+<p>No secret argv/environment path, no protected-output stdout path, and no
+unauthenticated plaintext release. Explicit legacy and overwrite controls remain
+policy-gated.</p>
+</section>
+<section id="privacy-consequences">
+<h2>Privacy consequences<a class="headerlink" href="#privacy-consequences" title="Link to this heading">¶</a></h2>
+<p>Status/progress/audit use opaque operation ids and redacted metadata. Paths and
+context values are not emitted.</p>
+</section>
+<section id="compatibility-consequences">
+<h2>Compatibility consequences<a class="headerlink" href="#compatibility-consequences" title="Link to this heading">¶</a></h2>
+<p>Command names, long options, exit codes, and JSON schema major are stable from
+RC1. Text wording and field ordering are not semantic input. Breaking JSON
+changes require schema major and CLI major.</p>
+</section>
+<section id="operational-consequences">
+<h2>Operational consequences<a class="headerlink" href="#operational-consequences" title="Link to this heading">¶</a></h2>
+<p>Automation must provide explicit config/policy/context/status channels and
+handle reconciliation/exit classes.</p>
+</section>
+<section id="failure-behavior">
+<h2>Failure behavior<a class="headerlink" href="#failure-behavior" title="Link to this heading">¶</a></h2>
+<p>Exactly one final status is attempted. Broken status sinks do not make a failed
+crypto operation successful; mandatory audit/status policies may block before
+mutation. Temporary output is never promoted on error.</p>
+</section>
+<section id="alternatives-considered">
+<h2>Alternatives considered<a class="headerlink" href="#alternatives-considered" title="Link to this heading">¶</a></h2>
+<p>Preserve v3 commands; expose secrets via environment/file; allow uncommitted
+pipe/stdout outputs; the narrow tree above.</p>
+</section>
+<section id="rejected-alternatives">
+<h2>Rejected alternatives<a class="headerlink" href="#rejected-alternatives" title="Link to this heading">¶</a></h2>
+<p>They retain out-of-scope behavior or leak/commit secrets unsafely.</p>
+</section>
+<section id="implementation-constraints">
+<h2>Implementation constraints<a class="headerlink" href="#implementation-constraints" title="Link to this heading">¶</a></h2>
+<p>Argument parsing must not echo secret sources. Config files are bounded,
+permission-checked where supported, and contain references only.</p>
+</section>
+<section id="test-and-validation-requirements">
+<h2>Test and validation requirements<a class="headerlink" href="#test-and-validation-requirements" title="Link to this heading">¶</a></h2>
+<p>Snapshot help/tree/options/codes/schemas; test every error mapping, TTY and
+noninteractive matrix, rejection of pipe/socket/stdout output, transactional
+commit/abort, signals at each state, no-overwrite/link/atomic crash behavior,
+redaction/process-list checks, no provider discovery, and installed-wheel entry
+points.</p>
+</section>
+<section id="migration-implications">
+<h2>Migration implications<a class="headerlink" href="#migration-implications" title="Link to this heading">¶</a></h2>
+<p>v3 command mappings are documented as v4, explicit RFC-0008 migration, labs, or
+removal. No old command silently changes meaning.</p>
+</section>
+<section id="unresolved-questions">
+<h2>Unresolved questions<a class="headerlink" href="#unresolved-questions" title="Link to this heading">¶</a></h2>
+<p>No command/schema/exit decision remains. Provider-specific config schemas are
+owned by provider packages before beta.</p>
+</section>
+<section id="explicitly-deferred-work">
+<h2>Explicitly deferred work<a class="headerlink" href="#explicitly-deferred-work" title="Link to this heading">¶</a></h2>
+<p>CLI code, schemas, completion/man pages, provider configs, and tests are deferred.</p>
+</section>
+<section id="acceptance-criteria">
+<h2>Acceptance criteria<a class="headerlink" href="#acceptance-criteria" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Installed wheel exposes only the command tree above.</p></li>
+<li><p>All secret-channel, JSON, code, signal, and atomic-output tests pass.</p></li>
+<li><p>Removed commands are absent by RC1.</p></li>
+</ul>
+</section>
+<section id="supersession-rules">
+<h2>Supersession rules<a class="headerlink" href="#supersession-rules" title="Link to this heading">¶</a></h2>
+<p>Stable command/option/code/schema changes require a CLI RFC, compatibility
+classification, migration note, and security review.</p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, Mojtaba Zaferanloo
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">RFC-0009: Stable Command-Line Contract</a><ul>
+<li><a class="reference internal" href="#context">Context</a></li>
+<li><a class="reference internal" href="#phase-1-evidence">Phase 1 evidence</a></li>
+<li><a class="reference internal" href="#problem-statement">Problem statement</a></li>
+<li><a class="reference internal" href="#goals">Goals</a></li>
+<li><a class="reference internal" href="#non-goals">Non-goals</a></li>
+<li><a class="reference internal" href="#binding-decision">Binding decision</a><ul>
+<li><a class="reference internal" href="#secret-and-context-input">Secret and context input</a></li>
+<li><a class="reference internal" href="#json-status-contract">JSON/status contract</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#api-or-architecture-implications">API or architecture implications</a></li>
+<li><a class="reference internal" href="#security-consequences">Security consequences</a></li>
+<li><a class="reference internal" href="#privacy-consequences">Privacy consequences</a></li>
+<li><a class="reference internal" href="#compatibility-consequences">Compatibility consequences</a></li>
+<li><a class="reference internal" href="#operational-consequences">Operational consequences</a></li>
+<li><a class="reference internal" href="#failure-behavior">Failure behavior</a></li>
+<li><a class="reference internal" href="#alternatives-considered">Alternatives considered</a></li>
+<li><a class="reference internal" href="#rejected-alternatives">Rejected alternatives</a></li>
+<li><a class="reference internal" href="#implementation-constraints">Implementation constraints</a></li>
+<li><a class="reference internal" href="#test-and-validation-requirements">Test and validation requirements</a></li>
+<li><a class="reference internal" href="#migration-implications">Migration implications</a></li>
+<li><a class="reference internal" href="#unresolved-questions">Unresolved questions</a></li>
+<li><a class="reference internal" href="#explicitly-deferred-work">Explicitly deferred work</a></li>
+<li><a class="reference internal" href="#acceptance-criteria">Acceptance criteria</a></li>
+<li><a class="reference internal" href="#supersession-rules">Supersession rules</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=acc74ff5"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
+</html>
