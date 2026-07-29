@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import configparser
 import email.parser
 import tarfile
 import zipfile
@@ -60,6 +61,25 @@ PROHIBITED_PARTS = {
     "tests/",
 }
 
+EXPECTED_EXTRAS = {"dev", "docs"}
+REMOVED_EXTRAS = {
+    "async",
+    "aws",
+    "bls",
+    "cli",
+    "codegen",
+    "fhe",
+    "hashing-extra",
+    "hsm",
+    "kms",
+    "legacy",
+    "network",
+    "pake",
+    "pqc",
+    "viz",
+    "zk",
+}
+
 
 def _wheel_names(wheel: Path) -> set[str]:
     with zipfile.ZipFile(wheel) as archive:
@@ -110,6 +130,38 @@ def test_wheel_metadata_has_no_entry_points(
     assert metadata["Name"] == "cryptography-suite"
     assert metadata["Version"] == "3.0.0"
     assert metadata["Requires-Python"] == ">=3.10"
+    assert set(metadata.get_all("Provides-Extra", [])) == EXPECTED_EXTRAS
+    assert set(metadata.get_all("Provides-Extra", [])).isdisjoint(REMOVED_EXTRAS)
+
+    description = metadata.get_payload().lower()
+    assert "declaration-only v4 development skeleton" in description
+    assert "no operational encryption or decryption" in description
+    for obsolete_advertisement in (
+        "cryptography_suite.cli",
+        "cryptography_suite.experimental",
+        "cryptography_suite.keystores",
+        "cryptography_suite.pipeline",
+        "cryptography-suite file",
+        "cryptosuite-fuzz",
+        "aws kms",
+        "homomorphic encryption",
+        "pkcs#11",
+        "post-quantum",
+        "zero-knowledge",
+    ):
+        assert obsolete_advertisement not in description
+
+
+def test_only_pyproject_defines_active_mypy_configuration() -> None:
+    setup = configparser.ConfigParser()
+    setup.read(REPO_ROOT / "setup.cfg", encoding="utf-8")
+    assert setup.sections() == ["build_ext"]
+
+    data = tomllib.loads((REPO_ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+    assert data["tool"]["mypy"]["python_version"] == "3.10"
+    assert "cryptography_suite._mypy_crypto_checker" not in (
+        REPO_ROOT / "setup.cfg"
+    ).read_text(encoding="utf-8")
 
 
 def test_sdist_has_only_explicit_source_boundary(

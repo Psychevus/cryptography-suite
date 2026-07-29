@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "cryptography-suite"
 dynamic = ["version"]
-description = "An educational and research-focused cryptography toolkit under active hardening."
+description = "A declaration-only v4 development skeleton with no operational cryptography."
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
@@ -15,19 +15,14 @@ authors = [
 ]
 keywords = [
     "cryptography",
-    "encryption",
     "security",
-    "AES",
-    "RSA",
-    "ChaCha20",
-    "Ed25519",
-    "ECDSA",
-    "hashing",
-    "PAKE",
-    "OTP",
-    "secret sharing",
-    "education",
-    "research"
+    "python",
+    "api",
+    "protocols",
+    "type-safety",
+    "key-management",
+    "envelope",
+    "development"
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -48,32 +43,19 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-cli = ["PyYAML", "rich"]
-hashing-extra = ["blake3"]
-bls = ["py_ecc"]
-pake = ["spake2"]
-pqc = ["pqcrypto"]
-fhe = ["Pyfhel"]
-zk = ["pybulletproofs", "PySNARK"]
-codegen = ["Jinja2", "PyYAML"]
-network = ["requests"]
 dev = [
+    "bandit",
+    "black",
+    "build",
     "pytest",
     "pytest-cov",
     "coverage",
     "mypy",
-    "types-PyYAML",
     "hypothesis",
-    "pytest-console-scripts",
-    "freezegun",
+    "pip-audit",
+    "ruff",
 ]
-async = ["aiofiles"]
 docs = ["sphinx", "furo", "myst-parser", "sphinxcontrib-mermaid"]
-viz = ["ipywidgets", "networkx"]
-kms = ["boto3"]
-aws = ["boto3"]
-hsm = ["python-pkcs11>=0.8.1"]
-legacy = ["salsa20>=0.9", "ascon>=1.2"]
 
 [project.urls]
 Homepage = "https://github.com/Psychevus/cryptography-suite"
