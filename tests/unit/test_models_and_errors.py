@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import FrozenInstanceError
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 
 import pytest
 
@@ -20,7 +20,10 @@ from cryptography_suite.envelope import AuthenticationStatus
 
 
 def test_encryption_context_is_immutable_and_defensively_copied() -> None:
-    source = {"purpose": "billing", "opaque": b"value"}
+    source: dict[str, str | bytes] = {
+        "purpose": "billing",
+        "opaque": b"value",
+    }
     context = EncryptionContext(source)
     source["purpose"] = "changed"
 
@@ -56,7 +59,7 @@ def test_metadata_defaults_to_not_verified_and_copies_sequences() -> None:
         ciphertext_size=0,
         chunk_count=0,
         context_commitment_id=None,
-        created_at=datetime.now(UTC),
+        created_at=datetime.now(timezone.utc),
         critical_features=tuple(features),
         policy_id="uncomputed",
     )

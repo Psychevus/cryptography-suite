@@ -6,9 +6,9 @@ import os
 import subprocess
 import sys
 from pathlib import Path
+from typing import TypedDict
 
-from conftest import REPO_ROOT
-
+REPO_ROOT = Path(__file__).resolve().parents[2]
 SOURCE = REPO_ROOT / "src" / "cryptography_suite"
 
 FORBIDDEN_TOKENS = {
@@ -36,7 +36,19 @@ FORBIDDEN_IMPORT_PARTS = {
 }
 
 
-def _import_snapshot(cwd: Path, environment_value: str) -> dict[str, object]:
+class ImportSnapshot(TypedDict):
+    all: list[str]
+    modules: list[str]
+    origin: str | None
+
+
+def _string_list(value: object, field: str) -> list[str]:
+    if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
+        raise TypeError(f"import snapshot field {field!r} must be a string list")
+    return [item for item in value if isinstance(item, str)]
+
+
+def _import_snapshot(cwd: Path, environment_value: str) -> ImportSnapshot:
     code = """
 import json
 import socket
@@ -66,7 +78,17 @@ print(json.dumps({
         capture_output=True,
         text=True,
     )
-    return json.loads(result.stdout)
+    raw: object = json.loads(result.stdout)
+    if not isinstance(raw, dict):
+        raise TypeError("import snapshot must be an object")
+    origin: object = raw.get("origin")
+    if origin is not None and not isinstance(origin, str):
+        raise TypeError("import snapshot field 'origin' must be a string or null")
+    return ImportSnapshot(
+        all=_string_list(raw.get("all"), "all"),
+        modules=_string_list(raw.get("modules"), "modules"),
+        origin=origin,
+    )
 
 
 def test_root_import_is_stable_across_cwd_and_environment(tmp_path: Path) -> None:

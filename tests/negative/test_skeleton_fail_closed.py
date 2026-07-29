@@ -1,31 +1,68 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from io import BytesIO
 
 import pytest
 
 from cryptography_suite import EncryptionContext, KeyRef, Policy, Protector
+from cryptography_suite.providers import (
+    KeyDescription,
+    ProviderHealth,
+    ProviderRequest,
+    ReadOnlySecret,
+    SecretBuffer,
+    WrappedKey,
+)
 
 
 class ProviderSpy:
-    provider_id = "example.provider"
-
     def __init__(self) -> None:
         self.calls: list[str] = []
 
-    def wrap_data_key(self, *args: object, **kwargs: object) -> object:
+    @property
+    def provider_id(self) -> str:
+        return "example.provider"
+
+    def wrap_data_key(
+        self,
+        data_key: ReadOnlySecret,
+        *,
+        key: KeyRef,
+        binding: bytes,
+        request: ProviderRequest,
+    ) -> WrappedKey:
+        del data_key, key, binding, request
         self.calls.append("wrap_data_key")
         raise AssertionError("provider must not be called in Phase 3")
 
-    def unwrap_data_key(self, *args: object, **kwargs: object) -> object:
+    def unwrap_data_key(
+        self,
+        wrapped_key: WrappedKey,
+        *,
+        binding: bytes,
+        request: ProviderRequest,
+    ) -> SecretBuffer:
+        del wrapped_key, binding, request
         self.calls.append("unwrap_data_key")
         raise AssertionError("provider must not be called in Phase 3")
 
-    def describe_key(self, *args: object, **kwargs: object) -> object:
+    def describe_key(
+        self,
+        key: KeyRef,
+        *,
+        request: ProviderRequest,
+    ) -> KeyDescription:
+        del key, request
         self.calls.append("describe_key")
         raise AssertionError("provider must not be called in Phase 3")
 
-    def health_check(self, *args: object, **kwargs: object) -> object:
+    def health_check(
+        self,
+        *,
+        request: ProviderRequest,
+    ) -> ProviderHealth:
+        del request
         self.calls.append("health_check")
         raise AssertionError("provider must not be called in Phase 3")
 
@@ -57,7 +94,7 @@ def test_every_operational_method_fails_closed_without_side_effects() -> None:
     plaintext = b"do-not-leak-plaintext"
     context = EncryptionContext({"purpose": "do-not-leak-context"})
 
-    calls = [
+    calls: list[Callable[[], object]] = [
         lambda: protector.seal(plaintext, context=context),
         lambda: protector.open(b"envelope", context=context),
         lambda: protector.inspect(b"envelope"),
