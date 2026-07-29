@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import FrozenInstanceError
 from datetime import datetime, timezone
+from types import MappingProxyType
 
 import pytest
 
@@ -16,6 +17,7 @@ from cryptography_suite import (
     KeyRef,
     Policy,
 )
+from cryptography_suite.audit import AuditEvent
 from cryptography_suite.envelope import AuthenticationStatus
 
 
@@ -69,6 +71,57 @@ def test_metadata_defaults_to_not_verified_and_copies_sequences() -> None:
     assert metadata.authentication_status is AuthenticationStatus.NOT_VERIFIED
     assert len(metadata.recipients) == 1
     assert metadata.critical_features == ("feature",)
+
+
+def test_audit_event_attributes_are_portable_immutable_and_copied() -> None:
+    occurred_at = datetime.now(timezone.utc)
+    first = AuditEvent(
+        schema_version="cs-audit/1",
+        event_id="event-1",
+        occurred_at=occurred_at,
+        operation_id="operation-1",
+        event_type="declaration",
+        outcome="not-implemented",
+        policy_id="policy-1",
+    )
+    second = AuditEvent(
+        schema_version="cs-audit/1",
+        event_id="event-2",
+        occurred_at=occurred_at,
+        operation_id="operation-2",
+        event_type="declaration",
+        outcome="not-implemented",
+        policy_id="policy-2",
+    )
+
+    assert first.attributes == {}
+    assert second.attributes == {}
+    assert isinstance(first.attributes, MappingProxyType)
+    assert isinstance(second.attributes, MappingProxyType)
+    assert first.attributes is not second.attributes
+
+    supplied: dict[str, str | int] = {
+        "component": "unit",
+        "attempt": 1,
+    }
+    explicit = AuditEvent(
+        schema_version="cs-audit/1",
+        event_id="event-3",
+        occurred_at=occurred_at,
+        operation_id="operation-3",
+        event_type="declaration",
+        outcome="not-implemented",
+        policy_id="policy-3",
+        attributes=supplied,
+    )
+    supplied["component"] = "changed"
+    supplied["attempt"] = 2
+
+    assert explicit.attributes == {
+        "component": "unit",
+        "attempt": 1,
+    }
+    assert isinstance(explicit.attributes, MappingProxyType)
 
 
 def test_errors_are_typed_immutable_and_redacted() -> None:

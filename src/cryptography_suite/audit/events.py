@@ -3,12 +3,16 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from types import MappingProxyType
 from typing import Protocol, runtime_checkable
 
 from ..errors import ErrorCode, JSONScalar
+
+
+def _empty_attributes() -> Mapping[str, JSONScalar]:
+    return MappingProxyType({})
 
 
 @dataclass(frozen=True)
@@ -21,7 +25,7 @@ class AuditEvent:
     outcome: str
     policy_id: str
     error_code: ErrorCode | None = None
-    attributes: Mapping[str, JSONScalar] = MappingProxyType({})
+    attributes: Mapping[str, JSONScalar] = field(default_factory=_empty_attributes)
 
     def __post_init__(self) -> None:
         if self.schema_version != "cs-audit/1":
