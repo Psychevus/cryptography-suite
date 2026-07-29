@@ -43,14 +43,16 @@ stateDiagram-v2
     [*] --> FRAMING
     FRAMING --> STRUCTURED: fixed preamble and limits pass
     STRUCTURED --> POLICY_ACCEPTED: canonical header and policy pass
-    POLICY_ACCEPTED --> KEY_READY: provider unwrap or resolved wrap
-    KEY_READY --> PROCESSING
+    POLICY_ACCEPTED --> KEY_READY: fresh or unwrapped DEK
+    KEY_READY --> CONTEXT_BOUND: keyed commitment created or verified
+    CONTEXT_BOUND --> PROCESSING
     PROCESSING --> AUTHENTICATED: final record verifies
     AUTHENTICATED --> COMMITTED
     FRAMING --> REJECTED
     STRUCTURED --> REJECTED
     POLICY_ACCEPTED --> REJECTED
     KEY_READY --> REJECTED
+    CONTEXT_BOUND --> REJECTED
     PROCESSING --> REJECTED
 ```
 
@@ -58,37 +60,46 @@ stateDiagram-v2
 | --- | --- | --- | --- |
 | start → `FRAMING` | Fixed input handle/bytes | bounded preamble; invalid → `REJECTED` | Read-only retry safe; `envelope.started`; no output |
 | `FRAMING` → `STRUCTURED` | Checked lengths within hard limits | restricted deterministic-CBOR model; malformed → rejected | Deterministic; `envelope.rejected`; discard parse state |
-| `STRUCTURED` → `POLICY_ACCEPTED` | Version/suite/critical/quota/context/provider allowed | accepted; denial → rejected before provider | Re-evaluate only same policy id; `policy.decision`; no output |
-| `POLICY_ACCEPTED` → `KEY_READY` | Explicit provider/key version/capability | internal DEK; transient provider failure remains retryable pre-processing | RFC-0006 retry; `provider.call`; release secret on failure |
-| `KEY_READY` → `PROCESSING` | Staging available | records processed; any auth/order/I/O/cancel → rejected | Seal retry creates new DEK/envelope; open read retry safe; remove owned staging |
-| `PROCESSING` → `AUTHENTICATED` | Final record/manifest and context verified | authenticated staging; failure rejected | No retry from partial state unless sealed resumable profile later; `envelope.authenticated` |
-| `AUTHENTICATED` → `COMMITTED` | Output policy/link/fsync checks | bytes return or atomic promotion; promotion failure retains source/staging per policy | Idempotent destination transaction; `envelope.completed`; rollback removes owned staging |
+| `STRUCTURED` → `POLICY_ACCEPTED` | Version/suite/critical/quota/context requirements/provider allowed | accepted; denial → rejected before provider | Re-evaluate only same policy id; `policy.decision`; no output |
+| `POLICY_ACCEPTED` → `KEY_READY` | Seal generates fresh DEK; open unwraps pinned version using protected-header bytes | internal DEK; transient provider failure remains retryable pre-processing | RFC-0006 retry; `provider.call`; release secret on failure |
+| `KEY_READY` → `CONTEXT_BOUND` | Canonical caller context; derived context-binding key | Seal stores keyed commitment then wraps with completed header; open constant-time verifies commitment; mismatch rejected | New seal DEK on retry; `context.bound` or redacted mismatch; provider never receives context |
+| `CONTEXT_BOUND` → `PROCESSING` | `TransactionalSink` is open and accepts bounded writes | records processed; any auth/order/I/O/cancel → rejected | Open read retry safe; call idempotent sink abort |
+| `PROCESSING` → `AUTHENTICATED` | Final record/manifest verified | authenticated uncommitted sink; failure rejected | No retry from partial state unless sealed resumable profile later; `envelope.authenticated` |
+| `AUTHENTICATED` → `COMMITTED` | Sink and output policy checks pass | sink commit or one-shot bytes return; commit failure enters typed I/O failure | Exactly-once commit; `envelope.completed`; pre-commit failures call idempotent abort |
 
 ## Streaming encryption
 
-States are `INIT → KEY_WRAPPED → HEADER_WRITTEN → CHUNKS → FINAL_WRITTEN →
-SYNCED → COMMITTED`. Before `KEY_WRAPPED`, policy and immutable provider version
-must pass. Each `CHUNKS` transition reads at most the policy chunk, increments
-exactly one index, authenticates index/length/final flag/header digest, and
-checks cancellation. Final writes authenticated count/length/manifest.
+States are `INIT → SINK_OPEN → DEK_READY → CONTEXT_COMMITTED → KEY_WRAPPED →
+HEADER_WRITTEN → CHUNKS → FINAL_AUTHENTICATED → COMMITTED`. Before
+`CONTEXT_COMMITTED`, policy and immutable provider version must pass and a fresh
+DEK must exist. Context is canonicalized and committed with a DEK-derived key;
+provider wrapping then binds the completed protected-header bytes. Each
+`CHUNKS` transition reads at most the policy chunk, increments exactly one
+index, authenticates index/length/final flag/header digest, and performs one
+bounded sink write.
 
-Failure before commit closes/release secrets and removes SDK-owned temporary
-output; existing destination is unchanged. A retry is a new envelope with a new
+Final authentication is followed by exactly one sink commit. Authentication,
+context, quota, cancellation, provider, or I/O failure invokes idempotent abort;
+existing destination remains unchanged. A retry is a new envelope with a new
 DEK/idempotency key unless no provider mutation occurred. Events:
 `stream.seal.started`, per-policy coarse progress, `stream.seal.completed` or
 `stream.seal.failed`. Rollback never deletes caller source.
 
 ## Streaming decryption
 
-States are `INIT → HEADER_ACCEPTED → KEY_UNWRAPPED → CHUNKS_STAGED →
-FINAL_AUTHENTICATED → SYNCED → COMMITTED`. Each record must be the next index,
-within declared/actual limits, and nonempty unless final. Missing/duplicate/
-reordered/trailing records transition to `FAILED`.
+States are `INIT → SINK_OPEN → HEADER_ACCEPTED → KEY_UNWRAPPED →
+CONTEXT_VERIFIED → CHUNKS_STAGED → FINAL_AUTHENTICATED → COMMITTED`.
+Provider unwrap binds the protected-header bytes without receiving context.
+After unwrap, the derived keyed commitment is recomputed from caller context and
+compared in constant time; mismatch aborts before plaintext writes. Each record
+must be the next index, within declared/actual limits, and nonempty unless final.
+Missing/duplicate/reordered/trailing records transition to `FAILED`.
 
-Plaintext remains in SDK-owned staging through `CHUNKS_STAGED`; no final sink is
-committed until `FINAL_AUTHENTICATED`. Failure/cancellation removes staging and
-leaves pre-existing output unchanged. Open is read-only/provider-idempotent and
-may restart from byte zero; partial plaintext is never resumed. Events:
+Plaintext remains uncommitted in the `TransactionalSink` through
+`CHUNKS_STAGED`; exactly one commit follows `FINAL_AUTHENTICATED`. Every failure
+or cancellation invokes idempotent abort and leaves pre-existing output
+unchanged. Open is read-only/provider-idempotent and may restart from byte zero;
+partial plaintext is never resumed. Events:
 `stream.open.started/completed/failed`.
 
 ## Rotation

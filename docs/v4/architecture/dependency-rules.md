@@ -60,6 +60,14 @@ listed in [module boundaries](module-boundaries.md).
     behavior outside the checkout is authoritative.
 16. Provider SDK dependencies MUST live in separately versioned provider
     distributions; stable core must install/import without them.
+17. Context canonicalization MUST NOT compute or expose a public deterministic
+    hash of context values. The suite layer derives the context-binding key from
+    the DEK and verifies the opaque commitment after unwrap. Providers receive
+    protected-header bytes for binding and MUST NOT receive plaintext context.
+18. Safe `seal_stream` and `open_stream` output MUST depend on the public
+    `TransactionalSink` protocol. Pipes, sockets, stdout, and arbitrary
+    `BinaryIO` destinations are forbidden in the safe stable path; filesystem
+    output is implemented by the internal atomic sink.
 
 ## Phase 3 enforcement
 
@@ -75,6 +83,8 @@ Phase 3 MUST add, before moving implementations:
   `exec_module`, ambient entry-point scans, and current-working-directory loads
   in stable runtime;
 - exact `__all__` and documented public-submodule snapshots;
+- signature and import checks proving both safe stream methods require
+  `TransactionalSink`, with no arbitrary-output overload;
 - isolated wheel/sdist build inventories compared to explicit allowlists and
   negative patterns for labs, demos, templates, duplicate trees, fake provider,
   tests, caches, and source paths;
@@ -92,6 +102,8 @@ From Phase 4 onward CI MUST run graph/artifact checks on every change, plus:
 - reproducible artifact comparison and SBOM component ownership;
 - parser tests proving no provider call before structural/policy acceptance;
 - audit event schema tests rejecting forbidden values at construction;
+- keyed context-commitment/provider-nondisclosure tests and transactional-sink
+  conformance tests;
 - legacy no-fallback/import tests; and
 - platform installed-wheel matrices from RFC-0010.
 

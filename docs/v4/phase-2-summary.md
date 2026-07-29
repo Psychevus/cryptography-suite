@@ -16,6 +16,13 @@ a broader primitive suite. The selected envelope representation is a strict
 binary preamble/record framing with deterministic CBOR protected metadata.
 One-shot and streaming are compatible profiles. Final byte labels and the
 cryptographic suite require a normative format review before implementation.
+Application context is represented only by an opaque keyed commitment: seal
+canonically encodes context, derives a context-binding key from the envelope
+DEK, and stores the keyed commitment in protected metadata. Providers bind
+wrap/unwrap to protected-header bytes and never receive plaintext context. Open
+recomputes and compares the commitment after DEK unwrap. The exact
+KDF/commitment construction remains assigned to the normative format/security
+review.
 
 Labs is a separate repository and separately versioned
 `cryptography-suite-labs` distribution. Stable core never depends on or imports
@@ -45,8 +52,12 @@ ProviderError
 ```
 
 `Protector` owns sync seal/open/inspect/rewrap and bounded stream orchestration.
-High-level callers never provide nonces, algorithms, KDF tuning, raw DEKs, or
-long-term private keys. Provider contract methods are `wrap_data_key`,
+Both safe stream methods require the public-submodule `TransactionalSink`;
+bounded writes remain uncommitted until final authentication, commit occurs
+once, and every failure invokes idempotent abort. Pipes, sockets, stdout, and
+arbitrary `BinaryIO` outputs are outside the safe stable path. High-level
+callers never provide nonces, algorithms, KDF tuning, raw DEKs, or long-term
+private keys. Provider contract methods are `wrap_data_key`,
 `unwrap_data_key`, `describe_key`, and `health_check`. Key states are `PENDING`,
 `PRIMARY`, `DECRYPT_ONLY`, `DISABLED`, and `DESTROYED`, with provider
 confirmation and CAS required for promotion.
@@ -75,8 +86,8 @@ cryptosuite doctor
 ```
 
 It has stable exit codes and `cryptosuite-status/1`, no secret argv/environment
-values, no overwrite by default, atomic file outputs, explicit legacy format,
-and no unauthenticated plaintext stdout by default.
+values, no overwrite by default, transactional atomic file outputs, explicit
+legacy format, and no protected-output stdout path.
 
 ## Phase 1 proposal resolution
 
@@ -147,8 +158,8 @@ gates—not current controls.
 | Product charter and refusal boundary | Met; RFC-0001 |
 | Stable/internal/legacy/labs/tooling/dead boundaries | Met; RFC-0002 |
 | Canonical `src/cryptography_suite/` and Phase 3 plan | Met; RFC-0003 and plan above |
-| Exact root API and typed errors | Met; RFC-0004 and exact list above |
-| Envelope encoding, quotas, critical fields, stream failure | Met at requirements level; RFC-0005; byte constants explicitly deferred before implementation |
+| Exact root API, typed errors, and transactional stream sink | Met; RFC-0004 and exact list above |
+| Envelope encoding, keyed context commitment, quotas, critical fields, stream failure | Met at requirements level; RFC-0005; byte/commitment constructions explicitly deferred before implementation |
 | Password-derived encryption decision | Met; explicit stable optional profile, enterprise-disabled |
 | Provider interface, credentials, retry, idempotency | Met; RFC-0006 |
 | Lifecycle states/transitions/rollback/partial failure | Met; RFC-0006 and `state-machines.md` |

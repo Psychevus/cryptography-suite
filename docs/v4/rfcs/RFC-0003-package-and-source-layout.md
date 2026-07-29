@@ -59,6 +59,7 @@ src/cryptography_suite/
     streaming/
         __init__.py
         service.py
+        sinks.py
         atomic.py
     audit/
         __init__.py
@@ -81,9 +82,11 @@ src/cryptography_suite/
 
 Only `__init__.py`, `protector`, `context`, `policy`, `errors`, and documented
 symbols from `envelope`, `providers`, `lifecycle`, `audit`, and `streaming` are
-public. `codec`, `suites`, `retry`, `atomic`, `redaction`, `legacy.formats`,
-`cli`, and `_internal` are implementation details. `legacy` is public only as
-an explicit migration namespace and is never imported by the package root.
+public. The stable `streaming` submodule includes the `TransactionalSink`
+protocol but does not add it to the package root. `codec`, `suites`, `retry`,
+`atomic`, `redaction`, `legacy.formats`, `cli`, and `_internal` are
+implementation details. `legacy` is public only as an explicit migration
+namespace and is never imported by the package root.
 
 Provider SDK integrations MUST be separate distributions with their own
 dependencies and support tier. Stable core contains only provider-neutral

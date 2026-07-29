@@ -97,7 +97,7 @@ class Protector:
     def seal_stream(
         self,
         source: BinaryIO,
-        destination: BinaryIO,
+        destination: TransactionalSink,
         *,
         context: EncryptionContext,
         cancel: Callable[[], bool] | None = None,
@@ -106,7 +106,7 @@ class Protector:
     def open_stream(
         self,
         source: BinaryIO,
-        destination: BinaryIO,
+        destination: TransactionalSink,
         *,
         context: EncryptionContext,
         cancel: Callable[[], bool] | None = None,
@@ -117,16 +117,26 @@ class Protector:
 `bytes(envelope)` returns the original canonical bytes. Construction performs
 only hard-limit framing validation and no provider call. `EnvelopeMetadata` is
 an immutable, redacted view containing format/profile/version, algorithm-suite
-identifier, provider/key references and immutable versions, sizes/counts,
-context digest (never context values), creation time if present, critical
-features, and policy identifier. It contains no plaintext, DEK, nonce, wrapped
-key bytes, password/KDF salt, or ciphertext samples.
+identifier, provider/key references and immutable versions, sizes/counts, an
+opaque context-commitment identifier (never context values), creation time if
+present, critical features, and policy identifier. It contains no plaintext,
+DEK, nonce, wrapped key bytes, password/KDF salt, or ciphertext samples.
 
 `EncryptionContext` is a frozen mapping of UTF-8 string keys to UTF-8 string or
 bytes values with convenience fields `purpose` and `tenant_id`. Keys are
 normalized and duplicates rejected; values are size-bounded. Its deterministic
-encoding is authenticated but not stored in clear. The envelope stores a
-domain-separated digest; callers MUST supply exactly matching context to open.
+encoding is authenticated but not stored in clear. Seal MUST derive a
+domain-separated context-binding key from the fresh envelope DEK and use a
+reviewed keyed construction to compute an opaque context commitment over the
+canonical context encoding. Only that commitment is stored in protected
+metadata. Provider wrap/unwrap binding uses protected-header bytes; providers
+do not receive plaintext context.
+
+After unwrapping the DEK, open MUST derive the same context-binding key,
+recompute the commitment from the caller-supplied context, and compare it in
+constant time. Mismatch raises `ContextMismatchError` without identifying the
+field or value that failed. The exact KDF/keyed construction is assigned to the
+normative format/security review before implementation.
 
 `KeyRef(provider_id: str, key_id: str, version: str | None)` is frozen. Seal
 MUST resolve and record an immutable version; an alias without a resolved
@@ -137,18 +147,50 @@ record a non-authoritative logical alias.
 [RFC-0007](RFC-0007-policy-model.md). `KeyProvider` is the explicit protocol in
 [RFC-0006](RFC-0006-provider-and-key-lifecycle.md). Supporting provider/audit/
 lifecycle/streaming models remain stable in their named submodules but are not
-root exports.
+root exports. `TransactionalSink` is imported from
+`cryptography_suite.streaming`.
+
+The stable sink contract is normative:
+
+```python
+class TransactionalSink(Protocol):
+    @property
+    def max_write_size(self) -> int: ...
+
+    def write(self, chunk: bytes) -> None: ...
+    def commit(self) -> None: ...
+    def abort(self) -> None: ...
+```
+
+The sink states are `OPEN`, `COMMITTED`, and `ABORTED`. `write` is valid only
+while `OPEN`, MUST reject a chunk larger than `max_write_size`, and MUST keep
+written bytes uncommitted and externally invisible. `commit` is permitted only
+after final authentication and all policy/I/O checks and MUST atomically
+transition `OPEN` to `COMMITTED`; a failed commit MUST leave no committed result
+and must permit idempotent abort. `abort` transitions `OPEN` to `ABORTED`, is a
+no-op when already `ABORTED`, and MUST run on authentication, context, quota,
+cancellation, provider, and I/O failure. After commit, neither further write nor
+abort may alter the committed result. SDK filesystem sinks use same-directory
+exclusive staging, fsync, atomic promotion, and directory fsync.
+
+Both safe stable stream methods require `TransactionalSink`, including seal, so
+the failure-atomic promise is consistent for ciphertext and plaintext output.
+Pipes, sockets, stdout, and arbitrary already-open `BinaryIO` destinations are
+not valid sinks. An explicitly unsafe/uncommitted API, if ever proposed, MUST
+live outside the default stable path and cannot inherit these guarantees.
 
 The initial API is synchronous. Provider SDKs and file I/O may block subject to
 required timeouts. A future native async API requires a separate RFC and MUST
 NOT implement blocking calls on an event loop. One-shot calls have no
 cooperative cancellation point; stream calls check `cancel` before provider
-calls, before each chunk, and before atomic promotion. Cancellation raises a
-typed error and discards operation-owned temporary output.
+calls, before each chunk, and before sink commit. Cancellation raises a typed
+error and invokes sink abort.
 
 `inspect` MUST parse and policy-check structural metadata without unwrapping a
 DEK, decrypting content, or making a network/provider call. It MUST clearly mark
-authentication as “not verified”; callers cannot use it as proof of authenticity.
+authentication as “not verified”; callers cannot use it as proof of
+authenticity. It MAY expose only an opaque context-commitment identifier and
+MUST NOT imply that a public hash protects low-entropy context values.
 
 `rewrap` MUST parse and enforce policy, unwrap the existing DEK internally, wrap
 it to a resolved destination version, update only the mutable recipient
@@ -181,9 +223,10 @@ context values MUST be redacted.
 
 ## API or architecture implications
 
-`Protector` is the sole stable orchestration object. File-path convenience lives
-in `streaming` and MUST apply RFC-0009-equivalent atomic/link policy. Providers
-cannot be registered globally or selected from environment/import state.
+`Protector` is the sole stable orchestration object. Safe stream output always
+uses `TransactionalSink`. File-path convenience lives in `streaming` and MUST
+apply RFC-0007/RFC-0009 atomic/link policy. Providers cannot be registered
+globally or selected from environment/import state.
 
 ## Security consequences
 
@@ -194,8 +237,9 @@ must not be advertised otherwise.
 
 ## Privacy consequences
 
-Context values can be sensitive. They are authenticated externally and only a
-digest is serialized. Inspection and exceptions are redacted by construction.
+Context values can be sensitive and low entropy. Only a DEK-keyed opaque context
+commitment is serialized. Inspection and exceptions are redacted by
+construction, and providers never receive plaintext context.
 
 ## Compatibility consequences
 
@@ -211,9 +255,10 @@ audit sink, timeouts configured on providers, and stream lifetime.
 ## Failure behavior
 
 No operation returns partial success. One-shot open returns no bytes before full
-authentication. Stream open writes only to SDK-owned staging until final
-authentication; on failure the caller destination is unchanged where the SDK
-owns the path, or the supplied sink is documented as uncommitted/staging-only.
+authentication. Stream methods write only through an `OPEN`
+`TransactionalSink`; they call `commit` after final authentication and call
+idempotent `abort` on every failure. No externally visible committed plaintext
+or ciphertext exists before commit.
 
 ## Alternatives considered
 
@@ -229,13 +274,16 @@ protectors fragment semantics, and convenience exports regrow the audit surface.
 
 Models MUST use defensive copies and frozen fields. Bytes-like inputs other than
 `bytes` MAY be accepted internally but return types are exact. No implicit text
-encoding is permitted.
+encoding is permitted. Safe stream implementations MUST reject objects that do
+not implement the transactional state contract.
 
 ## Test and validation requirements
 
 Snapshot `__all__`, signatures, typing behavior, immutability, error codes,
-redaction, context mismatch, no-network inspect, same-key rewrap, cancellation
-at every transition, and authenticate-before-release behavior.
+redaction, keyed context-commitment vectors/mismatch/non-oracle behavior,
+no-network inspect, same-key rewrap, cancellation at every transition, sink
+write bounds, idempotent abort, commit timing, and authenticate-before-release
+behavior.
 
 ## Migration implications
 

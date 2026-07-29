@@ -64,8 +64,9 @@ Every envelope MUST have:
    encodings, sorted integer keys, no floats/tags/indefinite items, no duplicate
    map keys, and no semantically equivalent alternative encodings;
 4. an algorithm-suite identifier, profile, policy identifier, creation metadata
-   only when policy permits, context digest, plaintext/ciphertext bounds, chunk
-   parameters, and a sorted `critical` label set;
+   only when policy permits, an opaque keyed context commitment,
+   plaintext/ciphertext bounds, chunk parameters, and a sorted `critical` label
+   set;
 5. one or more bounded recipient entries containing explicit provider id,
    logical key id when allowed, immutable key version, wrapping algorithm id,
    and opaque wrapped-DEK bytes;
@@ -84,12 +85,25 @@ registered suite. Algorithm identifiers MUST define key size, nonce derivation,
 tag size, record AAD, limits, and provider-wrap binding as one indivisible suite.
 
 Interpretation-critical metadata and external application context MUST be
-cryptographically bound. Context is supplied out-of-band; only a
-domain-separated deterministic digest is stored. Unknown labels listed in
-`critical` MUST fail with `CRITICAL_FIELD_UNSUPPORTED`; unknown noncritical
-labels MAY be retained byte-for-byte but MUST NOT change interpretation.
-Non-deterministic encodings, duplicate labels, unsupported versions/profiles,
-and trailing data MUST fail deterministically.
+cryptographically bound. Context is supplied out-of-band and canonically
+encoded. Seal MUST derive a domain-separated context-binding key from the fresh
+envelope DEK and compute an opaque context commitment with a reviewed keyed
+construction. Only the commitment is stored in protected metadata; a public
+deterministic hash of context values is forbidden.
+
+Provider wrap/unwrap binding uses the deterministic protected-header bytes and
+does not disclose plaintext context to the provider. After DEK unwrap, open
+MUST derive the context-binding key, recompute the commitment from the
+caller-supplied canonical context, and compare it in constant time. Failure maps
+to `ContextMismatchError` without revealing a field or value. The exact
+derivation and keyed commitment construction MUST be selected in the normative
+format/security review before implementation.
+
+Unknown labels listed in `critical` MUST fail with
+`CRITICAL_FIELD_UNSUPPORTED`; unknown noncritical labels MAY be retained
+byte-for-byte but MUST NOT change interpretation. Non-deterministic encodings,
+duplicate labels, unsupported versions/profiles, and trailing data MUST fail
+deterministically.
 
 ### Profiles and quotas
 
@@ -102,7 +116,7 @@ Hard implementation ceilings, which policy may only lower, are:
 | Resource | Hard ceiling | Enterprise default |
 | --- | ---: | ---: |
 | Protected header | 1 MiB | 64 KiB |
-| Context encoding before digest | 1 MiB | 64 KiB |
+| Context encoding before commitment | 1 MiB | 64 KiB |
 | Recipients | 32 | 4 |
 | One recipient entry | 64 KiB | 16 KiB |
 | One-shot plaintext | 64 MiB | 16 MiB |
@@ -114,14 +128,20 @@ Hard implementation ceilings, which policy may only lower, are:
 The parser MUST read the fixed preamble into fixed memory, validate lengths by
 checked arithmetic against hard and policy limits, and only then allocate.
 Provider calls MUST occur only after complete structural/policy validation.
+The provider receives the protected-header binding and wrapped-key request, not
+the plaintext context or context-binding key.
 
 Each chunk authenticates envelope identity, zero-based index, declared length,
 final/nonfinal flag, and protected-header digest. Missing final record is
 truncation. Skipped, reordered, or duplicate indices; zero-length nonfinal
 records; extra records; length mismatch; or bytes after final record fail.
-Streaming open MUST stage plaintext until the final record authenticates. It
-MUST NOT commit partial plaintext on corruption, cancellation, provider
-failure, quota failure, or truncation.
+Safe streaming seal and open MUST write through the RFC-0004
+`TransactionalSink` contract. Open MUST keep plaintext uncommitted until the
+final record authenticates. Both profiles MUST commit exactly once only after
+final authentication and all policy/I/O checks, and MUST abort on corruption,
+authentication or context mismatch, cancellation, provider failure, quota
+failure, truncation, or I/O failure. Pipes, sockets, stdout, and arbitrary
+already-open byte streams are not accepted by the safe stable API.
 
 ### Password-derived profile
 
@@ -144,9 +164,11 @@ logs, errors, audit, or telemetry.
 
 ## API or architecture implications
 
-`Envelope` is opaque bytes; `inspect` returns redacted structural data.
-`Protector` selects the policy-approved suite. Password operations live outside
-the root/provider constructor and use equivalent context and failure semantics.
+`Envelope` is opaque bytes; `inspect` returns redacted structural data and at
+most an opaque context-commitment identifier. `Protector` selects the
+policy-approved suite. Password operations live outside the root/provider
+constructor and use equivalent context, commitment, sink, and failure
+semantics.
 
 ## Security consequences
 
@@ -158,9 +180,11 @@ reverified unless actually checked.
 
 ## Privacy consequences
 
-Format, size, provider id, key reference/version, recipient count, and allowed
-timestamps may be visible. Context values, plaintext-derived names, DEKs,
-passwords, and raw KDF inputs MUST NOT be visible.
+Format, size, provider id, key reference/version, recipient count, an opaque
+context-commitment identifier, and allowed timestamps may be visible. Context
+values, plaintext-derived names, DEKs, passwords, and raw KDF inputs MUST NOT be
+visible. The keyed commitment prevents a party lacking the DEK from testing
+low-entropy context guesses offline.
 
 ## Compatibility consequences
 
@@ -202,10 +226,12 @@ review.
 ## Test and validation requirements
 
 Publish positive and negative vectors in at least Python plus one independent
-language; round-trip deterministic bytes; reject alternate encodings, duplicates,
-unknown critical fields, integer overflow, quota edges, truncation/reorder/
-duplicate/trailing data; maintain malformed corpora; fuzz parser and state
-machine; test no provider call before validation and no committed partial output.
+language; round-trip deterministic bytes; test keyed context commitment,
+wrong-context comparison behavior, and provider non-disclosure; reject
+alternate encodings, duplicates, unknown critical fields, integer overflow,
+quota edges, truncation/reorder/duplicate/trailing data; maintain malformed
+corpora; fuzz parser and state machine; test no provider call before validation
+and no committed partial output.
 
 ## Migration implications
 
@@ -215,8 +241,9 @@ legacy header is reinterpreted as v4.
 ## Unresolved questions
 
 Final magic bytes, integer labels, suite construction/ids, recipient-manifest
-construction, CDDL, and exact benchmark-derived defaults are owned by the
-format/security leads and MUST be resolved before cryptographic implementation.
+construction, context-binding KDF/keyed commitment construction, CDDL, and
+exact benchmark-derived defaults are owned by the format/security leads and
+MUST be resolved before cryptographic implementation.
 
 ## Explicitly deferred work
 
@@ -227,7 +254,9 @@ benchmarks, and cryptographic review are deferred to the format-spec phase.
 
 - The normative spec resolves every unresolved byte/suite item before code.
 - Independent decoders produce identical protected bytes.
-- All quota, critical-field, streaming, and password-profile tests pass.
+- Keyed context commitment and provider non-disclosure vectors pass.
+- All quota, critical-field, transactional streaming, and password-profile
+  tests pass.
 
 ## Supersession rules
 

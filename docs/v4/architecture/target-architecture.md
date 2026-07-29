@@ -11,7 +11,8 @@ The SDK protects application bytes/files. The application owns plaintext
 purpose, provider credentials/configuration, key aliases, policy selection,
 audit sink, and final data retention. The provider owns long-term wrapping keys
 and authoritative version/state. The SDK owns envelope parsing, quotas,
-DEK/nonce generation, authenticated context binding, staging, and redaction.
+DEK/nonce generation, the DEK-keyed context commitment, transactional staging,
+and redaction.
 
 ```mermaid
 flowchart LR
@@ -44,7 +45,7 @@ substitute for cryptographic authentication.
 | Suite adapter | Maintained-library AEAD/key-wrap binding | Receives internal DEK/nonce; no caller algorithm controls |
 | Provider adapter | Four-method normalized provider contract | Network/SDK/token errors and metadata are untrusted |
 | Lifecycle service | CAS state, rotation, reconciliation, destroy gates | Durable application store may be stale/concurrent |
-| Streaming/atomic service | Bounded chunks, staging, fsync/promotion | Filesystem names, links, mounts, capacity, and crashes are hostile conditions |
+| Streaming/sink/atomic service | Bounded writes, commit/abort, fsync/promotion | Sink state, filesystem names, links, mounts, capacity, and crashes are hostile conditions |
 | Legacy service | One explicitly named bounded parser at a time | Legacy bytes/metadata/password inputs are hostile and weaker |
 | Audit service | Build/redact/deliver structured events | Sink may fail or be unavailable; never receives secrets |
 | CLI | Parse explicit configuration and map output/errors | argv, stdin, config, TTY, signals, and output paths are untrusted |
@@ -66,9 +67,11 @@ sequenceDiagram
     P->>K: describe_key(alias, deadline)
     K-->>P: immutable version + capabilities/state
     P->>P: generate fresh DEK and internal nonce
-    P->>K: wrap_data_key(DEK, version, binding)
+    P->>E: canonical context + DEK; derive keyed commitment
+    E-->>P: deterministic protected-header bytes
+    P->>K: wrap_data_key(DEK, version, protected-header bytes)
     K-->>P: WrappedKey
-    P->>E: canonical header + authenticated ciphertext
+    P->>E: protected header + wrapped key + plaintext
     E-->>P: Envelope
     P->>U: redacted seal.completed
     P-->>A: immutable Envelope
@@ -92,12 +95,15 @@ sequenceDiagram
     A->>P: open(envelope, context)
     P->>E: bounded parse and canonical validation
     E-->>P: protected model + records
-    P->>Y: validate version/suite/quotas/context/key state
-    P->>K: unwrap_data_key(pinned version, binding)
+    P->>Y: validate version/suite/quotas/context requirements/key state
+    P->>K: unwrap_data_key(pinned version, protected-header bytes)
     K-->>P: internal DEK
+    P->>E: recompute keyed commitment from caller context
+    E-->>P: constant-time match or ContextMismatchError
     P->>S: decrypt into uncommitted memory/staging
-    P->>P: verify final authentication/context
-    P-->>A: plaintext or atomic promotion
+    P->>P: verify final authentication
+    P->>S: commit transactional sink
+    P-->>A: plaintext or committed destination
 ```
 
 Any failure discards staging. Authentication and context mismatch have distinct
@@ -107,7 +113,9 @@ codes but equally non-oracular default messages.
 
 `inspect` performs fixed framing, restricted-CBOR, quota, critical-field, and
 policy checks only. It makes no provider/network call and returns redacted
-metadata with `authentication_status = not_verified`.
+metadata with `authentication_status = not_verified`. It may return an opaque
+context-commitment identifier, never context values or a public hash presented
+as protection for low-entropy values.
 
 ```mermaid
 sequenceDiagram
@@ -132,17 +140,20 @@ content tag was actually verified. Failure leaves the original envelope valid.
 
 ## Streaming behavior and failure boundary
 
-Seal reads one policy-bounded chunk, encrypts/authenticates its index/length/
-header binding, and writes to SDK-owned staging. It appends a final authenticated
-manifest, fsyncs, then atomically promotes. Open parses and decrypts records into
-staging, rejects missing/duplicate/reordered/trailing records, verifies the final
-record, fsyncs, then promotes. Cancellation is checked before provider calls,
-every chunk, and promotion.
+Both safe stream operations receive an `OPEN` `TransactionalSink`. Seal reads
+one policy-bounded chunk, encrypts/authenticates its index/length/header binding,
+and performs bounded sink writes. It appends a final authenticated manifest,
+then commits. Open verifies the keyed context commitment after DEK unwrap,
+decrypts records through bounded uncommitted writes, rejects missing/duplicate/
+reordered/trailing records, verifies the final record, then commits.
+Cancellation is checked before provider calls, every chunk, and commit.
 
-Caller-provided generic streams are treated as uncommitted staging sinks; the
-SDK cannot promise rollback for arbitrary sinks. File APIs provide the complete
-no-overwrite/link/fsync/same-filesystem contract from
-[RFC-0007](../rfcs/RFC-0007-policy-model.md).
+Authentication, context, quota, cancellation, provider, and I/O failure invoke
+idempotent abort. No committed output is externally visible before `commit`.
+Pipes, sockets, stdout, and arbitrary already-open `BinaryIO` outputs are not
+accepted by the safe API. The SDK filesystem sink implements same-directory
+staging, no-overwrite/link checks, fsync, atomic promotion, and directory fsync
+from [RFC-0007](../rfcs/RFC-0007-policy-model.md).
 
 ## Migration data flow
 
@@ -165,10 +176,12 @@ rollback/reconciliation.
 
 ## Policy and provider interaction
 
-Evaluation order is hard limits, policy validity, format/profile, quotas,
-context, operation permission, provider allowlist, fresh key description/effective
-state, then provider call. Provider health is advisory and cannot override
-operation results. Provider selection is constructor-owned, never ambient or
+Pre-provider evaluation order is hard limits, policy validity, format/profile,
+quotas, context shape/required keys, operation permission, provider allowlist,
+and fresh key description/effective state. Open then unwraps using
+protected-header bytes, verifies the keyed context commitment, and only then
+processes plaintext. Provider health is advisory and cannot override operation
+results. Provider selection is constructor-owned, never ambient or
 insertion-ordered.
 
 ## Audit event generation
@@ -186,7 +199,7 @@ durable `AUDIT_PENDING` reconciliation after an irreversible external mutation.
 | Plaintext | Application | Operation memory/staging only; never logs/metadata |
 | DEK | No caller persistence; wrapped in envelope | Fresh per envelope, internal mutable buffer, best-effort release |
 | Long-term wrapping key/credentials | Provider/application | Never exported or serialized by core |
-| Context values | Application | Canonically digested/authenticated; values not stored |
+| Context values | Application | Canonically encoded; DEK-keyed commitment stored; values never stored or sent to providers |
 | Wrapped DEK/key version | Envelope/application storage | Visible bounded metadata; policy-redacted on inspect/audit |
 | Policy document | Application governance | Validated/canonicalized; identifier stored |
 | Audit events/checkpoints | Application audit system | Allowlisted redacted schema |

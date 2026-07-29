@@ -46,10 +46,10 @@ The schema MUST control at least:
 
 - allowed envelope major/minor versions, profiles, algorithm suites, providers,
   recipient counts, key states, and immutable-version requirement;
-- required context keys, maximum context bytes, and whether selected key
-  references/timestamps may be visible;
+- required context keys, maximum context bytes, keyed context-commitment
+  requirements, and whether selected key references/timestamps may be visible;
 - maximum plaintext, envelope, header, entry, nesting, chunk size/count, and
-  streaming staging requirements;
+  transactional streaming-sink requirements;
 - password-profile enablement, KDF ids, minimum/maximum work factors, and
   resource ceilings;
 - explicit legacy formats, decrypt deadlines, required migration context, and
@@ -84,9 +84,20 @@ algorithms, or legacy permissions. Importing the package reads no environment.
 Application overrides use explicit constructor/restriction calls and are logged
 by policy id.
 
-Evaluation order is hard implementation ceilings, policy schema validity,
-format/profile/version, quotas, context, provider/key state, operation-specific
-permission, then provider call. Missing/unknown values fail closed.
+Evaluation order before a provider call is hard implementation ceilings, policy
+schema validity, format/profile/version, quotas, context shape/required keys,
+provider/key state, and operation-specific permission. After DEK unwrap, open
+MUST verify the keyed context commitment before releasing plaintext.
+Missing/unknown values fail closed.
+
+### Transactional streaming policy
+
+Every safe stable seal/open stream output MUST implement the RFC-0004
+`TransactionalSink` state contract. Policy controls maximum write size,
+staging-capacity requirements, commit prerequisites, and cleanup reporting.
+Authentication, context, quota, cancellation, provider, and I/O failure require
+idempotent abort. Pipes, sockets, stdout, and arbitrary already-open `BinaryIO`
+destinations are denied by enterprise and development built-ins.
 
 ### File-operation policy
 
@@ -107,6 +118,10 @@ Enterprise defaults MUST:
 
 On platforms lacking a promised primitive, the operation fails rather than
 quietly weakening the guarantee.
+
+The SDK filesystem implementation is a `TransactionalSink`: staged bytes are
+not externally visible as the destination, atomic promotion is `commit`, and
+owned temporary cleanup is idempotent `abort`.
 
 ### Audit policy
 
@@ -174,8 +189,9 @@ in serialization. Validation must be deterministic and bounded.
 
 Golden canonical policy ids; schema/unknown-field tests; composition algebra and
 property tests proving no widening; environment/import tests; quota boundaries;
-file link/crash/fsync/cross-filesystem tests; audit redaction and sink-failure
-state tests.
+transactional sink write/commit/abort tests; file
+link/crash/fsync/cross-filesystem tests; audit redaction and sink-failure state
+tests.
 
 ## Migration implications
 

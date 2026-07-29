@@ -52,7 +52,7 @@ Global options are `--help`, `--version`, `--output {text,json}`,
 Provider type/package is named in nonsecret config and instantiated explicitly;
 there is no discovery/list command.
 
-`encrypt/decrypt` require `--input PATH|-` and `--output PATH|-`.
+`encrypt/decrypt` require `--input PATH|-` and a filesystem `--output PATH`.
 `encrypt` requires `--key-ref` through config/file/stdin-safe structured input,
 not a secret, plus repeatable `--context-file`; `decrypt` requires equivalent
 context. `rewrap` requires input/output and destination key reference.
@@ -67,16 +67,12 @@ printing credentials, or sending telemetry.
 Overwrite is denied by default. `--overwrite` is accepted only when policy
 allows it and still uses same-directory exclusive staging, link checks, fsync,
 atomic replace, and directory fsync. Input=output, symlinks, hardlinked
-destinations, cross-filesystem atomic claims, and non-atomic stdout plaintext
-are handled as follows:
-
-- binary ciphertext MAY stream to stdout after the header is fixed;
-- plaintext decrypt to stdout is denied by default because final
-  authentication cannot retract bytes; it requires explicit policy
-  `allow_uncommitted_stdout` and `--unsafe-plaintext-stdout`, is forbidden in
-  noninteractive enterprise mode, and carries no failure-atomic guarantee;
-- normal decrypt/migrate outputs MUST be filesystem paths or an SDK-owned
-  transactional sink.
+destinations and cross-filesystem atomic claims are rejected. Encrypt, decrypt,
+rewrap, and migrate outputs use an SDK-owned filesystem `TransactionalSink`.
+Pipes, sockets, stdout, and arbitrary already-open streams cannot satisfy the
+safe commit/abort contract and MUST NOT be accepted as output by these stable
+commands. An unsafe/uncommitted streaming interface would require a separate
+non-default proposal and is not part of this CLI.
 
 ### Secret and context input
 
@@ -91,7 +87,7 @@ documented separately.
 
 Context values use bounded JSON files or a dedicated nonsecret FD, never
 repeatable `key=value` argv. The operator is warned that context may be
-sensitive; only its digest appears in output.
+sensitive; output may contain only an opaque context-commitment identifier.
 
 TTY prompts are used only when stdin/stdout roles permit and
 `--non-interactive` is absent. Noninteractive mode never prompts, guesses,
@@ -116,9 +112,9 @@ JSON is one UTF-8 object per final status, schema:
 On error, `status` is `"error"` and `error` contains exactly `code`,
 `category`, `message`, `retryable`, and redacted `details`; `result` is null.
 Keys are emitted in the documented order, unknown additive result keys may be
-ignored within schema major 1, and secret fields are forbidden. Binary output
-uses stdout; status/progress then uses `--status-file` or stderr. `--output json`
-without a status channel is rejected when stdout carries binary. Text output is
+ignored within schema major 1, and secret fields are forbidden. Protected binary
+output is written only to the transactional filesystem destination. Final
+status uses stdout or `--status-file`; logs use stderr. Text output is
 human-facing and not parsed/stable except command names, exit codes, and the
 promise that secrets are absent.
 
@@ -149,8 +145,8 @@ immediately after best-effort cleanup. Exit 9 never implies provider mutations
 were rolled back; the status/receipt identifies reconciliation requirement.
 Retries follow RFC-0006 and respect `--timeout`.
 
-Every operation emits RFC-0007 audit events when required. Logs go to stderr,
-never stdout binary, and contain operation/code/category only at default level.
+Every operation emits RFC-0007 audit events when required. Logs go to stderr
+and contain operation/code/category only at default level.
 
 The v3 `cryptography-suite` binary and hidden aliases are not v4 stable
 commands. A packaging-only deprecation launcher MAY exist in pre-release builds
@@ -164,8 +160,9 @@ primitives, legacy adapters directly, or labs.
 
 ## Security consequences
 
-No secret argv/environment path and no unauthenticated stdout plaintext by
-default. Explicit legacy and overwrite controls remain policy-gated.
+No secret argv/environment path, no protected-output stdout path, and no
+unauthenticated plaintext release. Explicit legacy and overwrite controls remain
+policy-gated.
 
 ## Privacy consequences
 
@@ -191,8 +188,8 @@ mutation. Temporary output is never promoted on error.
 
 ## Alternatives considered
 
-Preserve v3 commands; expose secrets via environment/file; plaintext stdout by
-default; the narrow tree above.
+Preserve v3 commands; expose secrets via environment/file; allow uncommitted
+pipe/stdout outputs; the narrow tree above.
 
 ## Rejected alternatives
 
@@ -206,9 +203,10 @@ permission-checked where supported, and contain references only.
 ## Test and validation requirements
 
 Snapshot help/tree/options/codes/schemas; test every error mapping, TTY and
-noninteractive matrix, binary stdout separation, signals at each state,
-no-overwrite/link/atomic crash behavior, redaction/process-list checks, no
-provider discovery, and installed-wheel entry points.
+noninteractive matrix, rejection of pipe/socket/stdout output, transactional
+commit/abort, signals at each state, no-overwrite/link/atomic crash behavior,
+redaction/process-list checks, no provider discovery, and installed-wheel entry
+points.
 
 ## Migration implications
 

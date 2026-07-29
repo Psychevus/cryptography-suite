@@ -83,9 +83,10 @@ independent audit/scanning, provider conformance, installed-wheel and format
 interoperability tests, migration rollback tests, release provenance/signing,
 and two-person stable-release approval.
 
-The project MUST NOT market v4 as formally verified, audited, FIPS validated,
-HSM certified, production approved, zero-knowledge capable, post-quantum secure,
-or compliant unless separately scoped evidence supports the exact claim.
+The project MUST NOT claim completed formal verification, completed independent
+security assessment, FIPS validation, HSM certification, production approval,
+zero-knowledge capability, post-quantum security, or compliance unless
+separately scoped evidence supports the exact claim.
 
 ## API or architecture implications
 

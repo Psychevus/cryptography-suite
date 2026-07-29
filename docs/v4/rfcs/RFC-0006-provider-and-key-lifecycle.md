@@ -78,10 +78,12 @@ key id/version, wrapping algorithm id, opaque bytes, and provider-safe metadata.
 and freshness time. Provider ids are lowercase reverse-DNS identifiers;
 `KeyRef` ids are opaque provider-owned UTF-8 strings with no path semantics.
 
-`wrap_data_key` and `unwrap_data_key` are limited to suite-approved DEK sizes
-and domain-separated binding. Generic ciphertext decrypt, raw private-key
-export, silent selection/fallback, unbounded retry, swallowed failure, and
-credential persistence by the SDK are forbidden.
+`wrap_data_key` and `unwrap_data_key` are limited to suite-approved DEK sizes.
+Their `binding` is the deterministic protected-header bytes; providers MUST NOT
+receive plaintext `EncryptionContext` values or the derived context-binding
+key. Generic ciphertext decrypt, raw private-key export, silent
+selection/fallback, unbounded retry, swallowed failure, and credential
+persistence by the SDK are forbidden.
 
 Capability discovery is explicit through `KeyDescription.capabilities`.
 Lifecycle operations are separate optional protocols (`KeyCreator`,
@@ -126,8 +128,8 @@ policy. Network health checks are never performed by import or `inspect`.
 | HashiCorp Vault Transit | Separate provider package | Version pinning, mount/namespace, token, rotation and HA failure tests |
 | PKCS#11/HSM | Experimental provider package until separate mechanism policy and review | Real hardware tests, session/PIN design, approved wrap mechanisms, side-channel/error review |
 
-PKCS#11 is not production-ready because a code path exists. RSA PKCS#1 v1.5
-generic decrypt is forbidden.
+PKCS#11 receives no production support claim merely because a code path exists.
+RSA PKCS#1 v1.5 generic decrypt is forbidden.
 
 ### Lifecycle state machine
 

@@ -86,8 +86,9 @@ Migration MUST execute these durable states:
    atomic same-filesystem rename, and fsync directory.
 9. **Receipt:** durably record schema `cs-migration-receipt/1`, operation/
    idempotency id, redacted source/destination ids, source and destination
-   digests, declared format, policy/context digests, key version, byte counts,
-   timestamps, verification result, warnings, and audit checkpoint—no secrets.
+   digests, declared format, policy id, opaque destination context commitment,
+   key version, byte counts, timestamps, verification result, warnings, and
+   audit checkpoint—no secrets.
 10. **Complete:** leave source untouched. Source deletion is a separate,
     user-authorized retention workflow outside the SDK transaction.
 
@@ -111,7 +112,8 @@ gaps remain limitations and must appear in receipts/audit.
 ## Privacy consequences
 
 Inventories and receipts can reveal filenames, formats, tenants, and key ids;
-defaults store pseudonymous identifiers and context digests only.
+defaults store pseudonymous identifiers and, when needed, only the opaque
+destination context-commitment identifier.
 
 ## Compatibility consequences
 
