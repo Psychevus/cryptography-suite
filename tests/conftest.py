@@ -1,24 +1,31 @@
-import os
+from __future__ import annotations
+
+import subprocess
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 
 import pytest
 
-# Ensure src is importable for crypto_suite package
-ROOT = Path(__file__).resolve().parents[1]
-SRC = ROOT / "src"
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
-if str(SRC) not in sys.path:
-    sys.path.append(str(SRC))
+REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
-def pytest_configure(config: pytest.Config) -> None:
-    config.addinivalue_line(
-        "markers", "experimental: mark test as requiring EXPERIMENTAL=1 to run"
+@dataclass(frozen=True)
+class BuiltArtifacts:
+    wheel: Path
+    sdist: Path
+
+
+@pytest.fixture(scope="session")
+def built_artifacts(tmp_path_factory: pytest.TempPathFactory) -> BuiltArtifacts:
+    output = tmp_path_factory.mktemp("phase3-artifacts")
+    subprocess.run(
+        [sys.executable, "-m", "build", "--outdir", str(output)],
+        cwd=REPO_ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
     )
-
-
-def pytest_runtest_setup(item: pytest.Item) -> None:
-    if "experimental" in item.keywords and os.getenv("EXPERIMENTAL") != "1":
-        pytest.skip("experimental features disabled")
+    wheel = next(output.glob("*.whl"))
+    sdist = next(output.glob("*.tar.gz"))
+    return BuiltArtifacts(wheel=wheel, sdist=sdist)
