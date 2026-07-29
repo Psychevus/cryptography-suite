@@ -47,9 +47,6 @@ dependencies = [
     "cryptography>=46.0.5",
 ]
 
-[project.entry-points."cryptosuite.aead"]
-"gcm-sst" = "cryptography_suite.aead_plugins:aes_gcm_sst_encrypt"
-
 [project.optional-dependencies]
 cli = ["PyYAML", "rich"]
 hashing-extra = ["blake3"]
@@ -78,10 +75,6 @@ aws = ["boto3"]
 hsm = ["python-pkcs11>=0.8.1"]
 legacy = ["salsa20>=0.9", "ascon>=1.2"]
 
-[project.scripts]
-cryptography-suite = "cryptography_suite.cli:main"
-cryptosuite-fuzz = "cryptography_suite.cli:fuzz_cli"
-
 [project.urls]
 Homepage = "https://github.com/Psychevus/cryptography-suite"
 Documentation = "https://psychevus.github.io/cryptography-suite"
@@ -92,17 +85,17 @@ Tracker = "https://github.com/Psychevus/cryptography-suite/issues"
 version = {attr = "cryptography_suite.__version__"}
 
 [tool.setuptools]
-include-package-data = true
+package-dir = {"" = "src"}
+include-package-data = false
 license-files = ["LICENSE"]
 
 [tool.setuptools.packages.find]
-where = ["."]
+where = ["src"]
 include = ["cryptography_suite*"]
-exclude = ["tests*", "docs*", "examples*", "demo*"]
+namespaces = false
 
 [tool.setuptools.package-data]
 "cryptography_suite" = ["py.typed"]
-"cryptography_suite.codegen" = ["templates/**"]
 
 [tool.black]
 line-length = 88
@@ -120,7 +113,6 @@ python_version = "3.10"
 strict = true
 warn_unused_configs = true
 exclude = ["^tests/"]
-plugins = ["cryptography_suite._mypy_crypto_checker"]
 
 
 [tool.pytest.ini_options]
