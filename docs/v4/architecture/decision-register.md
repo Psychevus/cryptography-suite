@@ -1,0 +1,27 @@
+# Phase 2 Decision Register
+
+- **Status:** Binding proposals for v4 implementation
+- **Last updated:** 2026-07-29
+- **Source:** [15 Phase 1 open decisions](../baseline/open-decisions.md)
+
+| ID | Phase 1 # | Decision summary | Binding RFC | Status | Rationale | Deferred item, owner, target |
+| --- | ---: | --- | --- | --- | --- | --- |
+| D-001 | 1 | Exact 15 root exports; `Protector` API; stable typed error/code families | [RFC-0004](../rfcs/RFC-0004-public-python-api.md) | Resolved | Replaces 111-name unsafe facade with explicit orchestration | Native async decision; API owner; post-4.0 RFC |
+| D-002 | 2 | Deterministic CBOR protected header plus strict preamble/records; quotas and context digest | [RFC-0005](../rfcs/RFC-0005-envelope-requirements.md) | Resolved with format details deferred | Canonical cross-language metadata with explicit criticality and bounded streaming | Constants/CDDL/suite/recipient MAC; format + security leads; before cryptographic implementation/a2 |
+| D-003 | 3 | Four-method explicit provider protocol, immutable versions, conformance, bounded retry/idempotency | [RFC-0006](../rfcs/RFC-0006-provider-and-key-lifecycle.md) | Resolved | Narrow wrap authority and no ambient selection/fallback | Per-provider syntax/mechanism/config; provider owners; before beta |
+| D-004 | 4 | Explicit format matrix and deadlines; no automatic fallback | [RFC-0008](../rfcs/RFC-0008-legacy-and-migration-policy.md) | Resolved | Compatibility is migration-only and bounded | Adapter/vector implementation; migration owner; Phase 4 before beta |
+| D-005 | 5 | Stable optional password profile, separately enabled and enterprise-disabled; authenticated KDF parameters/floors | [RFC-0005](../rfcs/RFC-0005-envelope-requirements.md) | Resolved | Portable use remains possible without weakening provider-first path | Final KDF benchmarks/floors; crypto lead; before a2 format freeze |
+| D-006 | 6 | No-overwrite, link rejection, same-directory temp, fsync/atomic rename, no cross-filesystem claim | [RFC-0007](../rfcs/RFC-0007-policy-model.md) | Resolved | Prevents v3 destructive and partial-output behavior | Platform primitive implementation/tests; streaming owner; Phase 4 before a3 |
+| D-007 | 7 | Five-state lifecycle plus CAS rotation/rewrap/reconciliation/rollback | [RFC-0006](../rfcs/RFC-0006-provider-and-key-lifecycle.md) | Resolved | Provider-confirmed state prevents false promotion | Durable store schema; lifecycle owner; Phase 4 before beta |
+| D-008 | 8 | `cs-audit/1`, field allowlist, policy sink failures, external checkpoint required for tamper-evidence | [RFC-0007](../rfcs/RFC-0007-policy-model.md) | Resolved | Secret-free events without repeating demo audit claims | Reference checkpoint/sink; audit owner; before beta |
+| D-009 | 9 | No ambient plugins; provider integrations are separate packages explicitly constructed | [RFC-0002](../rfcs/RFC-0002-stable-core-boundary.md), [RFC-0006](../rfcs/RFC-0006-provider-and-key-lifecycle.md) | Resolved | Avoids executable discovery/name collision | Provider package signing policy; supply-chain owner; before Tier 1/stable |
+| D-010 | 10 | Labs is separate repository and separately versioned distribution; stable never depends/imports it | [RFC-0002](../rfcs/RFC-0002-stable-core-boundary.md) | Resolved | Strongest artifact/audit boundary | Labs owner/release number; product owner; separate labs project before v4 stable removal docs |
+| D-011 | 11 | Canonical `src/cryptography_suite/`; retire root and duplicate trees after proof | [RFC-0003](../rfcs/RFC-0003-package-and-source-layout.md) | Resolved | One installed-wheel source of truth | Mechanical execution; package owner; Phase 3 |
+| D-012 | 12 | CPython 3.12–3.14 and named OS targets; provider tiers; installed-wheel matrix | [RFC-0010](../rfcs/RFC-0010-release-support-and-assurance.md) | Resolved as target | Testable support instead of classifiers/claims | Actual tuple/provider evidence; release/provider owners; RC1–stable |
+| D-013 | 13 | Provider extras become separate distributions; immutable CI pins, locked inputs, SBOM/signing/provenance/protected publishing are stable gates | [RFC-0003](../rfcs/RFC-0003-package-and-source-layout.md), [RFC-0010](../rfcs/RFC-0010-release-support-and-assurance.md) | Resolved as gate; implementation deferred | Prevents current mutable/fetched supply-chain behavior from being called assurance | Tool/pin selection and exceptions register; supply-chain owner; before RC1/stable as applicable |
+| D-014 | 14 | Exact eight-command `cryptosuite` tree, status schema, exit codes, no secret argv, no-overwrite/atomic output | [RFC-0009](../rfcs/RFC-0009-cli-contract.md) | Resolved | Small automation-safe CLI | Provider config schemas; provider/CLI owners; before beta |
+| D-015 | 15 | Failed Deep Scan remains rejected; fresh independent scan, external audit, validated remediation, and no blocking Critical/High are gates | [RFC-0010](../rfcs/RFC-0010-release-support-and-assurance.md) | Resolved as mandatory prerequisite | No failed-run artifact or self-attestation establishes assurance | Scan in Phase 4 (security lead); auditor/remediation validation before RC2/RC3 (security + release leads) |
+
+All 15 decisions are resolved at the contract level. Deferred entries are
+bounded implementation/assurance details with an owner role and target; none
+authorizes Phase 3 or remediation in this phase.
