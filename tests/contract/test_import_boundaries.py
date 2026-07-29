@@ -17,6 +17,8 @@ FORBIDDEN_TOKENS = {
     "spec_from_file_location",
     "exec_module",
     "entry_points",
+    "getenv",
+    "os.environ",
     "Path.cwd",
     "os.getcwd",
     "getcwd(",
@@ -107,6 +109,54 @@ def test_stable_ast_imports_exclude_forbidden_packages() -> None:
             for name in names:
                 if any(part in name for part in FORBIDDEN_IMPORT_PARTS):
                     violations.append(f"{path.relative_to(REPO_ROOT)}: {name}")
+    assert violations == []
+
+
+def test_internal_import_graph_matches_phase_2_layers() -> None:
+    allowed: dict[str, set[str]] = {
+        "cryptography_suite": {
+            "audit",
+            "context",
+            "envelope",
+            "errors",
+            "policy",
+            "protector",
+            "providers",
+            "streaming",
+        },
+        "cryptography_suite.audit": {"errors"},
+        "cryptography_suite.context": set(),
+        "cryptography_suite.envelope": {"providers"},
+        "cryptography_suite.errors": set(),
+        "cryptography_suite.legacy": set(),
+        "cryptography_suite.lifecycle": {"providers"},
+        "cryptography_suite.policy": set(),
+        "cryptography_suite.protector": {
+            "audit",
+            "context",
+            "envelope",
+            "policy",
+            "providers",
+            "streaming",
+        },
+        "cryptography_suite.providers": set(),
+        "cryptography_suite.streaming": set(),
+    }
+    violations: list[str] = []
+    for path in sorted(SOURCE.rglob("*.py")):
+        relative = path.relative_to(SOURCE)
+        parts = relative.with_suffix("").parts
+        owner = "cryptography_suite"
+        if len(parts) > 1:
+            owner = f"cryptography_suite.{parts[0]}"
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.ImportFrom) or node.level == 0:
+                continue
+            target = (node.module or "").split(".", 1)[0]
+            is_local_submodule = len(parts) > 1 and node.level == 1
+            if not is_local_submodule and target and target not in allowed[owner]:
+                violations.append(f"{path.relative_to(REPO_ROOT)}: {owner} -> {target}")
     assert violations == []
 
 

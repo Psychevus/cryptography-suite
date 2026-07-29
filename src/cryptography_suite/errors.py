@@ -134,6 +134,15 @@ class CryptographySuiteError(Exception):
 class EnvelopeError(CryptographySuiteError):
     """Envelope structure, format, or resource-limit failure."""
 
+    def __init__(
+        self,
+        code: ErrorCode = ErrorCode.FORMAT_INVALID,
+        *,
+        retryable: bool = False,
+        details: Mapping[str, JSONScalar] | None = None,
+    ) -> None:
+        super().__init__(code, retryable=retryable, details=details)
+
 
 class AuthenticationError(CryptographySuiteError):
     """Protected data authentication failure."""
@@ -164,13 +173,40 @@ class ContextMismatchError(CryptographySuiteError):
 class PolicyError(CryptographySuiteError):
     """Policy validation or authorization failure."""
 
+    def __init__(
+        self,
+        code: ErrorCode = ErrorCode.POLICY_INVALID,
+        *,
+        retryable: bool = False,
+        details: Mapping[str, JSONScalar] | None = None,
+    ) -> None:
+        super().__init__(code, retryable=retryable, details=details)
+
 
 class ProviderError(CryptographySuiteError):
     """Normalized provider failure."""
 
+    def __init__(
+        self,
+        code: ErrorCode = ErrorCode.PROVIDER_UNAVAILABLE,
+        *,
+        retryable: bool = False,
+        details: Mapping[str, JSONScalar] | None = None,
+    ) -> None:
+        super().__init__(code, retryable=retryable, details=details)
+
 
 class MigrationError(CryptographySuiteError):
     """Explicit migration transaction failure."""
+
+    def __init__(
+        self,
+        code: ErrorCode = ErrorCode.MIGRATION_INCOMPLETE,
+        *,
+        retryable: bool = False,
+        details: Mapping[str, JSONScalar] | None = None,
+    ) -> None:
+        super().__init__(code, retryable=retryable, details=details)
 
 
 __all__ = [

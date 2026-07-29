@@ -5,7 +5,8 @@ import tarfile
 import zipfile
 from pathlib import Path
 
-from conftest import BuiltArtifacts
+import tomllib
+from conftest import REPO_ROOT, BuiltArtifacts
 
 RUNTIME_FILES = {
     "cryptography_suite/__init__.py",
@@ -75,6 +76,22 @@ def test_wheel_runtime_is_exact_allowlist(built_artifacts: BuiltArtifacts) -> No
         for name in names
         for prohibited in PROHIBITED_PARTS
     )
+
+
+def test_package_discovery_and_data_are_exact_allowlists() -> None:
+    data = tomllib.loads((REPO_ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+    setuptools = data["tool"]["setuptools"]
+
+    assert setuptools["package-dir"] == {"": "src"}
+    assert setuptools["include-package-data"] is False
+    assert setuptools["packages"]["find"] == {
+        "where": ["src"],
+        "include": ["cryptography_suite*"],
+        "namespaces": False,
+    }
+    assert setuptools["package-data"] == {"cryptography_suite": ["py.typed"]}
+    assert "scripts" not in data["project"]
+    assert "entry-points" not in data["project"]
 
 
 def test_wheel_metadata_has_no_entry_points(
