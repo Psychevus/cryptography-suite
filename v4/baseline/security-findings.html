@@ -1,0 +1,489 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html">
+
+    <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
+        <title>Manual security findings - cryptography-suite 3.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">cryptography-suite 3.0.0 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  <span class="sidebar-brand-text">cryptography-suite 3.0.0 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../../_sources/v4/baseline/security-findings.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="manual-security-findings">
+<h1>Manual security findings<a class="headerlink" href="#manual-security-findings" title="Link to this heading">¶</a></h1>
+<section id="assurance-statement">
+<h2>Assurance statement<a class="headerlink" href="#assurance-statement" title="Link to this heading">¶</a></h2>
+<p><strong>Deep Security Scan status: BLOCKED BY TOOLING FAILURE</strong></p>
+<p>Reason: A discovery worker failed to create its required <code class="docutils literal notranslate"><span class="pre">threat_model.md</span></code>
+artifact, and deterministic artifact validation terminated with <code class="docutils literal notranslate"><span class="pre">ENOENT</span></code>.</p>
+<p>Consequences:</p>
+<ul class="simple">
+<li><p>no Deep Security Scan result was accepted;</p></li>
+<li><p>no candidate from the failed run may be treated as validated;</p></li>
+<li><p>no no-findings conclusion may be made;</p></li>
+<li><p>independent security scanning remains a release blocker.</p></li>
+</ul>
+<p>The items below come only from manual inspection and local baseline commands.
+None is Deep-Scan validated. “Implementation fact” is directly supported by the
+named lines. “Exploitability assumption” records what is <em>not</em> established by
+the repository alone. No severity is assigned in Phase 1.</p>
+</section>
+<section id="sf-01-local-keystore-identifiers-are-not-confined-to-the-keystore-directory">
+<h2>SF-01 — Local keystore identifiers are not confined to the keystore directory<a class="headerlink" href="#sf-01-local-keystore-identifiers-are-not-confined-to-the-keystore-directory" title="Link to this heading">¶</a></h2>
+<p><strong>Label: Confirmed by direct code inspection</strong></p>
+<p>Implementation facts:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">_load_key</span></code> and <code class="docutils literal notranslate"><span class="pre">export_key</span></code> join caller-provided <code class="docutils literal notranslate"><span class="pre">key_id</span></code> into
+<code class="docutils literal notranslate"><span class="pre">self.dir</span> <span class="pre">/</span> <span class="pre">f&quot;{key_id}.pem&quot;</span></code> at
+<code class="docutils literal notranslate"><span class="pre">cryptography_suite/keystores/local.py:58-63</span></code> and <code class="docutils literal notranslate"><span class="pre">:160-165</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">_allocate_import_path</span></code> repeats the same join without an identifier grammar,
+resolution, or parent check at <code class="docutils literal notranslate"><span class="pre">:239-248</span></code>.</p></li>
+<li><p>dictionary migration metadata supplies <code class="docutils literal notranslate"><span class="pre">meta[&quot;id&quot;]</span></code> directly to that helper
+at <code class="docutils literal notranslate"><span class="pre">:302-311</span></code>, then writes the PEM and adjacent JSON at <code class="docutils literal notranslate"><span class="pre">:311-321</span></code>.</p></li>
+</ul>
+<p>Consequence: identifiers containing parent/path components can resolve outside
+the configured directory for reads or writes. Exploitability assumes an
+attacker can influence the key id or imported metadata and that the process has
+filesystem access to the target. Symlink/hardlink and concurrent path changes
+are separate unresolved races.</p>
+</section>
+<section id="sf-02-file-encryption-is-destructive-rather-than-failure-atomic">
+<h2>SF-02 — File encryption is destructive rather than failure-atomic<a class="headerlink" href="#sf-02-file-encryption-is-destructive-rather-than-failure-atomic" title="Link to this heading">¶</a></h2>
+<p><strong>Label: Confirmed by direct code inspection</strong></p>
+<p>Implementation facts:</p>
+<ul class="simple">
+<li><p>synchronous encryption opens the destination with <code class="docutils literal notranslate"><span class="pre">&quot;wb&quot;</span></code> before streaming
+(<code class="docutils literal notranslate"><span class="pre">cryptography_suite/symmetric/aes.py:366-379</span></code>);</p></li>
+<li><p>its exception path removes whatever is at the destination path (<code class="docutils literal notranslate"><span class="pre">:380-384</span></code>);</p></li>
+<li><p>asynchronous encryption also writes directly and removes the output on error
+(<code class="docutils literal notranslate"><span class="pre">cryptography_suite/symmetric/aes.py:466-516</span></code>);</p></li>
+<li><p>decryption, in contrast, uses a same-directory temporary file and calls
+<code class="docutils literal notranslate"><span class="pre">os.replace</span></code> only after GCM finalization
+(<code class="docutils literal notranslate"><span class="pre">cryptography_suite/symmetric/aes.py:431-454,558-581</span></code>).</p></li>
+</ul>
+<p>Consequence: an existing destination is truncated before encryption succeeds,
+and input equal to output can destroy the input. A crash can leave a partial
+ciphertext; a handled error can delete a pre-existing destination. No attacker
+is required for the data-loss path. Whether an attacker can choose paths is
+application-specific.</p>
+</section>
+<section id="sf-03-csf-ciphertexts-omit-the-kdf-parameters-used-to-derive-their-keys">
+<h2>SF-03 — CSF ciphertexts omit the KDF parameters used to derive their keys<a class="headerlink" href="#sf-03-csf-ciphertexts-omit-the-kdf-parameters-used-to-derive-their-keys" title="Link to this heading">¶</a></h2>
+<p><strong>Label: Confirmed by direct code inspection</strong></p>
+<p>Implementation facts:</p>
+<ul class="simple">
+<li><p>the CSF header stores a one-byte KDF id but no work factors
+(<code class="docutils literal notranslate"><span class="pre">cryptography_suite/symmetric/aes.py:33-62</span></code>);</p></li>
+<li><p>Scrypt and PBKDF2 factors are module constants
+(<code class="docutils literal notranslate"><span class="pre">cryptography_suite/constants.py:13-19</span></code>,
+<code class="docutils literal notranslate"><span class="pre">cryptography_suite/symmetric/kdf.py:53-105</span></code>);</p></li>
+<li><p>Argon2 factors are environment-derived at import
+(<code class="docutils literal notranslate"><span class="pre">cryptography_suite/symmetric/kdf.py:37-45,113-137</span></code>).</p></li>
+</ul>
+<p>Consequence: changing deployed defaults can make existing data undecryptable.
+Lowering ambient values weakens newly encrypted data without changing the
+authenticated format description. Exploitability as a security downgrade
+assumes an attacker or misconfiguration can influence the encryption process
+environment.</p>
+</section>
+<section id="sf-04-counter-nonce-uniqueness-is-process-instance-local">
+<h2>SF-04 — Counter nonce uniqueness is process/instance local<a class="headerlink" href="#sf-04-counter-nonce-uniqueness-is-process-instance-local" title="Link to this heading">¶</a></h2>
+<p><strong>Label: Confirmed by direct code inspection</strong></p>
+<p>Implementation facts:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">cryptography_suite/nonce.py:39-64</span></code> defaults the counter to zero and stores
+seen values only in an in-memory set/ordered dictionary;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">next()</span></code> returns monotonically increasing 12-byte values at <code class="docutils literal notranslate"><span class="pre">:66-73</span></code>; the root
+implementation does not add returned values to the replay cache;</p></li>
+<li><p>LRU mode evicts old remembered values at <code class="docutils literal notranslate"><span class="pre">:88-94</span></code>;</p></li>
+<li><p>excluded <code class="docutils literal notranslate"><span class="pre">src/crypto_suite/nonce.py:34-59</span></code> is a different implementation that
+remembers returned values but still defaults to in-memory state at zero.</p></li>
+</ul>
+<p>Consequence: restart, multiple manager instances, or multiple processes can
+repeat a nonce. Cryptographic compromise additionally requires reuse under the
+same AEAD key and use of this API by an encryption path; that reachability is
+not established for every application.</p>
+</section>
+<section id="sf-05-pkcs-11-decrypt-uses-rsa-pkcs-1-v1-5-and-ambient-pin-storage">
+<h2>SF-05 — PKCS#11 decrypt uses RSA PKCS#1 v1.5 and ambient PIN storage<a class="headerlink" href="#sf-05-pkcs-11-decrypt-uses-rsa-pkcs-1-v1-5-and-ambient-pin-storage" title="Link to this heading">¶</a></h2>
+<p><strong>Label: Requires dynamic validation</strong></p>
+<p>Implementation facts are confirmed: the provider labels itself <code class="docutils literal notranslate"><span class="pre">production</span></code>
+(<code class="docutils literal notranslate"><span class="pre">cryptography_suite/keystores/pkcs11.py:33-46</span></code>), reads PIN/library/token values
+from arguments, environment, or <code class="docutils literal notranslate"><span class="pre">~/.cryptosuite.toml</span></code>
+(<code class="docutils literal notranslate"><span class="pre">cryptography_suite/keystores/pkcs11.py:83-110</span></code>), caches a logged-in session
+(<code class="docutils literal notranslate"><span class="pre">cryptography_suite/keystores/pkcs11.py:113-119</span></code>), and decrypts with
+<code class="docutils literal notranslate"><span class="pre">Mechanism.RSA_PKCS</span></code> (<code class="docutils literal notranslate"><span class="pre">cryptography_suite/keystores/pkcs11.py:172-178</span></code>).</p>
+<p>Potential consequence: PKCS#1 v1.5 decryption can become an oracle when an
+application exposes distinguishable responses or timing. Dynamic validation
+requires a real token/library and a calling service that exposes repeated
+attacker-controlled ciphertexts. Environment/TOML PIN exposure depends on host
+permissions and process inspection.</p>
+</section>
+<section id="sf-06-code-generation-interpolates-pipeline-text-into-executable-source">
+<h2>SF-06 — Code generation interpolates pipeline text into executable source<a class="headerlink" href="#sf-06-code-generation-interpolates-pipeline-text-into-executable-source" title="Link to this heading">¶</a></h2>
+<p><strong>Label: Candidate</strong></p>
+<p>Implementation facts: <code class="docutils literal notranslate"><span class="pre">cryptography_suite/codegen/__init__.py:31-56</span></code> parses
+YAML with <code class="docutils literal notranslate"><span class="pre">safe_load</span></code>, treats its values as <code class="docutils literal notranslate"><span class="pre">steps</span></code>, and renders them into
+templates. FastAPI, Flask, and Node templates insert each value directly into
+<code class="docutils literal notranslate"><span class="pre">value</span> <span class="pre">=</span> <span class="pre">{{</span> <span class="pre">step</span> <span class="pre">}}(value)</span></code> at
+<code class="docutils literal notranslate"><span class="pre">cryptography_suite/codegen/templates/fastapi/app.py.j2:12-15</span></code>,
+<code class="docutils literal notranslate"><span class="pre">cryptography_suite/codegen/templates/flask/app.py.j2:8-11</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">cryptography_suite/codegen/templates/node/app.ts.j2:9-12</span></code>.</p>
+<p>Potential consequence: a crafted pipeline value can generate arbitrary
+Python/TypeScript syntax or code. The generator does not execute the output;
+exploitability assumes the pipeline is untrusted and a user later runs or
+deploys generated code without review.</p>
+</section>
+<section id="sf-07-provider-registries-silently-replace-names-enabled-local-plugins-execute-python">
+<h2>SF-07 — Provider registries silently replace names; enabled local plugins execute Python<a class="headerlink" href="#sf-07-provider-registries-silently-replace-names-enabled-local-plugins-execute-python" title="Link to this heading">¶</a></h2>
+<p><strong>Label: Candidate</strong></p>
+<p>Implementation facts: keystore registration assigns without a conflict check
+(<code class="docutils literal notranslate"><span class="pre">cryptography_suite/keystores/__init__.py:18-23</span></code>); backend
+registration/selection does the same
+(<code class="docutils literal notranslate"><span class="pre">cryptography_suite/crypto_backends/__init__.py:24-31,82-98</span></code>). The keystore
+loader executes every Python file from an explicit directory or opt-in
+<code class="docutils literal notranslate"><span class="pre">cwd/keystores</span></code> (<code class="docutils literal notranslate"><span class="pre">cryptography_suite/keystores/__init__.py:52-69</span></code>) and loads
+entry points (<code class="docutils literal notranslate"><span class="pre">cryptography_suite/keystores/__init__.py:75-82</span></code>).</p>
+<p>Potential consequence: an enabled plugin can replace a trusted name or run with
+process authority. Local CWD discovery is disabled by default; exploitability
+requires explicit directory use, the opt-in environment flag, or installation
+of a malicious entry-point distribution.</p>
+</section>
+<section id="sf-08-migration-demo-audit-signatures-do-not-establish-durable-tamper-evidence">
+<h2>SF-08 — Migration-demo audit signatures do not establish durable tamper evidence<a class="headerlink" href="#sf-08-migration-demo-audit-signatures-do-not-establish-durable-tamper-evidence" title="Link to this heading">¶</a></h2>
+<p><strong>Label: Candidate</strong></p>
+<p>Implementation facts: every <code class="docutils literal notranslate"><span class="pre">AuditLogger</span></code> instance generates a new Ed25519 key
+(<code class="docutils literal notranslate"><span class="pre">src/cryptography_suite/cli/migrate_keys.py:152-169</span></code>), loads only the last
+untrusted digest from the existing file (<code class="docutils literal notranslate"><span class="pre">:178-187</span></code>), appends a chain/digest
+signature (<code class="docutils literal notranslate"><span class="pre">:189-197</span></code>), and exports the newly generated public key with the
+report (<code class="docutils literal notranslate"><span class="pre">:214-246</span></code>). No trusted public key persistence or verification routine
+is present. The separate main audit logger writes independent Fernet lines and
+has no hash chain (<code class="docutils literal notranslate"><span class="pre">cryptography_suite/audit.py:33-44</span></code>).</p>
+<p>Potential consequence: a party able to rewrite the log can start a new process,
+construct a new chain, and present its new public key/report unless a verifier
+has an independently trusted key or checkpoint. The repository does not show
+such a verifier or external checkpoint.</p>
+</section>
+<section id="sf-09-generic-encrypted-message-decoding-has-no-resource-quota">
+<h2>SF-09 — Generic encrypted-message decoding has no resource quota<a class="headerlink" href="#sf-09-generic-encrypted-message-decoding-has-no-resource-quota" title="Link to this heading">¶</a></h2>
+<p><strong>Label: Candidate</strong></p>
+<p>Implementation facts: <code class="docutils literal notranslate"><span class="pre">cryptography_suite/utils.py:451-480</span></code> Base64-decodes the
+complete input, JSON-decodes it, and Base64-decodes every string value before
+checking exact field sets. There is no maximum encoded size, decoded size,
+member count, or depth. <code class="docutils literal notranslate"><span class="pre">cryptography_suite/hybrid.py:105-141</span></code> accepts this
+string form.</p>
+<p>Potential consequence: large crafted input can consume memory/CPU. The
+repository does not establish an unauthenticated remote route, request limit,
+or concurrency model, so service-level exploitability requires dynamic
+validation.</p>
+</section>
+<section id="sf-10-ci-uses-mutable-fetched-executable-dependencies">
+<h2>SF-10 — CI uses mutable/fetched executable dependencies<a class="headerlink" href="#sf-10-ci-uses-mutable-fetched-executable-dependencies" title="Link to this heading">¶</a></h2>
+<p><strong>Label: Candidate</strong></p>
+<p>Implementation facts: workflows use major-version action tags such as
+<code class="docutils literal notranslate"><span class="pre">actions/checkout&#64;v4</span></code>, <code class="docutils literal notranslate"><span class="pre">actions/setup-python&#64;v5</span></code>, and third-party
+<code class="docutils literal notranslate"><span class="pre">tj-actions/changed-files&#64;v45</span></code>
+(<code class="docutils literal notranslate"><span class="pre">.github/workflows/quality-gate.yml:23-66</span></code>).
+<code class="docutils literal notranslate"><span class="pre">.github/workflows/build.yml:57-63</span></code> downloads a remote Trivy installer from a
+mutable tag and pipes it to <code class="docutils literal notranslate"><span class="pre">sh</span></code>. <code class="docutils literal notranslate"><span class="pre">.github/workflows/build.yml:55-56</span></code> also
+ignores one specific dependency CVE without an in-file risk/expiry record.</p>
+<p>Potential consequence: upstream tag/script compromise can affect CI, and a
+stale exception can hide a relevant advisory. Exploitability depends on
+upstream compromise or the ignored advisory applying to the audited
+environment. Phase 10 should pin immutable action/script digests and govern
+exceptions.</p>
+</section>
+<section id="required-next-assurance">
+<h2>Required next assurance<a class="headerlink" href="#required-next-assurance" title="Link to this heading">¶</a></h2>
+<p>Phase 4 must independently validate or reject the surviving candidates,
+establish attack paths in the chosen v4 architecture, and close release-blocking
+findings. The failed Deep Security Scan remains an unresolved prerequisite for
+Phase 4 and the v4 stable release.</p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, Mojtaba Zaferanloo
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Manual security findings</a><ul>
+<li><a class="reference internal" href="#assurance-statement">Assurance statement</a></li>
+<li><a class="reference internal" href="#sf-01-local-keystore-identifiers-are-not-confined-to-the-keystore-directory">SF-01 — Local keystore identifiers are not confined to the keystore directory</a></li>
+<li><a class="reference internal" href="#sf-02-file-encryption-is-destructive-rather-than-failure-atomic">SF-02 — File encryption is destructive rather than failure-atomic</a></li>
+<li><a class="reference internal" href="#sf-03-csf-ciphertexts-omit-the-kdf-parameters-used-to-derive-their-keys">SF-03 — CSF ciphertexts omit the KDF parameters used to derive their keys</a></li>
+<li><a class="reference internal" href="#sf-04-counter-nonce-uniqueness-is-process-instance-local">SF-04 — Counter nonce uniqueness is process/instance local</a></li>
+<li><a class="reference internal" href="#sf-05-pkcs-11-decrypt-uses-rsa-pkcs-1-v1-5-and-ambient-pin-storage">SF-05 — PKCS#11 decrypt uses RSA PKCS#1 v1.5 and ambient PIN storage</a></li>
+<li><a class="reference internal" href="#sf-06-code-generation-interpolates-pipeline-text-into-executable-source">SF-06 — Code generation interpolates pipeline text into executable source</a></li>
+<li><a class="reference internal" href="#sf-07-provider-registries-silently-replace-names-enabled-local-plugins-execute-python">SF-07 — Provider registries silently replace names; enabled local plugins execute Python</a></li>
+<li><a class="reference internal" href="#sf-08-migration-demo-audit-signatures-do-not-establish-durable-tamper-evidence">SF-08 — Migration-demo audit signatures do not establish durable tamper evidence</a></li>
+<li><a class="reference internal" href="#sf-09-generic-encrypted-message-decoding-has-no-resource-quota">SF-09 — Generic encrypted-message decoding has no resource quota</a></li>
+<li><a class="reference internal" href="#sf-10-ci-uses-mutable-fetched-executable-dependencies">SF-10 — CI uses mutable/fetched executable dependencies</a></li>
+<li><a class="reference internal" href="#required-next-assurance">Required next assurance</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=acc74ff5"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
+</html>
