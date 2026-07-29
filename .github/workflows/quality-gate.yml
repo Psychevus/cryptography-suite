@@ -69,14 +69,14 @@ jobs:
         run: python tools/verify_docs_references.py
 
       - name: Security scan (bandit)
-        run: bandit -q -r cryptography_suite -x tests,docs,examples -s B101,B110,B301,B311,B403,B404,B413,B603,B701
+        run: bandit -q -r src/cryptography_suite -x tests,docs -s B101,B110,B301,B311,B403,B404,B413,B603,B701
 
       - name: Dependency vulnerabilities (pip-audit)
         run: pip-audit -r requirements.txt --strict
 
-      - name: Tests with branch coverage report
+      - name: Tests and installed-artifact boundary
         run: |
-          pytest --ignore=tests/generated --cov=cryptography_suite --cov-branch --cov-report=xml --cov-report=term-missing
+          pytest --cov=cryptography_suite --cov-branch --cov-report=xml --cov-report=term-missing
 
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4

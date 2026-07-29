@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""Fail if deprecated functions are exported via __all__ or imported in public modules."""
+"""Reject deprecated exports and public-module imports."""
 
 from __future__ import annotations
 
 import ast
-from pathlib import Path
 import sys
+from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1] / "cryptography_suite"
+ROOT = Path(__file__).resolve().parents[1] / "src" / "cryptography_suite"
 
 
 def module_of(path: Path, root: Path) -> str:
@@ -32,7 +32,7 @@ def resolve_import_module(current_mod: str, node: ast.ImportFrom) -> str:
     module = node.module or ""
     if node.level:
         parts = current_mod.split(".")
-        module_parts = parts[:-node.level]
+        module_parts = parts[: -node.level]
         if module:
             module_parts.append(module)
         module = ".".join(module_parts)
@@ -53,7 +53,9 @@ def check_exports(root: Path, deprecated: set[tuple[str, str]]) -> list[str]:
                             names = ast.literal_eval(node.value)
                             for name in names:
                                 if name in dep_names:
-                                    errors.append(f"{path}: deprecated {name} found in __all__")
+                                    errors.append(
+                                        f"{path}: deprecated {name} found in __all__"
+                                    )
                         except Exception:
                             pass
             elif isinstance(node, ast.ImportFrom):

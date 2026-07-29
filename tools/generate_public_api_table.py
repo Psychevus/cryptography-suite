@@ -11,11 +11,14 @@ import importlib
 import inspect
 from pathlib import Path
 
-
 SECTIONS = [
-    ("Core", "cryptography_suite"),
-    ("Experimental", "cryptography_suite.experimental"),
-    ("Legacy", "cryptography_suite.legacy"),
+    ("Root", "cryptography_suite"),
+    ("Audit", "cryptography_suite.audit"),
+    ("Envelope", "cryptography_suite.envelope"),
+    ("Legacy declarations", "cryptography_suite.legacy"),
+    ("Lifecycle", "cryptography_suite.lifecycle"),
+    ("Providers", "cryptography_suite.providers"),
+    ("Streaming", "cryptography_suite.streaming"),
 ]
 
 
@@ -47,7 +50,9 @@ def generate_table() -> str:
 
 def main() -> None:
     content = "Public API Inventory\n====================\n\n" + generate_table()
-    out_path = Path(__file__).resolve().parent.parent / "docs" / "api" / "public_api_table.rst"
+    out_path = (
+        Path(__file__).resolve().parent.parent / "docs" / "api" / "public_api_table.rst"
+    )
     out_path.write_text(content, encoding="utf-8")
 
 

@@ -4,10 +4,10 @@
 from __future__ import annotations
 
 import ast
-from pathlib import Path
 import sys
+from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1] / "cryptography_suite"
+ROOT = Path(__file__).resolve().parents[1] / "src" / "cryptography_suite"
 EXPERIMENTAL = ROOT / "experimental"
 
 
@@ -22,10 +22,16 @@ def main() -> int:
             if isinstance(node, ast.Import):
                 for alias in node.names:
                     if alias.name.startswith("cryptography_suite.experimental"):
-                        errors.append(f"{mod}: import of experimental primitive {alias.name}")
+                        errors.append(
+                            f"{mod}: import of experimental primitive {alias.name}"
+                        )
             elif isinstance(node, ast.ImportFrom):
-                if node.module and node.module.startswith("cryptography_suite.experimental"):
-                    errors.append(f"{mod}: import from experimental module {node.module}")
+                if node.module and node.module.startswith(
+                    "cryptography_suite.experimental"
+                ):
+                    errors.append(
+                        f"{mod}: import from experimental module {node.module}"
+                    )
     if errors:
         for err in errors:
             print(err, file=sys.stderr)
