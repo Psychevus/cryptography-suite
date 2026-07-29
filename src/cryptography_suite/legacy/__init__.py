@@ -10,7 +10,7 @@ class LegacyFormat(str, Enum):
     CSF_V2 = "csf-v2"
     CSF_V1 = "csf-v1"
     RAW_AES = "raw-aes"
-    PASSWORD_AES_V3 = "password-aes-v3"
+    PORTABLE_AES_V3 = "password-aes-v3"
     LOCAL_KEYSTORE = "local-keystore"
     PEM_DER = "pem-der"
 
