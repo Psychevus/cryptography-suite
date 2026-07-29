@@ -132,7 +132,10 @@ def test_errors_are_typed_immutable_and_redacted() -> None:
 
     assert error.code is ErrorCode.INTERNAL_ERROR
     assert error.retryable is False
-    assert error.details == {"plaintext": "<redacted>", "attempt": 2}
+    assert error.details == {
+        "plaintext": "<redacted>",
+        "attempt": "<redacted>",
+    }
     assert "sensitive-value" not in str(error)
     with pytest.raises(TypeError):
         error.details["new"] = "value"  # type: ignore[index]

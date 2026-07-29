@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+import re
 from collections.abc import Mapping
 from enum import Enum
 from types import MappingProxyType
 from typing import Final, TypeAlias
 
 JSONScalar: TypeAlias = str | int | bool | None
+_MAX_UNKNOWN_ERROR_CODE_LENGTH: Final = 64
+_UNKNOWN_ERROR_CODE_RE: Final = re.compile(r"[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*")
 
 
 class ErrorCode(str, Enum):
@@ -45,12 +48,15 @@ class ErrorCode(str, Enum):
 
     @classmethod
     def _missing_(cls, value: object) -> ErrorCode | None:
-        if not isinstance(value, str) or not value:
+        if (
+            not isinstance(value, str)
+            or not 1 <= len(value) <= _MAX_UNKNOWN_ERROR_CODE_LENGTH
+            or _UNKNOWN_ERROR_CODE_RE.fullmatch(value) is None
+        ):
             return None
         member = str.__new__(cls, value)
         member._name_ = f"UNKNOWN_{value}"
         member._value_ = value
-        cls._value2member_map_[value] = member
         return member
 
 
@@ -86,6 +92,52 @@ _SAFE_MESSAGES: Final[Mapping[ErrorCode, str]] = MappingProxyType(
     }
 )
 
+_ENVELOPE_CODES: Final = frozenset(
+    {
+        ErrorCode.FORMAT_INVALID,
+        ErrorCode.FORMAT_UNSUPPORTED,
+        ErrorCode.LIMIT_EXCEEDED,
+        ErrorCode.CRITICAL_FIELD_UNSUPPORTED,
+        ErrorCode.TRAILING_DATA,
+    }
+)
+_AUTHENTICATION_CODES: Final = frozenset({ErrorCode.AUTHENTICATION_FAILED})
+_CONTEXT_CODES: Final = frozenset({ErrorCode.CONTEXT_MISMATCH})
+_POLICY_CODES: Final = frozenset(
+    {
+        ErrorCode.POLICY_INVALID,
+        ErrorCode.POLICY_DENIED,
+        ErrorCode.KEY_STATE_DENIED,
+        ErrorCode.LEGACY_DENIED,
+    }
+)
+_PROVIDER_CODES: Final = frozenset(
+    {
+        ErrorCode.PROVIDER_UNAVAILABLE,
+        ErrorCode.PROVIDER_TIMEOUT,
+        ErrorCode.PROVIDER_RATE_LIMITED,
+        ErrorCode.PROVIDER_AUTH_FAILED,
+        ErrorCode.KEY_NOT_FOUND,
+        ErrorCode.KEY_VERSION_STALE,
+        ErrorCode.CAPABILITY_UNSUPPORTED,
+    }
+)
+_MIGRATION_CODES: Final = frozenset(
+    {
+        ErrorCode.MIGRATION_INCOMPLETE,
+        ErrorCode.MIGRATION_VERIFY_FAILED,
+        ErrorCode.MIGRATION_CONFLICT,
+    }
+)
+
+
+def _safe_detail_value(key: str, value: JSONScalar) -> JSONScalar:
+    if key == "retry_attempt" and type(value) is int and 0 <= value <= 100:
+        return value
+    if key == "http_status_code" and type(value) is int and 100 <= value <= 599:
+        return value
+    return "<redacted>"
+
 
 def _redact_details(
     details: Mapping[str, JSONScalar] | None,
@@ -94,13 +146,19 @@ def _redact_details(
         return MappingProxyType({})
 
     redacted: dict[str, JSONScalar] = {}
-    for raw_key, value in dict(details).items():
+    for raw_key, value in details.items():
         key = str(raw_key)
-        if isinstance(value, bool | int) or value is None:
-            redacted[key] = value
-        else:
-            redacted[key] = "<redacted>"
+        redacted[key] = _safe_detail_value(key, value)
     return MappingProxyType(redacted)
+
+
+def _validate_code_family(
+    code: ErrorCode,
+    allowed: frozenset[ErrorCode],
+    exception_name: str,
+) -> None:
+    if code not in allowed:
+        raise ValueError(f"{exception_name} does not accept error code {code.value}")
 
 
 class CryptographySuiteError(Exception):
@@ -141,6 +199,7 @@ class EnvelopeError(CryptographySuiteError):
         retryable: bool = False,
         details: Mapping[str, JSONScalar] | None = None,
     ) -> None:
+        _validate_code_family(code, _ENVELOPE_CODES, type(self).__name__)
         super().__init__(code, retryable=retryable, details=details)
 
 
@@ -154,6 +213,7 @@ class AuthenticationError(CryptographySuiteError):
         retryable: bool = False,
         details: Mapping[str, JSONScalar] | None = None,
     ) -> None:
+        _validate_code_family(code, _AUTHENTICATION_CODES, type(self).__name__)
         super().__init__(code, retryable=retryable, details=details)
 
 
@@ -167,6 +227,7 @@ class ContextMismatchError(CryptographySuiteError):
         retryable: bool = False,
         details: Mapping[str, JSONScalar] | None = None,
     ) -> None:
+        _validate_code_family(code, _CONTEXT_CODES, type(self).__name__)
         super().__init__(code, retryable=retryable, details=details)
 
 
@@ -180,6 +241,7 @@ class PolicyError(CryptographySuiteError):
         retryable: bool = False,
         details: Mapping[str, JSONScalar] | None = None,
     ) -> None:
+        _validate_code_family(code, _POLICY_CODES, type(self).__name__)
         super().__init__(code, retryable=retryable, details=details)
 
 
@@ -193,6 +255,7 @@ class ProviderError(CryptographySuiteError):
         retryable: bool = False,
         details: Mapping[str, JSONScalar] | None = None,
     ) -> None:
+        _validate_code_family(code, _PROVIDER_CODES, type(self).__name__)
         super().__init__(code, retryable=retryable, details=details)
 
 
@@ -206,6 +269,7 @@ class MigrationError(CryptographySuiteError):
         retryable: bool = False,
         details: Mapping[str, JSONScalar] | None = None,
     ) -> None:
+        _validate_code_family(code, _MIGRATION_CODES, type(self).__name__)
         super().__init__(code, retryable=retryable, details=details)
 
 

@@ -10,15 +10,16 @@ from typing import TypeAlias
 
 ContextValue: TypeAlias = str | bytes
 
-_MAX_CONTEXT_BYTES = 1024 * 1024
+_MAX_CONTEXT_INPUT_ENTRIES = 128
+_MAX_CONTEXT_INPUT_STORAGE_BYTES = 1024 * 1024
 
 
 @dataclass(frozen=True, init=False)
 class EncryptionContext(Mapping[str, ContextValue]):
     """A bounded, immutable context mapping.
 
-    This Phase 3 model performs no commitment, hashing, or encoding. Context
-    commitment construction remains explicitly unimplemented.
+    Phase 3 bounds retained input storage only. This is not a canonical encoded
+    size guarantee and performs no commitment, hashing, or encoding.
     """
 
     _values: Mapping[str, ContextValue]
@@ -30,26 +31,29 @@ class EncryptionContext(Mapping[str, ContextValue]):
         purpose: str | None = None,
         tenant_id: str | None = None,
     ) -> None:
-        source = {} if values is None else dict(values)
-        if purpose is not None:
-            if "purpose" in source:
-                raise ValueError("purpose must be supplied only once")
-            source["purpose"] = purpose
-        if tenant_id is not None:
-            if "tenant_id" in source:
-                raise ValueError("tenant_id must be supplied only once")
-            source["tenant_id"] = tenant_id
-
         normalized: dict[str, ContextValue] = {}
         total_bytes = 0
-        for raw_key, raw_value in source.items():
+        entry_count = 0
+
+        def retain(
+            raw_key: str,
+            raw_value: ContextValue,
+            *,
+            duplicate_message: str | None = None,
+        ) -> None:
+            nonlocal entry_count, total_bytes
+            entry_count += 1
+            if entry_count > _MAX_CONTEXT_INPUT_ENTRIES:
+                raise ValueError("context exceeds the hard input entry limit")
             if not isinstance(raw_key, str):
                 raise TypeError("context keys must be strings")
             key = unicodedata.normalize("NFC", raw_key)
             if not key:
                 raise ValueError("context keys must not be empty")
             if key in normalized:
-                raise ValueError("normalized context keys must be unique")
+                raise ValueError(
+                    duplicate_message or "normalized context keys must be unique"
+                )
 
             key_bytes = key.encode("utf-8")
             if isinstance(raw_value, str):
@@ -62,10 +66,27 @@ class EncryptionContext(Mapping[str, ContextValue]):
             else:
                 raise TypeError("context values must be strings or bytes")
 
-            total_bytes += len(key_bytes) + len(value_bytes)
-            if total_bytes > _MAX_CONTEXT_BYTES:
-                raise ValueError("context exceeds the hard size limit")
+            retained_bytes = len(key_bytes) + len(value_bytes)
+            if retained_bytes > _MAX_CONTEXT_INPUT_STORAGE_BYTES - total_bytes:
+                raise ValueError("context exceeds the hard input storage limit")
+            total_bytes += retained_bytes
             normalized[key] = value
+
+        if values is not None:
+            for raw_key, raw_value in values.items():
+                retain(raw_key, raw_value)
+        if purpose is not None:
+            retain(
+                "purpose",
+                purpose,
+                duplicate_message="purpose must be supplied only once",
+            )
+        if tenant_id is not None:
+            retain(
+                "tenant_id",
+                tenant_id,
+                duplicate_message="tenant_id must be supplied only once",
+            )
 
         object.__setattr__(self, "_values", MappingProxyType(normalized))
 

@@ -15,12 +15,18 @@ from .models import (
 
 @runtime_checkable
 class ReadOnlySecret(Protocol):
+    """Borrowed secret access valid only for the owning buffer's lifetime."""
+
     def __len__(self) -> int: ...
+
+    def readonly_view(self) -> memoryview:
+        """Return a borrowed read-only view that must not outlive the buffer."""
+        ...
 
 
 @runtime_checkable
-class SecretBuffer(Protocol):
-    def __len__(self) -> int: ...
+class SecretBuffer(ReadOnlySecret, Protocol):
+    """Closable secret storage without serialization or raw export methods."""
 
     def close(self) -> None: ...
 
