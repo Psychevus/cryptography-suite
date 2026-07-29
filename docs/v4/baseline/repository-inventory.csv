@@ -1,0 +1,286 @@
+path,classification,area,tracked_type,distribution,disposition_rationale
+.coveragerc,test/tooling,repository-root,no-extension,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+.github/ISSUE_TEMPLATE/bug_report.md,documentation,ci,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+.github/ISSUE_TEMPLATE/security_report.md,documentation,ci,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+.github/PULL_REQUEST_TEMPLATE.md,documentation,ci,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+.github/labels.json,test/tooling,ci,.json,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+.github/workflows/build.yml,test/tooling,ci,.yml,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+.github/workflows/docs.yml,test/tooling,ci,.yml,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+.github/workflows/formal.yml,test/tooling,ci,.yml,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+.github/workflows/fuzz.yml,test/tooling,ci,.yml,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+.github/workflows/quality-gate.yml,test/tooling,ci,.yml,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+.github/workflows/release.yml,test/tooling,ci,.yml,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+.github/workflows/reproducibility.yml,test/tooling,ci,.yml,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+.gitignore,test/tooling,repository-root,no-extension,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+.pre-commit-config.yaml,test/tooling,repository-root,.yaml,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+API_CLI_CONTRACT.md,documentation,repository-root,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+CHANGELOG.md,documentation,repository-root,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+CONTRIBUTING.md,documentation,repository-root,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+LICENSE,documentation,repository-root,no-extension,sdist-only,Current documentation or governance material; audit claims before carrying forward.
+MANIFEST.in,test/tooling,repository-root,.in,sdist-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+Makefile,test/tooling,repository-root,no-extension,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+README.md,documentation,repository-root,.md,sdist-only,Current documentation or governance material; audit claims before carrying forward.
+RELEASE_NOTES.md,documentation,repository-root,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+SECURITY.md,documentation,repository-root,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+STYLEGUIDE.md,documentation,repository-root,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+cryptography_suite/__init__.py,rewrite,runtime-package,.py,wheel+sdist,"Relevant role, but current shape/API or source location does not meet the v4 architecture."
+cryptography_suite/_key_files.py,stable-core candidate,runtime-package,.py,wheel+sdist,"Small reusable foundation candidate, subject to Phase 2 architecture and Phase 4 security validation."
+cryptography_suite/_mypy_crypto_checker.py,test/tooling,runtime-package,.py,wheel+sdist,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+cryptography_suite/aead.py,move-to-labs,runtime-package,.py,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/aead_plugins.py,move-to-labs,runtime-package,.py,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/asymmetric/__init__.py,move-to-labs,runtime-package,.py,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/asymmetric/bls.py,move-to-labs,runtime-package,.py,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/asymmetric/signatures.py,move-to-labs,runtime-package,.py,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/audit.py,rewrite,runtime-package,.py,wheel+sdist,"Relevant role, but current shape/API or source location does not meet the v4 architecture."
+cryptography_suite/cli.py,rewrite,runtime-package,.py,wheel+sdist,"Relevant role, but current shape/API or source location does not meet the v4 architecture."
+cryptography_suite/codegen/__init__.py,move-to-labs,runtime-package,.py,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/codegen/templates/README.md.j2,move-to-labs,runtime-package,.j2,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/codegen/templates/fastapi/app.py.j2,move-to-labs,runtime-package,.j2,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/codegen/templates/flask/app.py.j2,move-to-labs,runtime-package,.j2,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/codegen/templates/node/app.ts.j2,move-to-labs,runtime-package,.j2,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/config.py,rewrite,runtime-package,.py,wheel+sdist,"Relevant role, but current shape/API or source location does not meet the v4 architecture."
+cryptography_suite/constants.py,rewrite,runtime-package,.py,wheel+sdist,"Relevant role, but current shape/API or source location does not meet the v4 architecture."
+cryptography_suite/core/__init__.py,rewrite,runtime-package,.py,wheel+sdist,"Relevant role, but current shape/API or source location does not meet the v4 architecture."
+cryptography_suite/core/errors.py,stable-core candidate,runtime-package,.py,wheel+sdist,"Small reusable foundation candidate, subject to Phase 2 architecture and Phase 4 security validation."
+cryptography_suite/core/logging.py,rewrite,runtime-package,.py,wheel+sdist,"Relevant role, but current shape/API or source location does not meet the v4 architecture."
+cryptography_suite/core/operations.py,rewrite,runtime-package,.py,wheel+sdist,"Relevant role, but current shape/API or source location does not meet the v4 architecture."
+cryptography_suite/core/settings.py,rewrite,runtime-package,.py,wheel+sdist,"Relevant role, but current shape/API or source location does not meet the v4 architecture."
+cryptography_suite/crypto_backends/__init__.py,rewrite,runtime-package,.py,wheel+sdist,"Relevant role, but current shape/API or source location does not meet the v4 architecture."
+cryptography_suite/crypto_backends/abc.py,rewrite,runtime-package,.py,wheel+sdist,"Relevant role, but current shape/API or source location does not meet the v4 architecture."
+cryptography_suite/crypto_backends/pyca_backend.py,rewrite,runtime-package,.py,wheel+sdist,"Relevant role, but current shape/API or source location does not meet the v4 architecture."
+cryptography_suite/debug.py,rewrite,runtime-package,.py,wheel+sdist,"Relevant role, but current shape/API or source location does not meet the v4 architecture."
+cryptography_suite/errors.py,stable-core candidate,runtime-package,.py,wheel+sdist,"Small reusable foundation candidate, subject to Phase 2 architecture and Phase 4 security validation."
+cryptography_suite/exceptions.py,stable-core candidate,runtime-package,.py,wheel+sdist,"Small reusable foundation candidate, subject to Phase 2 architecture and Phase 4 security validation."
+cryptography_suite/experimental/__init__.py,move-to-labs,runtime-package,.py,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/experimental/aes_gcm_sst.py,move-to-labs,runtime-package,.py,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/experimental/ascon.py,move-to-labs,runtime-package,.py,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/experimental/fhe.py,move-to-labs,runtime-package,.py,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/experimental/salsa20.py,move-to-labs,runtime-package,.py,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/experimental/signal_demo/__init__.py,move-to-labs,runtime-package,.py,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/experimental/signal_demo/init_session.py,move-to-labs,runtime-package,.py,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/experimental/zk.py,move-to-labs,runtime-package,.py,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/hashing/__init__.py,move-to-labs,runtime-package,.py,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/homomorphic.py,move-to-labs,runtime-package,.py,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/hybrid.py,move-to-labs,runtime-package,.py,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/keystores/__init__.py,rewrite,runtime-package,.py,wheel+sdist,"Relevant role, but current shape/API or source location does not meet the v4 architecture."
+cryptography_suite/keystores/aws_kms.py,rewrite,runtime-package,.py,wheel+sdist,"Relevant role, but current shape/API or source location does not meet the v4 architecture."
+cryptography_suite/keystores/base.py,rewrite,runtime-package,.py,wheel+sdist,"Relevant role, but current shape/API or source location does not meet the v4 architecture."
+cryptography_suite/keystores/local.py,rewrite,runtime-package,.py,wheel+sdist,"Relevant role, but current shape/API or source location does not meet the v4 architecture."
+cryptography_suite/keystores/mock_hsm.py,rewrite,runtime-package,.py,wheel+sdist,"Relevant role, but current shape/API or source location does not meet the v4 architecture."
+cryptography_suite/keystores/pkcs11.py,rewrite,runtime-package,.py,wheel+sdist,"Relevant role, but current shape/API or source location does not meet the v4 architecture."
+cryptography_suite/legacy/__init__.py,legacy-decrypt-only,runtime-package,.py,wheel+sdist,"Retain only behind explicit, opt-in migration/decrypt compatibility."
+cryptography_suite/nonce.py,move-to-labs,runtime-package,.py,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/optional/__init__.py,move-to-labs,runtime-package,.py,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/optional/salsa20.py,move-to-labs,runtime-package,.py,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/pipeline.py,move-to-labs,runtime-package,.py,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/pqc/__init__.py,move-to-labs,runtime-package,.py,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/protocols/__init__.py,move-to-labs,runtime-package,.py,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/protocols/key_management.py,move-to-labs,runtime-package,.py,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/protocols/otp.py,move-to-labs,runtime-package,.py,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/protocols/pake.py,move-to-labs,runtime-package,.py,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/protocols/secret_sharing.py,move-to-labs,runtime-package,.py,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/py.typed,stable-core candidate,runtime-package,.typed,wheel+sdist,"Small reusable foundation candidate, subject to Phase 2 architecture and Phase 4 security validation."
+cryptography_suite/rich_logging.py,rewrite,runtime-package,.py,wheel+sdist,"Relevant role, but current shape/API or source location does not meet the v4 architecture."
+cryptography_suite/symmetric/__init__.py,rewrite,runtime-package,.py,wheel+sdist,"Relevant role, but current shape/API or source location does not meet the v4 architecture."
+cryptography_suite/symmetric/aes.py,legacy-decrypt-only,runtime-package,.py,wheel+sdist,"Retain only behind explicit, opt-in migration/decrypt compatibility."
+cryptography_suite/symmetric/ascon.py,move-to-labs,runtime-package,.py,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/symmetric/chacha.py,move-to-labs,runtime-package,.py,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/symmetric/kdf.py,rewrite,runtime-package,.py,wheel+sdist,"Relevant role, but current shape/API or source location does not meet the v4 architecture."
+cryptography_suite/utils.py,rewrite,runtime-package,.py,wheel+sdist,"Relevant role, but current shape/API or source location does not meet the v4 architecture."
+cryptography_suite/viz/__init__.py,move-to-labs,runtime-package,.py,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/viz/export.py,move-to-labs,runtime-package,.py,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/viz/widgets.py,move-to-labs,runtime-package,.py,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/x509.py,move-to-labs,runtime-package,.py,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/zk/__init__.py,move-to-labs,runtime-package,.py,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/zk/bulletproof.py,move-to-labs,runtime-package,.py,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+cryptography_suite/zk/zksnark.py,move-to-labs,runtime-package,.py,wheel+sdist,Outside the v4 stable envelope/provider/policy product boundary.
+demo_homomorphic.py,move-to-labs,repository-root,.py,source-checkout-only,Outside the v4 stable envelope/provider/policy product boundary.
+docs/EXPERIMENTAL.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/Makefile,documentation,documentation,no-extension,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/api-stability.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/api/modules.rst,documentation,documentation,.rst,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/api/pipeline.rst,documentation,documentation,.rst,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/api/public_api_table.rst,documentation,documentation,.rst,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/architecture.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/backend_consistency.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/cheatsheets/recipes.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/cli.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/conf.py,documentation,documentation,.py,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/feature_maturity.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/file_encryption.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/formal.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/fuzzing.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/index.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/index.rst,documentation,documentation,.rst,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/keystore.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/keystore_plugins.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/migration-from-pyca.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/migration_3.0.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/migration_4.0.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/migration_pipeline_api.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/mypy_plugin.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/no_surprises.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/operational_hardening.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/pipeline.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/pipeline_catalog.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/pipeline_coverage.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/pkcs11.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/protocols.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/release_checklist.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/release_process.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/rfc/README.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/rfc/RFC-0001-layered-architecture.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/roadmap.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/security.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/security.rst,documentation,documentation,.rst,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/testing.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/testing_plan_matrix.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/testing_playbook.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/threat-model.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/threat_model.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/usage.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/vision.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/visualization.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+docs/zeroization_faq.md,documentation,documentation,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+example_usage.py,move-to-labs,repository-root,.py,source-checkout-only,Outside the v4 stable envelope/provider/policy product boundary.
+examples/formal/README.md,documentation,examples,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+examples/formal/pipeline.yaml,move-to-labs,examples,.yaml,source-checkout-only,Outside the v4 stable envelope/provider/policy product boundary.
+examples/vulnerable.py,move-to-labs,examples,.py,source-checkout-only,Outside the v4 stable envelope/provider/policy product boundary.
+fuzz/README.md,documentation,fuzzing,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+fuzz/fuzz_aes.py,test/tooling,fuzzing,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+fuzz/fuzz_ecies.py,test/tooling,fuzzing,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+fuzz/fuzz_pipeline.py,test/tooling,fuzzing,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+fuzz/fuzz_rsa.py,test/tooling,fuzzing,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+mkdocs.yml,test/tooling,repository-root,.yml,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+notebooks/viz_demo.ipynb,move-to-labs,notebooks,.ipynb,source-checkout-only,Outside the v4 stable envelope/provider/policy product boundary.
+protocol/handshake.proto,move-to-labs,protocol-schema,.proto,source-checkout-only,Outside the v4 stable envelope/provider/policy product boundary.
+pyproject.toml,test/tooling,repository-root,.toml,sdist-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+requirements-dev.txt,test/tooling,repository-root,.txt,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+requirements-release.txt,test/tooling,repository-root,.txt,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+requirements.txt,test/tooling,repository-root,.txt,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+setup.cfg,test/tooling,repository-root,.cfg,sdist-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+setup.py,test/tooling,repository-root,.py,sdist-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+src/crypto_suite/__init__.py,delete/dead code,parallel-source,.py,source-checkout-only,Parallel source-tree implementation excluded from the current wheel; remove after compatibility proof.
+src/crypto_suite/aead.py,delete/dead code,parallel-source,.py,source-checkout-only,Parallel source-tree implementation excluded from the current wheel; remove after compatibility proof.
+src/crypto_suite/experimental/__init__.py,delete/dead code,parallel-source,.py,source-checkout-only,Parallel source-tree implementation excluded from the current wheel; remove after compatibility proof.
+src/crypto_suite/experimental/aes_gcm_sst.py,delete/dead code,parallel-source,.py,source-checkout-only,Parallel source-tree implementation excluded from the current wheel; remove after compatibility proof.
+src/crypto_suite/handshake.py,delete/dead code,parallel-source,.py,source-checkout-only,Parallel source-tree implementation excluded from the current wheel; remove after compatibility proof.
+src/crypto_suite/handshake_pb2.py,generated,parallel-source,.py,source-checkout-only,Generated compatibility artifact; regenerate only from its schema if labs retains it.
+src/crypto_suite/nonce.py,delete/dead code,parallel-source,.py,source-checkout-only,Parallel source-tree implementation excluded from the current wheel; remove after compatibility proof.
+src/crypto_suite/utils/__init__.py,delete/dead code,parallel-source,.py,source-checkout-only,Parallel source-tree implementation excluded from the current wheel; remove after compatibility proof.
+src/crypto_suite/utils/zeroize.py,delete/dead code,parallel-source,.py,source-checkout-only,Parallel source-tree implementation excluded from the current wheel; remove after compatibility proof.
+src/cryptography_suite/__init__.py,rewrite,parallel-source,.py,source-checkout-only,"Relevant role, but current shape/API or source location does not meet the v4 architecture."
+src/cryptography_suite/cli/__init__.py,rewrite,parallel-source,.py,source-checkout-only,"Relevant role, but current shape/API or source location does not meet the v4 architecture."
+src/cryptography_suite/cli/migrate_keys.py,rewrite,parallel-source,.py,source-checkout-only,"Relevant role, but current shape/API or source location does not meet the v4 architecture."
+src/suite/__init__.py,delete/dead code,parallel-source,.py,source-checkout-only,Parallel source-tree implementation excluded from the current wheel; remove after compatibility proof.
+src/suite/experimental/__init__.py,delete/dead code,parallel-source,.py,source-checkout-only,Parallel source-tree implementation excluded from the current wheel; remove after compatibility proof.
+src/suite/utils/__init__.py,delete/dead code,parallel-source,.py,source-checkout-only,Parallel source-tree implementation excluded from the current wheel; remove after compatibility proof.
+src/suite/utils/warnings.py,delete/dead code,parallel-source,.py,source-checkout-only,Parallel source-tree implementation excluded from the current wheel; remove after compatibility proof.
+tests/README.md,documentation,tests,.md,source-checkout-only,Current documentation or governance material; audit claims before carrying forward.
+tests/conftest.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_aes_property.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_architecture_hardening.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_ascon.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_asymmetric.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_async_file_format_streaming.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_audit.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_audit_freezegun.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_aws_kms_keystore.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_backend_consistency.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_backends.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_bls.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_bulletproof.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_bulletproof_stub.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_cli_backends.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_cli_export.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_cli_file.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_cli_file_roundtrip.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_cli_gen.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_cli_help.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_cli_integration.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_cli_main.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_cli_optional.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_core_errors_unit.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_core_settings_layers.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_dependency_metadata.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_docs_claims.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_ecies_property.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_encryption.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_entry_points.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_errors.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_experimental_loading.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_experimental_warning.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_file_format_streaming.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_gcm_limits.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_gcm_sst.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_hashing.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_homomorphic.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_homomorphic_edgecases.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_homomorphic_extra.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_hybrid.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_interfaces_full.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_kdf_functions.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_kem_negotiation.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_key_management.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_key_manager_class.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_keystore_cli_capabilities.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_keystore_migrate.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_keystore_plugins.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_local_add_key.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_migrate_keys.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_migration_oneshot_to_pipeline.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_mypy_plugin.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_no_new_oneshot.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_nonce_manager.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_operations_hardening.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_optional_features_missing.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_otp.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_otp_vectors.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_package_init.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_pake.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_pipeline.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_pipeline_export.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_pipeline_property.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_pipeline_roundtrip_property.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_pkcs11_keystore.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_pqc.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_pqc_stubs.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_public_api.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_readme_snippet.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_release_lint.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_root_exports.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_rsa_property.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_secret_output_redaction.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_secret_sharing.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_signal_protocol.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_signatures.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_stream_ciphers.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_strict_key_policy.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_utils.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_verbose.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_verbose_logging.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_verify_artifact.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_viz.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_x3dh.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_x509.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_xchacha.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_zeroize.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_zeroize_proc_mem.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_zeroize_pypy.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_zksnark.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tests/test_zksnark_stub.py,test/tooling,tests,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tools/__init__.py,test/tooling,tooling,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tools/bump_changelog.py,test/tooling,tooling,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tools/check_coverage_thresholds.py,test/tooling,tooling,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tools/check_deprecated_exports.py,test/tooling,tooling,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tools/check_experimental_imports.py,test/tooling,tooling,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tools/generate_public_api_table.py,test/tooling,tooling,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tools/generate_sbom.py,test/tooling,tooling,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tools/generate_support_matrix.py,test/tooling,tooling,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tools/release_lint.py,test/tooling,tooling,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tools/reproducible_build.py,test/tooling,tooling,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tools/sync_check.py,test/tooling,tooling,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tools/verify_artifact.py,test/tooling,tooling,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tools/verify_docs_references.py,test/tooling,tooling,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tools/vulture_whitelist.py,test/tooling,tooling,.py,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
+tox.ini,test/tooling,repository-root,.ini,source-checkout-only,"Build, test, CI, packaging, analysis, or maintainer support; not stable runtime API."
