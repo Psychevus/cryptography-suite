@@ -2,7 +2,8 @@
 
 - **Branch:** `refactor/v4-phase-3-canonical-package`
 - **Base / rollback checkpoint:** `def6fe31329ada2b112b09fff3f31ff1965a3ffb`
-- **Validated implementation HEAD before evidence commit:** `095ba0e`
+- **Validated implementation HEAD before evidence commit:**
+  `5211862d6597568e8daf912bbdab5faa4dba5e60`
 - **Package version:** `3.0.0`
 - **Goal:** one canonical stable source and an exact non-cryptographic v4 API
   skeleton
@@ -53,11 +54,15 @@ ProviderError
 
 ## Scope and explicit non-operational status
 
-Phase 3 implements declarations, immutable value semantics, bounded context
-storage, enums, protocols, redacted error formatting, and explicit
-`NotImplementedError` failures. It implements no operational cryptography,
-provider, policy evaluator, legacy parser, migration, rewrap, CLI operation,
-or filesystem transaction.
+Phase 3 implements declarations, immutable value semantics, allocation-safe
+bounded input context storage, enums, protocols, explicit secret-free audit
+metadata, aware-time UTC normalization, bounded provider identifiers, redacted
+error formatting, and explicit `NotImplementedError` failures. Error-code
+pseudo-members are not cached, concrete error classes enforce RFC-0004
+families, envelope recipients require immutable key versions, and the borrowed
+read-only secret protocol exposes no export operation. It implements no
+operational cryptography, provider, policy evaluator, legacy parser, migration,
+rewrap, CLI operation, or filesystem transaction.
 
 No v3 implementation was promoted. `py.typed` is the only moved foundation.
 All other canonical Python code was authored from the Phase 2 contracts.
@@ -81,14 +86,19 @@ unimplemented for its later authorized phase.
 Final artifacts:
 
 - `cryptography_suite-3.0.0-py3-none-any.whl`
-  (`8ceac0dd89ca11f600c98cdeb65d2a571b372e15b995e476ff75c27ce9d9894f`)
+  (`4300c0f0acbbef6d8991a01f877a05fcd97c3786e78bf4d4d67dd9414367a4d3`)
 - `cryptography_suite-3.0.0.tar.gz`
-  (`7a1c08db3d42163470837c1508216394eb38a94f7e814da490c311089536b948`)
+  (`958a74af4556739b39ae3a98526c407a57dc34aa6a92161b23c512e901071749`)
 
 The wheel contains only the approved Python modules, `py.typed`, distribution
 metadata, and license. The sdist adds only required packaging files, canonical
 source layout, and generated egg metadata. Exact inventories are in
 `artifact-before.txt` and `artifact-after.txt`.
+
+Wheel metadata exposes exactly the `dev` and `docs` extras, has no console
+entry point, and describes the package as a declaration-only non-operational
+v4 skeleton. The README no longer advertises removed v3 modules or features;
+historical v3 code is available only through Git history and historical tags.
 
 ## Deleted and excluded content
 
@@ -115,10 +125,13 @@ legacy namespace contains declarations only and is not root-imported.
 | AST dependency graph | pass |
 | No path mutation/dynamic source/CWD/provider discovery in runtime | pass |
 | Fail-closed skeleton/no side effects | pass |
-| Full pytest suite | 25 passed |
+| Local full pytest suite (CPython 3.13) | 45 passed; 90% branch coverage |
+| GitHub full pytest suite (CPython 3.11) | 45 passed; 90% branch coverage |
+| GitHub unit/contract/negative suite (CPython 3.10.20) | 39 passed |
 | Changed-file Ruff lint/format | pass |
 | Changed-file Black | pass |
-| Strict mypy on canonical source | pass; 17 files |
+| Strict mypy on canonical source and Phase 3 tests | pass; 28 files |
+| Exact Quality Gate mypy command | pass; 35 changed files |
 | Bandit on canonical source | pass; zero findings and zero suppressions |
 | `pip check` | pass |
 | `pip-audit -r requirements.txt --strict` | pass; no known vulnerabilities |
@@ -128,24 +141,25 @@ legacy namespace contains declarations only and is not root-imported.
 | Phase 1 document Git blobs | identical |
 | Phase 2 document Git blobs | identical |
 
-Actionlint 1.7.12 was downloaded to a temporary directory from its official
-release and its archive SHA-256 matched the published checksum. Two pre-existing
-notices for `actions/checkout@v3` and `actions/setup-python@v4` in the modified
-Formal workflow were ignored only in the local invocation because Phase 3
-forbids unrelated action upgrades. All other actionlint rules passed; no
-repository suppression or CI exception was added.
+Actionlint 1.7.12 passed the modified Quality Gate workflow with no repository
+suppression or CI exception.
 
 Narrow workflow changes:
 
 - Quality Gate and Release scan `src/cryptography_suite` and run the focused
   installed-artifact suite.
+- Quality Gate retains its Python 3.11 checks and adds a required CPython 3.10
+  compatibility job with a full-history checkout, non-editable installation,
+  isolated outside-checkout import, exact root/removed-module checks, 39
+  unit/contract/negative tests, and `pip check`.
 - Formal Model now proves formal exporters are absent from stable artifacts
   because those exporters moved outside the stable boundary.
 - The obsolete primitive fuzz schedule now runs stable fail-closed/import
   negative checks; cryptographic fuzzing is deferred until cryptography exists.
 
-Remote PR checks are recorded after draft publication. No existing failure is
-suppressed.
+At implementation HEAD `5211862d6597568e8daf912bbdab5faa4dba5e60`,
+Build, Formal Model, Quality Gate, and Reproducible Build all concluded
+`success`. No existing failure is suppressed.
 
 ## Documentation preservation
 
@@ -177,7 +191,7 @@ security completion claim is made.
 | API/import/artifact/preservation tests | met |
 | Package version unchanged | met |
 | Phase 1/2 documents unchanged | met |
-| Draft PR open, auto-merge disabled, checks passing | pending publication |
+| Draft PR open, auto-merge disabled, checks passing | met |
 | Phase 4/remediation not started | met |
 
 ## Deferred work and Phase 4 prerequisites

@@ -1,6 +1,7 @@
 # Phase 3 import-boundary evidence
 
 - **Base / rollback checkpoint:** `def6fe31329ada2b112b09fff3f31ff1965a3ffb`
+- **Validated implementation HEAD:** `5211862d6597568e8daf912bbdab5faa4dba5e60`
 - **Validated package version:** `3.0.0`
 - **Canonical runtime source:** `src/cryptography_suite/`
 - **Result:** pass
@@ -74,9 +75,8 @@ Repository-wide nonhistorical matches are classified as:
 
 - assertions and literals in Phase 3 negative tests;
 - `docs/conf.py` documentation tooling;
-- `tools/generate_support_matrix.py` maintainer tooling outside the runtime;
-  and
-- old user documentation recording the removed v3 plugin flag.
+- maintainer tooling outside the runtime; and
+- historical Phase 3 evidence describing mechanisms that were removed.
 
 No active stable-runtime result remains.
 
@@ -89,7 +89,13 @@ No active stable-runtime result remains.
 - Entry points: none
 - `pip check`: pass
 - Wheel rebuilt from sdist: identical entry inventory
-- Full Phase 3 suite: 25 passed
+- Local full suite on CPython 3.13: 45 passed
+- GitHub Quality Gate full suite on CPython 3.11: 45 passed
+- GitHub compatibility suite on CPython 3.10: 39 passed
+
+The CPython 3.10 job installs the package non-editably, imports it from outside
+the checkout, checks the exact root API and removed-module failures, runs the
+unit/contract/negative suite, and runs `pip check`.
 
 Ordinary import performs no environment policy read, network operation,
 provider discovery, filesystem discovery beyond normal module import, warning,
