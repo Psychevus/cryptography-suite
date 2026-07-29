@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import FrozenInstanceError
-from datetime import datetime, timezone
-from types import MappingProxyType
+from datetime import datetime, timedelta, timezone
 
 import pytest
 
@@ -17,7 +16,6 @@ from cryptography_suite import (
     KeyRef,
     Policy,
 )
-from cryptography_suite.audit import AuditEvent
 from cryptography_suite.envelope import AuthenticationStatus
 
 
@@ -73,55 +71,74 @@ def test_metadata_defaults_to_not_verified_and_copies_sequences() -> None:
     assert metadata.critical_features == ("feature",)
 
 
-def test_audit_event_attributes_are_portable_immutable_and_copied() -> None:
-    occurred_at = datetime.now(timezone.utc)
-    first = AuditEvent(
-        schema_version="cs-audit/1",
-        event_id="event-1",
-        occurred_at=occurred_at,
-        operation_id="operation-1",
-        event_type="declaration",
-        outcome="not-implemented",
-        policy_id="policy-1",
-    )
-    second = AuditEvent(
-        schema_version="cs-audit/1",
-        event_id="event-2",
-        occurred_at=occurred_at,
-        operation_id="operation-2",
-        event_type="declaration",
-        outcome="not-implemented",
-        policy_id="policy-2",
-    )
+def test_metadata_rejects_unresolved_recipient_versions() -> None:
+    with pytest.raises(ValueError, match="immutable key versions"):
+        EnvelopeMetadata(
+            format_name="unimplemented-v4",
+            profile="declaration",
+            major_version=4,
+            minor_version=0,
+            algorithm_suite="unassigned",
+            recipients=(KeyRef("example.provider", "alias"),),
+            plaintext_size=None,
+            ciphertext_size=0,
+            chunk_count=0,
+            context_commitment_id=None,
+            created_at=None,
+            critical_features=(),
+            policy_id="uncomputed",
+        )
 
-    assert first.attributes == {}
-    assert second.attributes == {}
-    assert isinstance(first.attributes, MappingProxyType)
-    assert isinstance(second.attributes, MappingProxyType)
-    assert first.attributes is not second.attributes
 
-    supplied: dict[str, str | int] = {
-        "component": "unit",
-        "attempt": 1,
-    }
-    explicit = AuditEvent(
-        schema_version="cs-audit/1",
-        event_id="event-3",
-        occurred_at=occurred_at,
-        operation_id="operation-3",
-        event_type="declaration",
-        outcome="not-implemented",
-        policy_id="policy-3",
-        attributes=supplied,
+def test_metadata_normalizes_aware_time_and_rejects_naive_time() -> None:
+    local_time = datetime(
+        2026,
+        1,
+        2,
+        12,
+        tzinfo=timezone(timedelta(hours=3, minutes=30)),
     )
-    supplied["component"] = "changed"
-    supplied["attempt"] = 2
+    metadata = EnvelopeMetadata(
+        format_name="unimplemented-v4",
+        profile="declaration",
+        major_version=4,
+        minor_version=0,
+        algorithm_suite="unassigned",
+        recipients=(KeyRef("example.provider", "key", "1"),),
+        plaintext_size=None,
+        ciphertext_size=0,
+        chunk_count=0,
+        context_commitment_id=None,
+        created_at=local_time,
+        critical_features=(),
+        policy_id="uncomputed",
+    )
+    assert metadata.created_at == datetime(
+        2026,
+        1,
+        2,
+        8,
+        30,
+        tzinfo=timezone.utc,
+    )
+    assert metadata.created_at.tzinfo is timezone.utc
 
-    assert explicit.attributes == {
-        "component": "unit",
-        "attempt": 1,
-    }
-    assert isinstance(explicit.attributes, MappingProxyType)
+    with pytest.raises(ValueError, match="timezone-aware"):
+        EnvelopeMetadata(
+            format_name="unimplemented-v4",
+            profile="declaration",
+            major_version=4,
+            minor_version=0,
+            algorithm_suite="unassigned",
+            recipients=(KeyRef("example.provider", "key", "1"),),
+            plaintext_size=None,
+            ciphertext_size=0,
+            chunk_count=0,
+            context_commitment_id=None,
+            created_at=datetime(2026, 1, 2),
+            critical_features=(),
+            policy_id="uncomputed",
+        )
 
 
 def test_errors_are_typed_immutable_and_redacted() -> None:

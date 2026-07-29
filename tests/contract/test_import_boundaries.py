@@ -146,7 +146,7 @@ def test_internal_import_graph_matches_phase_2_layers() -> None:
             "providers",
             "streaming",
         },
-        "cryptography_suite.audit": {"errors"},
+        "cryptography_suite.audit": {"errors", "providers"},
         "cryptography_suite.context": set(),
         "cryptography_suite.envelope": {"providers"},
         "cryptography_suite.errors": set(),

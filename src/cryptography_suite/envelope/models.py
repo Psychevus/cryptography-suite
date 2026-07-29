@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 
-from ..providers.models import KeyRef
+from ..providers.models import KeyRef, _normalize_utc_datetime
 
 _MAX_ENVELOPE_BYTES = 1024**4
 
@@ -54,8 +54,20 @@ class EnvelopeMetadata:
     authentication_status: AuthenticationStatus = AuthenticationStatus.NOT_VERIFIED
 
     def __post_init__(self) -> None:
-        object.__setattr__(self, "recipients", tuple(self.recipients))
+        recipients = tuple(self.recipients)
+        object.__setattr__(self, "recipients", recipients)
         object.__setattr__(self, "critical_features", tuple(self.critical_features))
+        for recipient in recipients:
+            if not isinstance(recipient, KeyRef):
+                raise TypeError("metadata recipients must be KeyRef values")
+            if recipient.version is None:
+                raise ValueError("metadata recipients require immutable key versions")
+        if self.created_at is not None:
+            object.__setattr__(
+                self,
+                "created_at",
+                _normalize_utc_datetime(self.created_at, "created_at"),
+            )
         for value in (
             self.major_version,
             self.minor_version,

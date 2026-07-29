@@ -1,16 +1,18 @@
 from __future__ import annotations
 
 import inspect
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 import pytest
 
 from cryptography_suite.providers import (
+    KeyCapability,
     KeyDescription,
     KeyProvider,
     KeyRef,
     ProviderHealth,
     ProviderHealthStatus,
+    ProviderKeyState,
     ProviderRequest,
     ReadOnlySecret,
     SecretBuffer,
@@ -160,4 +162,55 @@ def test_provider_identifier_validation_is_shared_by_provider_models() -> None:
             provider_id="example..provider",
             status=ProviderHealthStatus.UNKNOWN,
             observed_at=observed_at,
+        )
+
+
+def test_provider_timestamps_are_aware_and_normalized_to_utc() -> None:
+    local_time = datetime(
+        2026,
+        1,
+        2,
+        12,
+        tzinfo=timezone(timedelta(hours=-5)),
+    )
+    request = ProviderRequest(
+        deadline=local_time,
+        cancel=None,
+        operation_id="operation-1",
+    )
+    description = KeyDescription(
+        key=KeyRef("example.provider", "key", "1"),
+        capabilities=frozenset({KeyCapability.WRAP}),
+        state=ProviderKeyState.ENABLED,
+        observed_at=local_time,
+    )
+    health = ProviderHealth(
+        provider_id="example.provider",
+        status=ProviderHealthStatus.HEALTHY,
+        observed_at=local_time,
+    )
+
+    expected = datetime(2026, 1, 2, 17, tzinfo=timezone.utc)
+    assert request.deadline == expected
+    assert description.observed_at == expected
+    assert health.observed_at == expected
+    assert request.deadline.tzinfo is timezone.utc
+    assert description.observed_at.tzinfo is timezone.utc
+    assert health.observed_at.tzinfo is timezone.utc
+
+    naive = datetime(2026, 1, 2)
+    with pytest.raises(ValueError, match="timezone-aware"):
+        ProviderRequest(deadline=naive, cancel=None, operation_id="operation-2")
+    with pytest.raises(ValueError, match="timezone-aware"):
+        KeyDescription(
+            key=KeyRef("example.provider", "key", "1"),
+            capabilities=frozenset(),
+            state=ProviderKeyState.UNKNOWN,
+            observed_at=naive,
+        )
+    with pytest.raises(ValueError, match="timezone-aware"):
+        ProviderHealth(
+            provider_id="example.provider",
+            status=ProviderHealthStatus.UNKNOWN,
+            observed_at=naive,
         )
