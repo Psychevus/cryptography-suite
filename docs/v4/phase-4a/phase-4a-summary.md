@@ -2,7 +2,7 @@
 
 - **Branch:** `feat/v4-phase-4a-safe-filesystem`
 - **Base and rollback SHA:** `fc50585b280dd9bb76c7671f1932a6d80bc4f06e`
-- **Implementation SHA:** `86bc82df8124e1cf329fc4a5bf5ffe533774658a`
+- **Implementation SHA:** `3c51950fb090475229f1206e685aaa59a9fe50a9`
 - **Goal:** private transactional filesystem publication with explicit failure
   outcomes and no operational cryptography
 
@@ -29,9 +29,11 @@ The caller supplies an existing absolute trusted root and an untrusted relative
 destination. Components are validated lexically and traversed through
 no-follow directory descriptors on POSIX or retained non-reparse handles on
 Windows. Source/destination and owned-staging identity use device/inode on
-POSIX and volume/file-index values on Windows. Symlink/reparse destinations,
-linked parents, directories, and existing files with multiple hardlinks are
-rejected.
+POSIX and volume/file-index values on Windows. Existing overwrite destinations
+are retained by handle through revalidation and replacement, preventing inode
+or file-index reuse from hiding a namespace replacement. Symlink/reparse
+destinations, linked parents, directories, and existing files with multiple
+hardlinks are rejected.
 
 No overwrite is the default. POSIX uses same-directory `linkat` semantics and
 Windows uses handle-based no-replace rename. Exactly one synchronized
@@ -87,10 +89,10 @@ envelope, provider, policy, CLI, legacy, or migration implementation changed.
 
 Local Windows/Python 3.12 evidence:
 
-- focused filesystem boundary before the documentation-only commit: 86 passed,
-  4 explicitly justified platform/capability skips;
-- final full suite with branch coverage: 123 collected, 119 passed, 4 explicit
-  Windows capability/platform skips, 78% aggregate branch coverage;
+- focused core filesystem suite: 75 collected, 71 passed, 4 explicitly
+  justified Windows capability/platform skips;
+- final full suite with branch coverage: 125 collected, 121 passed, 4 explicit
+  Windows capability/platform skips, 76% aggregate branch coverage;
 - strict mypy: pass for 20 source files;
 - Ruff format and lint: pass;
 - Black: pass;
@@ -138,6 +140,6 @@ CLI behavior, provider behavior, policy evaluation, envelope codecs, and
 migration remain out of scope.
 
 Rollback is a branch-level revert to
-`fc50585b280dd9bb76c7671f1932a6d80bc4f06e`, or reviewable reverts of the seven
+`fc50585b280dd9bb76c7671f1932a6d80bc4f06e`, or reviewable reverts of the nine
 Phase 4A commits in reverse order. No data migration, published format, public
 API, or package-version rollback is required.

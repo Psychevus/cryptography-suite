@@ -60,6 +60,13 @@ Windows identity is volume serial plus file index from
 `GetFileInformationByHandle`. These values never enter exception text, repr,
 logs, or public metadata.
 
+For an existing overwrite destination, construction also retains an open
+destination handle. Commit compares the retained object with the immediately
+reinspected name before publication. On POSIX the retained handle prevents
+inode reuse from making a delete-and-recreate race look unchanged. Windows
+opens the retained target with delete sharing and uses POSIX-semantics replace
+flags so the handle can remain open through atomic replacement.
+
 ## Temporary ownership and permissions
 
 Staging occurs exclusively in the destination's existing parent. A random
@@ -117,7 +124,7 @@ operation-intent flag are true. An absent destination still uses the
 no-overwrite primitive so a newly appearing object is not replaced without
 inspection. A safely inspected existing destination is replaced atomically:
 POSIX uses same-directory `replace`; Windows uses handle-based rename with
-`FILE_RENAME_FLAG_REPLACE_IF_EXISTS`.
+`FILE_RENAME_FLAG_REPLACE_IF_EXISTS | FILE_RENAME_FLAG_POSIX_SEMANTICS`.
 
 The staged permission is the final permission; source or old-destination mode
 is not inherited.

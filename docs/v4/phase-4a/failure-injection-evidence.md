@@ -1,9 +1,9 @@
 # Phase 4A failure-injection evidence
 
-- **Implementation SHA:** `86bc82df8124e1cf329fc4a5bf5ffe533774658a`
+- **Implementation SHA:** `3c51950fb090475229f1206e685aaa59a9fe50a9`
 - **Injection seam:** private `FilesystemOS` facade
 - **Evidence test:** `tests/unit/test_atomic_failures.py`
-- **Result:** 25 cases collected; 24 passed and the POSIX namespace-replacement
+- **Result:** 27 cases collected; 26 passed and the POSIX namespace-replacement
   case was skipped on Windows/Python 3.12
 
 The facade wrapper raises one-shot `FilesystemOperationError` instances without
@@ -21,6 +21,7 @@ destination, temporary name, source bytes, or staged bytes.
 | Parent traversal | `FAILED` / `NOT_PUBLISHED` | absent; nested parent unchanged | never created | `AtomicSinkError`, `IO_FAILED` |
 | Pre-mutation parent durability barrier | `FAILED` / `NOT_PUBLISHED` | absent; no source supplied | never created | represented by the `open_parent` facade failure, `IO_FAILED` |
 | Temporary creation | `FAILED` / `NOT_PUBLISHED` | absent; no source supplied | creation refused; parent closed | `AtomicSinkError`, `IO_FAILED` |
+| Existing-destination handle retention | `FAILED` / `NOT_PUBLISHED` | original bytes unchanged | never created | `AtomicSinkError`, `IO_FAILED` |
 | First write | `FAILED` / `NOT_PUBLISHED` | absent; no source supplied | removed by abort | `AtomicSinkError`, `IO_FAILED` |
 | Partial write followed by later failure | `FAILED` / `NOT_PUBLISHED` | absent; no source supplied; completed-chunk count remains zero | removed by abort | `AtomicSinkError`, `IO_FAILED` |
 | Interrupted write | remains `OPEN`, then `COMMITTED` / `PUBLISHED` | exact payload published | promotion removes staging name | interruption retried; no error escapes |
@@ -37,6 +38,7 @@ destination, temporary name, source bytes, or staged bytes.
 | POSIX temporary pathname replacement | `FAILED`, then cleanup incomplete / `CLEANUP_INCOMPLETE` | destination absent | attacker replacement preserved | `AtomicSinkError`, `IO_FAILED`; POSIX CI case |
 | Post-publication directory durability barrier | `PUBLICATION_UNCERTAIN` / `PUBLISHED_DURABILITY_UNCERTAIN` | new destination retained; source unchanged | closed; abort cannot remove destination | `AtomicSinkError`, `IO_FAILED` |
 | Post-publication temporary-handle close | `CLEANUP_INCOMPLETE` / `CLEANUP_INCOMPLETE` | new destination retained; source unchanged | explicit abort retries close | `AtomicSinkError`, `IO_FAILED` |
+| Post-publication destination-lease close | `CLEANUP_INCOMPLETE` / `CLEANUP_INCOMPLETE` | replacement retained; source unchanged | explicit abort retries retained-target close | `AtomicSinkError`, `IO_FAILED` |
 | Post-publication parent-handle close | `CLEANUP_INCOMPLETE` / `CLEANUP_INCOMPLETE` | new destination retained; source unchanged | already promoted; explicit abort retries parent close | `AtomicSinkError`, `IO_FAILED` |
 
 Real namespace-race tests supplement the injected points:

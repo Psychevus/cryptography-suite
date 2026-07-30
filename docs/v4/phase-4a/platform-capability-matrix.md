@@ -12,7 +12,7 @@
 | File identity/link count | `fstat`/`fstatat`, device+inode+nlink | `GetFileInformationByHandle` | `fstat`/`fstatat`, device+inode+nlink |
 | Final-link detection | `fstatat(..., AT_SYMLINK_NOFOLLOW)` | open reparse point and inspect attributes | `fstatat(..., AT_SYMLINK_NOFOLLOW)` |
 | Atomic no-overwrite | same-directory `linkat`, then owned-name unlink | handle rename without replace flag | same-directory `linkat`, then owned-name unlink |
-| Atomic overwrite | same-directory `renameat` replacement | handle rename with replace flag | same-directory `renameat` replacement |
+| Atomic overwrite | same-directory `renameat` replacement with retained target descriptor | handle rename with replace and POSIX-semantics flags while retaining the target handle | same-directory `renameat` replacement with retained target descriptor |
 | File durability | `fsync(file_fd)` | `FlushFileBuffers(file_handle)` | `fsync(file_fd)` |
 | Directory/rename durability | `fsync(parent_fd)` | write-through handle plus post-rename metadata flush | `fsync(parent_fd)` |
 | Cross-filesystem fallback | none; refused | none; refused | none; refused |
