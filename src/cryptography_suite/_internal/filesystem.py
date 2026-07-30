@@ -872,7 +872,12 @@ class StandardFilesystemOS:
         root: str,
         parent_components: tuple[str, ...],
     ) -> ParentDirectory:
-        flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC
+        flags = (
+            os.O_RDONLY
+            | vars(os)["O_DIRECTORY"]
+            | vars(os)["O_NOFOLLOW"]
+            | vars(os)["O_CLOEXEC"]
+        )
         try:
             current = os.open(root, flags)
         except OSError:
@@ -911,7 +916,13 @@ class StandardFilesystemOS:
         parent: ParentDirectory,
         name: str,
     ) -> OwnedTemporary | None:
-        flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW | os.O_CLOEXEC
+        flags = (
+            os.O_WRONLY
+            | os.O_CREAT
+            | os.O_EXCL
+            | vars(os)["O_NOFOLLOW"]
+            | vars(os)["O_CLOEXEC"]
+        )
         try:
             fd = os.open(
                 name,
@@ -1224,7 +1235,11 @@ class StandardFilesystemOS:
             )
             length_offset = root_offset + ctypes.sizeof(wintypes.HANDLE)
             name_offset = length_offset + ctypes.sizeof(wintypes.DWORD)
-            size = name_offset + len(encoded)
+            # FileNameLength excludes the terminator. Still retain a zero
+            # WCHAR after the target: supported Windows/NTFS versions have
+            # otherwise been observed consuming adjacent bytes as a suffix.
+            information_size = name_offset + len(encoded)
+            size = information_size + ctypes.sizeof(wintypes.WCHAR)
             buffer = ctypes.create_string_buffer(size)
             flags = _FILE_RENAME_FLAG_REPLACE_IF_EXISTS if replace else 0
             ctypes.memmove(
@@ -1246,7 +1261,7 @@ class StandardFilesystemOS:
                 StandardFilesystemOS._windows_temporary_handle(temporary),
                 _FILE_RENAME_INFO_EX_CLASS,
                 buffer,
-                size,
+                information_size,
             ):
                 error = ctypes.get_last_error()
                 reason = (

@@ -11,6 +11,8 @@ from conftest import REPO_ROOT, BuiltArtifacts
 
 RUNTIME_FILES = {
     "cryptography_suite/__init__.py",
+    "cryptography_suite/_internal/__init__.py",
+    "cryptography_suite/_internal/filesystem.py",
     "cryptography_suite/audit/__init__.py",
     "cryptography_suite/audit/events.py",
     "cryptography_suite/context.py",
@@ -27,6 +29,7 @@ RUNTIME_FILES = {
     "cryptography_suite/providers/models.py",
     "cryptography_suite/py.typed",
     "cryptography_suite/streaming/__init__.py",
+    "cryptography_suite/streaming/atomic.py",
     "cryptography_suite/streaming/sinks.py",
 }
 

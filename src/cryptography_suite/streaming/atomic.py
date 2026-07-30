@@ -240,11 +240,18 @@ class AtomicFileSink:
         self._parent: ParentDirectory | None = None
         self._temporary: OwnedTemporary | None = None
         self._source_identity: FileIdentity | None = None
+        self._initial_destination_identity: FileIdentity | None = None
+        self._initial_destination_present = False
         self._state = AtomicSinkState.FAILED
         self._outcome = CommitOutcome.NOT_PUBLISHED
         self._bytes_written = 0
 
         try:
+            if not self._filesystem.capabilities(root).fully_supported:
+                raise FilesystemOperationError(
+                    FilesystemFailureReason.CAPABILITY_UNAVAILABLE,
+                    operation="capability_check",
+                )
             if source_fd is not None:
                 self._source_identity = self._filesystem.source_identity(source_fd)
             self._parent = self._filesystem.open_parent(root, parent_components)
@@ -253,6 +260,9 @@ class AtomicFileSink:
                 self._destination_name,
             )
             self._validate_destination(existing)
+            if existing is not None:
+                self._initial_destination_present = True
+                self._initial_destination_identity = existing.identity
             self._temporary = self._filesystem.create_temporary(self._parent)
         except FilesystemOperationError as error:
             self._construction_cleanup()
@@ -347,6 +357,7 @@ class AtomicFileSink:
                     self._destination_name,
                 )
                 self._validate_destination(existing)
+                self._validate_observed_destination(existing)
                 if existing is None:
                     self._filesystem.publish_no_overwrite(
                         parent,
@@ -371,10 +382,18 @@ class AtomicFileSink:
             if self._state in {AtomicSinkState.ABORTED, AtomicSinkState.COMMITTED}:
                 return
 
-            published = self._outcome is not CommitOutcome.NOT_PUBLISHED
             cleanup_error: FilesystemOperationError | None = None
             temporary = self._temporary
             parent = self._parent
+            published = (
+                temporary.published
+                if temporary is not None
+                else self._outcome
+                in {
+                    CommitOutcome.PUBLISHED,
+                    CommitOutcome.PUBLISHED_DURABILITY_UNCERTAIN,
+                }
+            )
 
             if temporary is not None:
                 try:
@@ -393,7 +412,7 @@ class AtomicFileSink:
                     except FilesystemOperationError as error:
                         cleanup_error = error
 
-            if parent is not None:
+            if parent is not None and cleanup_error is None:
                 try:
                     self._filesystem.close_parent(parent)
                 except FilesystemOperationError as error:
@@ -468,6 +487,24 @@ class AtomicFileSink:
                 self._filesystem.close_parent(parent)
             except FilesystemOperationError:
                 pass
+
+    def _validate_observed_destination(
+        self,
+        destination: DestinationInfo | None,
+    ) -> None:
+        initial = self._initial_destination_identity
+        if not self._initial_destination_present:
+            if destination is not None:
+                raise FilesystemOperationError(
+                    FilesystemFailureReason.DESTINATION_EXISTS,
+                    operation="destination_revalidation",
+                )
+            return
+        if initial is None or destination is None or destination.identity != initial:
+            raise FilesystemOperationError(
+                FilesystemFailureReason.IDENTITY_MISMATCH,
+                operation="destination_revalidation",
+            )
 
     def _close_all(self) -> None:
         temporary = self._required_temporary()

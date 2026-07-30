@@ -61,8 +61,13 @@ def test_isolated_installed_wheel_and_sdist_rebuild(
     code = """
 import importlib.metadata
 import json
+import os
+import stat
 import sys
+import tempfile
+from pathlib import Path
 import cryptography_suite
+from cryptography_suite.streaming.atomic import AtomicFileSink
 
 forbidden = [
     "cryptography_suite.aead",
@@ -80,8 +85,40 @@ for name in forbidden:
         continue
     failures.append(name)
 
+with tempfile.TemporaryDirectory() as directory:
+    root = Path(directory).absolute()
+    destination = root / "installed.bin"
+    aborted = AtomicFileSink(
+        output_root=root,
+        relative_destination="aborted.bin",
+    )
+    aborted.write(b"not-published")
+    stage_hidden = not (root / "aborted.bin").exists()
+    aborted.abort()
+
+    committed = AtomicFileSink(
+        output_root=root,
+        relative_destination="installed.bin",
+    )
+    committed.write(b"installed-wheel")
+    committed.commit()
+    atomic = {
+        "bytes": destination.read_bytes().decode("ascii"),
+        "mode": (
+            stat.S_IMODE(destination.stat().st_mode)
+            if os.name == "posix"
+            else None
+        ),
+        "stage_hidden": stage_hidden,
+        "temporary_names": [
+            path.name for path in root.iterdir()
+            if path.name.startswith(".cs4a-")
+        ],
+    }
+
 print(json.dumps({
     "all": cryptography_suite.__all__,
+    "atomic": atomic,
     "failures": failures,
     "origin": cryptography_suite.__file__,
     "version": importlib.metadata.version("cryptography-suite"),
@@ -103,6 +140,11 @@ print(json.dumps({
     snapshot = json.loads(result.stdout)
 
     assert snapshot["all"] == EXPECTED_ROOT
+    assert snapshot["atomic"]["bytes"] == "installed-wheel"
+    assert snapshot["atomic"]["stage_hidden"] is True
+    assert snapshot["atomic"]["temporary_names"] == []
+    if os.name == "posix":
+        assert snapshot["atomic"]["mode"] == 0o600
     assert snapshot["failures"] == []
     assert snapshot["version"] == "3.0.0"
     assert "site-packages" in snapshot["origin"].lower()

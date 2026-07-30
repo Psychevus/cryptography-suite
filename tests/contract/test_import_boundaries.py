@@ -51,6 +51,7 @@ def _string_list(value: object, field: str) -> list[str]:
 def _import_snapshot(cwd: Path, environment_value: str) -> ImportSnapshot:
     code = """
 import json
+import os
 import socket
 import sys
 
@@ -58,6 +59,15 @@ def blocked(*args, **kwargs):
     raise AssertionError("network access during import")
 
 socket.socket.connect = blocked
+for filesystem_operation in (
+    "fsync",
+    "link",
+    "mkdir",
+    "open",
+    "replace",
+    "unlink",
+):
+    setattr(os, filesystem_operation, blocked)
 import cryptography_suite
 print(json.dumps({
     "all": cryptography_suite.__all__,
@@ -103,6 +113,8 @@ def test_root_import_is_stable_across_cwd_and_environment(tmp_path: Path) -> Non
     assert snapshot_one["modules"] == snapshot_two["modules"]
     assert "cryptography_suite.legacy" not in snapshot_one["modules"]
     assert "cryptography_suite.lifecycle" not in snapshot_one["modules"]
+    assert "cryptography_suite.streaming.atomic" not in snapshot_one["modules"]
+    assert "cryptography_suite._internal.filesystem" not in snapshot_one["modules"]
     assert all(".cli" not in name for name in snapshot_one["modules"])
     assert all(".labs" not in name for name in snapshot_one["modules"])
 
@@ -150,6 +162,7 @@ def test_internal_import_graph_matches_phase_2_layers() -> None:
         "cryptography_suite.context": set(),
         "cryptography_suite.envelope": {"providers"},
         "cryptography_suite.errors": set(),
+        "cryptography_suite._internal": set(),
         "cryptography_suite.legacy": set(),
         "cryptography_suite.lifecycle": {"providers"},
         "cryptography_suite.policy": set(),
@@ -162,7 +175,7 @@ def test_internal_import_graph_matches_phase_2_layers() -> None:
             "streaming",
         },
         "cryptography_suite.providers": set(),
-        "cryptography_suite.streaming": set(),
+        "cryptography_suite.streaming": {"_internal", "errors"},
     }
     violations: list[str] = []
     for path in sorted(SOURCE.rglob("*.py")):
@@ -216,6 +229,30 @@ def test_audit_package_has_no_provider_import_edge() -> None:
                 )
                 if is_provider_edge:
                     violations.append(str(path.relative_to(REPO_ROOT)))
+    assert violations == []
+
+
+def test_atomic_module_has_only_approved_internal_edges() -> None:
+    path = SOURCE / "streaming" / "atomic.py"
+    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+    forbidden = {
+        "audit",
+        "cli",
+        "envelope",
+        "labs",
+        "legacy",
+        "lifecycle",
+        "policy",
+        "protector",
+        "providers",
+    }
+    violations: list[str] = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.ImportFrom):
+            continue
+        target = (node.module or "").split(".", 1)[0]
+        if target in forbidden:
+            violations.append(target)
     assert violations == []
 
 
