@@ -293,7 +293,8 @@ def test_platform_case_behavior_is_native_and_documented(tmp_path: Path) -> None
     )
     first.commit()
 
-    if os.name == "nt":
+    alternate_case_aliases = (tmp_path / "case.bin").exists()
+    if alternate_case_aliases:
         with pytest.raises(AtomicSinkError):
             AtomicFileSink(
                 output_root=tmp_path.absolute(),

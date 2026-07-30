@@ -140,6 +140,6 @@ CLI behavior, provider behavior, policy evaluation, envelope codecs, and
 migration remain out of scope.
 
 Rollback is a branch-level revert to
-`fc50585b280dd9bb76c7671f1932a6d80bc4f06e`, or reviewable reverts of the nine
+`fc50585b280dd9bb76c7671f1932a6d80bc4f06e`, or reviewable reverts of the ten
 Phase 4A commits in reverse order. No data migration, published format, public
 API, or package-version rollback is required.
