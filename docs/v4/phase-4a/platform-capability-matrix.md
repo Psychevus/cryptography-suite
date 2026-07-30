@@ -5,9 +5,9 @@
 
 | Primitive | Linux mechanism | Windows mechanism | macOS mechanism |
 | --- | --- | --- | --- |
-| Existing absolute root | `open` with `O_DIRECTORY | O_NOFOLLOW` | `CreateFileW`, directory and reparse flags | `open` with `O_DIRECTORY | O_NOFOLLOW` |
+| Existing absolute root | `open` with `O_DIRECTORY \| O_NOFOLLOW` | `CreateFileW`, directory and reparse flags | `open` with `O_DIRECTORY \| O_NOFOLLOW` |
 | Parent traversal | descriptor-relative `open` per component | retained non-reparse directory handles | descriptor-relative `open` per component |
-| Exclusive same-directory staging | `openat(O_CREAT | O_EXCL | O_NOFOLLOW)` | `CreateFileW(CREATE_NEW)` | `openat(O_CREAT | O_EXCL | O_NOFOLLOW)` |
+| Exclusive same-directory staging | `openat(O_CREAT \| O_EXCL \| O_NOFOLLOW)` | `CreateFileW(CREATE_NEW)` | `openat(O_CREAT \| O_EXCL \| O_NOFOLLOW)` |
 | Owner-only staging/final mode | `fchmod` and `fstat`, exact `0600` | protected owner-only DACL, queried after creation | `fchmod` and `fstat`, exact `0600` |
 | File identity/link count | `fstat`/`fstatat`, device+inode+nlink | `GetFileInformationByHandle` | `fstat`/`fstatat`, device+inode+nlink |
 | Final-link detection | `fstatat(..., AT_SYMLINK_NOFOLLOW)` | open reparse point and inspect attributes | `fstatat(..., AT_SYMLINK_NOFOLLOW)` |
@@ -34,4 +34,3 @@
   POSIX writable-by-other parents, and any runtime missing a required primitive.
 - **Deferred:** network filesystems, recovery scanning, backups, alternative
   ACL models, and cross-filesystem copy-and-verify transactions.
-

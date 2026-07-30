@@ -186,4 +186,3 @@ permissions, unavailable atomic publication, and unavailable durability
 barriers fail closed. Network shares, cross-filesystem publication, backups,
 automatic source deletion, stale-temp scanning, and recovery scanning are not
 implemented.
-

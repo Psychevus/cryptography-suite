@@ -4,14 +4,15 @@
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Build Status](https://github.com/Psychevus/cryptography-suite/actions/workflows/quality-gate.yml/badge.svg)](https://github.com/Psychevus/cryptography-suite/actions/workflows/quality-gate.yml)
 
-Cryptography Suite is a declaration-only v4 development skeleton. It provides
-no operational encryption or decryption and is not suitable for protecting
+Cryptography Suite is an incomplete v4 development skeleton. It provides no
+operational encryption or decryption and is not suitable for protecting
 production secrets.
 
-Phase 3 establishes the package boundary, immutable value models, public
-protocols, typed errors, and fail-closed orchestration signatures needed for
-later reviewed implementation work. The package version remains `3.0.0` while
-that incompatible v4 architecture is developed on the main branch.
+Phase 3 established the package boundary, immutable value models, public
+protocols, typed errors, and fail-closed orchestration signatures. Phase 4A
+adds a private transactional filesystem foundation for later streaming work.
+The package version remains `3.0.0` while that incompatible v4 architecture is
+developed on the main branch.
 
 ## Current status
 
@@ -22,8 +23,11 @@ that incompatible v4 architecture is developed on the main branch.
 - No policy engine or policy evaluation is implemented.
 - No legacy parser, format autodetection, or migration implementation is
   shipped.
-- No filesystem transactional sink is implemented.
+- A private filesystem transactional sink is implemented, but it performs no
+  encryption or authentication and is not a package-root API.
 - The project has not completed an independent security audit.
+- The independent Deep Security Scan remains **BLOCKED BY TOOLING FAILURE** and
+  is required before Phase 4 completion or a stable release.
 
 The public `Protector` methods intentionally raise `NotImplementedError` before
 cryptographic, provider, filesystem, audit-sink, or network side effects.
@@ -95,7 +99,10 @@ source distribution and are not compatibility fallbacks for the v4 skeleton.
 - [Phase 2 RFCs](docs/v4/rfcs/)
 - [Architecture documents](docs/v4/architecture/)
 - [Phase 3 evidence](docs/v4/phase-3/)
+- [Phase 4A filesystem contract](docs/v4/phase-4a/filesystem-contract.md)
+- [Phase 4A platform capability matrix](docs/v4/phase-4a/platform-capability-matrix.md)
 - [Security policy](SECURITY.md)
 - [Contributing guide](CONTRIBUTING.md)
 
-Phase 4 implementation work has not started.
+Phase 4A is the filesystem boundary only. Phase 4B, 4C, and 4D remain
+unimplemented, and the overall Phase 4 is incomplete.
