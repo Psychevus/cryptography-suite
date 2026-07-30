@@ -126,3 +126,56 @@ def test_audit_event_rejects_naive_and_normalizes_aware_timestamp() -> None:
         tzinfo=timezone.utc,
     )
     assert event.occurred_at.tzinfo is timezone.utc
+
+
+def test_audit_event_accepts_only_error_code_members() -> None:
+    event = _audit_event()
+    unknown = ErrorCode("FUTURE_PROVIDER_FAILURE")
+
+    assert event.error_code is None
+    assert replace(event, error_code=ErrorCode.PROVIDER_TIMEOUT).error_code is (
+        ErrorCode.PROVIDER_TIMEOUT
+    )
+    assert replace(event, error_code=unknown).error_code is unknown
+
+    for invalid in (
+        "PROVIDER_TIMEOUT",
+        7,
+        {"code": "PROVIDER_TIMEOUT"},
+    ):
+        captured = pytest.raises(
+            TypeError,
+            AuditEvent,
+            schema_version="cs-audit/1",
+            event_id="event-1",
+            occurred_at=datetime.now(timezone.utc),
+            operation_id="operation-1",
+            event_type="provider.call",
+            outcome="failed",
+            policy_id="policy-1",
+            error_code=invalid,
+        )
+        assert str(captured.value) == "error_code must be ErrorCode or None"
+
+
+def test_audit_event_rejects_exception_without_retaining_secret_text() -> None:
+    event = _audit_event()
+    secret = "provider-credential-secret"
+    provider_error = RuntimeError(secret)
+
+    captured = pytest.raises(
+        TypeError,
+        AuditEvent,
+        schema_version="cs-audit/1",
+        event_id="event-1",
+        occurred_at=datetime.now(timezone.utc),
+        operation_id="operation-1",
+        event_type="provider.call",
+        outcome="failed",
+        policy_id="policy-1",
+        error_code=provider_error,
+    )
+
+    assert str(captured.value) == "error_code must be ErrorCode or None"
+    assert secret not in str(captured.value)
+    assert event.error_code is None

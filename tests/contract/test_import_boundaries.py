@@ -146,7 +146,7 @@ def test_internal_import_graph_matches_phase_2_layers() -> None:
             "providers",
             "streaming",
         },
-        "cryptography_suite.audit": {"errors", "providers"},
+        "cryptography_suite.audit": {"errors"},
         "cryptography_suite.context": set(),
         "cryptography_suite.envelope": {"providers"},
         "cryptography_suite.errors": set(),
@@ -179,6 +179,43 @@ def test_internal_import_graph_matches_phase_2_layers() -> None:
             is_local_submodule = len(parts) > 1 and node.level == 1
             if not is_local_submodule and target and target not in allowed[owner]:
                 violations.append(f"{path.relative_to(REPO_ROOT)}: {owner} -> {target}")
+    assert violations == []
+
+
+def test_audit_package_has_no_provider_import_edge() -> None:
+    audit_source = SOURCE / "audit"
+    violations: list[str] = []
+    for path in sorted(audit_source.rglob("*.py")):
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                if any(
+                    alias.name == "cryptography_suite.providers"
+                    or alias.name.startswith("cryptography_suite.providers.")
+                    for alias in node.names
+                ):
+                    violations.append(str(path.relative_to(REPO_ROOT)))
+            elif isinstance(node, ast.ImportFrom):
+                module = node.module or ""
+                is_provider_edge = (
+                    module == "cryptography_suite.providers"
+                    or module.startswith("cryptography_suite.providers.")
+                    or (
+                        node.level >= 2
+                        and (
+                            module == "providers"
+                            or module.startswith("providers.")
+                            or (
+                                not module
+                                and any(
+                                    alias.name == "providers" for alias in node.names
+                                )
+                            )
+                        )
+                    )
+                )
+                if is_provider_edge:
+                    violations.append(str(path.relative_to(REPO_ROOT)))
     assert violations == []
 
 

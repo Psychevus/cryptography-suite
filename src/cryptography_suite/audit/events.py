@@ -4,15 +4,39 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Final, Protocol, runtime_checkable
 
 from ..errors import ErrorCode
-from ..providers.models import _normalize_utc_datetime, _validate_provider_id
 
 _AUDIT_TOKEN_RE: Final = re.compile(r"[A-Za-z][A-Za-z0-9_.:-]{0,127}")
 _AUDIT_VALUE_TOKEN_RE: Final = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}")
 _HASHED_IDENTIFIER_RE: Final = re.compile(r"sha256:[0-9a-f]{64}")
+_MAX_PROVIDER_ID_LENGTH: Final = 253
+_MAX_PROVIDER_LABEL_LENGTH: Final = 63
+_PROVIDER_LABEL_RE: Final = re.compile(r"[a-z](?:[a-z0-9-]{0,61}[a-z0-9])?")
+
+
+def _normalize_utc_datetime(value: datetime, field_name: str) -> datetime:
+    if not isinstance(value, datetime):
+        raise TypeError(f"{field_name} must be a datetime")
+    if value.utcoffset() is None:
+        raise ValueError(f"{field_name} must be timezone-aware")
+    return value.astimezone(timezone.utc)
+
+
+def _validate_provider_id(provider_id: str) -> None:
+    if not isinstance(provider_id, str):
+        raise TypeError("provider_id must be a string")
+    if not 1 <= len(provider_id) <= _MAX_PROVIDER_ID_LENGTH:
+        raise ValueError("provider_id exceeds the bounded reverse-DNS length")
+    labels = provider_id.split(".")
+    if len(labels) < 2 or any(
+        not 1 <= len(label) <= _MAX_PROVIDER_LABEL_LENGTH
+        or _PROVIDER_LABEL_RE.fullmatch(label) is None
+        for label in labels
+    ):
+        raise ValueError("provider_id must use bounded lowercase reverse-DNS syntax")
 
 
 def _validate_audit_token(value: str, field_name: str) -> None:
@@ -56,6 +80,8 @@ class AuditEvent:
     def __post_init__(self) -> None:
         if self.schema_version != "cs-audit/1":
             raise ValueError("unsupported audit schema")
+        if self.error_code is not None and not isinstance(self.error_code, ErrorCode):
+            raise TypeError("error_code must be ErrorCode or None")
         object.__setattr__(
             self,
             "occurred_at",
