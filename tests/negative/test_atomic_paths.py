@@ -13,7 +13,7 @@ from cryptography_suite.streaming.atomic import (
 )
 
 
-@pytest.mark.parametrize(
+@pytest.mark.parametrize(  # type: ignore[untyped-decorator]
     "destination",
     [
         "",

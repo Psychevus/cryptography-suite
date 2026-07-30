@@ -71,7 +71,7 @@ def _sink(tmp_path: Path, filesystem: FaultFilesystem) -> AtomicFileSink:
     )
 
 
-@pytest.mark.parametrize(
+@pytest.mark.parametrize(  # type: ignore[untyped-decorator]
     "method",
     ["capabilities", "open_parent", "create_temporary"],
 )
@@ -102,7 +102,7 @@ def test_unsupported_filesystem_report_fails_before_staging(
             atomic_no_overwrite_publication=False,
         )
 
-    filesystem.capabilities = unsupported  # type: ignore[method-assign]
+    filesystem.capabilities = unsupported  # type: ignore[attr-defined]
 
     with pytest.raises(AtomicSinkError) as captured:
         _sink(tmp_path, filesystem)
@@ -166,7 +166,7 @@ def test_partial_then_failed_write_tracks_no_completed_chunk(
     assert list(tmp_path.iterdir()) == []
 
 
-@pytest.mark.parametrize(
+@pytest.mark.parametrize(  # type: ignore[untyped-decorator]
     ("method", "occurrence"),
     [
         ("fsync_file", 1),
@@ -215,7 +215,7 @@ def test_cross_device_publication_failure_has_no_copy_fallback(
     assert list(tmp_path.iterdir()) == []
 
 
-@pytest.mark.parametrize(
+@pytest.mark.parametrize(  # type: ignore[untyped-decorator]
     ("method", "occurrence"),
     [
         ("fsync_file", 1),
@@ -273,7 +273,10 @@ def test_postpublication_durability_failure_reports_uncertainty(
     assert (tmp_path / "result.bin").read_bytes() == b"payload"
 
 
-@pytest.mark.parametrize("method", ["close_temporary", "close_parent"])
+@pytest.mark.parametrize(  # type: ignore[untyped-decorator]
+    "method",
+    ["close_temporary", "close_parent"],
+)
 def test_postpublication_close_failure_never_removes_destination(
     tmp_path: Path,
     method: str,
@@ -347,7 +350,7 @@ def test_interrupted_write_is_retried(tmp_path: Path) -> None:
             raise InterruptedError
         return base_write(temporary, data)
 
-    filesystem.write = write_once_interrupted  # type: ignore[method-assign]
+    filesystem.write = write_once_interrupted  # type: ignore[attr-defined]
     sink = _sink(tmp_path, filesystem)
     sink.write(b"payload")
     sink.commit()
@@ -358,7 +361,7 @@ def test_interrupted_write_is_retried(tmp_path: Path) -> None:
 
 def test_zero_progress_write_fails_closed(tmp_path: Path) -> None:
     filesystem = FaultFilesystem("unused")
-    filesystem.write = lambda temporary, data: 0  # type: ignore[method-assign]
+    filesystem.write = lambda temporary, data: 0  # type: ignore[attr-defined]
     sink = _sink(tmp_path, filesystem)
 
     with pytest.raises(AtomicSinkError):
@@ -387,7 +390,10 @@ def test_abort_does_not_touch_source_handle_or_source_bytes(
     assert not (tmp_path / "result.bin").exists()
 
 
-@pytest.mark.skipif(os.name != "posix", reason="POSIX namespace replacement test")
+@pytest.mark.skipif(  # type: ignore[untyped-decorator]
+    os.name != "posix",
+    reason="POSIX namespace replacement test",
+)
 def test_replaced_temporary_name_is_not_deleted_as_owned(tmp_path: Path) -> None:
     sink = AtomicFileSink(
         output_root=tmp_path.absolute(),

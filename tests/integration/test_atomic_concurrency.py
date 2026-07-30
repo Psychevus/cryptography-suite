@@ -42,7 +42,7 @@ def test_two_process_no_overwrite_race_has_exactly_one_winner(
     start = context.Event()
     results = context.Queue()
     processes = [
-        context.Process(
+        context.Process(  # type: ignore[attr-defined]
             target=_concurrent_writer,
             args=(str(tmp_path.absolute()), payload, ready, start, results),
         )

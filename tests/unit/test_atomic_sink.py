@@ -33,8 +33,8 @@ def test_stage_is_invisible_until_commit_and_has_secure_final_mode(
     )
 
     assert isinstance(sink, TransactionalSink)
-    assert sink.state is AtomicSinkState.OPEN
-    assert sink.outcome is CommitOutcome.NOT_PUBLISHED
+    assert sink.state.value == AtomicSinkState.OPEN.value
+    assert sink.outcome.value == CommitOutcome.NOT_PUBLISHED.value
     assert not destination.exists()
     sink.write(b"first")
     sink.write(b"")
@@ -113,7 +113,7 @@ def test_write_bounds_and_type_are_deterministic(tmp_path: Path) -> None:
     sink.abort()
 
 
-@pytest.mark.parametrize(
+@pytest.mark.parametrize(  # type: ignore[untyped-decorator]
     ("field", "value", "exception_type"),
     [
         ("max_write_size", True, TypeError),
@@ -147,7 +147,7 @@ def test_options_reject_write_bound_above_total_bound() -> None:
         AtomicSinkOptions(max_write_size=2, max_total_bytes=1)
 
 
-@pytest.mark.parametrize(
+@pytest.mark.parametrize(  # type: ignore[untyped-decorator]
     ("policy_allows", "requested"),
     [(False, False), (True, False), (False, True)],
 )
@@ -230,7 +230,10 @@ def test_capability_report_names_atomic_primitives(tmp_path: Path) -> None:
     assert "replace" in capabilities.overwrite_primitive.lower()
 
 
-@pytest.mark.skipif(os.name != "posix", reason="POSIX mode guarantee")
+@pytest.mark.skipif(  # type: ignore[untyped-decorator]
+    os.name != "posix",
+    reason="POSIX mode guarantee",
+)
 def test_permissive_umask_cannot_weaken_owner_only_mode(tmp_path: Path) -> None:
     previous = os.umask(0)
     try:
@@ -248,7 +251,10 @@ def test_permissive_umask_cannot_weaken_owner_only_mode(tmp_path: Path) -> None:
     assert stat.S_IMODE((tmp_path / "result.bin").stat().st_mode) == 0o600
 
 
-@pytest.mark.skipif(os.name != "nt", reason="Windows owner-only DACL guarantee")
+@pytest.mark.skipif(  # type: ignore[untyped-decorator]
+    os.name != "nt",
+    reason="Windows owner-only DACL guarantee",
+)
 def test_windows_staging_dacl_matches_claim(tmp_path: Path) -> None:
     sink = AtomicFileSink(
         output_root=tmp_path.absolute(),
