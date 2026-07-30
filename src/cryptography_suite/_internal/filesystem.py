@@ -94,6 +94,14 @@ class DestinationInfo:
 
 
 @dataclass
+class DestinationLease:
+    info: DestinationInfo
+    posix_fd: int | None = None
+    windows_handle: int | None = field(default=None, repr=False)
+    closed: bool = False
+
+
+@dataclass
 class ParentDirectory:
     path: str = field(repr=False)
     posix_fd: int | None = None
@@ -128,6 +136,19 @@ class FilesystemOS(Protocol):
         parent: ParentDirectory,
         name: str,
     ) -> DestinationInfo | None: ...
+
+    def retain_destination(
+        self,
+        parent: ParentDirectory,
+        name: str,
+    ) -> DestinationLease | None: ...
+
+    def revalidate_destination(
+        self,
+        lease: DestinationLease,
+    ) -> DestinationInfo: ...
+
+    def close_destination(self, lease: DestinationLease) -> None: ...
 
     def create_temporary(self, parent: ParentDirectory) -> OwnedTemporary: ...
 
@@ -210,8 +231,9 @@ if os.name == "nt":
     import msvcrt
     from ctypes import wintypes
 
-    _KERNEL32 = ctypes.WinDLL("kernel32", use_last_error=True)
-    _ADVAPI32 = ctypes.WinDLL("advapi32", use_last_error=True)
+    _win_dll = vars(ctypes)["WinDLL"]
+    _KERNEL32 = _win_dll("kernel32", use_last_error=True)
+    _ADVAPI32 = _win_dll("advapi32", use_last_error=True)
 
     _INVALID_HANDLE_VALUE: Final = ctypes.c_void_p(-1).value
     _GENERIC_READ: Final = 0x80000000
@@ -239,6 +261,7 @@ if os.name == "nt":
     _SE_FILE_OBJECT: Final = 1
     _FILE_RENAME_INFO_EX_CLASS: Final = 22
     _FILE_RENAME_FLAG_REPLACE_IF_EXISTS: Final = 0x00000001
+    _FILE_RENAME_FLAG_POSIX_SEMANTICS: Final = 0x00000002
     _OWNER_ONLY_SDDL: Final = "D:P(A;;FA;;;OW)"
 
     class _FILETIME(ctypes.Structure):
@@ -406,7 +429,9 @@ class StandardFilesystemOS:
                 owner_only_permissions=supported,
                 no_overwrite_primitive="SetFileInformationByHandle(no-replace)",
                 overwrite_primitive=(
-                    "SetFileInformationByHandle(FILE_RENAME_FLAG_REPLACE_IF_EXISTS)"
+                    "SetFileInformationByHandle("
+                    "FILE_RENAME_FLAG_REPLACE_IF_EXISTS | "
+                    "FILE_RENAME_FLAG_POSIX_SEMANTICS)"
                 ),
                 directory_durability_primitive=(
                     "FILE_FLAG_WRITE_THROUGH + post-rename FlushFileBuffers"
@@ -479,7 +504,7 @@ class StandardFilesystemOS:
             if os.name == "posix":
                 return _native_identity(os.fstat(source_fd))
             if os.name == "nt":
-                handle = int(msvcrt.get_osfhandle(source_fd))
+                handle = int(vars(msvcrt)["get_osfhandle"](source_fd))
                 return self._windows_handle_info(handle)[0]
         except (OSError, ValueError):
             pass
@@ -531,6 +556,125 @@ class StandardFilesystemOS:
             FilesystemFailureReason.CAPABILITY_UNAVAILABLE,
             "destination_inspection",
         )
+
+    def retain_destination(
+        self,
+        parent: ParentDirectory,
+        name: str,
+    ) -> DestinationLease | None:
+        if os.name == "posix":
+            flags = os.O_RDONLY | vars(os)["O_NOFOLLOW"] | vars(os)["O_CLOEXEC"]
+            try:
+                fd = os.open(
+                    name,
+                    flags,
+                    dir_fd=self._posix_parent_fd(parent),
+                )
+            except FileNotFoundError:
+                return None
+            except OSError:
+                raise _operation_error(
+                    FilesystemFailureReason.DESTINATION_UNSAFE,
+                    "destination_retain",
+                ) from None
+            try:
+                file_stat = os.fstat(fd)
+                return DestinationLease(
+                    info=DestinationInfo(
+                        identity=_native_identity(file_stat),
+                        link_count=int(file_stat.st_nlink),
+                        is_directory=stat.S_ISDIR(file_stat.st_mode),
+                        is_link=stat.S_ISLNK(file_stat.st_mode),
+                    ),
+                    posix_fd=fd,
+                )
+            except BaseException:
+                os.close(fd)
+                raise
+        if os.name == "nt":
+            handle = self._windows_open_existing(
+                ntpath.join(parent.path, name),
+                share_delete=True,
+            )
+            if handle is None:
+                return None
+            try:
+                identity, links, attributes = self._windows_handle_info(handle)
+                return DestinationLease(
+                    info=DestinationInfo(
+                        identity=identity,
+                        link_count=links,
+                        is_directory=bool(attributes & _FILE_ATTRIBUTE_DIRECTORY),
+                        is_link=bool(attributes & _FILE_ATTRIBUTE_REPARSE_POINT),
+                    ),
+                    windows_handle=handle,
+                )
+            except BaseException:
+                _KERNEL32.CloseHandle(handle)
+                raise
+        raise _operation_error(
+            FilesystemFailureReason.CAPABILITY_UNAVAILABLE,
+            "destination_retain",
+        )
+
+    def revalidate_destination(
+        self,
+        lease: DestinationLease,
+    ) -> DestinationInfo:
+        if lease.closed:
+            raise _operation_error(
+                FilesystemFailureReason.IDENTITY_MISMATCH,
+                "destination_identity",
+            )
+        if os.name == "posix" and lease.posix_fd is not None:
+            try:
+                file_stat = os.fstat(lease.posix_fd)
+            except OSError:
+                raise _operation_error(
+                    FilesystemFailureReason.IDENTITY_MISMATCH,
+                    "destination_identity",
+                ) from None
+            return DestinationInfo(
+                identity=_native_identity(file_stat),
+                link_count=int(file_stat.st_nlink),
+                is_directory=stat.S_ISDIR(file_stat.st_mode),
+                is_link=stat.S_ISLNK(file_stat.st_mode),
+            )
+        if os.name == "nt" and lease.windows_handle is not None:
+            identity, links, attributes = self._windows_handle_info(
+                lease.windows_handle
+            )
+            return DestinationInfo(
+                identity=identity,
+                link_count=links,
+                is_directory=bool(attributes & _FILE_ATTRIBUTE_DIRECTORY),
+                is_link=bool(attributes & _FILE_ATTRIBUTE_REPARSE_POINT),
+            )
+        raise _operation_error(
+            FilesystemFailureReason.IDENTITY_MISMATCH,
+            "destination_identity",
+        )
+
+    def close_destination(self, lease: DestinationLease) -> None:
+        if lease.closed:
+            return
+        success = True
+        if lease.posix_fd is not None:
+            try:
+                os.close(lease.posix_fd)
+            except OSError:
+                success = False
+            lease.posix_fd = None
+        if os.name == "nt" and lease.windows_handle is not None:
+            if not _KERNEL32.CloseHandle(lease.windows_handle):
+                success = False
+            lease.windows_handle = None
+        lease.closed = True
+        if not success:
+            raise _operation_error(
+                FilesystemFailureReason.CLEANUP_FAILED,
+                "destination_close",
+            )
 
     def create_temporary(self, parent: ParentDirectory) -> OwnedTemporary:
         for _ in range(_TEMPORARY_ATTEMPTS):
@@ -1092,7 +1236,7 @@ class StandardFilesystemOS:
             finally:
                 _KERNEL32.LocalFree(descriptor)
             if handle == _INVALID_HANDLE_VALUE:
-                error = ctypes.get_last_error()
+                error = vars(ctypes)["get_last_error"]()
                 if error in (_ERROR_FILE_EXISTS, _ERROR_ALREADY_EXISTS):
                     return None
                 raise _operation_error(
@@ -1143,7 +1287,7 @@ class StandardFilesystemOS:
                 None,
             )
             if handle == _INVALID_HANDLE_VALUE:
-                error = ctypes.get_last_error()
+                error = vars(ctypes)["get_last_error"]()
                 if error in (_ERROR_FILE_NOT_FOUND, _ERROR_PATH_NOT_FOUND):
                     return None
                 raise _operation_error(
@@ -1241,7 +1385,11 @@ class StandardFilesystemOS:
             information_size = name_offset + len(encoded)
             size = information_size + ctypes.sizeof(wintypes.WCHAR)
             buffer = ctypes.create_string_buffer(size)
-            flags = _FILE_RENAME_FLAG_REPLACE_IF_EXISTS if replace else 0
+            flags = (
+                _FILE_RENAME_FLAG_REPLACE_IF_EXISTS | _FILE_RENAME_FLAG_POSIX_SEMANTICS
+                if replace
+                else 0
+            )
             ctypes.memmove(
                 ctypes.addressof(buffer),
                 ctypes.byref(wintypes.DWORD(flags)),
@@ -1263,7 +1411,7 @@ class StandardFilesystemOS:
                 buffer,
                 information_size,
             ):
-                error = ctypes.get_last_error()
+                error = vars(ctypes)["get_last_error"]()
                 reason = (
                     FilesystemFailureReason.DESTINATION_EXISTS
                     if not replace

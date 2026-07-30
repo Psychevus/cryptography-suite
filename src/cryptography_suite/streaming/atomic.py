@@ -16,6 +16,7 @@ from typing import Final
 
 from .._internal.filesystem import (
     DestinationInfo,
+    DestinationLease,
     FileIdentity,
     FilesystemCapabilities,
     FilesystemFailureReason,
@@ -239,6 +240,7 @@ class AtomicFileSink:
         self._destination_name = destination_name
         self._parent: ParentDirectory | None = None
         self._temporary: OwnedTemporary | None = None
+        self._destination_lease: DestinationLease | None = None
         self._source_identity: FileIdentity | None = None
         self._initial_destination_identity: FileIdentity | None = None
         self._initial_destination_present = False
@@ -263,6 +265,18 @@ class AtomicFileSink:
             if existing is not None:
                 self._initial_destination_present = True
                 self._initial_destination_identity = existing.identity
+                self._destination_lease = self._filesystem.retain_destination(
+                    self._parent,
+                    self._destination_name,
+                )
+                if (
+                    self._destination_lease is None
+                    or self._destination_lease.info != existing
+                ):
+                    raise FilesystemOperationError(
+                        FilesystemFailureReason.IDENTITY_MISMATCH,
+                        operation="destination_retain",
+                    )
             self._temporary = self._filesystem.create_temporary(self._parent)
         except FilesystemOperationError as error:
             self._construction_cleanup()
@@ -358,6 +372,7 @@ class AtomicFileSink:
                 )
                 self._validate_destination(existing)
                 self._validate_observed_destination(existing)
+                self._validate_retained_destination(existing)
                 if existing is None:
                     self._filesystem.publish_no_overwrite(
                         parent,
@@ -409,6 +424,14 @@ class AtomicFileSink:
                 ):
                     try:
                         self._filesystem.unlink_temporary(parent, temporary)
+                    except FilesystemOperationError as error:
+                        cleanup_error = error
+
+            if parent is not None and cleanup_error is None:
+                lease = self._destination_lease
+                if lease is not None:
+                    try:
+                        self._filesystem.close_destination(lease)
                     except FilesystemOperationError as error:
                         cleanup_error = error
 
@@ -483,6 +506,12 @@ class AtomicFileSink:
                 except FilesystemOperationError:
                     pass
         if parent is not None:
+            lease = self._destination_lease
+            if lease is not None:
+                try:
+                    self._filesystem.close_destination(lease)
+                except FilesystemOperationError:
+                    pass
             try:
                 self._filesystem.close_parent(parent)
             except FilesystemOperationError:
@@ -506,10 +535,34 @@ class AtomicFileSink:
                 operation="destination_revalidation",
             )
 
+    def _validate_retained_destination(
+        self,
+        destination: DestinationInfo | None,
+    ) -> None:
+        lease = self._destination_lease
+        if lease is None:
+            return
+        retained = self._filesystem.revalidate_destination(lease)
+        if (
+            destination is None
+            or retained.identity != lease.info.identity
+            or retained.identity != destination.identity
+            or retained.is_directory
+            or retained.is_link
+            or retained.link_count != 1
+        ):
+            raise FilesystemOperationError(
+                FilesystemFailureReason.IDENTITY_MISMATCH,
+                operation="destination_revalidation",
+            )
+
     def _close_all(self) -> None:
         temporary = self._required_temporary()
         parent = self._required_parent()
         self._filesystem.close_temporary(temporary)
+        lease = self._destination_lease
+        if lease is not None:
+            self._filesystem.close_destination(lease)
         self._filesystem.close_parent(parent)
 
     def _handle_commit_failure(self, error: FilesystemOperationError) -> None:

@@ -108,12 +108,12 @@ def test_write_bounds_and_type_are_deterministic(tmp_path: Path) -> None:
         sink.write(b"789")
     assert total_error.value.code is ErrorCode.LIMIT_EXCEEDED
     with pytest.raises(TypeError):
-        sink.write(bytearray(b"x"))  # type: ignore[arg-type]
+        sink.write(bytearray(b"x"))
     assert sink.state is AtomicSinkState.OPEN
     sink.abort()
 
 
-@pytest.mark.parametrize(  # type: ignore[untyped-decorator]
+@pytest.mark.parametrize(
     ("field", "value", "exception_type"),
     [
         ("max_write_size", True, TypeError),
@@ -147,7 +147,7 @@ def test_options_reject_write_bound_above_total_bound() -> None:
         AtomicSinkOptions(max_write_size=2, max_total_bytes=1)
 
 
-@pytest.mark.parametrize(  # type: ignore[untyped-decorator]
+@pytest.mark.parametrize(
     ("policy_allows", "requested"),
     [(False, False), (True, False), (False, True)],
 )
@@ -227,10 +227,10 @@ def test_capability_report_names_atomic_primitives(tmp_path: Path) -> None:
     assert capabilities.atomic_replacement is True
     assert capabilities.file_fsync is True
     assert capabilities.directory_durability is True
-    assert "replace" in capabilities.overwrite_primitive.lower()
+    assert "rename" in capabilities.overwrite_primitive.lower()
 
 
-@pytest.mark.skipif(  # type: ignore[untyped-decorator]
+@pytest.mark.skipif(
     os.name != "posix",
     reason="POSIX mode guarantee",
 )
@@ -251,7 +251,7 @@ def test_permissive_umask_cannot_weaken_owner_only_mode(tmp_path: Path) -> None:
     assert stat.S_IMODE((tmp_path / "result.bin").stat().st_mode) == 0o600
 
 
-@pytest.mark.skipif(  # type: ignore[untyped-decorator]
+@pytest.mark.skipif(
     os.name != "nt",
     reason="Windows owner-only DACL guarantee",
 )

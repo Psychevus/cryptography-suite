@@ -71,7 +71,7 @@ def _sink(tmp_path: Path, filesystem: FaultFilesystem) -> AtomicFileSink:
     )
 
 
-@pytest.mark.parametrize(  # type: ignore[untyped-decorator]
+@pytest.mark.parametrize(
     "method",
     ["capabilities", "open_parent", "create_temporary"],
 )
@@ -131,6 +131,32 @@ def test_parent_traversal_failure_never_creates_a_temporary(
     assert list((tmp_path / "nested").iterdir()) == []
 
 
+def test_destination_lease_failure_preserves_existing_destination(
+    tmp_path: Path,
+) -> None:
+    destination = tmp_path / "result.bin"
+    destination.write_bytes(b"original")
+    filesystem = FaultFilesystem(
+        "retain_destination",
+        reason=FilesystemFailureReason.IDENTITY_MISMATCH,
+    )
+
+    with pytest.raises(AtomicSinkError) as captured:
+        AtomicFileSink(
+            output_root=tmp_path.absolute(),
+            relative_destination="result.bin",
+            options=AtomicSinkOptions(
+                policy_allows_overwrite=True,
+                overwrite_requested=True,
+            ),
+            _filesystem=filesystem,
+        )
+
+    assert captured.value.outcome is CommitOutcome.NOT_PUBLISHED
+    assert destination.read_bytes() == b"original"
+    assert [path.name for path in tmp_path.iterdir()] == ["result.bin"]
+
+
 def test_first_write_failure_is_abortable_without_publication(
     tmp_path: Path,
 ) -> None:
@@ -166,7 +192,7 @@ def test_partial_then_failed_write_tracks_no_completed_chunk(
     assert list(tmp_path.iterdir()) == []
 
 
-@pytest.mark.parametrize(  # type: ignore[untyped-decorator]
+@pytest.mark.parametrize(
     ("method", "occurrence"),
     [
         ("fsync_file", 1),
@@ -215,7 +241,7 @@ def test_cross_device_publication_failure_has_no_copy_fallback(
     assert list(tmp_path.iterdir()) == []
 
 
-@pytest.mark.parametrize(  # type: ignore[untyped-decorator]
+@pytest.mark.parametrize(
     ("method", "occurrence"),
     [
         ("fsync_file", 1),
@@ -273,7 +299,7 @@ def test_postpublication_durability_failure_reports_uncertainty(
     assert (tmp_path / "result.bin").read_bytes() == b"payload"
 
 
-@pytest.mark.parametrize(  # type: ignore[untyped-decorator]
+@pytest.mark.parametrize(
     "method",
     ["close_temporary", "close_parent"],
 )
@@ -297,6 +323,37 @@ def test_postpublication_close_failure_never_removes_destination(
     assert (tmp_path / "result.bin").exists()
     sink.abort()
     assert (tmp_path / "result.bin").read_bytes() == b"payload"
+
+
+def test_postpublication_destination_lease_close_failure_is_retryable(
+    tmp_path: Path,
+) -> None:
+    destination = tmp_path / "result.bin"
+    destination.write_bytes(b"original")
+    filesystem = FaultFilesystem(
+        "close_destination",
+        reason=FilesystemFailureReason.CLEANUP_FAILED,
+        published=True,
+    )
+    sink = AtomicFileSink(
+        output_root=tmp_path.absolute(),
+        relative_destination="result.bin",
+        options=AtomicSinkOptions(
+            policy_allows_overwrite=True,
+            overwrite_requested=True,
+        ),
+        _filesystem=filesystem,
+    )
+    sink.write(b"replacement")
+
+    with pytest.raises(AtomicSinkError) as captured:
+        sink.commit()
+
+    assert captured.value.state is AtomicSinkState.CLEANUP_INCOMPLETE
+    assert captured.value.outcome is CommitOutcome.CLEANUP_INCOMPLETE
+    assert destination.read_bytes() == b"replacement"
+    sink.abort()
+    assert destination.read_bytes() == b"replacement"
 
 
 def test_abort_cleanup_failure_can_be_retried_without_publication(
@@ -390,7 +447,7 @@ def test_abort_does_not_touch_source_handle_or_source_bytes(
     assert not (tmp_path / "result.bin").exists()
 
 
-@pytest.mark.skipif(  # type: ignore[untyped-decorator]
+@pytest.mark.skipif(
     os.name != "posix",
     reason="POSIX namespace replacement test",
 )
