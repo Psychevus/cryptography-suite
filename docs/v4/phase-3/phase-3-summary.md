@@ -206,9 +206,10 @@ evaluation, streaming/atomic services, lifecycle operations, legacy adapters,
 migration, stable CLI, cross-language vectors, and all assurance/remediation
 gates assigned to later phases.
 
-Phase 4 must begin only under separate authorization and only after its design
-and security prerequisites are satisfied, including a fresh independent Deep
-Security Scan. This task stops at the Phase 3 skeleton.
+Phase 4 may begin only under separate authorization and after its design
+prerequisites are satisfied. A fresh successful independent Deep Security Scan
+remains mandatory before Phase 4 completion and stable release. This task stops
+at the Phase 3 skeleton.
 
 ## Rollback
 
