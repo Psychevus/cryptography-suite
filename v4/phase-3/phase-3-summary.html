@@ -1,0 +1,624 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html">
+
+    <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
+        <title>Phase 3 canonical package migration - cryptography-suite 3.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">cryptography-suite 3.0.0 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  <span class="sidebar-brand-text">cryptography-suite 3.0.0 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../../_sources/v4/phase-3/phase-3-summary.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="phase-3-canonical-package-migration">
+<h1>Phase 3 canonical package migration<a class="headerlink" href="#phase-3-canonical-package-migration" title="Link to this heading">¶</a></h1>
+<ul class="simple">
+<li><p><strong>Branch:</strong> <code class="docutils literal notranslate"><span class="pre">refactor/v4-phase-3-canonical-package</span></code></p></li>
+<li><p><strong>Base / rollback checkpoint:</strong> <code class="docutils literal notranslate"><span class="pre">def6fe31329ada2b112b09fff3f31ff1965a3ffb</span></code></p></li>
+<li><p><strong>Validated implementation HEAD before evidence commit:</strong>
+<code class="docutils literal notranslate"><span class="pre">0dbb526d2fab9038b3ca70e25371608ffa43c13f</span></code></p></li>
+<li><p><strong>Package version:</strong> <code class="docutils literal notranslate"><span class="pre">3.0.0</span></code></p></li>
+<li><p><strong>Goal:</strong> one canonical stable source and an exact non-cryptographic v4 API
+skeleton</p></li>
+</ul>
+<section id="outcome">
+<h2>Outcome<a class="headerlink" href="#outcome" title="Link to this heading">¶</a></h2>
+<p>The sole runtime source is <code class="docutils literal notranslate"><span class="pre">src/cryptography_suite/</span></code>. Setuptools discovery is:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[tool.setuptools]</span>
+<span class="n">package-dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s2">&quot;&quot;</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;src&quot;</span><span class="p">}</span>
+<span class="n">include-package-data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
+
+<span class="k">[tool.setuptools.packages.find]</span>
+<span class="n">where</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;src&quot;</span><span class="p">]</span>
+<span class="n">include</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;cryptography_suite*&quot;</span><span class="p">]</span>
+<span class="n">namespaces</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
+
+<span class="k">[tool.setuptools.package-data]</span>
+<span class="s2">&quot;cryptography_suite&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;py.typed&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Before Phase 3, the wheel came from repository-root <code class="docutils literal notranslate"><span class="pre">cryptography_suite/</span></code>,
+three conflicting <code class="docutils literal notranslate"><span class="pre">src</span></code> trees existed, package data included executable
+templates, and root <code class="docutils literal notranslate"><span class="pre">__all__</span></code> contained 111 names. After Phase 3, duplicate
+trees are deleted, the wheel has the exact approved skeleton, package data is
+only <code class="docutils literal notranslate"><span class="pre">py.typed</span></code>, and root <code class="docutils literal notranslate"><span class="pre">__all__</span></code> is:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>AuthenticationError
+ContextMismatchError
+CryptographySuiteError
+EncryptionContext
+Envelope
+EnvelopeError
+EnvelopeMetadata
+ErrorCode
+KeyProvider
+KeyRef
+MigrationError
+Policy
+PolicyError
+Protector
+ProviderError
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">__version__</span></code> remains readable and is not a root export.</p>
+</section>
+<section id="scope-and-explicit-non-operational-status">
+<h2>Scope and explicit non-operational status<a class="headerlink" href="#scope-and-explicit-non-operational-status" title="Link to this heading">¶</a></h2>
+<p>Phase 3 implements declarations, immutable value semantics, allocation-safe
+bounded input context storage, enums, protocols, explicit secret-free audit
+metadata, aware-time UTC normalization, bounded provider identifiers, redacted
+error formatting, and explicit <code class="docutils literal notranslate"><span class="pre">NotImplementedError</span></code> failures. Error-code
+pseudo-members are not cached, concrete error classes enforce RFC-0004
+families, envelope recipients require immutable key versions, and the borrowed
+read-only secret protocol exposes no export operation. Audit events enforce
+<code class="docutils literal notranslate"><span class="pre">error_code</span></code> as <code class="docutils literal notranslate"><span class="pre">ErrorCode</span> <span class="pre">|</span> <span class="pre">None</span></code> at runtime and reject arbitrary or
+secret-bearing objects. The audit package duplicates its minimal UTC and
+provider-id invariant checks locally so its binding Phase 2 dependency boundary
+remains exactly <code class="docutils literal notranslate"><span class="pre">audit</span> <span class="pre">-&gt;</span> <span class="pre">errors</span></code> plus the standard library. It implements no
+operational cryptography, provider, policy evaluator, legacy parser, migration,
+rewrap, CLI operation, or filesystem transaction.</p>
+<p>No v3 implementation was promoted. <code class="docutils literal notranslate"><span class="pre">py.typed</span></code> is the only moved foundation.
+All other canonical Python code was authored from the Phase 2 contracts.</p>
+</section>
+<section id="cli-and-entry-point-decision">
+<h2>CLI and entry-point decision<a class="headerlink" href="#cli-and-entry-point-decision" title="Link to this heading">¶</a></h2>
+<p>All v3 console scripts and the <code class="docutils literal notranslate"><span class="pre">cryptosuite.aead</span></code> entry-point group were
+removed. The Phase 3 wheel has no entry-point metadata and no CLI module. A
+deprecation launcher was unnecessary. The RFC-0009 command tree remains
+unimplemented for its later authorized phase.</p>
+</section>
+<section id="artifact-comparison">
+<h2>Artifact comparison<a class="headerlink" href="#artifact-comparison" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Artifact</p></th>
+<th class="head text-right"><p>Before</p></th>
+<th class="head text-right"><p>After</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Wheel entries</p></td>
+<td class="text-right"><p>77</p></td>
+<td class="text-right"><p>23</p></td>
+</tr>
+<tr class="row-odd"><td><p>Sdist entries</p></td>
+<td class="text-right"><p>106</p></td>
+<td class="text-right"><p>40</p></td>
+</tr>
+<tr class="row-even"><td><p>Wheel runtime/data files</p></td>
+<td class="text-right"><p>71</p></td>
+<td class="text-right"><p>18</p></td>
+</tr>
+<tr class="row-odd"><td><p>Console/other entry points</p></td>
+<td class="text-right"><p>3</p></td>
+<td class="text-right"><p>0</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Final artifacts:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">cryptography_suite-3.0.0-py3-none-any.whl</span></code>
+(<code class="docutils literal notranslate"><span class="pre">95af48af3818bc835961bce2a35400edb9fc1025c0c3acf4b9ee67ae3d47bf6c</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cryptography_suite-3.0.0.tar.gz</span></code>
+(<code class="docutils literal notranslate"><span class="pre">c1e1896c7c1c23674be212a53de6d527d9a0e0ece0f42e307a40796fcfa11c0e</span></code>)</p></li>
+</ul>
+<p>The wheel contains only the approved Python modules, <code class="docutils literal notranslate"><span class="pre">py.typed</span></code>, distribution
+metadata, and license. The sdist adds only required packaging files, canonical
+source layout, and generated egg metadata. Exact inventories are in
+<code class="docutils literal notranslate"><span class="pre">artifact-before.txt</span></code> and <code class="docutils literal notranslate"><span class="pre">artifact-after.txt</span></code>.</p>
+<p>Wheel metadata exposes exactly the <code class="docutils literal notranslate"><span class="pre">dev</span></code> and <code class="docutils literal notranslate"><span class="pre">docs</span></code> extras, has no console
+entry point, and describes the package as a declaration-only non-operational
+v4 skeleton. The README no longer advertises removed v3 modules or features;
+historical v3 code is available only through Git history and historical tags.</p>
+</section>
+<section id="deleted-and-excluded-content">
+<h2>Deleted and excluded content<a class="headerlink" href="#deleted-and-excluded-content" title="Link to this heading">¶</a></h2>
+<p>Deleted duplicate/runtime trees are repository-root <code class="docutils literal notranslate"><span class="pre">cryptography_suite/</span></code>,
+<code class="docutils literal notranslate"><span class="pre">src/crypto_suite/</span></code>, <code class="docutils literal notranslate"><span class="pre">src/suite/</span></code>, the old dynamic canonical wrapper/demo CLI,
+and <code class="docutils literal notranslate"><span class="pre">protocol/</span></code>. Old demos, labs examples, notebook, primitive fuzz harnesses,
+and 92 v3-only test files were also retired after disposition evidence.</p>
+<p>Labs code was not transferred or copied; it remains recoverable in Git history.
+Provider SDK implementations and fake/mock providers are absent. The explicit
+legacy namespace contains declarations only and is not root-imported.</p>
+</section>
+<section id="validation">
+<h2>Validation<a class="headerlink" href="#validation" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Check</p></th>
+<th class="head"><p>Result</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Fresh <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">build</span></code></p></td>
+<td><p>pass</p></td>
+</tr>
+<tr class="row-odd"><td><p>Wheel allowlist</p></td>
+<td><p>pass; 23 entries</p></td>
+</tr>
+<tr class="row-even"><td><p>Sdist allowlist</p></td>
+<td><p>pass; 40 entries</p></td>
+</tr>
+<tr class="row-odd"><td><p>Sdist-built wheel inventory</p></td>
+<td><p>identical</p></td>
+</tr>
+<tr class="row-even"><td><p>Installed-wheel unrelated-directory import</p></td>
+<td><p>pass; site-packages origin</p></td>
+</tr>
+<tr class="row-odd"><td><p>Exact root API/signatures</p></td>
+<td><p>pass</p></td>
+</tr>
+<tr class="row-even"><td><p>Root import closure / forbidden imports</p></td>
+<td><p>pass</p></td>
+</tr>
+<tr class="row-odd"><td><p>AST dependency graph</p></td>
+<td><p>pass</p></td>
+</tr>
+<tr class="row-even"><td><p>No path mutation/dynamic source/CWD/provider discovery in runtime</p></td>
+<td><p>pass</p></td>
+</tr>
+<tr class="row-odd"><td><p>Fail-closed skeleton/no side effects</p></td>
+<td><p>pass</p></td>
+</tr>
+<tr class="row-even"><td><p>Local full pytest suite (CPython 3.13)</p></td>
+<td><p>48 passed; 89% branch coverage</p></td>
+</tr>
+<tr class="row-odd"><td><p>GitHub full pytest suite (CPython 3.11)</p></td>
+<td><p>48 passed; 89% branch coverage</p></td>
+</tr>
+<tr class="row-even"><td><p>GitHub unit/contract/negative suite (CPython 3.10.20)</p></td>
+<td><p>42 passed</p></td>
+</tr>
+<tr class="row-odd"><td><p>Changed-file Ruff lint/format</p></td>
+<td><p>pass</p></td>
+</tr>
+<tr class="row-even"><td><p>Changed-file Black</p></td>
+<td><p>pass</p></td>
+</tr>
+<tr class="row-odd"><td><p>Strict mypy on canonical source and Phase 3 tests</p></td>
+<td><p>pass; 28 files</p></td>
+</tr>
+<tr class="row-even"><td><p>Exact Quality Gate mypy command</p></td>
+<td><p>pass; 35 changed files</p></td>
+</tr>
+<tr class="row-odd"><td><p>Bandit on canonical source</p></td>
+<td><p>pass; zero findings and zero suppressions</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">check</span></code></p></td>
+<td><p>pass</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">pip-audit</span> <span class="pre">-r</span> <span class="pre">requirements.txt</span> <span class="pre">--strict</span></code></p></td>
+<td><p>pass; no known vulnerabilities</p></td>
+</tr>
+<tr class="row-even"><td><p>Unsupported trust-claim test</p></td>
+<td><p>pass</p></td>
+</tr>
+<tr class="row-odd"><td><p>Documentation-reference check</p></td>
+<td><p>pass</p></td>
+</tr>
+<tr class="row-even"><td><p>Modified-workflow actionlint</p></td>
+<td><p>pass; see CI note</p></td>
+</tr>
+<tr class="row-odd"><td><p>Phase 1 document Git blobs</p></td>
+<td><p>identical</p></td>
+</tr>
+<tr class="row-even"><td><p>Phase 2 document Git blobs</p></td>
+<td><p>identical</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Actionlint 1.7.12 passed the modified Quality Gate workflow with no repository
+suppression or CI exception.</p>
+<p>Narrow workflow changes:</p>
+<ul class="simple">
+<li><p>Quality Gate and Release scan <code class="docutils literal notranslate"><span class="pre">src/cryptography_suite</span></code> and run the focused
+installed-artifact suite.</p></li>
+<li><p>Quality Gate retains its Python 3.11 checks and adds a required CPython 3.10
+compatibility job with a full-history checkout, non-editable installation,
+isolated outside-checkout import, exact root/removed-module checks, 42
+unit/contract/negative tests, and <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">check</span></code>.</p></li>
+<li><p>Formal Model now proves formal exporters are absent from stable artifacts
+because those exporters moved outside the stable boundary.</p></li>
+<li><p>The obsolete primitive fuzz schedule now runs stable fail-closed/import
+negative checks; cryptographic fuzzing is deferred until cryptography exists.</p></li>
+</ul>
+<p>At implementation HEAD <code class="docutils literal notranslate"><span class="pre">0dbb526d2fab9038b3ca70e25371608ffa43c13f</span></code>,
+Build, Formal Model, Quality Gate, and Reproducible Build all concluded
+<code class="docutils literal notranslate"><span class="pre">success</span></code>. No existing failure is suppressed.</p>
+</section>
+<section id="documentation-preservation">
+<h2>Documentation preservation<a class="headerlink" href="#documentation-preservation" title="Link to this heading">¶</a></h2>
+<p>All 16 Phase 1 baseline files, all ten Phase 2 RFCs, all five architecture
+files, the Phase 2 summary, and the Phase 1 historical anchor text match the
+base Git blobs exactly.</p>
+</section>
+<section id="assurance-status">
+<h2>Assurance status<a class="headerlink" href="#assurance-status" title="Link to this heading">¶</a></h2>
+<p><strong>Deep Security Scan status: BLOCKED BY TOOLING FAILURE</strong></p>
+<p>No failed manifest, partial worker artifact, candidate, or incomplete threat
+model was reused. No scan result, no-findings result, independent review, or
+security completion claim is made.</p>
+</section>
+<section id="definition-of-done">
+<h2>Definition of Done<a class="headerlink" href="#definition-of-done" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Requirement</p></th>
+<th class="head"><p>Result</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>PR #195 merged before branch creation</p></td>
+<td><p>met</p></td>
+</tr>
+<tr class="row-odd"><td><p>Fresh branch at current fetched <code class="docutils literal notranslate"><span class="pre">origin/main</span></code></p></td>
+<td><p>met</p></td>
+</tr>
+<tr class="row-even"><td><p>One canonical runtime source</p></td>
+<td><p>met</p></td>
+</tr>
+<tr class="row-odd"><td><p>Exact 15-symbol root</p></td>
+<td><p>met</p></td>
+</tr>
+<tr class="row-even"><td><p>Stable artifacts exclude labs/providers/fakes/templates/protobuf/tests/duplicates/old CLI</p></td>
+<td><p>met</p></td>
+</tr>
+<tr class="row-odd"><td><p>Declaration-only operations fail closed</p></td>
+<td><p>met</p></td>
+</tr>
+<tr class="row-even"><td><p>Legacy explicit, non-operational, and not root-imported</p></td>
+<td><p>met</p></td>
+</tr>
+<tr class="row-odd"><td><p>No ambient loading/path mutation</p></td>
+<td><p>met</p></td>
+</tr>
+<tr class="row-even"><td><p>Installed-wheel and sdist rebuild validation</p></td>
+<td><p>met</p></td>
+</tr>
+<tr class="row-odd"><td><p>API/import/artifact/preservation tests</p></td>
+<td><p>met</p></td>
+</tr>
+<tr class="row-even"><td><p>Package version unchanged</p></td>
+<td><p>met</p></td>
+</tr>
+<tr class="row-odd"><td><p>Phase 1/2 documents unchanged</p></td>
+<td><p>met</p></td>
+</tr>
+<tr class="row-even"><td><p>Draft PR open, auto-merge disabled, checks passing</p></td>
+<td><p>met</p></td>
+</tr>
+<tr class="row-odd"><td><p>Phase 4/remediation not started</p></td>
+<td><p>met</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="deferred-work-and-phase-4-prerequisites">
+<h2>Deferred work and Phase 4 prerequisites<a class="headerlink" href="#deferred-work-and-phase-4-prerequisites" title="Link to this heading">¶</a></h2>
+<p>Deferred work includes the normative envelope constants/constructions,
+cryptographic implementation, provider packages and conformance, policy
+evaluation, streaming/atomic services, lifecycle operations, legacy adapters,
+migration, stable CLI, cross-language vectors, and all assurance/remediation
+gates assigned to later phases.</p>
+<p>Phase 4 may begin only under separate authorization and after its design
+prerequisites are satisfied. A fresh successful independent Deep Security Scan
+remains mandatory before Phase 4 completion and stable release. This task stops
+at the Phase 3 skeleton.</p>
+</section>
+<section id="rollback">
+<h2>Rollback<a class="headerlink" href="#rollback" title="Link to this heading">¶</a></h2>
+<p>Create a recovery branch at
+<code class="docutils literal notranslate"><span class="pre">def6fe31329ada2b112b09fff3f31ff1965a3ffb</span></code>, or revert Phase 3 commits in reverse
+order. The pre-migration hashes and artifact inventory are in commit <code class="docutils literal notranslate"><span class="pre">e3feafb</span></code>.
+No public tag was created.</p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, Mojtaba Zaferanloo
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Phase 3 canonical package migration</a><ul>
+<li><a class="reference internal" href="#outcome">Outcome</a></li>
+<li><a class="reference internal" href="#scope-and-explicit-non-operational-status">Scope and explicit non-operational status</a></li>
+<li><a class="reference internal" href="#cli-and-entry-point-decision">CLI and entry-point decision</a></li>
+<li><a class="reference internal" href="#artifact-comparison">Artifact comparison</a></li>
+<li><a class="reference internal" href="#deleted-and-excluded-content">Deleted and excluded content</a></li>
+<li><a class="reference internal" href="#validation">Validation</a></li>
+<li><a class="reference internal" href="#documentation-preservation">Documentation preservation</a></li>
+<li><a class="reference internal" href="#assurance-status">Assurance status</a></li>
+<li><a class="reference internal" href="#definition-of-done">Definition of Done</a></li>
+<li><a class="reference internal" href="#deferred-work-and-phase-4-prerequisites">Deferred work and Phase 4 prerequisites</a></li>
+<li><a class="reference internal" href="#rollback">Rollback</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=acc74ff5"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
+</html>
