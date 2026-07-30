@@ -11,6 +11,8 @@ from conftest import REPO_ROOT, BuiltArtifacts
 
 RUNTIME_FILES = {
     "cryptography_suite/__init__.py",
+    "cryptography_suite/_internal/__init__.py",
+    "cryptography_suite/_internal/filesystem.py",
     "cryptography_suite/audit/__init__.py",
     "cryptography_suite/audit/events.py",
     "cryptography_suite/context.py",
@@ -27,6 +29,7 @@ RUNTIME_FILES = {
     "cryptography_suite/providers/models.py",
     "cryptography_suite/py.typed",
     "cryptography_suite/streaming/__init__.py",
+    "cryptography_suite/streaming/atomic.py",
     "cryptography_suite/streaming/sinks.py",
 }
 
@@ -129,14 +132,17 @@ def test_wheel_metadata_has_no_entry_points(
 
     assert metadata["Name"] == "cryptography-suite"
     assert metadata["Version"] == "3.0.0"
+    assert metadata["Summary"] == (
+        "An incomplete v4 development skeleton with no operational cryptography."
+    )
     assert metadata["Requires-Python"] == ">=3.10"
     assert set(metadata.get_all("Provides-Extra", [])) == EXPECTED_EXTRAS
     assert set(metadata.get_all("Provides-Extra", [])).isdisjoint(REMOVED_EXTRAS)
 
     payload = metadata.get_payload()
     assert isinstance(payload, str)
-    description = payload.lower()
-    assert "declaration-only v4 development skeleton" in description
+    description = " ".join(payload.lower().split())
+    assert "incomplete v4 development skeleton" in description
     assert "no operational encryption or decryption" in description
     for obsolete_advertisement in (
         "cryptography_suite.cli",

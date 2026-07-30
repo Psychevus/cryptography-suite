@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "cryptography-suite"
 dynamic = ["version"]
-description = "A declaration-only v4 development skeleton with no operational cryptography."
+description = "An incomplete v4 development skeleton with no operational cryptography."
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}

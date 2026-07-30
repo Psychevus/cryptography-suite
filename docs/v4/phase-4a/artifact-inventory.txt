@@ -1,0 +1,103 @@
+PHASE 4A ARTIFACT INVENTORY
+============================
+
+Base SHA:
+fc50585b280dd9bb76c7671f1932a6d80bc4f06e
+
+Implementation SHA before evidence commit:
+3c51950fb090475229f1206e685aaa59a9fe50a9
+
+Package version:
+3.0.0
+
+Wheel:
+name=cryptography_suite-3.0.0-py3-none-any.whl
+file_count=26
+runtime_file_count=21
+bytes=31578
+sha256=7a0e6d78e853ff9c433642909220e276567e92f0a3bc78f6778ec74c22be28a8
+
+Source distribution:
+name=cryptography_suite-3.0.0.tar.gz
+file_count=33
+runtime_file_count=21
+bytes=28451
+sha256=dfbb60b340033babcc551e3e805bf502c1c6e7d28da79a4a41b7b0f1ab79e983
+
+Exact runtime inventory:
+cryptography_suite/__init__.py
+cryptography_suite/_internal/__init__.py
+cryptography_suite/_internal/filesystem.py
+cryptography_suite/audit/__init__.py
+cryptography_suite/audit/events.py
+cryptography_suite/context.py
+cryptography_suite/envelope/__init__.py
+cryptography_suite/envelope/models.py
+cryptography_suite/errors.py
+cryptography_suite/legacy/__init__.py
+cryptography_suite/lifecycle/__init__.py
+cryptography_suite/lifecycle/models.py
+cryptography_suite/policy.py
+cryptography_suite/protector.py
+cryptography_suite/providers/__init__.py
+cryptography_suite/providers/base.py
+cryptography_suite/providers/models.py
+cryptography_suite/py.typed
+cryptography_suite/streaming/__init__.py
+cryptography_suite/streaming/atomic.py
+cryptography_suite/streaming/sinks.py
+
+Installed-wheel origin:
+C:\Users\Mojta\AppData\Local\Temp\cryptography-suite-phase4a-evidence-20260730-d\venv\Lib\site-packages\cryptography_suite\__init__.py
+
+Installed-wheel result:
+non-editable install from outside checkout=pass
+root API=pass
+private sink direct import=pass
+stage/abort=pass
+stage/commit=pass
+destination hidden before commit=true
+committed bytes=exact
+owned temporary names after completion=none
+pip check=no broken requirements
+sdist rebuilt-wheel runtime inventory=equal, 21 files
+
+Console entry points:
+none
+
+Exact root exports:
+AuthenticationError
+ContextMismatchError
+CryptographySuiteError
+EncryptionContext
+Envelope
+EnvelopeError
+EnvelopeMetadata
+ErrorCode
+KeyProvider
+KeyRef
+MigrationError
+Policy
+PolicyError
+Protector
+ProviderError
+
+Exact public streaming exports:
+SinkState
+TransactionalSink
+
+New approved internal runtime files:
+cryptography_suite/_internal/__init__.py
+cryptography_suite/_internal/filesystem.py
+cryptography_suite/streaming/atomic.py
+
+Prohibited artifact checks:
+tests in wheel=absent
+temporary files=absent
+generated failure fixtures=absent
+platform-private data=absent
+console entry point=absent
+removed runtime families=absent
+runtime allowlist mismatch=none
+sdist unexpected roots=none
+Phase 3 historical documents in artifacts=not packaged and unchanged in repository

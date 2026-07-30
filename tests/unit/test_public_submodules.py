@@ -52,6 +52,14 @@ def test_all_public_submodule_exports_are_exact() -> None:
     assert "KeyRecord" not in suite.__all__
 
 
+def test_atomic_filesystem_sink_remains_private() -> None:
+    for module in (suite, streaming):
+        assert not hasattr(module, "AtomicFileSink")
+        assert not hasattr(module, "AtomicSinkOptions")
+        assert not hasattr(module, "AtomicSinkState")
+        assert not hasattr(module, "CommitOutcome")
+
+
 def test_legacy_namespace_is_declaration_only() -> None:
     assert {member.name: member.value for member in LegacyFormat} == {
         "CSF_V2": "csf-v2",

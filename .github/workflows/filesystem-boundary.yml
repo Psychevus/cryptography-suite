@@ -1,0 +1,78 @@
+name: Filesystem Boundary
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: filesystem-boundary-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  phase-4a:
+    name: Phase 4A (${{ matrix.label }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            label: Linux
+          - os: windows-latest
+            label: Windows
+          - os: macos-latest
+            label: macOS
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: |
+            requirements-dev.txt
+            requirements.txt
+            pyproject.toml
+
+      - name: Install package and validation dependencies
+        run: |
+          python -m pip install --upgrade pip==24.2
+          python -m pip install -r requirements-dev.txt
+          python -m pip install -e .
+
+      - name: Report filesystem capabilities
+        run: >-
+          python -c "import json,tempfile;
+          from pathlib import Path;
+          from dataclasses import asdict;
+          from cryptography_suite.streaming.atomic import AtomicFileSink;
+          root=Path(tempfile.mkdtemp()).absolute();
+          print(json.dumps(asdict(AtomicFileSink.capabilities(root)),indent=2))"
+
+      - name: Validate filesystem contract and artifacts
+        run: >-
+          python -m pytest -ra
+          tests/unit/test_atomic_sink.py
+          tests/unit/test_atomic_failures.py
+          tests/negative/test_atomic_paths.py
+          tests/integration/test_atomic_concurrency.py
+          tests/contract/test_import_boundaries.py
+          tests/contract/test_root_api.py
+          tests/unit/test_public_submodules.py
+          tests/artifact/test_artifact_contract.py
+          tests/integration/test_installed_wheel.py
+
+      - name: Validate package typing and lint boundary
+        run: |
+          python -m mypy src/cryptography_suite
+          python -m ruff check src/cryptography_suite tests
+          python -m ruff format --check src/cryptography_suite tests
