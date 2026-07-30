@@ -7,7 +7,7 @@ import ntpath
 import os
 import secrets
 import stat
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 from typing import Final, Protocol, runtime_checkable
 
@@ -79,7 +79,7 @@ class FilesystemCapabilities:
         )
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, repr=False)
 class FileIdentity:
     volume: int
     file_index: int
@@ -87,7 +87,7 @@ class FileIdentity:
 
 @dataclass(frozen=True)
 class DestinationInfo:
-    identity: FileIdentity
+    identity: FileIdentity = field(repr=False)
     link_count: int
     is_directory: bool
     is_link: bool
@@ -95,18 +95,18 @@ class DestinationInfo:
 
 @dataclass
 class ParentDirectory:
-    path: str
+    path: str = field(repr=False)
     posix_fd: int | None = None
-    windows_handles: tuple[int, ...] = ()
+    windows_handles: tuple[int, ...] = field(default=(), repr=False)
     closed: bool = False
 
 
 @dataclass
 class OwnedTemporary:
-    name: str
-    identity: FileIdentity
+    name: str = field(repr=False)
+    identity: FileIdentity = field(repr=False)
     posix_fd: int | None = None
-    windows_handle: int | None = None
+    windows_handle: int | None = field(default=None, repr=False)
     closed: bool = False
     published: bool = False
 
