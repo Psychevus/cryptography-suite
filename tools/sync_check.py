@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Synchronisation checker for README vs codebase."""
+
 from __future__ import annotations
 
-import re
 from pathlib import Path
 
 import cryptography_suite
@@ -13,10 +13,8 @@ def get_exports() -> list[str]:
 
 
 def get_cli_subcommands() -> list[str]:
-    cli_src = Path("cryptography_suite/cli.py").read_text()
-    # Rough pattern for sub.add_parser("name")
-    pattern = re.compile(r"sub\.add_parser\(\n?\s*\"([^\"]+)\"")
-    return sorted(set(pattern.findall(cli_src)))
+    # Phase 3 intentionally publishes no CLI implementation.
+    return []
 
 
 def get_documented_features() -> list[str]:
@@ -37,7 +35,9 @@ def get_documented_features() -> list[str]:
     return features
 
 
-def check_mismatches(exports: list[str], subcommands: list[str], features: list[str]) -> list[str]:
+def check_mismatches(
+    exports: list[str], subcommands: list[str], features: list[str]
+) -> list[str]:
     lower_exports = [e.lower() for e in exports]
     lower_cmds = [c.lower() for c in subcommands]
     mismatches: list[str] = []

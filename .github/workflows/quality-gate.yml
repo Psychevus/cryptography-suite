@@ -69,17 +69,97 @@ jobs:
         run: python tools/verify_docs_references.py
 
       - name: Security scan (bandit)
-        run: bandit -q -r cryptography_suite -x tests,docs,examples -s B101,B110,B301,B311,B403,B404,B413,B603,B701
+        run: bandit -q -r src/cryptography_suite -x tests,docs -s B101,B110,B301,B311,B403,B404,B413,B603,B701
 
       - name: Dependency vulnerabilities (pip-audit)
         run: pip-audit -r requirements.txt --strict
 
-      - name: Tests with branch coverage report
+      - name: Tests and installed-artifact boundary
         run: |
-          pytest --ignore=tests/generated --cov=cryptography_suite --cov-branch --cov-report=xml --cov-report=term-missing
+          pytest --cov=cryptography_suite --cov-branch --cov-report=xml --cov-report=term-missing
 
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
           path: coverage.xml
+
+  compatibility-py310:
+    name: Python 3.10 compatibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+          cache-dependency-path: |
+            requirements-dev.txt
+            requirements.txt
+            pyproject.toml
+
+      - name: Install package and test dependencies
+        run: |
+          python -m pip install --upgrade pip==24.2
+          pip install -r requirements-dev.txt
+          pip install .
+
+      - name: Validate installed package outside checkout
+        run: |
+          outside="$(mktemp -d)"
+          cd "$outside"
+          python -I - <<'PY'
+          import importlib
+          import pathlib
+
+          import cryptography_suite
+
+          expected_root = [
+              "AuthenticationError",
+              "ContextMismatchError",
+              "CryptographySuiteError",
+              "EncryptionContext",
+              "Envelope",
+              "EnvelopeError",
+              "EnvelopeMetadata",
+              "ErrorCode",
+              "KeyProvider",
+              "KeyRef",
+              "MigrationError",
+              "Policy",
+              "PolicyError",
+              "Protector",
+              "ProviderError",
+          ]
+          assert cryptography_suite.__all__ == expected_root
+          assert pathlib.Path.cwd() not in pathlib.Path(
+              cryptography_suite.__file__
+          ).parents
+
+          for name in (
+              "cryptography_suite.aead",
+              "cryptography_suite.cli",
+              "cryptography_suite.experimental",
+              "cryptography_suite.keystores",
+              "cryptography_suite.labs",
+              "cryptography_suite.providers.fake",
+          ):
+              try:
+                  importlib.import_module(name)
+              except ModuleNotFoundError:
+                  continue
+              raise AssertionError(f"removed module is importable: {name}")
+          PY
+
+      - name: Run Phase 3 tests on Python 3.10
+        run: pytest tests/unit tests/contract tests/negative
+
+      - name: Validate installed dependencies
+        run: python -m pip check

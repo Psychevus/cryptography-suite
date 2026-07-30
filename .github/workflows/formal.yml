@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  export-models:
+  stable-boundary:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -17,8 +17,6 @@ jobs:
       - name: Install package
         run: |
           python -m pip install --upgrade pip
-          pip install . PyYAML
-      - name: Run export
-        run: |
-          cryptography-suite export examples/formal/pipeline.yaml --format proverif > /dev/null
-          cryptography-suite export examples/formal/pipeline.yaml --format tamarin > /dev/null
+          pip install . pytest build
+      - name: Prove formal exporters are absent from stable artifacts
+        run: python -m pytest tests/artifact/test_artifact_contract.py
