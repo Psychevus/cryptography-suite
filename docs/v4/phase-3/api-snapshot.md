@@ -1,7 +1,7 @@
 # Phase 3 public API snapshot
 
 - **Package version:** `3.0.0`
-- **Validated implementation HEAD:** `5211862d6597568e8daf912bbdab5faa4dba5e60`
+- **Validated implementation HEAD:** `0dbb526d2fab9038b3ca70e25371608ffa43c13f`
 - **Operational status:** declaration-only and fail-closed
 - **Snapshot result:** exact match to RFC-0004
 
@@ -123,9 +123,12 @@ abort() -> None
 `AuditEvent` has explicit optional metadata fields only: `component_id`,
 `provider_id`, `key_identifier_hash`, `envelope_identifier_hash`,
 `retry_attempt`, `transition`, `latency_bucket`, and
-`integrity_checkpoint_ref`. It accepts no arbitrary attribute bag. No concrete
-provider, fake provider, filesystem sink, audit sink, or policy evaluator is
-implemented.
+`integrity_checkpoint_ref`. It accepts no arbitrary attribute bag and enforces
+`error_code` as `ErrorCode | None` at runtime, including bounded uncached
+unknown `ErrorCode` members. The audit package implements its UTC and
+reverse-DNS checks locally and depends only on `errors` and the Python standard
+library; it has no provider import edge. No concrete provider, fake provider,
+filesystem sink, audit sink, or policy evaluator is implemented.
 
 ## Public submodule surfaces
 

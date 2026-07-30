@@ -3,7 +3,7 @@
 - **Branch:** `refactor/v4-phase-3-canonical-package`
 - **Base / rollback checkpoint:** `def6fe31329ada2b112b09fff3f31ff1965a3ffb`
 - **Validated implementation HEAD before evidence commit:**
-  `5211862d6597568e8daf912bbdab5faa4dba5e60`
+  `0dbb526d2fab9038b3ca70e25371608ffa43c13f`
 - **Package version:** `3.0.0`
 - **Goal:** one canonical stable source and an exact non-cryptographic v4 API
   skeleton
@@ -60,7 +60,11 @@ metadata, aware-time UTC normalization, bounded provider identifiers, redacted
 error formatting, and explicit `NotImplementedError` failures. Error-code
 pseudo-members are not cached, concrete error classes enforce RFC-0004
 families, envelope recipients require immutable key versions, and the borrowed
-read-only secret protocol exposes no export operation. It implements no
+read-only secret protocol exposes no export operation. Audit events enforce
+`error_code` as `ErrorCode | None` at runtime and reject arbitrary or
+secret-bearing objects. The audit package duplicates its minimal UTC and
+provider-id invariant checks locally so its binding Phase 2 dependency boundary
+remains exactly `audit -> errors` plus the standard library. It implements no
 operational cryptography, provider, policy evaluator, legacy parser, migration,
 rewrap, CLI operation, or filesystem transaction.
 
@@ -86,9 +90,9 @@ unimplemented for its later authorized phase.
 Final artifacts:
 
 - `cryptography_suite-3.0.0-py3-none-any.whl`
-  (`4300c0f0acbbef6d8991a01f877a05fcd97c3786e78bf4d4d67dd9414367a4d3`)
+  (`95af48af3818bc835961bce2a35400edb9fc1025c0c3acf4b9ee67ae3d47bf6c`)
 - `cryptography_suite-3.0.0.tar.gz`
-  (`958a74af4556739b39ae3a98526c407a57dc34aa6a92161b23c512e901071749`)
+  (`c1e1896c7c1c23674be212a53de6d527d9a0e0ece0f42e307a40796fcfa11c0e`)
 
 The wheel contains only the approved Python modules, `py.typed`, distribution
 metadata, and license. The sdist adds only required packaging files, canonical
@@ -125,9 +129,9 @@ legacy namespace contains declarations only and is not root-imported.
 | AST dependency graph | pass |
 | No path mutation/dynamic source/CWD/provider discovery in runtime | pass |
 | Fail-closed skeleton/no side effects | pass |
-| Local full pytest suite (CPython 3.13) | 45 passed; 90% branch coverage |
-| GitHub full pytest suite (CPython 3.11) | 45 passed; 90% branch coverage |
-| GitHub unit/contract/negative suite (CPython 3.10.20) | 39 passed |
+| Local full pytest suite (CPython 3.13) | 48 passed; 89% branch coverage |
+| GitHub full pytest suite (CPython 3.11) | 48 passed; 89% branch coverage |
+| GitHub unit/contract/negative suite (CPython 3.10.20) | 42 passed |
 | Changed-file Ruff lint/format | pass |
 | Changed-file Black | pass |
 | Strict mypy on canonical source and Phase 3 tests | pass; 28 files |
@@ -150,14 +154,14 @@ Narrow workflow changes:
   installed-artifact suite.
 - Quality Gate retains its Python 3.11 checks and adds a required CPython 3.10
   compatibility job with a full-history checkout, non-editable installation,
-  isolated outside-checkout import, exact root/removed-module checks, 39
+  isolated outside-checkout import, exact root/removed-module checks, 42
   unit/contract/negative tests, and `pip check`.
 - Formal Model now proves formal exporters are absent from stable artifacts
   because those exporters moved outside the stable boundary.
 - The obsolete primitive fuzz schedule now runs stable fail-closed/import
   negative checks; cryptographic fuzzing is deferred until cryptography exists.
 
-At implementation HEAD `5211862d6597568e8daf912bbdab5faa4dba5e60`,
+At implementation HEAD `0dbb526d2fab9038b3ca70e25371608ffa43c13f`,
 Build, Formal Model, Quality Gate, and Reproducible Build all concluded
 `success`. No existing failure is suppressed.
 

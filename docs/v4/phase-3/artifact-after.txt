@@ -1,11 +1,11 @@
 phase3_base_sha=def6fe31329ada2b112b09fff3f31ff1965a3ffb
-validated_implementation_head=5211862d6597568e8daf912bbdab5faa4dba5e60
+validated_implementation_head=0dbb526d2fab9038b3ca70e25371608ffa43c13f
 package_version=3.0.0
-local_full_test_count=45
-github_python311_full_test_count=45
-github_python310_compatibility_test_count=39
+local_full_test_count=48
+github_python311_full_test_count=48
+github_python310_compatibility_test_count=42
 wheel_filename=cryptography_suite-3.0.0-py3-none-any.whl
-wheel_sha256=4300c0f0acbbef6d8991a01f877a05fcd97c3786e78bf4d4d67dd9414367a4d3
+wheel_sha256=95af48af3818bc835961bce2a35400edb9fc1025c0c3acf4b9ee67ae3d47bf6c
 wheel_entry_count=23
 [wheel]
 cryptography_suite-3.0.0.dist-info/METADATA
@@ -32,7 +32,7 @@ cryptography_suite/py.typed
 cryptography_suite/streaming/__init__.py
 cryptography_suite/streaming/sinks.py
 sdist_filename=cryptography_suite-3.0.0.tar.gz
-sdist_sha256=958a74af4556739b39ae3a98526c407a57dc34aa6a92161b23c512e901071749
+sdist_sha256=c1e1896c7c1c23674be212a53de6d527d9a0e0ece0f42e307a40796fcfa11c0e
 sdist_entry_count=40
 [sdist]
 cryptography_suite-3.0.0

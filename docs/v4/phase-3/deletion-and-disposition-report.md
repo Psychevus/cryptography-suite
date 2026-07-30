@@ -1,7 +1,7 @@
 # Phase 3 deletion and disposition report
 
 - **Rollback checkpoint:** `def6fe31329ada2b112b09fff3f31ff1965a3ffb`
-- **Validated implementation HEAD:** `5211862d6597568e8daf912bbdab5faa4dba5e60`
+- **Validated implementation HEAD:** `0dbb526d2fab9038b3ca70e25371608ffa43c13f`
 - **Pre-deletion evidence commit:** `e3feafb`
 - **Destructive checkpoint commit:** `23caa01`
 - **Result:** stable runtime and artifacts contain only the approved skeleton
@@ -64,7 +64,7 @@ remain.
 Ninety-two old Python tests and `tests/README.md` were retired because their
 subjects were removed v3 primitives, providers, labs features, CLI commands,
 duplicate packages, or compatibility behavior rejected by Phase 2. They were
-replaced by 45 focused tests covering:
+replaced by 48 focused tests covering:
 
 - immutable models and redacted errors;
 - bounded unknown error codes and concrete exception families;
@@ -72,6 +72,10 @@ replaced by 45 focused tests covering:
   contract;
 - provider identifier grammar and aware-time UTC normalization;
 - secret-free allowlisted audit events;
+- runtime-only `ErrorCode | None` audit error codes and rejection of arbitrary
+  strings, numbers, mappings, and secret-bearing exceptions;
+- the immutable Phase 2 `audit -> errors` dependency boundary with no provider
+  import edge;
 - immutable recipient versions and allocation-safe context limits;
 - exact public submodule, legacy, and lifecycle contracts;
 - exact root exports and signatures;
@@ -85,8 +89,8 @@ replaced by 45 focused tests covering:
 - unsupported trust-claim text; and
 - Phase 1/2 Git-blob preservation.
 
-The local full suite passes 45 tests on CPython 3.13. GitHub separately passes
-45 full-suite tests on CPython 3.11 and 39 unit/contract/negative compatibility
+The local full suite passes 48 tests on CPython 3.13. GitHub separately passes
+48 full-suite tests on CPython 3.11 and 42 unit/contract/negative compatibility
 tests on CPython 3.10.
 
 ## Deletion proof

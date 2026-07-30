@@ -1,7 +1,7 @@
 # Phase 3 import-boundary evidence
 
 - **Base / rollback checkpoint:** `def6fe31329ada2b112b09fff3f31ff1965a3ffb`
-- **Validated implementation HEAD:** `5211862d6597568e8daf912bbdab5faa4dba5e60`
+- **Validated implementation HEAD:** `0dbb526d2fab9038b3ca70e25371608ffa43c13f`
 - **Validated package version:** `3.0.0`
 - **Canonical runtime source:** `src/cryptography_suite/`
 - **Result:** pass
@@ -49,6 +49,9 @@ The focused tests prove:
   experimental modules, and a fake provider, cannot be imported from the
   installed wheel;
 - the AST import graph matches the Phase 2 module-layer allowlist;
+- `cryptography_suite.audit` has the exact allowed dependency set `{"errors"}`;
+  a focused AST regression rejects relative or absolute provider imports from
+  every audit module;
 - only the canonical `src/cryptography_suite/__init__.py` is tracked as a
   runtime package identity; and
 - provider selection and provider SDK packages are absent.
@@ -89,9 +92,9 @@ No active stable-runtime result remains.
 - Entry points: none
 - `pip check`: pass
 - Wheel rebuilt from sdist: identical entry inventory
-- Local full suite on CPython 3.13: 45 passed
-- GitHub Quality Gate full suite on CPython 3.11: 45 passed
-- GitHub compatibility suite on CPython 3.10: 39 passed
+- Local full suite on CPython 3.13: 48 passed
+- GitHub Quality Gate full suite on CPython 3.11: 48 passed
+- GitHub compatibility suite on CPython 3.10: 42 passed
 
 The CPython 3.10 job installs the package non-editably, imports it from outside
 the checkout, checks the exact root API and removed-module failures, runs the
